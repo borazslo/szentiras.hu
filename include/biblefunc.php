@@ -294,7 +294,7 @@ function advsearchbible($db, $texttosearch, $reftrans, $offset, $rows) {
       //$rs1 = $db->execute("select count(*) as cnt from tdverse where verse regexp '" . $texttosearch . "' and reftrans=$reftrans");
 	  
 	  $words = explode(' ',$texttosearch);
-	  $where = '';
+	  $where = ''; $query = '';
 	  foreach($words as $k=>$word) {
 		$query .= "verse regexp '".$word."' ";
 		if($k < (count($words)-1)) $query .= ' AND ';
@@ -464,7 +464,7 @@ function displayoptionlist($name,$size,$rs,$valuefield,$listfield,$default,$comm
        $i++;
     } while ((!$rs->EOF));
   }
-  $rs->close;
+  if(isset($rs->close)) $rs->close();
   echo "</select><br>\n";
 }
 

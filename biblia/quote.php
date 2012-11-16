@@ -15,6 +15,8 @@ function print_quotetion($args) {
 	global $verses;
 	global $error;
 	global $query;
+	
+	$return = false;
 		
 	if(in_array('title',$args)) $return .= "<p class='cim'>Idézet a szentírásból: $query<p>";
 	if(in_array('form',$args)) $return .= print_form();
@@ -237,7 +239,8 @@ function print_verses($verses) {
 	$user="root";
 	$password="Felpecz";
 	$database="bible";
-	
+
+	if($_SERVER['HTTP_HOST'] == 'localhost') $password = '';
 	$db_link = mysql_connect('localhost:3306',$user,$password) or die ("Can't connect to mysql");
 	
 	//mysql_set_charset('utf8');

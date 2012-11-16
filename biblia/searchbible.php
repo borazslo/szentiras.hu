@@ -1,14 +1,16 @@
 <?php
 
-  require("design.php");
-  require("biblemenu.php");
-  require("bibleconf.php");
-  require("biblefunc.php");
+  require("../include/design.php");
+  require("../include/biblemenu.php");
+  require("../include/bibleconf.php");
+  require("../include/biblefunc.php");
 
   portalhead("Keresés eredményei");
   bibleleftmenu();
 
-  if (!(empty($texttosearch) or empty($reftrans))) {
+  if (isset($_REQUEST['texttosearch']) AND isset($_REQUEST['reftrans'])) {
+	$texttosearch = $_REQUEST['texttosearch'];
+	$reftrans = $_REQUEST['reftrans'];
 
    $script = explode("?",$_SERVER['REQUEST_URI']);
    if (empty($offset)) {$offset = 0;}
@@ -125,6 +127,7 @@
 	function get_less($texttosearch, $reftrans, $results) {
 		if(!is_numeric($results)) $results = 0;
 	
+		$return = false;
 		global $baseurl;
 		$words = explode(' ',$texttosearch);
 		if(count($words)>1) {
