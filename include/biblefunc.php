@@ -288,7 +288,7 @@ function shownextprev ($db, $reftrans, $abbook, $numch) {
    echo "</tr></table><br>";
 }
 
-function advsearchbible($db, $texttosearch, $reftrans, $offset, $rows) {
+function advsearchbible($db, $texttosearch, $reftrans, $offset = 0, $rows = 50) {
 
       #$rs1 = $db->execute("select count(*) as cnt from tdverse where MATCH (verse) AGAINST ('" . $texttosearch . "') and reftrans=$reftrans");
       //$rs1 = $db->execute("select count(*) as cnt from tdverse where verse regexp '" . $texttosearch . "' and reftrans=$reftrans");
