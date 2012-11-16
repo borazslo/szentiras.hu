@@ -1,4 +1,5 @@
 <?php
+session_start();
 
   require("../include/design.php");
   require("../include/biblemenu.php");
@@ -31,12 +32,10 @@
 	$_GET['quotation'] = $texttosearch;
 	include 'quote.php';
 	
-	$better = get_better($texttosearch,$reftrans,$res2);
-		if($better) echo "<span class='hiba'>TIPP:</span> <a href='".$baseurl."searchbible.php?texttosearch=".$texttosearch."&reftrans=".$better."' class=link>Egy másik fordításban több eredmény vár! >>KLIKK<<</a>";
+	$tipps = get_tipps($texttosearch,$reftrans,$res2);	
 	
-	$less = get_less($texttosearch,$reftrans,$res2);
-		if($less) echo "<span class='hiba'>TIPP:</span> ".$less;
-		
+	
+	
     if ($res2 > 0) {
         $begin=$res3+1;
         if ($begin + $res4 > $res2 ) {
@@ -44,17 +43,17 @@
         } else {
            $end = $begin + $res4 -1;
         }
+		if($begin == 1) insert_stat($texttosearch,$reftrans,$res2);		
+	
+		foreach($tipps as $tipp)
+			echo "<span class='hiba'>TIPP:</span> ".$tipp."<br>\n";
 		
-		if($res2 > 20) {
-			$detail = get_more($texttosearch,$reftrans,$res2);
-			if($detail) echo "<span class='hiba'>TIPP:</span> ".$detail;
-		}	
 		
         echo "<p class='kiscim'> $begin - $end. találat az összesen $res2-bõl.</p>";
         showverses($res1,"showchapter.php",$reftrans);
         showversesnextprev($script[0]."?texttosearch=$texttosearch&reftrans=$reftrans", $res2, $res3, $res4,"&");
-		if($begin == 1) insert_stat($texttosearch,$reftrans,$res2);
-		//db_query("INSERT INTO stats_texttosearch VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$res2.");");
+		
+		
     } else {
 			
 		
@@ -92,12 +91,33 @@
   portalfoot();
 
   function insert_stat($texttosearch, $reftrans, $results) {
-	db_query("INSERT INTO stats_texttosearch VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.");");
+	global $tipps;
+	$tipp = strip_tags(implode('\n',$tipps));
+	
+	db_query("INSERT INTO stats_texttosearch VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."');");
 	$result = db_query("SELECT * FROM stats_search WHERE texttosearch = '".$texttosearch."' AND reftrans = ".$reftrans." ORDER BY texttosearch, count DESC LIMIT 0,1",1);
 	if(is_array($result))
 		db_query("UPDATE stats_search SET count = ".($result[0]['count']+1)." WHERE texttosearch = '".$texttosearch."' AND reftrans = ".$reftrans.";",1);
 	else
 		db_query("INSERT INTO stats_search VALUES ('".$texttosearch."',".$reftrans.",".$results.",1);");
+  }
+  function get_tipps($texttosearch, $reftrans, $results) {
+	global $tipp;
+	$return = array();
+	$better = get_better($texttosearch,$reftrans,$results);
+	if($better) {
+			$return[] = "<a href='".$baseurl."searchbible.php?texttosearch=".$texttosearch."&reftrans=".$better."' class=link>Egy másik fordításban több eredmény vár! >>KLIKK<<</a>";
+			
+	}
+	$less = get_less($texttosearch,$reftrans,$results);
+	if($less) {
+			$return[] = $less;
+	}
+	if($results > 20) {
+			$detail = get_more($texttosearch,$reftrans,$results);
+			if($detail) $return[] = $detail;
+	}
+	return $return;
   }
   
   function get_better($texttosearch, $reftrans, $results) {
