@@ -49,7 +49,10 @@ session_start();
 	/*
 	 * HA SZÖVEGET KERES
 	 */
+		
 		list($res1, $res2, $res3, $res4)=advsearchbible($db,$texttosearch,$reftrans,$offset,$rows);
+		
+		$tipps = get_tipps($texttosearch,$reftrans,$res2);	
 		//db_query("SELECT * FROM searcgstats WHERE");
 	
 		//HA EGY SZÓBÓL ÁLL
@@ -129,12 +132,12 @@ session_start();
 			$return[] = "<a href='".$baseurl."searchbible.php?texttosearch=".$texttosearch."&reftrans=".$bet['reftrans']."' class=link>A ".$trans[$bet['reftrans']]['name']." fordításában több eredmény vár (".$bet['results']." találat)! </a>";
 			}		
 	}
-	
+	/*
 	$jsonurl = "http://szolgaltatas.jezsu.hu:8083/tmp/hunspell/json.php?text=".$texttosearch;
 	$json = file_get_contents($jsonurl,0,null,null);
 	$json_output = json_decode($json);
 	print_R($json_output);
-
+	*/
 	
 	
 	}
