@@ -6,7 +6,10 @@ ini_set('error_reporting', E_ALL);
 if(array_key_exists('quotation',$_GET)) $code = $_GET['quotation']; else $code = ""; //"1Kor 7, 25-28. 30; 2, 12";
 if(array_key_exists('reftrans',$_GET)) $trans = $_GET['reftrans']; else $trans = 1;
 
+if(mb_detect_encoding($code,'UTF-8, ISO-8859-2') == 'ISO-8859-2') $code = iconv("ISO-8859-2",'UTF-8',$code);
+
 $query = $code;
+
 
 $verses = array();
 
@@ -17,7 +20,9 @@ function print_quotetion($args) {
 	global $query;
 	
 	$return = false;
-		
+	
+	if(!is_array($args)) $args = array($args);
+	
 	if(in_array('title',$args)) $return .= "<p class='cim'>Idézet a szentírásból: $query<p>";
 	if(in_array('form',$args)) $return .= print_form();
 
@@ -104,13 +109,54 @@ function quotetion($arg1 = '',$arg2 = '',$arg3 = '',$arg4 = '',$arg5 = '',$arg6 
 	
 	if($match[0]=='') $error[] = "There is no book...";
 	else {
-	$books = db_query("SELECT * FROM tdbook WHERE reftrans = $trans AND abbrev = '".$match[0]."' LIMIT 0,1");
-	
+	$mysqlquery = "SELECT * FROM tdbook WHERE reftrans = $trans AND abbrev = '".iconv('UTF-8','ISO-8859-2',$match[0])."' LIMIT 0,1";
+	$books = db_query($mysqlquery);
 	if(!is_array($books)) { 
 		$tmp = preg_replace('/([\d]{1})(.*)/','$1 $2',$match[0]);
-		$books = db_query("SELECT * FROM tdbook WHERE reftrans = $trans AND abbrev = '".$tmp."' LIMIT 0,1");
+		$books = db_query("SELECT * FROM tdbook WHERE reftrans = $trans AND abbrev = '".iconv('UTF-8','ISO-8859-2',$tmp)."' LIMIT 0,1");
 	}
-	if(!is_array($books)) {  $error[] = "Wrong abbrevation of the book";  }
+	if(!is_array($books)) {  $error[] = "Wrong abbrevation of the book";  
+		global $tipps;
+		
+		$select = "SELECT * FROM szinonimak WHERE tipus = 'konyv' AND (binary szinonimak LIKE '%|".preg_replace('/ /','',iconv('UTF-8','ISO-8859-2',$tmp))."|%' OR binary  szinonimak LIKE  '%|".preg_replace('/ /','',iconv('UTF-8','ISO-8859-2',$tmp)).":%');";
+		$result = db_query($select); $szinonima = array();
+		global $baseurl;
+		if(is_array($result)) foreach($result as $r) {
+			$szin = explode('|',$r['szinonimak']);
+			foreach($szin as $sz) {
+				$s = explode(':',$sz);
+				if($s[0] != '' AND $s[0] != $tmp AND !in_array($s[0],$szinonima) ) {
+					global $reftrans;
+					if(isset($s[1]) AND $s[1] == $reftrans) {
+						$szinonima[] = $s[0];
+					}
+				}
+			}
+		}
+		if($szinonima != array()){
+		$return = iconv("UTF-8",'ISO-8859-2',"Próbáld meg így: ");
+		$c = 1;
+		foreach($szinonima as $szin) {
+			//$szin amiben nincs szóköz
+			//$tmp amiben van
+			//$query amiben vagy van, vagy nincs
+			$szin1 = preg_replace('/([1-4]{1})[ ]{0,1}(.*)/','$1 $2',$szin);
+			$tmp1 = preg_replace('/([1-4]{1})[ ]{0,1}(.*)/','$1 $2',$tmp);
+			$query1 = preg_replace('/(^[1-4]{1})[ ]{0,1}(.*)/','$1 $2',$query);
+			$new = preg_replace('/'.$tmp1.'/',$szin1,$query1);
+			//echo $new."::".$tmp1."||".$szin1."||".$query1;
+			
+			
+			$return .= " <a href='".$baseurl."searchbible.php?texttosearch=".$new."&reftrans=".$reftrans."' class=link>".$new."</a>";		
+			if($c<count($szinonima)) $return .= ',';
+			$c++;
+		}
+		$return .= '!';
+		
+		//$tipps[] = iconv("UTF-8",'ISO-8859-2',$return);
+		$tipps[] = $return;
+		}
+	}
 	else { $book = $books[0]['did'];
 	$code = preg_replace('/^(\d){0,1}([^;\.\-\,0-9]*)/','',$code);
 	
@@ -152,6 +198,7 @@ function quotetion($arg1 = '',$arg2 = '',$arg3 = '',$arg4 = '',$arg5 = '',$arg6 
 	
 	if(in_array('html',$args)) return print_quotetion($args);	
 	elseif(in_array('json',$args)) return json_encode(array('verses'=>$verses,'errors'=>$errors,'query'=>$query));
+	elseif(in_array('array',$args)) return array('verses'=>$verses,'error'=>$error);
 }
 
 function add_verses($code,$start = false) {

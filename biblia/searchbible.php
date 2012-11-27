@@ -87,9 +87,11 @@ session_start();
 	/*
 	 * HA IGEHELYET KERES
 	 */
-						
-		//foreach($tipps as $tipp) echo "<span class='hiba'>TIPP:</span> ".$tipp."<br>\n";
-		echo "<br>".quotetion('verses')."<br>";
+				
+		$quotation = quotetion('verses','array');
+		foreach($tipps as $tipp) echo "<span class='hiba'>TIPP:</span> ".$tipp."<br>\n";
+		
+		echo "<br>".print_quotetion('verses')."<br>";
 		
 		if($error == array()) {
 			insert_stat($texttosearch,$reftrans,0);
@@ -164,7 +166,7 @@ session_start();
 		}
 	}
 	/* saját adatbázisból */
-	$query = "SELECT * FROM szinonimak WHERE szinonimak LIKE '%|".$texttosearch."|%' OR szinonimak LIKE  '%|".$texttosearch.":%';";
+	$query = "SELECT * FROM szinonimak WHERE tipus = 'szo' AND (szinonimak LIKE '%|".$texttosearch."|%' OR szinonimak LIKE  '%|".$texttosearch.":%');";
 	$result = db_query($query);
 	if(is_array($result)) foreach($result as $r) {
 		$szin = explode('|',$r['szinonimak']);
