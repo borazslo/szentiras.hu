@@ -14,13 +14,16 @@ session_start();
   require("../include/biblemenu.php");
   require("../include/bibleconf.php");
   require("../include/biblefunc.php");
+  
+  require("JSON.php"); /* PHP 5.2 >= esetén */
 
   portalhead("Keresés eredményei");
   bibleleftmenu();
 
   
-  printSearchForm();  
-  if(!isset($_REQUEST['texttosearch']) OR $_REQUEST['texttosearch'] == '') { portalfoot(); exit; }
+  
+  if(!isset($_REQUEST['texttosearch']) OR $_REQUEST['texttosearch'] == '') {  printSearchForm();  portalfoot(); exit; }
+  
   
   
   if(mb_detect_encoding($_REQUEST['texttosearch'],'UTF-8, ISO-8859-2') == 'UTF-8') $texttosearch = iconv('UTF-8',"ISO-8859-2",$_REQUEST['texttosearch']);
@@ -141,10 +144,12 @@ session_start();
   
   function getSzinonima($texttosearch,$max = 2) {
 	$szinonima = array();
+	/* opendir szinoníma szótárból */
 	$url = "http://opendir.hu/szinonima-szotar/api.php?t=json&q=".iconv("ISO-8859-2",'UTF-8',$texttosearch);
 	$file = file_get_contents($url,0,null,null);
 	if($file != iconv("ISO-8859-2",'UTF-8','Nincs találat!')) {
 		$json = json_decode($file,true); $c = 1;
+	
 		foreach($json as $k=>$i) {
 			$szo = iconv('UTF-8',"ISO-8859-2",$k);
 			if($szo != $texttosearch) {
@@ -153,6 +158,21 @@ session_start();
 			}
 		}
 	}
+	/* saját adatbázisból */
+	$query = "SELECT * FROM szinonimak WHERE szinonimak LIKE '%|".$texttosearch."|%' OR szinonimak LIKE  '%|".$texttosearch.":%';";
+	$result = db_query($query);
+	if($result) foreach($result as $r) {
+		$szin = explode('|',$r['szinonimak']);
+		foreach($szin as $sz) {
+			$s = explode(':',$sz);
+			if($s[0] != '' AND $s[0] != $texttosearch AND !in_array($s[0],$szinonima) ) {
+				if((isset($s[1]) AND $s[1] != 0) OR !isset($s[1]))
+					$szinonima[] = $s[0];
+				}
+		}
+	}
+	
+	
 	return $szinonima;
   }
   function getSzinonimaTipp($texttosearch) {
