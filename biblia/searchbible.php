@@ -43,6 +43,7 @@ session_start();
     echo "<strong>$texttosearch</strong>";
     echo "; fordítás: ". dlookup($db,"name","tdtrans","did=$reftrans") . " </span><br>\n";
 	
+	/*nem ismeri fel az alrészese izéket a-v*/
 	preg_match('/([1-4]{0,1})(| )([\w]{0,10})(| )([0-9,.;-]{1,20})/',$texttosearch,$matches);
 	if($matches == array()) {
 	/*
@@ -76,7 +77,11 @@ session_start();
 	    echo "<p class='kiscim'> $begin - $end. találat az összesen $res2-bõl.</p>";
         showverses($res1,"showchapter.php",$reftrans);
         showversesnextprev($script[0]."?texttosearch=$texttosearch&reftrans=$reftrans", $res2, $res3, $res4,"&");	
-    }
+    } else {
+	
+		echo "<br>Nincs találat!";
+		insert_stat($texttosearch,$reftrans,-1);
+	}
 	/* END */
 	} else {
 	/*
@@ -161,12 +166,13 @@ session_start();
 	/* saját adatbázisból */
 	$query = "SELECT * FROM szinonimak WHERE szinonimak LIKE '%|".$texttosearch."|%' OR szinonimak LIKE  '%|".$texttosearch.":%';";
 	$result = db_query($query);
-	if($result) foreach($result as $r) {
+	if(is_array($result)) foreach($result as $r) {
 		$szin = explode('|',$r['szinonimak']);
 		foreach($szin as $sz) {
 			$s = explode(':',$sz);
 			if($s[0] != '' AND $s[0] != $texttosearch AND !in_array($s[0],$szinonima) ) {
-				if((isset($s[1]) AND $s[1] != 0) OR !isset($s[1]))
+				global $reftrans;
+				if((isset($s[1]) AND $s[1] != 0) OR !isset($s[1]) OR (isset($s[1]) AND $s[1] == $reftrans ))
 					$szinonima[] = $s[0];
 				}
 		}
