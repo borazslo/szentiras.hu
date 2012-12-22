@@ -248,9 +248,8 @@ function get_verse($book,$chapter,$verse,$trans	= 1,$start = false) {
 	
 	if($verses != 1) { $return['verse'] = $verses[0]['verse']; }
 	else { $error[] = "There is no verse found."; return false;}
-	
 	if($start != false) $return['start'] = true;
-	$return['query'] = array("book"=>$book,"chapter"=>$chapter,"verse"=>$verse,"trans"=>$trans);
+	$return['query'] = array("book"=>$book,"chapter"=>$chapter,"verse"=>$verse,"trans"=>$trans,'abbrev'=>$verses[0]['abbrev']);
 	
 	return $return;
 }

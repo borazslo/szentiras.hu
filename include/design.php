@@ -55,6 +55,7 @@ echo"</head>\n";
 
 echo"<body bgcolor='#FFFFFF' topmargin='0' leftmargin='0' ONLOAD='preloadImages();'>\n";
 
+if($_SERVER['HTTP_HOST'] != 'localhost') {
 echo "<script type=\"text/javascript\">
 
   var _gaq = _gaq || [];
@@ -68,7 +69,7 @@ echo "<script type=\"text/javascript\">
   })();
 
 </script>";
-
+}
 echo"<table border='0' cellpadding='0' cellspacing='0' width='750'>\n";
 echo"  <tr>\n";
 echo"    <td valign='top'>\n";

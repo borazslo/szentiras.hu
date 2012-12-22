@@ -1,18 +1,18 @@
 <?php
 
-  require("design.php");
-  require("biblemenu.php");
-  require("bibleconf.php");
-  require("biblefunc.php");
+  require("../include/design.php");
+  require("../include/biblemenu.php");
+  require("../include/bibleconf.php");
+  require("../include/biblefunc.php");
 
   portalhead("Biblia");
   bibleleftmenu();
 
-  $script = explode("&",$REQUEST_URI);
+  $script = explode("&",$_SERVER['REQUEST_URI']);
 
-  if (!empty($reftrans)) {
+  if (empty($reftrans)) $reftrans = 1;
     showtrans($db, $reftrans, listtrans($db, $reftrans));
-  }
+  
 
   portalfoot();
 

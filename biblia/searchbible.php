@@ -29,6 +29,8 @@ session_start();
   if(mb_detect_encoding($_REQUEST['texttosearch'],'UTF-8, ISO-8859-2') == 'UTF-8') $texttosearch = iconv('UTF-8',"ISO-8859-2",$_REQUEST['texttosearch']);
   else $texttosearch = $_REQUEST['texttosearch'];
 	
+$texttosearch = trim($texttosearch);
+	
   	/* a db_query is ebbenvan */
 	$_GET['quotation'] = $texttosearch;
 	include 'quote.php';
