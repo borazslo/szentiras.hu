@@ -1,0 +1,8 @@
+RewriteEngine on 
+
+#RewriteCond %{REQUEST_FILENAME} !-f 
+#RewriteCond %{REQUEST_FILENAME} !-d 
+
+RewriteCond %{HTTP_HOST} kereszteny.hu$ [NC]
+RewriteRule ^(.*) http://szentiras.hu/$1 [QSA] 
+
