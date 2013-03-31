@@ -4,6 +4,7 @@ $sb="<span class='alap'>";
 $se="</span>";
 
 $translations = db_query('SELECT * FROM tdtrans');
+$books = db_query('SELECT * FROM tdbook');
 
 function listbible($db) {
   $rs = $db->execute("select did, name, denom from tdtrans order by name");
@@ -184,6 +185,7 @@ function showchapter($db, $reftrans, $abbook, $numch, $rs) {
 }
 
 function showbookabbrevlist($db,$reftrans,$abbook) {
+	global $baseurl;
 	$return = false;
    $rs=$db->execute("select * from tdbook where reftrans =" . $reftrans . " order by bookorder");
    if ($rs->GetNumOfRows() > 0) {
@@ -199,7 +201,7 @@ function showbookabbrevlist($db,$reftrans,$abbook) {
             if ($rs->fields["abbrev"]==$abbook) {
                 $return .= "<b>" . $rs->fields["abbrev"] . "</b>";
             } else {
-                $return .= "<a href='index.php?q=showbook&reftrans=" . $reftrans . "&abbook=" . $rs->fields["abbrev"] . "' class='minilink'>" . $rs->fields["abbrev"] . "</a>";
+                $return .= "<a href='".$baseurl."index.php?q=showbook&reftrans=" . $reftrans . "&abbook=" . $rs->fields["abbrev"] . "' class='minilink'>" . $rs->fields["abbrev"] . "</a>";
             }
             $rs->nextRow();
          } while (!$rs->EOF);
@@ -279,7 +281,8 @@ function showintro ($text,$length) {
 }
 
 function showverselinks($text, $reftrans) {
-  return preg_replace("/([0-9]*[a-zA-ZáÁéÉíÍóÓöÖőŐúÚüÜűŰ]+) ([0-9]+),([0-9]+)/","<a href=\"index.php?q=showchapter&reftrans=$reftrans&abbook=$1&numch=$2#$3\" class='link'>$1 $2,$3</a>",$text);
+global $baseurl;
+  return preg_replace("/([0-9]*[a-zA-ZáÁéÉíÍóÓöÖőŐúÚüÜűŰ]+) ([0-9]+),([0-9]+)/","<a href=\"".$baseurl."index.php?q=showchapter&reftrans=$reftrans&abbook=$1&numch=$2#$3\" class='link'>$1 $2,$3</a>",$text);
 }
 
 
@@ -302,7 +305,8 @@ function showhier ($db, $reftrans, $abbook, $numch) {
     return $output;
 }
 
-function shownextprev ($db, $reftrans, $abbook, $numch) {
+function shownextprev ($db, $reftrans, $abbook, $numch) {	
+	global $baseurl;
    $return = false;
    $return .= "<table width='100%'><tr>";
    if ($numch>1) {

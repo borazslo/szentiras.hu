@@ -87,6 +87,7 @@
 
 <div id="wrapper">
 	<div id="headcontainer">
+		<? if($dolgozunk) echo '<div algin="center" style="background-color:red;color:white;text-align:center">Éppen fejlesztünk! Ha furcsa dolgot lát, kérjük frissítse az oldalt, vagy térjen vissza pár perc múlva!</div>'; ?>
 		<header>
 		<!--<?php if(isset($pagetitle)) echo "<h1>".$pagetitle."</h1>"; ?>-->
 		<h1>Szentírás</h1>
@@ -104,7 +105,7 @@
 				<?php if(isset($title)) echo "<h4>".$title."</h4>"; ?>
 				<?php if(isset($content)) echo $content; 
 				
-				echo "<br>".showbookabbrevlist($db,$reftrans,"");
+				echo "<br>".$abbrevlist;
 				?>
 				</div>
 				

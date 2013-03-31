@@ -1,6 +1,6 @@
 <?php
 
-function isquotetion($text) {
+function isquotetion($text,$forcedtrans = false) {
 	/* Ékezetes kis-nagybetű hiábánál false-al tér vissza!*/
 	global $db,$reftrans;
 	
@@ -26,7 +26,10 @@ function isquotetion($text) {
 	if(preg_match($pattern,$text,$matches))  {
 	//echo "<pre>"; print_R($matches);	
 	$book = $matches[1];
-		if(!in_array($book,$books[$reftrans])) {
+		if($forcedtrans != false AND in_array($book,$books[(int) $forcedtrans])) {
+			$reftrans = $forcedtrans;
+		}
+		elseif(!in_array($book,$books[$reftrans])) {
 			for($i=5;$i>0;$i--) {
 				if(is_array($books[$i]) AND $i != $reftrans AND in_array($book,$books[$i])) {
 					$reftrans = $i;
@@ -149,6 +152,8 @@ function isquotetion($text) {
 		
 		
 		}
+		//echo $forcedtrans."+".$reftrans."+".$quote['reftrans'];
+		if($forcedtrans != NULL AND $forcedtrans != $quote['reftrans']) return FALSE;
 		return $quote;
 	} 
 	return FALSE; 

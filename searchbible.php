@@ -271,13 +271,13 @@ if($texttosearch == '') {
 	}
 
 	function printSearchForm() {
-		global $db;
+		global $db, $reftrans;
 		$return = "<p class='cim'>Keresés a Bibliában</p>";
 		$return .= "<form action='index.php' method='get'>\n";
 		$return .= "<input type='hidden' name='q' value='searchbible'>\n";
 		$return .= displaytextfield("texttosearch",30,80,"","Keresendő:","alap");
 		
-		$return .= displayoptionlist("reftrans",1,listbible($db),"did","name","1","Fordítás:","alap");
+		$return .= displayoptionlist("reftrans",1,listbible($db),"did","name",$reftrans,"Fordítás:","alap");
 		$return .= '<br><br>';
 		//$return .= "<input type=reset value='Törlés' class='alap'> &nbsp;&nbsp;\n";
 		$return .= "<input type=submit value='Küldés' class='alap'>\n";

@@ -47,17 +47,44 @@ background-color: rgba(0,0,0,0.1);">
 
 EOD;
 
+$return = array() ;
+$errors = array();
+if(isset($_REQUEST['forditas'])) {
+	foreach($translations as $tdtrans) {
+			if($tdtrans['abbrev'] == $_REQUEST['forditas']) {
+				$forcedtrans = $tdtrans['did']; 
+				break;
+			}
+		}
+	if(!isset($forcedtrans)) {
+		header('Content-type: application/json');
+		require_once("JSON.php");
+		$errors[] = 'Nem létező fordítás';
+		echo json_encode(array('error'=>$errors));
+		exit;
+	}
+}
+
  
  if($api!='') { 
 	header('Content-type: application/json');
 	require_once("JSON.php");
 	/*xml*/
-	$code = isquotetion($api);
+	$code = isquotetion($api,$forcedtrans);
 	global $tipps;
 	$tipps[] = 'API';
-	echo quotetion(array('verses','json',"code"=>$code));
-	if(!isset($code['tag'])) insert_stat($api,$code['reftrans'],-1);
-	else insert_stat($api,$code['reftrans'],0);
+	if(is_array($code)) {
+		$return = array_merge($return,quotetion(array('verses','array',"code"=>$code)));
+		$return['error'] = array_merge($errors,$return['error']);
+		$reftrans = $code['reftrans'];
+	} else {
+		$errors[] = 'Nincs megfelelő vers';
+		$return['error'] = $errors;
+		if(isset($forcedtrans)) $reftrans = $forcedtrans; else $reftrans = -1;
+	}
+	echo json_encode($return);
+	if(!isset($code['tag'])) insert_stat($api,$reftrans,-1);
+	else insert_stat($api,$reftrans,0);
 	
 	exit;
 }
