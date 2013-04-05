@@ -72,6 +72,12 @@ function isquotetion($text,$forcedtrans = false) {
 	}
 	if(isset($return)) {
 		//echo "<pre>";
+		$pattern = "/^(".implode("|",$abbrevs).")(.*?)[a-f]{1}(.*?)/";
+		//echo "<br>".$text;
+		$text = preg_replace($pattern,'$1$2$3',$text);
+		//echo "->".$text;
+		//echo "<==".$pattern;
+		
 		$pattern = "/^(".implode("|",$abbrevs).")([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1}(;([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1})*$/i";
 		preg_match($pattern,$text,$matches);
 		
@@ -406,7 +412,29 @@ function print_errors($error) {
 	return $return;
 }
 
+function replace_hivatkozas($m) {
+	global $books, $reftrans;
+	foreach($books as $book) if($book['reftrans'] ==  $reftrans) $abbrevs[] = $book['abbrev'];	
+	$verses = preg_replace('/ /','',$m[1]);
+	$pattern = "/(".implode("|",$abbrevs).")([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1}(;([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1})*/i";
+	$verses = preg_replace_callback($pattern,"replace_hivatkozas2link",$verses);
+	return $verses;
+}
+function replace_hivatkozas2link($m) {
+	global $baseurl,$translations;
+	$return = '';
+	$quote = isquotetion($m[0]);
+	print_R($quore);
+	if(is_array($quote)) {
+		$return = "<a href='".$baseurl.$translations[$quote['reftrans']]['abbrev']."/".$quote['code']."' class='hivatkozas' style='/*font-size: 21px;*/color: #6274B5;'>[".$quote['code']."]</a>";
+	} else $return = $m[0];
+	return $return;
+
+}
+
 function print_verses($verses) {
+	global $reftrans;
+	
 
 	$return = "<span class='alap'>"; 
 	foreach($verses as $k=>$verse) {
@@ -414,7 +442,10 @@ function print_verses($verses) {
 		
 			$verse['verse'] = preg_replace('/ "/',' „',$verse['verse']);
 			$verse['verse'] = preg_replace('/"( |,|\.|$)/','”$1',$verse['verse']);
-
+			
+			//$pattern = "/{(".implode("|",$abbrevs).")([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1}(;([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1})*}/i";
+			$pattern = "/{(.*)}/";
+			$verse['verse'] = preg_replace_callback($pattern,'replace_hivatkozas',$verse['verse']);
 		
 			if($verse['title']!='') $return .= "<p class='kiscim'>".$verse['title']."</p>";
 		if(array_key_exists('start',$verse) OR $k == 0 OR $numch != $verse['numch']) $return .= " <strong>".$verse['numch']."</strong> ";

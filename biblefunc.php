@@ -3,11 +3,14 @@
 $sb="<span class='alap'>";
 $se="</span>";
 
-$translations = db_query('SELECT * FROM tdtrans');
+$TMPtranslations = db_query('SELECT * FROM tdtrans ORDER BY denom, name');
+foreach($TMPtranslations as $TMP) 
+	$translations[$TMP['did']] = $TMP;
+
 $books = db_query('SELECT * FROM tdbook');
 
 function listbible($db) {
-  $rs = $db->execute("select did, name, denom from tdtrans order by name");
+  $rs = $db->execute("select * from tdtrans order by denom, name");
   return $rs;
 }
 
@@ -49,7 +52,9 @@ function showbible($db, $rs) {
         $return .= "<blockquote>";
         $rs->firstRow();
 	 do {
-            $return .= "<a href='" . $baseurl . "index.php?q=showtrans&reftrans=" . $rs->fields["did"] . "' class='link'>" . $rs->fields["name"] . " (" . $rs->fields["denom"] . ")</a></p>\n";
+            $return .= "<p><span class='alcim'><a href='" . $baseurl . "index.php?q=showtrans&reftrans=" . $rs->fields["did"] . "' class='alcim'>" . $rs->fields["name"] . " (" . $rs->fields["denom"] . ")</a></span>\n";
+			$return .= "<br><span class='catlinksmall'>".$rs->fields['copyright']."</span></p>";
+			
             $rs->nextRow();
 	 } while (!$rs->EOF);
         $return .= "</blockquote>";
@@ -152,6 +157,8 @@ function showchapter($db, $reftrans, $abbook, $numch, $rs) {
             $return .= "&nbsp;<span class='kicsi'><sup>" . $rs->fields["numv"] . "</sup></span>";
             $return .= "<a name='" . $rs->fields["numv"] . "'></a>";
             
+			if($reftrans == 3) $rs->fields["verse"] = preg_replace_callback("/{(.*)}/",'replace_hivatkozas',$rs->fields["verse"]);
+			
 			$rs->fields["verse"] = preg_replace('/>>>/','>»',$rs->fields["verse"]);
 			$rs->fields["verse"] = preg_replace('/>>/','»',$rs->fields["verse"]);
 			$rs->fields["verse"] = preg_replace('/<<</','«<',$rs->fields["verse"]);
@@ -211,7 +218,7 @@ function showbookabbrevlist($db,$reftrans,$abbook) {
 }
 
 function showcomms($db, $rs, $reftrans, $rsmin, $rsmax) {
-    global $sb, $se;
+    global $sb, $se, $baseurl;
 	$return = false;
 	
     if ($rs->GetNumOfRows() > 0 && $reftrans==1) {
@@ -386,6 +393,7 @@ function showverse($db,$reftrans,$abbook,$numch,$fromnumv,$tonumv) {
   $rs = $db->execute("select * from tdverse where reftrans = $reftrans and abbook='". $abbook . "' and numch=$numch and numv>=". $fromnumv . " and numv <=" . $tonumv);
   if ($rs->GetNumOfRows() > 0) {
      $rs->firstRow();
+	 
      $return .= "<p class='alap'><b>" . $rs->fields["abbook"] . " " . $rs->fields["numch"] . ",";
      if ($fromnumv==$tonumv) {
        $return .= $fromnumv . ":</b> \n";
@@ -393,6 +401,8 @@ function showverse($db,$reftrans,$abbook,$numch,$fromnumv,$tonumv) {
        $return .= $fromnumv . "-" . $tonumv . ":</b> \n";
      }
      do {
+		if($reftrans == 3) $rs->fields["verse"] = preg_replace_callback("/{(.*)}/",'replace_hivatkozas',$rs->fields["verse"]);
+
         $return .= "&nbsp;<span class='kicsi'><sup>" . $rs->fields["numv"] . "</sup></span>";
         $return .= $rs->fields["verse"] . "\n";
         $rs->nextRow();
@@ -412,6 +422,8 @@ function showverses($rs,$script,$reftrans) {
   if ($rs->GetNumOfRows() > 0) {
          $rs->firstRow();
 	 do {
+			if($reftrans == 3) $rs->fields["verse"] = preg_replace_callback("/{(.*)}/",'replace_hivatkozas',$rs->fields["verse"]);
+			
             $return .= "<img src=".$fileurl."img/arrowright.jpg>&nbsp;";
 			$return .= shln($rs->fields["abbook"] . " " . $rs->fields["numch"] . "," . $rs->fields["numv"],$script . "&reftrans=" . $rs->fields['reftrans'] . "&abbook=" . $rs->fields["abbook"] . "&numch=" . $rs->fields["numch"] . "#" . $rs->fields["numv"],"link") . "\n";
             $return .= " - $sb" . $rs->fields["verse"] . $se . "\n";
@@ -600,6 +612,37 @@ function db_query($query,$debug = '',$return = '') {
 	else return true;
 
 	}
+
+function igenaptar($datum = false) {
+	global $baseurl;
+	$return = '';
+	if($datum == false) $datum = date('Y-m-d');
+
+	$fn2 = "http://katolikus.hu/igenaptar/".date('Ymd',strtotime($datum)).".html";
+
+	//$file = iconv("UTF-8", "ISO-8859-2",file_get_contents($fn2));
+	$file = file_get_contents($fn2);
+
+	preg_match('/<!-- helyek:(.*)-->/',$file,$tmp);
+	if(isset($tmp[1])) $olvasmany_rov = trim($tmp[1]); else $olvasmany_rov = '';
+	$olvasmanyok_rov = explode(';',$tmp[1]);
+	preg_match('/<hr>([^x]*)<\/body>/',$file,$tmp);
+	if(isset($tmp[1])) $olvasmany = trim($tmp[1]); else $olvasmany = '';
 	
+	$olvasmanyok = explode(';',$olvasmany_rov);
+	$return .= '<p class="alcim">';
+	foreach($olvasmanyok as $olvasmany) {
+		if(preg_match('/Zs ([0-9]{1,3})/',$olvasmany,$matches)) {
+			$olvasmany = 'Zsolt'.(( (int) $matches[1]) + 1 );
+		}
+		$code = isquotetion(preg_replace('/ /','',$olvasmany));
+		if(is_array($code)) $olvasmany = $code['code'];
+		$return .= " <a href='".$baseurl."KNB/".preg_replace('/ /','',$olvasmany)."' class='link'>".$olvasmany."</a><br>";
+	}
+	$return .= '</p>';
+
+	return $return;
+
+}	
 
 ?>

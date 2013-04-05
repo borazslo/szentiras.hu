@@ -78,7 +78,26 @@ if($texttosearch == '') {
 		
 		foreach($tipps as $tipp) $content .= "<span class='hiba'>TIPP:</span> ".$tipp."<br>\n";
 		
-		$content .= "<br>".print_quotetion('verses')."<br>";
+		$content .= "<br>".print_quotetion('verses')."<br><br>";
+
+		$query = "SELECT gepi FROM tdverse WHERE reftrans = ".$code['reftrans']." AND abbook = '".$code['book']."' LIMIT 1";
+		$result = db_query($query);
+
+		if($result[0]['gepi']!='') {
+			$query = "SELECT tdtrans.*, abbook, reftrans FROM tdverse LEFT JOIN tdtrans ON reftrans = tdtrans.did WHERE gepi = ".$result[0]['gepi'];
+			$results = db_query($query);
+			if(count($results)>1) {
+			foreach($results as $result) {
+				$transcode = preg_replace('/ /','',preg_replace("/^".$code['book']."/",$result['abbook'],$code['code']));
+				$url = $baseurl.$result['abbrev']."/".$transcode;
+				
+				if($transcode = $code['code'] AND $code['reftrans'] == $result['reftrans']) $style = " style=\"background-color:#9DA7D8;color:white;\" "; else $style = '';
+				$change = "<a href=\"".$url."\" ".$style." class=\"button minilink\">".$result['abbrev']."</a> \n";
+				$content .= $change;//echo $url;
+			} }
+			$content .= '<br>';
+		}
+		
 		
 		if($error == array()) {
 			insert_stat($texttosearch,$reftrans,0);

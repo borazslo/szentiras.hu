@@ -18,6 +18,7 @@ if(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'showtrans') {
 	
 	foreach($translations as $tdtrans) {
 			if($tdtrans['did'] == $reftrans) {
+				Header( "HTTP/1.1 301 Moved Permanently" ); 
 				Header( "Location: ".$basurl.$tdtrans['abbrev']); 
 				break;
 			}
@@ -30,6 +31,7 @@ if(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'showtrans') {
 			if($tdtrans['did'] == $reftrans) {
 				foreach($books as $book) {
 					if($book['abbrev'] == $_REQUEST['abbook'] AND $tdtrans['did'] == $book['reftrans']) {
+						Header( "HTTP/1.1 301 Moved Permanently" ); 
 						Header( "Location: ".$basurl.$tdtrans['abbrev'].'/'.$_REQUEST['abbook']); 
 						break;
 					}
@@ -41,10 +43,21 @@ if(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'showtrans') {
 	else $reftrans = 1;
 	
 	foreach($translations as $tdtrans) {
+		//echo mb_detect_encoding($_REQUEST['abbook'],'UTF-8','ISO-8859-2');
+		//echo iconv('ISO-8859-2','UTF-8',urldecode($_REQUEST['abbook']));
+		
 			if($tdtrans['did'] == $reftrans) {
 				foreach($books as $book) {
 					if($book['abbrev'] == $_REQUEST['abbook'] AND $tdtrans['did'] == $book['reftrans']) {
+						Header( "HTTP/1.1 301 Moved Permanently" ); 
 						Header( "Location: ".$basurl.$tdtrans['abbrev'].'/'.$_REQUEST['abbook'].$_REQUEST['numch']); 
+						break;
+					}
+				}
+				foreach($books as $book) {
+					if($book['abbrev'] == iconv('ISO-8859-2','UTF-8',$_REQUEST['abbook']) AND $tdtrans['did'] == $book['reftrans']) {
+						Header( "HTTP/1.1 301 Moved Permanently" ); 
+						Header( "Location: ".$basurl.$tdtrans['abbrev'].'/'.iconv('ISO-8859-2','UTF-8',$_REQUEST['abbook']).$_REQUEST['numch']); 
 						break;
 					}
 				}
@@ -112,6 +125,11 @@ if(isset($_REQUEST['rewrite']) AND $_REQUEST['rewrite'] != '') {
 	}
 	elseif(count($uri)==1 ) {
 		$go = false;
+		if($uri[0] == 'kereses') {
+			$go = true;
+			$q = 'searchbible';
+		}
+		if($go == false) {
 		foreach($translations as $tdtrans) {
 			if($tdtrans['abbrev'] == $uri[0]) {
 				$q = 'showtrans';
@@ -119,7 +137,7 @@ if(isset($_REQUEST['rewrite']) AND $_REQUEST['rewrite'] != '') {
 				$go = true;
 				break;
 			}
-		}
+		} }
 		if($go == false) {
 			$isit = isquotetion($uri[0]);
 			if($isit != false) {
@@ -144,8 +162,9 @@ else {
 }
 
 $menu = new Menu();
-	$menu->add_item("Bibliaolvasás","showbible");
-	$menu->add_item("Keresés a Bibliában","searchbible");
+	//$menu->add_item("Bibliaolvasás","showbible");
+	$menu->add_item("Bibliaolvasás",$baseurl);
+	$menu->add_item("Keresés a Bibliában",$baseurl.'kereses');
 	$menu->add_pause();
 	foreach($translations as $tdtrans) {
 		$menu->add_item($tdtrans['name']." (".$tdtrans['abbrev'].")",$baseurl.$tdtrans['abbrev']);

@@ -155,7 +155,7 @@
 				<!--<p> Tartalmi kérdések: <a href='mailto:info@kereszteny.hu' class='link'>Info</a> - 
 				Technikai problémák: <a href='mailto:webmaster@kereszteny.hu' class='link'>Webmaster</a> - 
 				<a href='/impresszum.php' class='link'>Impresszum</a></p>-->
-				<p>Kérdések, ötletek, problémák: <a href='mailto:eleklaszlosj@gmail.com'>Elek László SJ</a> (<a href="http://jezsuita.hu">JTMR</a>) 4/6</p>
+				<p>Kérdések, ötletek, problémák: <a href='mailto:eleklaszlosj@gmail.com'>Elek László SJ</a> (<a href="http://jezsuita.hu">JTMR</a>)</p>
 			</div>
 			
 

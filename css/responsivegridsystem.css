@@ -724,7 +724,7 @@ strong.code {
 	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
 	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
 	box-shadow: 0 1px 2px rgba(0,0,0,.2);
-	background: #cc1122 url(/images/glass.png) repeat-x 0 50%;
+	/*background: #cc1122 url(/images/glass.png) repeat-x 0 50%;*/
 	-webkit-transition: all 0.3s ease;
 	-moz-transition: all 0.3s ease;
 	-o-transition: all 0.3s ease;
