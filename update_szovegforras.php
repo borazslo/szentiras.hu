@@ -1,15 +1,136 @@
 <?php
-include_once 'quote.php';
+header('Content-type: text/html; charset=utf-8'); 
 
-$results = db_query("SELECT * FROM tdverse  ORDER BY gepi;");
-foreach($results as $result) {
-	set_time_limit(60);
-	 $gepi = $result['book'].sprintf("%03d", $result['chapter']).sprintf("%03d", $result['numv']).'00';
-	$query = "UPDATE tdverse SET gepi = ".$gepi." WHERE did = ".$result['did']." LIMIT 1 ";
-	echo $query."<br>\n";
-	db_query($query);
+include_once 'quote.php';
+include_once 'include\Dropbox-master\examples\bootstrap.php';
+//include_once 'include/Dropbox-master/examples/bootstrap.php';
+
+if(isset($_REQUEST['trans'])) $trans = $_REQUEST['trans'];
+else $trans = "KG";
+
+/*
+ * Dropbox
+ */
+ 
+// Set the file path
+// You will need to modify $path or run putFile.php first
+$path = 'Biblia_sajat_cucc/'.$trans.'/'.$trans.'_szovegforras.xls';
+$shares = $dropbox->shares($path, false);
+
+setvar('update_KG',time());
+// Set the output file
+// If $outFile is set, the downloaded file will be written
+// directly to disk rather than storing file data in memory
+$outFile = false;
+try {
+	$tmp = "tmp_".$trans.".xls";
+    // Download the file
+    $file = $dropbox->getFile($path, $outFile);
+	
+	if(getvar('update_'.$trans) < strtotime($file['meta']->modified)) {
+		setvar('update_'.$trans,time());
+		echo "Nincs szükség frissítésre.";
+		exit;
+	} 
+	setvar('update_'.$trans,time());
+	if(file_exists($tmp)) unlink($tmp);
+	file_put_contents($tmp,$file['data']);
+} catch (\Dropbox\Exception\NotFoundException $e) {
+    echo 'The file was not found at the specified path/revision';
+	exit;
+}
+/**/
+$books = array();
+$result = db_query("SELECT tdbook.abbrev, tdbook.bookorder, reftrans FROM tdbook, tdtrans WHERE reftrans = tdtrans.did AND tdtrans.abbrev = '".$trans."' ORDER BY bookorder");
+foreach($result as $key => $res) {	$books[$res['bookorder']] = $res; }
+
+/*
+ * Excel
+ */
+include_once 'include/excel_reader2.php';
+
+$data = new Spreadsheet_Excel_Reader("tmp_".$trans.".xls",false,'UTF-8//IGNORE');
+$data->setUTFEncoder('iconv');
+
+foreach($data->boundsheets as $key => $sheet) {
+	if($sheet['name'] == $trans) {
+		$sheetid = $key;
+	}
+} if(!isset($sheetid)) exit;
+
+for($col = 1; $col <= $data->colcount($sheetid);$col++) {
+	$cols[$data->val(1,$col,$sheetid)] = $col;
 }
 
+$max = $data->rowcount($sheetid);
+for($row = 3; $row <= $max; $row++) {
+	set_time_limit(60);
+	$DCC_hiv = strtolower($data->val($row,$cols['DCC_hiv'],$sheetid));
+	
+	$jel = $data->val($row,$cols['jel'],$sheetid);
+	$jelstatusz = $data->val($row,$cols['jelstatusz'],$sheetid);
+	
+	$update[$DCC_hiv]['w']['gepi'] = $DCC_hiv;	
+	$update[$DCC_hiv]['w']['reftrans'] = $books[(int)($DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2])]['reftrans'];
+	
+	$update[$DCC_hiv]['s']['refbook'] = $books[(int)($DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2])]['bookorder'];
+	$update[$DCC_hiv]['s']['refchapter'] = (int)($DCC_hiv[3].$DCC_hiv[4].$DCC_hiv[5]);
+	
+	$update[$DCC_hiv]['s']['abbook'] = $books[(int)($DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2])]['abbrev'];
+	$update[$DCC_hiv]['s']['numch'] = (int)($DCC_hiv[3].$DCC_hiv[4].$DCC_hiv[5]);
+	$update[$DCC_hiv]['s']['numv'] = (int)($DCC_hiv[6].$DCC_hiv[7].$DCC_hiv[8]);
+		
+	preg_match('/[{]{1}(.*?)[}]{1}/',$jel,$match);
+	if(count($match)>1) $update[$DCC_hiv]['s']['refs'] = $match[1];
+		
+	if(!@iconv("UTF-8", "UTF-8", $jel))  {
+		$jel = iconv('windows-1250', 'UTF-8',$jel); 
+	}
+	
+	if($jelstatusz==6) $update[$DCC_hiv]['s']['verse'] = $jel;
+	elseif($jelstatusz < 4) {
+		if(isset($update[$DCC_hiv]['s']['title'])) $update[$DCC_hiv]['s']['title'] .= "<br>".$jel;
+		else $update[$DCC_hiv]['s']['title'] = $jel;
+	}
+}
+//echo"<pre>".print_R($update,1);
+ 
+ /*
+  * mySQL
+  */
+ $tmpbook = '';
+ foreach ($update as $up) {
+	set_time_limit(60);
+	if($up['s']['abbook'] != $tmpbook) {
+		$query = "DELETE FROM tdverse WHERE gepi LIKE '".(int) ($up['w']['gepi']{0}.$up['w']['gepi']{1}.$up['w']['gepi']{2}) ."%' AND reftrans = ".$up['w']['reftrans']." ";
+		echo $query."<br>";
+		$tmpbook = $up['s']['abbook'];
+	}
+	$set = array(); $where = array(); $insert = array();
+	foreach($up['s'] as $n=>$v) { $set[] = $n.' = "'.$v.'"'; $insert['name'][] = $n; $insert['value'][] = $v; }
+	foreach($up['w'] as $n=>$v) { $where[] = $n.' = "'.$v.'"'; $insert['name'][] = $n; $insert['value'][] = $v; }
+	/*
+	$query = "SELECT * FROM tdverse WHERE  ".implode(' AND ',$where)."  LIMIT 1";
+	echo $query."<br>\n";
+	$result = db_query($query);
+	if(is_Array($result)) {
+		$query = "UPDATE tdverse SET ".implode(', ',$set)." WHERE ".implode(' AND ',$where)." LIMIT 1";
+		db_query($query);
+		$content .= $query."<br>\n";
+	} else {
+		$query = "INSERT INTO tdverse (".implode(',',$insert['name']).") VALUES ('".implode("','",$insert['value'])."');";
+		db_query($query);
+		$content .= $query."<br>\n";
+	}*/
+	$query = "INSERT INTO tdverse (".implode(',',$insert['name']).") VALUES ('".implode("','",$insert['value'])."');";
+	db_query($query);
+	$content .= $query;
+	
+		echo '<span style="white-space: nowrap;">'.htmlentities($content).'</span><br>';
+		$content = '';
+//	exit;
+}
+ 
 /* KNB csv bedolgozása *
 $result = db_query("SELECT abbrev, oldtest FROM tdbook WHERE reftrans = 3  AND oldtest = 1 ORDER BY oldtest DESC, bookorder");
 foreach($result as $key => $res) $books[1][($key+1)] = $res['abbrev'];
@@ -216,5 +337,5 @@ foreach($results as $result) {
 	db_query($query);
 }
 /**/
-
+exit;
 ?>

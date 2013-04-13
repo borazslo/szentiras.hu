@@ -10,7 +10,7 @@ if($texttosearch == '') {
 		$content .= printSearchForm(); 
 } else {
  
-  require("JSON.php"); /* PHP 5.2 >= esetén */
+  require("include/JSON.php"); /* PHP 5.2 >= esetén */
   $texttosearch = trim($texttosearch);
   $texttosearch = preg_replace("/(_)/"," ",$texttosearch);
   $texttosearch = preg_replace("/([\.,;:_]*)$/","",$texttosearch);
@@ -31,7 +31,7 @@ if($texttosearch == '') {
 	 * HA SZÖVEGET KERES
 	 */
 		$title .= "<a href='".$baseurl."index.php?q=searchbible'>Keresés</a>: „".$texttosearch."”\n";
-		$content .= "<span class='alap'>Fordítás: <a href='".$baseurl."index.php?q=showbible&reftrans=".$reftrans."'>". dlookup($db,"name","tdtrans","did=$reftrans") . "</a></span><br>\n";
+		$content .= "<span class='alap'>Fordítás: <a href='".$baseurl."index.php?q=showbible&reftrans=".$reftrans."'>". dlookup($db,"name","tdtrans","id=$reftrans") . "</a></span><br>\n";
 		list($res1, $res2, $res3, $res4)=advsearchbible($db,$texttosearch,$reftrans,$offset,$rows);
 		$tipps = get_tipps($texttosearch,$reftrans,$res2);	
 		
@@ -72,7 +72,7 @@ if($texttosearch == '') {
 	/*
 	 * HA IGEHELYET KERES
 	 */
-		$title = "<a href='".$baseurl."index.php?q=showtrans&reftrans=".$code['reftrans']."'>".dlookup($db,"name","tdtrans","did=".$code['reftrans']."")."</a> <img src='".$fileurl."img/arrowright.jpg'> ".$code['code']."\n";
+		$title = "<a href='".$baseurl."index.php?q=showtrans&reftrans=".$code['reftrans']."'>".dlookup($db,"name","tdtrans","id=".$code['reftrans']."")."</a> <img src='".$fileurl."img/arrowright.jpg'> ".$code['code']."\n";
 		
 		$quotation = quotetion(array('verses','array','code'=>$code));
 		
@@ -80,19 +80,22 @@ if($texttosearch == '') {
 		
 		$content .= "<br>".print_quotetion('verses')."<br><br>";
 
-		$query = "SELECT gepi FROM tdverse WHERE reftrans = ".$code['reftrans']." AND abbook = '".$code['book']."' LIMIT 1";
+		$query = "SELECT gepi FROM tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans  WHERE tdverse.trans = ".$code['reftrans']." AND tdbook.abbrev = '".$code['book']."' LIMIT 1";
 		$result = db_query($query);
-
 		if($result[0]['gepi']!='') {
-			$query = "SELECT tdtrans.*, abbook, reftrans FROM tdverse LEFT JOIN tdtrans ON reftrans = tdtrans.did WHERE gepi = ".$result[0]['gepi'];
+			$query = "SELECT tdtrans.*, tdtrans.abbrev as transabbrev,tdbook.abbrev, tdverse.trans FROM tdverse 
+				LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans 
+				LEFT JOIN tdtrans ON tdverse.trans = tdtrans.id WHERE gepi = ".$result[0]['gepi']."
+				 ORDER BY tdtrans.denom, tdtrans.name";
+		
 			$results = db_query($query);
 			if(count($results)>1) {
 			foreach($results as $result) {
-				$transcode = preg_replace('/ /','',preg_replace("/^".$code['book']."/",$result['abbook'],$code['code']));
-				$url = $baseurl.$result['abbrev']."/".$transcode;
+				$transcode = preg_replace('/ /','',preg_replace("/^".$code['book']."/",$result['abbrev'],$code['code']));
+				$url = $baseurl.$result['transabbrev']."/".$transcode;
 				
-				if($transcode = $code['code'] AND $code['reftrans'] == $result['reftrans']) $style = " style=\"background-color:#9DA7D8;color:white;\" "; else $style = '';
-				$change = "<a href=\"".$url."\" ".$style." class=\"button minilink\">".$result['abbrev']."</a> \n";
+				if($transcode = $code['code'] AND $code['reftrans'] == $result['trans']) $style = " style=\"background-color:#9DA7D8;color:white;\" "; else $style = '';
+				$change = "<a href=\"".$url."\" ".$style." class=\"button minilink\">".$result['transabbrev']."</a> \n";
 				$content .= $change;//echo $url;
 			} }
 			$content .= '<br>';
@@ -119,7 +122,7 @@ if($texttosearch == '') {
 	$better = get_better($texttosearch,$reftrans,$results);
 	if($better != array()) {
 			global $baseurl; global $db;
-			$trans = array(); foreach(db_query("SELECT * FROM tdtrans") as $list) $trans[$list['did']] = $list;
+			$trans = array(); foreach(db_query("SELECT * FROM tdtrans") as $list) $trans[$list['id']] = $list;
 			foreach($better as $bet) {
 			$return[] = "<a href='".$baseurl."index.php?q=searchbible&texttosearch=".$texttosearch."&reftrans=".$bet['reftrans']."' class=link>A ".$trans[$bet['reftrans']]['name']." fordításában több eredmény vár (".$bet['results']." találat)! </a>";
 			}		
@@ -290,17 +293,18 @@ if($texttosearch == '') {
 	}
 
 	function printSearchForm() {
-		global $db, $reftrans;
+		global $db, $reftrans,$baseurl;
 		$return = "<p class='cim'>Keresés a Bibliában</p>";
-		$return .= "<form action='index.php' method='get'>\n";
+		$return .= "<form action='".$baseurl."index.php' method='get'>\n";
 		$return .= "<input type='hidden' name='q' value='searchbible'>\n";
 		$return .= displaytextfield("texttosearch",30,80,"","Keresendő:","alap");
 		
-		$return .= displayoptionlist("reftrans",1,listbible($db),"did","name",$reftrans,"Fordítás:","alap");
+		$return .= displayoptionlist("reftrans",1,listbible($db),"id","name",$reftrans,"Fordítás:","alap");
 		$return .= '<br><br>';
 		//$return .= "<input type=reset value='Törlés' class='alap'> &nbsp;&nbsp;\n";
 		$return .= "<input type=submit value='Küldés' class='alap'>\n";
 		$return .= "</form>\n";
+		$return .= '<div id="tipp"><font color="red">TIPP:</font> a keresét le lehet szűkíteni egy-egy könyvre vagy az Ószövetségre/Újszövetségre a keresés végére írt <strong>in:<i>könyvrövidítés</i></strong> formával! Például: <A href="http://szentiras.hu/SZIT/%C3%B6r%C3%B6m%20in:Lk">öröm in:Lk</a></div>';
 		return $return;
 	}
 	

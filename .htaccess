@@ -1,5 +1,12 @@
 RewriteEngine on 
 
+#RewriteCond %{REMOTE_ADDR} !^81\.182\.240\.247
+#RewriteCond %{REQUEST_URI} !^/karbantartunk\.html$
+#RewriteCond %{REQUEST_URI} !^/img/.*$
+#RewriteCond %{REQUEST_URI} !^/css/.*$
+#RewriteRule ^(.*)$ http://szentiras.hu/karbantartunk.html [R=301,L]
+
+
 #RewriteCond %{REQUEST_FILENAME} !-f 
 #RewriteCond %{REQUEST_FILENAME} !-d 
 

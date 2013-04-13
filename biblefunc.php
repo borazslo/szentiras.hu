@@ -5,7 +5,7 @@ $se="</span>";
 
 $TMPtranslations = db_query('SELECT * FROM tdtrans ORDER BY denom, name');
 foreach($TMPtranslations as $TMP) 
-	$translations[$TMP['did']] = $TMP;
+	$translations[$TMP['id']] = $TMP;
 
 $books = db_query('SELECT * FROM tdbook');
 
@@ -15,17 +15,19 @@ function listbible($db) {
 }
 
 function listtrans($db, $reftrans) {
-  $rs = $db->execute("select name, abbrev, oldtest from tdbook where reftrans = $reftrans order by bookorder");
+  $rs = $db->execute("select name, abbrev, oldtest from tdbook where trans = $reftrans order by id");
   return $rs;
 }
 
 function listbook($db, $reftrans, $abbook) {
-  $rs = $db->execute("select numch from tdverse where reftrans = $reftrans and abbook='". $abbook . "' group by numch order by numch");
+  $query = "select chapter from tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans WHERE tdverse.trans = $reftrans and tdbook.abbrev='". $abbook . "' group by chapter order by chapter";
+  $rs = $db->execute($query);
   return $rs;
 }
 
 function listchapter($db, $reftrans, $abbook, $numch) {
-  $rs = $db->execute("select did, numv, title, verse, refs from tdverse where reftrans = $reftrans and abbook='". $abbook . "' and numch=$numch order by did");
+  $query = "select did, numv, title, verse, refs from tdverse LEFT JOIN tdbook ON tdbook.id = tdverse.book  AND tdbook.trans = tdverse.trans where tdverse.trans = $reftrans and abbrev='". $abbook . "' and chapter=$numch order by gepi";
+  $rs = $db->execute($query);
   return array($reftrans, $abbook, $numch, $rs);
 }
 
@@ -52,7 +54,7 @@ function showbible($db, $rs) {
         $return .= "<blockquote>";
         $rs->firstRow();
 	 do {
-            $return .= "<p><span class='alcim'><a href='" . $baseurl . "index.php?q=showtrans&reftrans=" . $rs->fields["did"] . "' class='alcim'>" . $rs->fields["name"] . " (" . $rs->fields["denom"] . ")</a></span>\n";
+            $return .= "<p><span class='alcim'><a href='" . $baseurl . "index.php?q=showtrans&reftrans=" . $rs->fields["id"] . "' class='alcim'>" . $rs->fields["name"] . " (" . $rs->fields["denom"] . ")</a></span>\n";
 			$return .= "<br><span class='catlinksmall'>".$rs->fields['copyright']."</span></p>";
 			
             $rs->nextRow();
@@ -114,9 +116,9 @@ function showbook($db, $reftrans, $abbook, $rs) {
         $output="";
         $rs->firstRow();
 	 do {
-            $return .= "<a href='" . $baseurl . "index.php?q=showchapter&reftrans=" . $reftrans . "&abbook=" . $abbook . "&numch=" . $rs->fields["numch"] ."' class='link'>" . $rs->fields["numch"] . ". fejezet</a><br>\n";
+            $return .= "<a href='" . $baseurl . "index.php?q=showchapter&reftrans=" . $reftrans . "&abbook=" . $abbook . "&numch=" . $rs->fields["chapter"] ."' class='link'>" . $rs->fields["chapter"] . ". fejezet</a><br>\n";
             $return .= $sb;
-            list($res1, $res2, $res3, $res4)=listchapter($db, $reftrans, $abbook, $rs->fields["numch"]);
+            list($res1, $res2, $res3, $res4)=listchapter($db, $reftrans, $abbook, $rs->fields["chapter"]);
             if ($res4->GetNumOfRows() > 0) {
                 $res4->firstRow();
                 if (strlen(trim($res4->fields["title"]))>0) {
@@ -130,7 +132,7 @@ function showbook($db, $reftrans, $abbook, $rs) {
                   $verses=$verses . " " . $res4->fields["verse"];
                 }
                 $return .= showintro($verses,200);
-                $return .= "<a href='" . $baseurl . "index.php?q=showchapter&reftrans=" . $reftrans . "&abbook=" . $abbook . "&numch=" . $rs->fields["numch"] ."' class='link'> >> </a><br>\n";
+                $return .= "<a href='" . $baseurl . "index.php?q=showchapter&reftrans=" . $reftrans . "&abbook=" . $abbook . "&numch=" . $rs->fields["chapter"] ."' class='link'> >> </a><br>\n";
                 $return .="$se<br>";
             }
             $rs->nextRow();
@@ -142,7 +144,7 @@ function showbook($db, $reftrans, $abbook, $rs) {
 
 
 function showchapter($db, $reftrans, $abbook, $numch, $rs) {
-    global $sb, $se, $title;
+    global $sb, $se, $title,$baseurl;
 	$return = false;
     if ($rs->GetNumOfRows() > 0) {
         $title = showhier($db, $reftrans, $abbook, $numch);
@@ -172,20 +174,46 @@ function showchapter($db, $reftrans, $abbook, $numch, $rs) {
             $return .= $se;
             $rs->nextRow();
 	 } while (!$rs->EOF);
+	 
         $return .= shownextprev($db, $reftrans, $abbook, $numch);
+		
+		
+		$query = "SELECT id FROM tdbook WHERE abbrev = '".$abbook."' AND trans =  ".$reftrans;
+	$results = db_query($query);
+	if(count($results)>0) { 
+	$bookid = $results[0]['id'];
+	//$abbook." ".$numch." (".gettransname($db,$reftrans,'true').")	
+	$query = "SELECT * FROM tdbook WHERE id = '".$bookid."'";
+	$results = db_query($query);
+	if(count($results)>1) {
+		foreach($results as $result) {
+			//$transcode = preg_replace('/ /','',preg_replace("/^".$abbook."/",$result['abbrev'],$code['code']));
+			$url = $baseurl.gettransname($db,$result['trans'],'true')."/".$result['abbrev'].$numch;
+			
+			if($reftrans == $result['trans']) $style = " style=\"background-color:#9DA7D8;color:white;\" "; else $style = '';
+			$change = "<a href=\"".$url."\" ".$style." class=\"button minilink\">".gettransname($db,$result['trans'],'true')."</a> \n";
+			$content .= $change;//echo $url;
+		} 
+		$content .= '<br>';
+	} }
+	$return .= $content;
+		
+		
         $rs->firstRow();
-        if ($reftrans==2) {
-          $return .= "<p class='kiscim'>Hivatkozások</p>\n";
+        if ($reftrans==3 OR 3==3) {
+          
 	  do {
             if (strlen(trim($rs->fields["refs"]))>0) {
-               $return .= $sb;
-               $return .= $rs->fields["numv"] . ": ";
-               $return .= showverselinks($rs->fields["refs"],$reftrans) . "<br>";
-               $return .= $se;
+               $hivat .= $sb;
+               $hivat .= $rs->fields["numv"] . ": ";
+               $hivat .= showverselinks($rs->fields["refs"],$reftrans) . "<br>";
+               $hivat .= $se;
             }
             $rs->nextRow();
 	 }while (!$rs->EOF);
-        }
+        
+		if(isset($hivat)) $return .= "<p class='kiscim'>Hivatkozások</p>\n".$hivat;
+		}
 
     }
 	return $return;
@@ -194,7 +222,7 @@ function showchapter($db, $reftrans, $abbook, $numch, $rs) {
 function showbookabbrevlist($db,$reftrans,$abbook) {
 	global $baseurl;
 	$return = false;
-   $rs=$db->execute("select * from tdbook where reftrans =" . $reftrans . " order by bookorder");
+   $rs=$db->execute("select * from tdbook where trans =" . $reftrans . " order by id");
    if ($rs->GetNumOfRows() > 0) {
         $rs->firstRow();
         $return .= "<blockquote><p class='kicsi' align='center'>";
@@ -321,7 +349,7 @@ function shownextprev ($db, $reftrans, $abbook, $numch) {
       $return .= "<a href='" . $baseurl . "index.php?q=showchapter&reftrans=" . $reftrans . "&abbook=" . $abbook . "&numch=" . ($numch-1) ."' class='link'><< előző</a>";
       $return .= "</td>";
    }
-   $querystring="select max(numch) as maxcount from tdverse where reftrans=" . $reftrans . " and abbook='" . $abbook . "'";
+   $querystring="select max(chapter) as maxcount from tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans  where tdbook.trans=" . $reftrans . " and tdbook.abbrev='" . $abbook . "'";
    $rs=$db->execute($querystring);
    if ($rs->GetNumOfRows() > 0) {
      $rs->firstRow();
@@ -341,6 +369,35 @@ function advsearchbible($db, $texttosearch, $reftrans, $offset = 0, $rows = 50) 
       #$rs1 = $db->execute("select count(*) as cnt from tdverse where MATCH (verse) AGAINST ('" . $texttosearch . "') and reftrans=$reftrans");
       //$rs1 = $db->execute("select count(*) as cnt from tdverse where verse regexp '" . $texttosearch . "' and reftrans=$reftrans");
 	  
+	  $rs = $db->execute("SELECT oldtest, trans, abbrev, id FROM tdbook WHERE trans = $reftrans ORDER BY trans ");
+	  do {
+		if($rs->fields['abbrev'] != '') {
+			$books[$rs->fields['trans']][] = preg_replace('/ /','',$rs->fields['abbrev']);
+			$abbrevs[preg_replace('/ /','',$rs->fields['abbrev'])] = preg_replace('/ /','',$rs->fields['abbrev']);
+			$pattern = '/^'.preg_replace('/ /','',$rs->fields['abbrev']).'([0-9]{1,2}|$)/i';
+			if($rs->fields['oldtest'] == 1) $oldtest[] = " tdverse.book = '".$rs->fields['id']."'";
+			else $newtest[] = " tdverse.book = '".$rs->fields['id']."'";
+		}
+        $rs->nextRow();
+	 } while (!$rs->EOF);
+	  
+	  //print_R($newtest);
+	  
+	   $pattern = "/in:(".implode("|",$abbrevs).")$/i";
+	   $patternNew = "/in:(Újszöv|Új|Újszövetség|Ótestamentum|Ótestámentum)$/i";
+	   $patternOld = "/in:(Ó|Ószöv|Ószövetség|Újtestamentum|Újtestámentum)$/i";
+	   if(preg_match($pattern,$texttosearch,$matches)) {
+			$texttosearch = trim(preg_replace($pattern,'',$texttosearch));
+			$isinbook = " AND tdbook.abbrev = '".$matches[1]."' ";
+	   } elseif(preg_match($patternOld,$texttosearch,$matches)) {
+			$texttosearch = trim(preg_replace($patternOld,'',$texttosearch));
+			$isinbook = " AND (".implode(' OR ',$oldtest).")";
+	   } elseif(preg_match($patternNew,$texttosearch,$matches)) {
+			$texttosearch = trim(preg_replace($patternNew,'',$texttosearch));
+			$isinbook = " AND (".implode(' OR ',$newtest).")";
+	   } else $isinbook = '';
+	  
+	  
 	  $words = explode(' ',$texttosearch);
 	  $where = ''; $query = '';
 	  foreach($words as $k=>$word) {
@@ -350,7 +407,7 @@ function advsearchbible($db, $texttosearch, $reftrans, $offset = 0, $rows = 50) 
 		$query2 .= "title regexp '".$word."' ";
 		if($k < (count($words)-1)) $query2 .= ' AND ';
 	  }
-	  $query = "select count(*) as cnt from tdverse where ((".$query.") OR (".$query2."))  and reftrans=$reftrans";
+	  $query = "select count(*) as cnt from tdverse LEFT JOIN tdbook ON tdbook.trans = tdverse.trans AND tdbook.id = tdverse.book where ((".$query.") OR (".$query2.")) ".$isinbook." and tdverse.trans=$reftrans";
 	  //echo $query;
 	  $rs1 = $db->execute($query);
 	  
@@ -368,7 +425,7 @@ function advsearchbible($db, $texttosearch, $reftrans, $offset = 0, $rows = 50) 
        elseif ($offset<0) {$offset = 0;}
 
        #$querystring = "select * from tdverse where MATCH (verse) AGAINST ('" . $texttosearch . "')>1 and reftrans=$reftrans order by did limit $offset, $rows";
-       $querystring = "select * from tdverse where (verse regexp '" . $texttosearch . "' OR title regexp '" . $texttosearch . "') and reftrans=$reftrans order by did limit $offset, $rows";
+       $querystring = "select * from tdverse LEFT JOIN tdbook ON tdbook.trans = tdverse.trans AND tdbook.id = tdverse.book  where (verse regexp '" . $texttosearch . "' OR title regexp '" . $texttosearch . "') and tdverse.trans=$reftrans order by gepi limit $offset, $rows";
 
 		$words = explode(' ',$texttosearch);
 		$query = ''; $query2 = '';
@@ -379,7 +436,7 @@ function advsearchbible($db, $texttosearch, $reftrans, $offset = 0, $rows = 50) 
 		$query2 .= "title regexp '".$word."' ";
 		if($k < (count($words)-1)) $query2 .= ' AND ';
 	  }
-	  $querystring = "select * from tdverse where ((".$query.") OR (".$query2."))  and reftrans=$reftrans order by did limit $offset, $rows";
+	  $querystring = "select * from tdverse LEFT JOIN tdbook ON tdbook.trans = tdverse.trans AND tdbook.id = tdverse.book where ((".$query.") OR (".$query2.")) ".$isinbook." and tdverse.trans=$reftrans order by gepi limit $offset, $rows";
 	   
        //echo "<br>" . $querystring . "<br>\n";
        $rs = $db->execute($querystring);
@@ -417,15 +474,17 @@ function showverse($db,$reftrans,$abbook,$numch,$fromnumv,$tonumv) {
 
 
 function showverses($rs,$script,$reftrans) {
-  global $sb, $se, $fileurl;
+  global $sb, $se, $fileurl, $books, $baseurl,$translations;
+
   $return = '';
   if ($rs->GetNumOfRows() > 0) {
          $rs->firstRow();
 	 do {
 			if($reftrans == 3) $rs->fields["verse"] = preg_replace_callback("/{(.*)}/",'replace_hivatkozas',$rs->fields["verse"]);
-			
+			//print_R($rs->fields);
             $return .= "<img src=".$fileurl."img/arrowright.jpg>&nbsp;";
-			$return .= shln($rs->fields["abbook"] . " " . $rs->fields["numch"] . "," . $rs->fields["numv"],$script . "&reftrans=" . $rs->fields['reftrans'] . "&abbook=" . $rs->fields["abbook"] . "&numch=" . $rs->fields["numch"] . "#" . $rs->fields["numv"],"link") . "\n";
+			//$return .= shln($rs->fields["abbrev"] . " " . $rs->fields["chapter"] . "," . $rs->fields["numv"],$baseurl.$script . "&reftrans=" . $rs->fields['trans'] . "&abbook=" . $rs->fields["abbrev"] . "&numch=" . $rs->fields["chapter"] . "#" . $rs->fields["numv"],"link") . "\n";
+			$return .= shln($rs->fields["abbrev"] . " " . $rs->fields["chapter"] . "," . $rs->fields["numv"],$baseurl.$translations[$rs->fields['trans']]['abbrev'] .'/'.$rs->fields["abbrev"] . $rs->fields["chapter"] . "#" . $rs->fields["numv"],"link") . "\n";
             $return .= " - $sb" . $rs->fields["verse"] . $se . "\n";
             $return .= "<br>\n";
 	    $rs->nextRow();
@@ -437,7 +496,7 @@ function showverses($rs,$script,$reftrans) {
 
 
 function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
-	global $fileurl;
+	global $fileurl, $baseurl;
   $return =  "<table><tr>";
 
   if (!empty($request) && !empty($catcount)) {
@@ -457,7 +516,7 @@ function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
          $prevstring = $prevoffset+1 ." - " . $prevstring;
          $return .= "<td align='left' width='50%'>";
 		 $return .= "<img src='".$fileurl."img/arrowleft.jpg'> ";
-         $return .= shln($prevstring , $request . $paramchr . "offset=$prevoffset&rows=$prevrows","link");
+         $return .= shln($prevstring , $baseurl."index.php".$request . $paramchr . "offset=$prevoffset&rows=$prevrows","link");
          $return .= "&nbsp;</td>";
      }
 
@@ -472,7 +531,7 @@ function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
          $nextstring = (string) $nextstring;
          $nextstring = $nextoffset + 1 ." - " . $nextstring;
          $return .= "<td align='right'  width='50%'>&nbsp;";
-         $return .= shln($nextstring , $request .  $paramchr . "offset=$nextoffset&rows=$rows","link");
+         $return .= shln($nextstring , $baseurl."index.php".$request .  $paramchr . "offset=$nextoffset&rows=$rows","link");
 		 $return .= " <img src='".$fileurl."img/arrowright.jpg'>";
          $return .= "</td>";
      }
@@ -482,12 +541,12 @@ function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
 }
 
 function gettransname($db, $reftrans,$rov = false) {
- if($rov == false) return dlookup($db, "name","tdtrans","did=$reftrans");
- else return dlookup($db, "abbrev","tdtrans","did=$reftrans");
+ if($rov == false) return dlookup($db, "name","tdtrans","id=$reftrans");
+ else return dlookup($db, "abbrev","tdtrans","id=$reftrans");
 }
 
 function getbookname($db, $reftrans, $abbook) {
- return dlookup($db, "name","tdbook","reftrans=$reftrans and abbrev='" . $abbook ."'");
+ return dlookup($db, "name","tdbook","trans=$reftrans and abbrev='" . $abbook ."'");
 }
 
 function shln($name,$url,$class) {
@@ -547,11 +606,11 @@ function displayoptionlist($name,$size,$rs,$valuefield,$listfield,$default,$comm
  
  function db_connect() {
 	
-	$user="root";
-	$password="Felpecz";
+	$user="szentiras";
+	$password="saritnezs11";
 	$database="bible";
 
-	if($_SERVER['HTTP_HOST'] == 'localhost') $password = '';
+	//if($_SERVER['HTTP_HOST'] == 'localhost') $password = '';
 	$db_link = mysql_connect('localhost:3306',$user,$password) or die ("Can't connect to mysql");
 	//mysql_set_charset('utf8',$db_link);
 	mysql_query("SET CHARACTER SET 'utf8'");
@@ -636,8 +695,37 @@ function igenaptar($datum = false) {
 			$olvasmany = 'Zsolt'.(( (int) $matches[1]) + 1 );
 		}
 		$code = isquotetion(preg_replace('/ /','',$olvasmany));
-		if(is_array($code)) $olvasmany = $code['code'];
-		$return .= " <a href='".$baseurl."KNB/".preg_replace('/ /','',$olvasmany)."' class='link'>".$olvasmany."</a><br>";
+		if(is_array($code)) {
+			$olvasmany = $code['code'];
+			$return .= " <div style='height:20px'><a href='".$baseurl."KNB/".preg_replace('/ /','',$olvasmany)."' class='link'>".$olvasmany."</a> ";
+	
+		$query = "SELECT gepi FROM tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans  WHERE tdverse.trans = ".$code['reftrans']." AND tdbook.abbrev = '".$code['book']."' LIMIT 1";
+		$result = db_query($query);
+		if($result[0]['gepi']!='') {
+			$query = "SELECT tdtrans.*, tdtrans.abbrev as transabbrev,tdbook.abbrev, tdverse.trans FROM tdverse 
+				LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans 
+				LEFT JOIN tdtrans ON tdverse.trans = tdtrans.id WHERE gepi = ".$result[0]['gepi']."
+				 ORDER BY tdtrans.denom, tdtrans.name";
+		
+			$results = db_query($query);
+			if(count($results)>1) {
+			$content = "</div><div style='float:right;margin-top:-30px'>";
+			foreach($results as $result) {
+				$transcode = preg_replace('/ /','',preg_replace("/^".$code['book']."/",$result['abbrev'],$code['code']));
+				$url = $baseurl.$result['transabbrev']."/".$transcode;
+				
+				//if($transcode = $code['code'] AND $code['reftrans'] == $['trans']) $style = " style=\"background-color:#9DA7D8;color:white;\" "; else $style = '';
+				$style = '';
+				$change = "<a href=\"".$url."\" ".$style." class=\"button minilink\">".$result['transabbrev']."</a>\n";
+				$content .= $change;//echo $url;
+			} }
+			$return .=  $content."</div><br>";
+		
+			}
+		}
+		
+	
+	
 	}
 	$return .= '</p>';
 

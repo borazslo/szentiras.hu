@@ -11,10 +11,10 @@ function isquotetion($text,$forcedtrans = false) {
 	}
 	
 	/* összeszedjük a lehetséges könyv rövidítéseket */
-	$rs = $db->execute("SELECT abbrev, reftrans FROM tdbook ORDER BY reftrans DESC");
+	$rs = $db->execute("SELECT trans, abbrev FROM tdbook ORDER BY trans ");
 	do {
 		if($rs->fields['abbrev'] != '') {
-			$books[$rs->fields['reftrans']][] = preg_replace('/ /','',$rs->fields['abbrev']);
+			$books[$rs->fields['trans']][] = preg_replace('/ /','',$rs->fields['abbrev']);
 			$abbrevs[preg_replace('/ /','',$rs->fields['abbrev'])] = preg_replace('/ /','',$rs->fields['abbrev']);
 			$pattern = '/^'.preg_replace('/ /','',$rs->fields['abbrev']).'([0-9]{1,2}|$)/i';
 			$text = preg_replace($pattern,preg_replace('/ /','',$rs->fields['abbrev']).'$1',$text);
@@ -80,17 +80,17 @@ function isquotetion($text,$forcedtrans = false) {
 		
 		$pattern = "/^(".implode("|",$abbrevs).")([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1}(;([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1})*$/i";
 		preg_match($pattern,$text,$matches);
-		
 		$quote['book'] = $matches[1];
 		$quote['code'] = preg_replace("/^(".implode("|",$abbrevs).")/",'$1 ',$text);
 		$quote['reftrans'] = $reftrans;
-		if(preg_match("/^(".implode("|",$abbrevs).")([0-9]{1,3})$/i",$text,$match)) {
-			$query = "SELECT numv FROM tdverse WHERE reftrans = ".$quote['reftrans']." AND abbook = '".$quote['book']."' AND numch = ".$match[2]." ORDER BY ABS(numv) DESC LIMIT 1";
+		$pattern = "/^(".implode("|",$abbrevs).")([0-9]{1,3})$/i";
+		if(preg_match($pattern,$text,$match)) {
+			$query = "SELECT numv FROM tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans  WHERE tdverse.trans = ".$quote['reftrans']." AND tdbook.abbrev = '".$quote['book']."' AND chapter = ".$match[2]." ORDER BY ABS(numv) DESC LIMIT 1";
 			$numv = db_query($query);
 			if(is_array($numv) AND $numv[0]['numv']>0) {
 				/* TODO: vesszőt vagy kettőspontot?? */
 				$quote['tag'][1]['code'] = $match[2].",1-".$numv[0]['numv'];
-				$quote['tag'][1]['numch'] = $match[2];
+				$quote['tag'][1]['chapter'] = $match[2];
 				for($s=1;$s<=$numv[0]['numv'];$s++)
 				$quote['tag'][1]['numv'][] = $s;							
 			}
@@ -106,13 +106,14 @@ function isquotetion($text,$forcedtrans = false) {
 			switch ($case-1) {
 				case 0:
 					preg_match('/^([0-9]{1,3})-([0-9]{1,3})$/',$tag,$tmp);
+					//print_R($tmp);
 					for($c=$tmp[1];$c<=$tmp[2];$c++) {
-						$query = "SELECT numv FROM tdverse WHERE reftrans = ".$quote['reftrans']." AND abbook = '".$quote['book']."' AND numch = $c ORDER BY ABS(numv) DESC LIMIT 1";
+						$query = "SELECT numv FROM tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans WHERE tdverse.trans = ".$quote['reftrans']." AND tdbook.abbrev = '".$quote['book']."' AND chapter = $c ORDER BY ABS(numv) DESC LIMIT 1";
 						$numv = db_query($query);
 						if(is_array($numv) AND $numv[0]['numv']>0) {
 							/* TODO: vesszőt vagy kettőspontot?? */
 							$quote['tag'][$key*100+$c]['code'] = $c.",1-".$numv[0]['numv'];
-							$quote['tag'][$key*100+$c]['numch'] = $c;
+							$quote['tag'][$key*100+$c]['chapter'] = $c;
 							for($s=1;$s<=$numv[0]['numv'];$s++)
 								$quote['tag'][$key*100+$c]['numv'][] = $s;							
 						}
@@ -121,13 +122,13 @@ function isquotetion($text,$forcedtrans = false) {
 				case 2:
 					preg_match('/^([0-9]{1,3})(,|:)([0-9]{1,2})-([0-9]{1,3})(,|:)([0-9]{1,2})$/',$tag,$tmp);
 					for($c=$tmp[1];$c<=$tmp[4];$c++) {
-						$query = "SELECT numv FROM tdverse WHERE reftrans = ".$quote['reftrans']." AND abbook = '".$quote['book']."' AND numch = $c ORDER BY ABS(numv) DESC LIMIT 1";
+						$query = "SELECT numv FROM tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans WHERE tdverse.trans = ".$quote['reftrans']." AND tdbook.abbrev = '".$quote['book']."' AND chapter = $c ORDER BY ABS(numv) DESC LIMIT 1";
 						$numv = db_query($query);
 						if(is_array($numv) AND $numv[0]['numv']>0) {
 							if($c==$tmp[1]) $from = $tmp[3]; else $from = 1;
 							if($c==$tmp[4]) $to = $tmp[6]; else $to = $numv[0]['numv'];
 							$quote['tag'][$key*100+$c]['code'] = $c.$tmp[2].$from."-".$to;
-							$quote['tag'][$key*100+$c]['numch'] = $c;
+							$quote['tag'][$key*100+$c]['chapter'] = $c;
 							for($s=$from;$s<=$to;$s++)
 								$quote['tag'][$key*100+$c]['numv'][] = $s;				
 						}
@@ -135,10 +136,10 @@ function isquotetion($text,$forcedtrans = false) {
 					break;
 				case 1:
 					preg_match('/^([0-9]{1,3})(,|:)(.*?)$/',$tag,$tmp);
-					$query = "SELECT numv FROM tdverse WHERE reftrans = ".$quote['reftrans']." AND abbook = '".$quote['book']."' AND numch = ".$tmp[1]." ORDER BY ABS(numv) DESC LIMIT 1";
+					$query = "SELECT numv FROM tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans WHERE tdverse.trans = ".$quote['reftrans']." AND tdbook.abbrev = '".$quote['book']."' AND chapter = ".$tmp[1]." ORDER BY ABS(numv) DESC LIMIT 1";
 					$numv = db_query($query);
 					if(is_array($numv) AND $numv[0]['numv']>0) {
-						$quote['tag'][$key*100]['numch'] = $tmp[1];
+						$quote['tag'][$key*100]['chapter'] = $tmp[1];
 						$quote['tag'][$key*100]['code'] = $tag;
 						
 						$tmp2 = explode('.',$tmp[3]);
@@ -154,9 +155,6 @@ function isquotetion($text,$forcedtrans = false) {
 					}
 					break;
 			}
-		
-		
-		
 		}
 		//echo $forcedtrans."+".$reftrans."+".$quote['reftrans'];
 		if($forcedtrans != NULL AND $forcedtrans != $quote['reftrans']) return FALSE;
@@ -174,7 +172,6 @@ function print_quotetion($args) {
 	$return = false;
 	
 	if(!is_array($args)) $args = array($args);
-	
 	if(in_array('title',$args)) $return .= "<p class='cim'>Idézet a szentírásból: $query<p>";
 	if(in_array('form',$args)) $return .= print_form();
 
@@ -317,15 +314,15 @@ function quotetion($argss)  {
 	foreach($kod['tag'] as $tag) {
 		if(isset($tag['numv'])) {
 		foreach($tag['numv'] as $numv) {
-				//echo $kod['reftrans']." ".$kod['book']." ".$tag['numch'].":".$numv."<br>\n";
+				//echo $kod['reftrans']." ".$kod['book']." ".$tag['chapter'].":".$numv."<br>\n";
 				$where = array(
-					'reftrans'=>$kod['reftrans'],
-					'abbook'=>$kod['book'],
-					'numch'=>$tag['numch'],
+					'tdverse.trans'=>$kod['reftrans'],
+					'tdbook.abbrev'=>$kod['book'],
+					'chapter'=>$tag['chapter'],
 					'numv'=>$numv);
 				$w = array();
 				foreach($where as $name=>$value) $w[] = " ".$name." = '".$value."'";
-				$query = "SELECT * FROM tdverse WHERE ".implode(' AND ',$w)." LIMIT 1;";
+				$query = "SELECT * FROM tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans WHERE ".implode(' AND ',$w)." LIMIT 1;";
 				//echo $query."\n";
 				$result = db_query($query);
 				if(is_array($result)) $verses2[] = $result[0];
@@ -345,7 +342,7 @@ function quotetion($argss)  {
 }
 
 
-
+/*
 function add_verses($code,$start = false) {
 
 	global $verses;
@@ -353,10 +350,10 @@ function add_verses($code,$start = false) {
 	global $reftrans;
 	global $error;
 	$tmp = explode(',',$code);
-	$chapter = db_query("SELECT numch FROM tdchapter as c, tdbook as b WHERE c.reftrans = b.reftrans AND c.abbook = b.abbrev AND b.did = $book AND numch = ".$tmp[0]." LIMIT 0,1");
+	$chapter = db_query("SELECT chapter FROM tdchapter as c, tdbook as b WHERE c.trans = b.trans AND c.abbook = b.abbrev AND b.did = $book AND numch = ".$tmp[0]." LIMIT 0,1");
 	if(!is_array($chapter)) { $error[] = "Nincs is ennyi fejezete a könyvnek."; $chapter = $tmp[0]; //return;
 	}
-	else $chapter = $chapter[0]['numch'];
+	else $chapter = $chapter[0]['chapter'];
 	$s = 'maci';
 	$tmp = explode('.',$tmp[1]);
 	foreach($tmp as $k=>$t) {
@@ -383,7 +380,7 @@ function add_verses($code,$start = false) {
 		}
 	}
 }
-
+*
 function get_verse($book,$chapter,$verse,$reftrans	= 1,$start = false) {
 	global $error;
 	
@@ -404,7 +401,7 @@ function get_verse($book,$chapter,$verse,$reftrans	= 1,$start = false) {
 	
 	return $return;
 }
-
+/**/
 function print_errors($error) {
 	$return =  "<span class=\"alap\"><font color='red'>";
 	foreach($error as $er) $return .= $er."<br>";
@@ -414,7 +411,7 @@ function print_errors($error) {
 
 function replace_hivatkozas($m) {
 	global $books, $reftrans;
-	foreach($books as $book) if($book['reftrans'] ==  $reftrans) $abbrevs[] = $book['abbrev'];	
+	foreach($books as $book) if($book['trans'] ==  $reftrans) $abbrevs[] = $book['abbrev'];	
 	$verses = preg_replace('/ /','',$m[1]);
 	$pattern = "/(".implode("|",$abbrevs).")([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1}(;([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1})*/i";
 	$verses = preg_replace_callback($pattern,"replace_hivatkozas2link",$verses);
@@ -448,9 +445,9 @@ function print_verses($verses) {
 			$verse['verse'] = preg_replace_callback($pattern,'replace_hivatkozas',$verse['verse']);
 		
 			if($verse['title']!='') $return .= "<p class='kiscim'>".$verse['title']."</p>";
-		if(array_key_exists('start',$verse) OR $k == 0 OR $numch != $verse['numch']) $return .= " <strong>".$verse['numch']."</strong> ";
+		if(array_key_exists('start',$verse) OR $k == 0 OR $numch != $verse['chapter']) $return .= " <strong>".$verse['chapter']."</strong> ";
 		$return.= " <sup>".$verse['numv']."</sup>".$verse['verse']." ";
-		$numch = $verse['numch'];
+		$numch = $verse['chapter'];
 		}
 	}
 	$return .= "</span>	";
@@ -497,14 +494,15 @@ function getvar($name) {
 }
 
 function insert_stat($texttosearch, $reftrans, $results) {
-	global $tipps;
+	global $tipps, $original;
+	
 	$tipp = strip_tags(implode('\n',$tipps));
 	db_query("SET NAMES 'utf8'");
 	db_query("SET CHARACTER SET 'utf8'");
 	if(isset($_REQUEST['texttosearch']) AND $_REQUEST['texttosearch'])
-			db_query("INSERT INTO stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,original,referrer)VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$_REQUEST['texttosearch']."','".$_SERVER['HTTP_REFERER']."');");
+			db_query("INSERT INTO stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,original,referrer)VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$original."','".$_REQUEST['HTTP_REFERER']."');");
 	else 
-		db_query("INSERT INTO stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,referrer) VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$_SERVER['HTTP_REFERER']."');");
+		db_query("INSERT INTO stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,original,referrer) VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$original."','".$_SERVER['HTTP_REFERER']."');");
 		
 	$result = db_query("SELECT * FROM stats_search WHERE texttosearch = '".$texttosearch."' AND reftrans = ".$reftrans." ORDER BY texttosearch, count DESC LIMIT 0,1",1);
 	if(is_array($result))

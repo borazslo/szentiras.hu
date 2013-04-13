@@ -63,7 +63,8 @@
 			case "mssql":
 			case "sybase":
 			case "informix":
-				include("$phpDBRootPath". "/phpDB-" . "$dbType.lib");
+				//include("$phpDBRootPath". "/phpDB-" . "$dbType.lib");
+				include("phpDB-$dbType.lib");
 				break;
 			case "":
 				die("Please edit phpDB.inc in order to use phpDB");

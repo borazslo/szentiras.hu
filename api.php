@@ -69,9 +69,27 @@ EOD;
 $content .= highlight_string("<?php
 	\$json = file_get_contents('http://szentiras.hu/API/?feladat=forditasok&hivatkozas=10100100100');
 	\$data = json_decode(\$json, TRUE);
-	echo \"<pre>\".print_r(\$json,1).\"</pre>\";
+	echo \"<pre>\".print_r(\$data,1).\"</pre>\";
 ?>",TrUE);
+$content .= '</div><br><br>';
 
+$content .='
+<div style="font-sie: 13px;
+line-heigt: 16px;
+background-color: rgba(0,0,0,0.1);">';
+
+$content .= highlight_string("<?php
+	\$json = file_get_contents('http://szentiras.hu/API/?feladat=idezet&hivatkozas=1Kor2,10-14');
+    \$data = json_decode(\$json, TRUE);
+	
+	if(\$data['valasz'] == '') echo '<strong>Hiba történt:</strong> '.\$data['hiba'];
+	else {
+		echo \"<strong>1Kor2,10-14:</strong><br>\\n\";
+		foreach(\$data['valasz']['versek'] as \$vers) {
+			echo \$vers['szoveg'].\" \";
+		}
+	}
+?>",TrUE);
 $content .= '</div><br><br>';
 
 
@@ -88,7 +106,7 @@ if(isset($_REQUEST['forditas'])) {
 		}
 	if(!isset($forcedtrans)) {
 		header('Content-type: application/json');
-		require_once("JSON.php");
+		require_once("include/JSON.php");
 		$errors[] = 'Nem létező fordítás';
 		echo json_encode(array('error'=>$errors));
 		exit;
@@ -184,7 +202,7 @@ elseif(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'idezet') {
 }
 
 if(isset($return)) {
-	require_once("JSON.php");
+	require_once("include/JSON.php");
 	if(!isset($_REQUEST['forma']) OR !in_array($_REQUEST['forma'],array('json','tomb'))) $forma = 'json'; else $forma = $_REQUEST['forma'];
 	$return['keres']['forma'] = $forma;
 	
