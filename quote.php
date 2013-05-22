@@ -31,7 +31,7 @@ function isquotetion($text,$forcedtrans = false) {
 		}
 		elseif(!in_array($book,$books[$reftrans])) {
 			for($i=5;$i>0;$i--) {
-				if(is_array($books[$i]) AND $i != $reftrans AND in_array($book,$books[$i])) {
+				if(isset($books[$i]) AND is_array($books[$i]) AND $i != $reftrans AND in_array($book,$books[$i])) {
 					$reftrans = $i;
 				}
 			}
@@ -106,7 +106,7 @@ function isquotetion($text,$forcedtrans = false) {
 			switch ($case-1) {
 				case 0:
 					preg_match('/^([0-9]{1,3})-([0-9]{1,3})$/',$tag,$tmp);
-					//print_R($tmp);
+					if(count($tmp)>2) { //print_R($tmp);
 					for($c=$tmp[1];$c<=$tmp[2];$c++) {
 						$query = "SELECT numv FROM tdverse LEFT JOIN tdbook ON book = tdbook.id AND tdbook.trans = tdverse.trans WHERE tdverse.trans = ".$quote['reftrans']." AND tdbook.abbrev = '".$quote['book']."' AND chapter = $c ORDER BY ABS(numv) DESC LIMIT 1";
 						$numv = db_query($query);
@@ -117,7 +117,7 @@ function isquotetion($text,$forcedtrans = false) {
 							for($s=1;$s<=$numv[0]['numv'];$s++)
 								$quote['tag'][$key*100+$c]['numv'][] = $s;							
 						}
-					}
+					} }
 					break;
 				case 2:
 					preg_match('/^([0-9]{1,3})(,|:)([0-9]{1,2})-([0-9]{1,3})(,|:)([0-9]{1,2})$/',$tag,$tmp);
@@ -180,7 +180,7 @@ function print_quotetion($args) {
 		$averses = $verses;
 		$verses = print_verses($verses);
 		
-		if($pverses == "<span class='alap'></span>	") { $return .= "Nincs találat.";}
+		if(isset($pverses) AND $pverses == "<span class='alap'></span>	") { $return .= "Nincs találat.";}
 		else		{ $return .= $verses;
 			
 			global $meta;
@@ -192,7 +192,9 @@ function print_quotetion($args) {
 			if (strlen($description) > 90) {
 				$stringCut = substr($description, 0, 90);
 				$datatext = substr($stringCut, 0, strrpos($stringCut, ' ')).'...'; 
-			}
+			} 
+			if(!isset($datatext)) $datatext = $description;
+			
 			$meta = '<meta property="og:description" content="'.$description.'">';
 			global $texttosearch, $baseurl;
 			$meta .= '<meta property="og:url" content="'.$baseurl.urlencode(preg_replace('/ /i','',$texttosearch)).'/" />';
@@ -421,7 +423,7 @@ function replace_hivatkozas2link($m) {
 	global $baseurl,$translations;
 	$return = '';
 	$quote = isquotetion($m[0]);
-	print_R($quore);
+	//print_R($quore);
 	if(is_array($quote)) {
 		$return = "<a href='".$baseurl.$translations[$quote['reftrans']]['abbrev']."/".$quote['code']."' class='hivatkozas' style='/*font-size: 21px;*/color: #6274B5;'>[".$quote['code']."]</a>";
 	} else $return = $m[0];
@@ -441,7 +443,7 @@ function print_verses($verses) {
 			$verse['verse'] = preg_replace('/"( |,|\.|$)/','”$1',$verse['verse']);
 			
 			//$pattern = "/{(".implode("|",$abbrevs).")([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1}(;([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1})*}/i";
-			$pattern = "/{(.*)}/";
+			$pattern = "/{(.*?)}/";
 			$verse['verse'] = preg_replace_callback($pattern,'replace_hivatkozas',$verse['verse']);
 		
 			if($verse['title']!='') $return .= "<p class='kiscim'>".$verse['title']."</p>";
@@ -496,13 +498,15 @@ function getvar($name) {
 function insert_stat($texttosearch, $reftrans, $results) {
 	global $tipps, $original;
 	
+	if(isset($_SERVER['HTTP_REFERER'])) $server = $_SERVER['HTTP_REFERER']; else $server = '';
+	
 	$tipp = strip_tags(implode('\n',$tipps));
 	db_query("SET NAMES 'utf8'");
 	db_query("SET CHARACTER SET 'utf8'");
 	if(isset($_REQUEST['texttosearch']) AND $_REQUEST['texttosearch'])
-			db_query("INSERT INTO stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,original,referrer)VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$original."','".$_REQUEST['HTTP_REFERER']."');");
+			db_query("INSERT INTO stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,original,referrer)VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$original."','".$server."');");
 	else 
-		db_query("INSERT INTO stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,original,referrer) VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$original."','".$_SERVER['HTTP_REFERER']."');");
+		db_query("INSERT INTO stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,original,referrer) VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$original."','".$server."');");
 		
 	$result = db_query("SELECT * FROM stats_search WHERE texttosearch = '".$texttosearch."' AND reftrans = ".$reftrans." ORDER BY texttosearch, count DESC LIMIT 0,1",1);
 	if(is_array($result))

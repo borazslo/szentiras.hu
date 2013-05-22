@@ -2,6 +2,12 @@ BODY {
 SCROLLBAR-FACE-COLOR: #F2EBE3; SCROLLBAR-HIGHLIGHT-COLOR: #DCC7AF; SCROLLBAR-SHADOW-COLOR: #DCC7AF; SCROLLBAR-3DLIGHT-COLOR: #F2EBE3; SCROLLBAR-ARROW-COLOR: #DCC7AF; SCROLLBAR-TRACK-COLOR: #EBEBEB; SCROLLBAR-DARKSHADOW-COLOR: #F3C300; SCROLLBAR-BASE-COLOR: #FFFFFF
 }
 
+@media only screen and (max-width: 480px) {
+	.pager {
+		display:none;
+	}
+}
+
 .alap {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000}
 .kiscim {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; font-weight: bold; color: #373A8D;margin-top: 12px; margin-bottom: 2px;}
 .alcim {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt; font-weight: bold; color: #373A8D}

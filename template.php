@@ -15,7 +15,7 @@
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-
+	<meta property="fb:admins" content="1819502454" />
 	<title><?php if(isset($pagetitle)) echo $pagetitle; ?></title>
 	<!--<meta name="description" content="A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban">-->
 	<meta name="keywords" content="biblia, katolikus, protestáns, szentírás">

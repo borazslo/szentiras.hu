@@ -57,6 +57,7 @@ if($texttosearch == '') {
 	
 	    $content .= "<p class='kiscim'> $begin - $end. találat az összesen $res2-ből.</p>";
 		foreach($tipps as $tipp) $content .= "<div id='tipp'><span class='hiba'>TIPP:</span> ".$tipp."</div>\n";
+		if(!isset($script[0])) $script[0] = '';
 		$content .= showversesnextprev($script[0]."?q=searchbible&texttosearch=$texttosearch&reftrans=$reftrans", $res2, $res3, $res4,"&");	
         $content  .= showverses($res1,"index.php?q=showchapter",$reftrans);
         $content .= showversesnextprev($script[0]."?q=searchbible&texttosearch=$texttosearch&reftrans=$reftrans", $res2, $res3, $res4,"&");	

@@ -1,4 +1,5 @@
-RewriteEngine on 
+RewriteEngine On
+RewriteBase /
 
 #RewriteCond %{REMOTE_ADDR} !^81\.182\.240\.247
 #RewriteCond %{REQUEST_URI} !^/karbantartunk\.html$
@@ -7,9 +8,19 @@ RewriteEngine on
 #RewriteRule ^(.*)$ http://szentiras.hu/karbantartunk.html [R=301,L]
 
 
-#RewriteCond %{REQUEST_FILENAME} !-f 
-#RewriteCond %{REQUEST_FILENAME} !-d 
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
 
-RewriteCond %{HTTP_HOST} kereszteny.hu$ [NC]
-RewriteRule ^(.*) http://szentiras.hu/$1 [QSA] 
+
+RewriteCond %{REQUEST_URI} !mp3$
+RewriteCond %{REQUEST_URI} !/img/.*$
+RewriteCond %{REQUEST_URI} !/css/.*$
+RewriteCond %{REQUEST_URI} !/js/.*$
+RewriteCond %{REQUEST_URI} !/include/.*$
+#RewriteCond %{HTTP_HOST} szentiras.hu$ [NC]
+RewriteCond %{REQUEST_URI}   !hang/$
+RewriteCond %{REQUEST_URI}   !index.html$
+RewriteCond %{REQUEST_URI}   !^/index.php$
+RewriteRule ^(.*) index.php?rewrite=$1 [QSA]
+
 

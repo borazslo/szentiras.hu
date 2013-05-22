@@ -1,4 +1,26 @@
+<?php 
+$curl = curl_init('http://index.hu'); 
+curl_setopt($curl, CURLOPT_FAILONERROR, true); 
+curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true); 
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); 
+curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false); 
+curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);   
+curl_setopt($curl,  CURLOPT_VERBOSE , false);
+
+$result = curl_exec($curl); 
+$value = curl_getinfo($curl);
+    var_dump($value);
+
+$result = curl_exec($curl); 
+echo $result; 
+
+print_R($curl);
+
+exit;
+?>
 <?php
+/*
+
 //header("Content-type: image/png");
 
 $q     = $_REQUEST['q'];
@@ -14,5 +36,5 @@ $green = imagecolorallocate($im, 60, 240, 60);
 
 imagefttext($im, $size, 0, -$bbox[6], -$bbox[7], $green, $font, $q);
 imagepng($im);
-imagedestroy($im);
+imagedestroy($im); */
 ?>

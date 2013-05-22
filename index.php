@@ -6,6 +6,8 @@ header('Content-type: text/html; charset=utf-8');
  *
  * esetleg fejezenként lapozható lehessen
  * az 51-100-ak url rövidítése nem kóséer
+ * keresésbe szótövek
+ * keresésbe idézőjel esetén egyben ill. előre a szüneteseket
  */
 
 $dolgozunk = false;
@@ -72,7 +74,9 @@ if(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'showtrans') {
 			}
 	}
 } elseif(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'searchbible' AND isset($_REQUEST['texttosearch']) AND isset($_REQUEST['reftrans'])) {
+	$texttosearch = $_REQUEST['texttosearch'];
 	$code = isquotetion($texttosearch);
+	
 	if($code)  {
 		
 		Header( "HTTP/1.1 301 Moved Permanently" ); 
@@ -184,11 +188,26 @@ if(isset($_REQUEST['rewrite']) AND $_REQUEST['rewrite'] != '') {
 				$reftrans = $isit['reftrans'];
 			}
 		}
+	} elseif(count($uri) == 3) {
+		foreach($translations as $tdtrans) {	
+			if($tdtrans['abbrev'] == $uri[0]) {
+				foreach($books as $book) {
+					if($book['abbrev'] == $uri[1] AND $tdtrans['id'] == $book['trans']) {
+						if($uri[2] == 'epub') $type = 'epub';
+						elseif($uri[2] == 'mobi') $type = 'mobi';
+						$reftrans = $tdtrans['id'];
+						$abbook = $uri[1];
+						$q = 'ebook';
+					}	 	
+				}
+			}
+		}
+		if(!isset($type)) $q = '404';
 	}
 	
 	if($uri[0] == 'API') {
 		$q = 'api';
-		$api = $uri[1];
+		if(isset($uri[1])) $api = $uri[1]; else $api = '';
 	}
 	
 }
@@ -212,6 +231,7 @@ $menu = new Menu();
 	}
 	$menu->add_pause();
 
+	if(!isset($form)) $form = '';
 	$form .= "<form action='".$baseurl."index.php' method='get'>\n";
 		$form .= "<input type='hidden' name='q' value='searchbible'>\n";
 		$form .= "<input type='hidden' name='reftrans' value='".$reftrans."'>\n";
@@ -220,7 +240,7 @@ $menu = new Menu();
 		$form .= "</form>\n";
 	
 	$menu->add_item("Görög újszövetségi honlap","http://www.ujszov.hu/");
-	$menu->add_item("Újszövetség: hangfájlok","http://www.kereszteny.hu/biblia/hang/");
+	$menu->add_item("Újszövetség: hangfájlok","http://szentiras.hu/hang/");
 	//$menu->add_item("A templom egere","http://templom-egere.kereszteny.hu/");
 	$menu->add_pause();
 		$menu->add_text($form);
@@ -266,6 +286,7 @@ $menu = new Menu();
 	function url_searchbible($m) {
 			//print_R($m);
 			global $baseurl, $translationIDs;
+			if(!isset($m[5])) $m[5] = '';
 			return $m[1].$baseurl.$translationIDs[$m[3]]['abbrev']."/".$m[2].$m[4].$m[5].$m[1];
 		}
 	/*

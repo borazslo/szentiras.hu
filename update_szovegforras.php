@@ -1,10 +1,13 @@
 <?php
 header('Content-type: text/html; charset=utf-8'); 
 
-include_once 'quote.php';
-include_once 'include\Dropbox-master\examples\bootstrap.php';
-//include_once 'include/Dropbox-master/examples/bootstrap.php';
+//echo phpinfo();
 
+include_once 'quote.php';
+include_once 'include/Dropbox-master/examples/bootstrap.php';
+//include_once 'include/Dropbox-master/examples/bootstrap.php';
+echo 'laci';
+exit;
 if(isset($_REQUEST['trans'])) $trans = $_REQUEST['trans'];
 else $trans = "KG";
 
@@ -62,7 +65,7 @@ for($col = 1; $col <= $data->colcount($sheetid);$col++) {
 	$cols[$data->val(1,$col,$sheetid)] = $col;
 }
 
-$max = $data->rowcount($sheetid);
+$max = 5; //$data->rowcount($sheetid);
 for($row = 3; $row <= $max; $row++) {
 	set_time_limit(60);
 	$DCC_hiv = strtolower($data->val($row,$cols['DCC_hiv'],$sheetid));
@@ -93,7 +96,9 @@ for($row = 3; $row <= $max; $row++) {
 		else $update[$DCC_hiv]['s']['title'] = $jel;
 	}
 }
-//echo"<pre>".print_R($update,1);
+echo"<pre>".print_R($update,1);
+
+exit;
  
  /*
   * mySQL

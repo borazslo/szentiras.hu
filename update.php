@@ -1,15 +1,6 @@
 <?php
 include_once 'quote.php';
 
-$results = db_query("SELECT * FROM tdverse  ORDER BY gepi;");
-foreach($results as $result) {
-	set_time_limit(60);
-	 $gepi = $result['book'].sprintf("%03d", $result['chapter']).sprintf("%03d", $result['numv']).'00';
-	$query = "UPDATE tdverse SET gepi = ".$gepi." WHERE did = ".$result['did']." LIMIT 1 ";
-	echo $query."<br>\n";
-	db_query($query);
-}
-
 /* KNB csv bedolgozása *
 $result = db_query("SELECT abbrev, oldtest FROM tdbook WHERE reftrans = 3  AND oldtest = 1 ORDER BY oldtest DESC, bookorder");
 foreach($result as $key => $res) $books[1][($key+1)] = $res['abbrev'];
@@ -173,29 +164,24 @@ foreach($rows as $key=>$row) {
 } } }
 /* */ 
 
-/* fejezetek ÉS VERSEK mennyisége *
+/* fejezetek ÉS VERSEK mennyisége */
 $books = db_query('SELECT * FROM tdbook');
 foreach($books as $book) {
-	$numch = db_query("SELECT numch FROM tdverse WHERE reftrans = '".$book['reftrans']."' AND abbook = '".$book['abbrev']."' ORDER BY numch DESC LIMIT 1;");
+	$query = "SELECT chapter FROM tdverse WHERE trans = '".$book['trans']."' AND book = '".$book['id']."' ORDER BY chapter DESC LIMIT 1;";
+	$numch = db_query($query);
 	if(is_array($numch)) {
-		$query = "UPDATE tdbook SET countch = ".$numch[0]['numch']." WHERE reftrans = '".$book['reftrans']."' AND abbrev = '".$book['abbrev']."' LIMIT 1";
-		db_query($query);
-	}
-}
-$chapters = db_query('SELECT * FROM tdbook');
-foreach($books as $book) {
-	$numch = db_query("SELECT numch FROM tdverse WHERE reftrans = '".$book['reftrans']."' AND abbook = '".$book['abbrev']."' ORDER BY numch DESC LIMIT 1;");
-	if(is_array($numch)) {
-		$query = "UPDATE tdbook SET countch = ".$numch[0]['numch']." WHERE reftrans = '".$book['reftrans']."' AND abbrev = '".$book['abbrev']."' LIMIT 1";
+		$query = "UPDATE tdbook SET countch = ".$numch[0]['chapter']." WHERE trans = '".$book['trans']."' AND id = '".$book['id']."' LIMIT 1";
+		//echo $query."<br>";
 		db_query($query);
 		
-		for($i=1;$i<=$numch[0]['numch'];$i++) {
-			$query = "SELECT numv FROM tdverse WHERE reftrans = '".$book['reftrans']."' AND abbook = '".$book['abbrev']."' AND numch = ".$i." ORDER BY ABS(numv) DESC LIMIT 1";
+		for($i=1;$i<=$numch[0]['chapter'];$i++) {
+			$query = "SELECT numv FROM tdverse WHERE trans = '".$book['trans']."' AND book = '".$book['id']."' AND chapter = ".$i." ORDER BY ABS(numv) DESC LIMIT 1";
 			//echo $query."<br>\n";
 			$numv = db_query($query);
 			if(is_array($numv)) {
 			//TAKARÍTANI KELLENE ELŐBB!!
-				$query= "INSERT INTO tdchapter (reftrans, abbook, numch, lastv) VALUES (".$book['reftrans'].",'".$book['abbrev']."',".$i.",".$numv[0]['numv'].");";
+				$query= "INSERT INTO tdchapter (trans, book, chapter, lastv) VALUES (".$book['trans'].",'".$book['id']."',".$i.",".$numv[0]['numv'].");";
+				//echo $query."<br>";
 				db_query($query);
 
 			}
@@ -208,13 +194,16 @@ foreach($books as $book) {
 /* */
 
 /* gépi kódok nagyon primitív előállítása *
-$results = db_query("SELECT * FROM tdverse WHERE gepi IS NOT NULL ORDER BY gepi;");
+$results = db_query("SELECT * FROM tdverse WHERE gepi IS NULL ORDER BY gepi;");
 foreach($results as $result) {
 	set_time_limit(60);
-	$query = "UPDATE tdverse SET gepi = ".$result['gepi']." WHERE abbook = '".$result['abbook']."' AND numch = ".$result['numch']." AND numv = ".$result['numv']." LIMIT 5 ";
+	 $gepi = $result['book'].sprintf("%03d", $result['chapter']).sprintf("%03d", $result['numv']).'00';
+	$query = "UPDATE tdverse SET gepi = ".$gepi." WHERE did = ".$result['did']." LIMIT 1 ";
 	echo $query."<br>\n";
 	db_query($query);
 }
 /**/
+
+
 
 ?>

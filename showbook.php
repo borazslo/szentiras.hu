@@ -1,5 +1,5 @@
 <?php
-  $script = explode("&",$REQUEST_URI);
+  $script = explode("&",$_SERVER['REQUEST_URI']);
 
   if(!(empty($reftrans) or empty($abbook))) {
 	$pagetitle = $abbook." (".gettransname($db,$reftrans,'true').") | Szentírás"; 

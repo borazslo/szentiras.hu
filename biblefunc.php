@@ -185,6 +185,7 @@ function showchapter($db, $reftrans, $abbook, $numch, $rs) {
 	//$abbook." ".$numch." (".gettransname($db,$reftrans,'true').")	
 	$query = "SELECT * FROM tdbook WHERE id = '".$bookid."'";
 	$results = db_query($query);
+	if(!isset($content)) $content = '';
 	if(count($results)>1) {
 		foreach($results as $result) {
 			//$transcode = preg_replace('/ /','',preg_replace("/^".$abbook."/",$result['abbrev'],$code['code']));
@@ -203,6 +204,7 @@ function showchapter($db, $reftrans, $abbook, $numch, $rs) {
         if ($reftrans==3 OR 3==3) {
           
 	  do {
+			if(!isset($hivat)) $hivat = '';
             if (strlen(trim($rs->fields["refs"]))>0) {
                $hivat .= $sb;
                $hivat .= $rs->fields["numv"] . ": ";
@@ -323,10 +325,10 @@ global $baseurl;
 
 function showhier ($db, $reftrans, $abbook, $numch) {
     global $baseurl, $fileurl;
-    $output = "<a href='" . $baseurl . "index.php?q=showbible' >Bibliák</a>\n";
+    $output = ""; // "<a href='" . $baseurl . "index.php?q=showbible' >Bibliák</a>\n";
 	//$output = "<a href='" . $baseurl . "showbible.php' class='link'>Bibliák</a>\n";
     if (!empty($reftrans)) {
-         $output = $output . " <img src='".$fileurl."img/arrowright.jpg'> ";
+         //$output = $output . " <img src='".$fileurl."img/arrowright.jpg'> ";
          $output = $output . "<a href='" . $baseurl . "index.php?q=showtrans&reftrans=" . $reftrans . "' >" . gettransname($db,$reftrans) . "</a>\n";
          if (!empty($abbook)) {
               $output = $output . " <img src='".$fileurl."img/arrowright.jpg'> ";
@@ -399,7 +401,7 @@ function advsearchbible($db, $texttosearch, $reftrans, $offset = 0, $rows = 50) 
 	  
 	  
 	  $words = explode(' ',$texttosearch);
-	  $where = ''; $query = '';
+	  $where = ''; $query = ''; $query2 = '';
 	  foreach($words as $k=>$word) {
 		$query .= "verse regexp '".$word."' ";
 		if($k < (count($words)-1)) $query .= ' AND ';
@@ -497,13 +499,17 @@ function showverses($rs,$script,$reftrans) {
 
 function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
 	global $fileurl, $baseurl;
+	$return = '';
+	//echo $request."-".$catcount."-".$offset."-".$rows."-".$paramchr."<br>";
+	
   $return =  "<table><tr>";
 
   if (!empty($request) && !empty($catcount)) {
      $request = preg_replace("/ /","_",$request);
      if (empty($offset)) {$offset=0;}
      if (empty($rows)) {$rows=50;}
-
+	 
+	 $return .= "<td align='left' width='180px'>";
      if ($offset > 0) {
          if ($offset > $rows) {
            $prevoffset = $offset - $rows;
@@ -514,12 +520,24 @@ function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
          $prevstring = $prevoffset+$prevrows;
          $prevstring = (string) $prevstring;
          $prevstring = $prevoffset+1 ." - " . $prevstring;
-         $return .= "<td align='left' width='50%'>";
 		 $return .= "<img src='".$fileurl."img/arrowleft.jpg'> ";
          $return .= shln($prevstring , $baseurl."index.php".$request . $paramchr . "offset=$prevoffset&rows=$prevrows","link");
-         $return .= "&nbsp;</td>";
      }
-
+	 $return .= "&nbsp;</td>";
+	 
+	 $return .= "<td align='center' width='*'><span class='pager'>";
+	 $signs = ceil ($catcount / $rows);
+	 for($i=1;$i<=$signs;$i++) {
+		$off = $rows * ( $i - 1 );
+		$prevrows = $rows;
+		if($off == $offset) $return .= '<span style="background-color:#CFD4EC;padding:2px"><strong>';
+		$return .= shln($i , $baseurl."index.php".$request . $paramchr . "offset=$off&rows=$prevrows","link");
+		if($off == $offset) $return .= '</strong></span>';
+		if($i < $signs) $return .= ' ';
+	}
+	$return .= '</span></td>';
+	 
+	 $return .= "<td align='right'  width='180px'>&nbsp;";
      if ($catcount > $offset+$rows) {
          $nextoffset = $offset + $rows;
          if ($catcount > $offset + 2*$rows) {
@@ -530,11 +548,10 @@ function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
          $nextstring = $nextoffset+$nextrows;
          $nextstring = (string) $nextstring;
          $nextstring = $nextoffset + 1 ." - " . $nextstring;
-         $return .= "<td align='right'  width='50%'>&nbsp;";
          $return .= shln($nextstring , $baseurl."index.php".$request .  $paramchr . "offset=$nextoffset&rows=$rows","link");
 		 $return .= " <img src='".$fileurl."img/arrowright.jpg'>";
-         $return .= "</td>";
      }
+	 $return .= "</td>";
      $return .= "</tr></table>";
   }
   return $return;
