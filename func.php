@@ -1,4 +1,108 @@
 <?php
+function simpleverse($verse) {
+	$verse = preg_replace('/([^a-zA-zöőóúüűáéíÖ ŐÓÚÜŰÁÉÍ]*)/is','',$verse);
+	$verse = preg_replace('/( ){2,10}/is',' ',$verse);
+	return $verse;
+}
+function search($text,$reftrans) {
+	  $results = array();
+ 	  
+	  foreach(array('verse','simpleverse') as $cell) {
+		$tmp = dbsearchtext($cell." regexp '([ ,\"\']|^)".$text."([\"\' ,.;?!-]|$)' ",$reftrans);
+		$results = addresults($tmp,$results);
+	  
+		$tmp = dbsearchtext($cell." regexp '".$text."' ",$reftrans);
+		$results = addresults($tmp,$results);
+		
+		$segments = explode(' ',$text);
+		$resultstmp = array(); $resultstmp2 = array(); 
+		foreach($segments as $key => $segment) {
+			$tmp = dbsearchtext($cell." regexp '([ ,\"\']|^)".$segment."([\"\' ,.;?!-]|$)' ",$reftrans);
+			foreach($tmp as $t) { 
+				$resultstmp[] = $t;
+				$resultstmp2[$t['gepi']] = $t;
+			}
+		}
+		$mm = array_count_values(array_map(function($item) {
+			return $item['gepi'];
+		}, $resultstmp));
+		
+		$resultstmp = array();
+		foreach($mm as $gepi => $m) {
+			if($m == count($segments)) {
+				$resultstmp[$gepi] = $resultstmp2[$gepi];
+			}
+		}
+		$results = addresults($resultstmp,$results);
+		
+		
+		$segments = explode(' ',$text);
+		$resultstmp = array(); $resultstmp2 = array(); 
+		foreach($segments as $key => $segment) {
+			$tmp = dbsearchtext($cell." regexp '".$segment."' ",$reftrans);
+			foreach($tmp as $t) { 
+				$resultstmp[] = $t;
+				$resultstmp2[$t['gepi']] = $t;
+			}
+		}
+		$mm = array_count_values(array_map(function($item) {
+			return $item['gepi'];
+		}, $resultstmp));
+		
+		$resultstmp = array();
+		foreach($mm as $gepi => $m) {
+			if($m == count($segments)) {
+				$resultstmp[$gepi] = $resultstmp2[$gepi];
+			}
+		}
+		$results = addresults($resultstmp,$results);
+		/*
+		$prepare = array();
+		foreach($resultstmp as $resulttmp) {
+			foreach($resulttmp as $tmp) {
+				if(array_
+			}
+		}
+		*/
+		//echo $shorttext;
+		
+	  }
+	  $order1 = array(); $order2 = array();
+	  foreach($results as $key=>$res) {
+				$order1[$key] = $res['point'];
+				$order2[$key] = $res['gepi'];
+	 }
+	  array_multisort($order1,SORT_DESC, $order2, SORT_ASC, $results);
+	  
+	  
+	  return $results;
+}
+
+function addresults($news,$old) {
+	foreach($news as $gepi => $new) {
+		if(array_key_exists($gepi,$old)) {
+			if(isset($old[$gepi]['point'])) $old[$gepi]['point']++;
+			else $old[$gepi]['point'] = 1;
+		} else {
+			$old[$gepi] = $new;
+			$old[$gepi]['point'] = 1;
+		}
+	}
+	return $old;
+}
+
+function dbsearchtext($query,$reftrans) {
+	$return = array();
+	$query = "select * from tdverse  where (".$query.") and tdverse.trans=$reftrans";
+	$results = db_query($query);
+	if(is_array($results)) 
+		foreach($results as $r) {
+			$return[$r['gepi']] = $r;
+		}
+	return $return;
+
+}
+
 
 class Menu {
 

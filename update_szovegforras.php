@@ -1,58 +1,61 @@
 <?php
 header('Content-type: text/html; charset=utf-8'); 
 
-//echo phpinfo();
+ini_set('memory_limit', '512M');
+//echo phpinfo(); exit;
+
 
 include_once 'quote.php';
 include_once 'include/Dropbox-master/examples/bootstrap.php';
-//include_once 'include/Dropbox-master/examples/bootstrap.php';
-echo 'laci';
-exit;
-if(isset($_REQUEST['trans'])) $trans = $_REQUEST['trans'];
-else $trans = "KG";
+include_once 'include/excel_reader2.php';
 
-/*
- * Dropbox
- */
- 
-// Set the file path
-// You will need to modify $path or run putFile.php first
+$transs = array();
+$result = db_query("SELECT abbrev, id FROM tdtrans ORDER BY id");
+foreach($result as $key => $res) {	$transs[$res['id']] = $res['abbrev']; }
+
+if(!isset($_REQUEST['trans']) OR !in_array($_REQUEST['trans'],$transs)) {
+	foreach($transs as $t) {
+	 echo "<a href='".$baseurl."index.php?q=update_szovegforras&trans=".$t."'>".$t."</a><br>\n";
+	}
+	exit;
+}
+else $trans = $_REQUEST['trans'];
+
+$tmp = "tmp/tmp_".$trans.".xls";
+
+/* Dropbox  */
 $path = 'Biblia_sajat_cucc/'.$trans.'/'.$trans.'_szovegforras.xls';
 $shares = $dropbox->shares($path, false);
 
-setvar('update_KG',time());
 // Set the output file
 // If $outFile is set, the downloaded file will be written
 // directly to disk rather than storing file data in memory
 $outFile = false;
 try {
-	$tmp = "tmp_".$trans.".xls";
     // Download the file
     $file = $dropbox->getFile($path, $outFile);
 	
-	if(getvar('update_'.$trans) < strtotime($file['meta']->modified)) {
+	if(getvar('update_'.$trans) < strtotime($file['meta']->modified) AND (!isset($_REQUEST['forced']) OR $_REQUEST['forced'] != true)) {
 		setvar('update_'.$trans,time());
-		echo "Nincs szükség frissítésre.";
+		echo "Nincs szükség frissítésre, mert a ".$path." nem rég lett frissítve. ".date('Y.m.d. H:i:s',strtotime($file['meta']->modified))." vs ".date('Y.m.d. H:i:s',getvar('update_'.$trans));
 		exit;
 	} 
-	setvar('update_'.$trans,time());
 	if(file_exists($tmp)) unlink($tmp);
 	file_put_contents($tmp,$file['data']);
 } catch (\Dropbox\Exception\NotFoundException $e) {
-    echo 'The file was not found at the specified path/revision';
+    echo 'The file was not found at the specified path/revision: '.$path;
 	exit;
 }
 /**/
 $books = array();
-$result = db_query("SELECT tdbook.abbrev, tdbook.bookorder, reftrans FROM tdbook, tdtrans WHERE reftrans = tdtrans.did AND tdtrans.abbrev = '".$trans."' ORDER BY bookorder");
-foreach($result as $key => $res) {	$books[$res['bookorder']] = $res; }
+$result = db_query("SELECT tdbook.abbrev, tdbook.id, trans FROM tdbook, tdtrans WHERE trans = tdtrans.id AND tdtrans.abbrev = '".$trans."' ORDER BY tdbook.id");
+foreach($result as $key => $res) {	$books[$res['id']] = $res; }
 
 /*
  * Excel
  */
-include_once 'include/excel_reader2.php';
 
-$data = new Spreadsheet_Excel_Reader("tmp_".$trans.".xls",false,'UTF-8//IGNORE');
+$data = new Spreadsheet_Excel_Reader($tmp,false,'UTF-8//IGNORE');
 $data->setUTFEncoder('iconv');
 
 foreach($data->boundsheets as $key => $sheet) {
@@ -65,8 +68,10 @@ for($col = 1; $col <= $data->colcount($sheetid);$col++) {
 	$cols[$data->val(1,$col,$sheetid)] = $col;
 }
 
-$max = 5; //$data->rowcount($sheetid);
+$max = 5; 
+$max = $data->rowcount($sheetid);
 for($row = 3; $row <= $max; $row++) {
+	
 	set_time_limit(60);
 	$DCC_hiv = strtolower($data->val($row,$cols['DCC_hiv'],$sheetid));
 	
@@ -74,15 +79,16 @@ for($row = 3; $row <= $max; $row++) {
 	$jelstatusz = $data->val($row,$cols['jelstatusz'],$sheetid);
 	
 	$update[$DCC_hiv]['w']['gepi'] = $DCC_hiv;	
-	$update[$DCC_hiv]['w']['reftrans'] = $books[(int)($DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2])]['reftrans'];
+	$update[$DCC_hiv]['w']['trans'] = $books[(int)($DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2])]['trans'];
 	
-	$update[$DCC_hiv]['s']['refbook'] = $books[(int)($DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2])]['bookorder'];
-	$update[$DCC_hiv]['s']['refchapter'] = (int)($DCC_hiv[3].$DCC_hiv[4].$DCC_hiv[5]);
-	
+	$update[$DCC_hiv]['s']['book'] = $DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2];
+	$update[$DCC_hiv]['s']['chapter'] = (int)($DCC_hiv[3].$DCC_hiv[4].$DCC_hiv[5]);
+	/*
 	$update[$DCC_hiv]['s']['abbook'] = $books[(int)($DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2])]['abbrev'];
-	$update[$DCC_hiv]['s']['numch'] = (int)($DCC_hiv[3].$DCC_hiv[4].$DCC_hiv[5]);
+	*/
+	$update[$DCC_hiv]['s']['chapter'] = (int)($DCC_hiv[3].$DCC_hiv[4].$DCC_hiv[5]);
 	$update[$DCC_hiv]['s']['numv'] = (int)($DCC_hiv[6].$DCC_hiv[7].$DCC_hiv[8]);
-		
+	
 	preg_match('/[{]{1}(.*?)[}]{1}/',$jel,$match);
 	if(count($match)>1) $update[$DCC_hiv]['s']['refs'] = $match[1];
 		
@@ -90,26 +96,30 @@ for($row = 3; $row <= $max; $row++) {
 		$jel = iconv('windows-1250', 'UTF-8',$jel); 
 	}
 	
-	if($jelstatusz==6) $update[$DCC_hiv]['s']['verse'] = $jel;
-	elseif($jelstatusz < 4) {
+	if(in_array($jelstatusz,array(6,60))) {
+		$update[$DCC_hiv]['s']['verse'] = $jel;
+		$update[$DCC_hiv]['s']['simpleverse'] = simpleverse(strip_tags($jel));
+	}
+	elseif(in_array($jelstatusz,array(1,2,3,10,20,30))) {
 		if(isset($update[$DCC_hiv]['s']['title'])) $update[$DCC_hiv]['s']['title'] .= "<br>".$jel;
 		else $update[$DCC_hiv]['s']['title'] = $jel;
 	}
+	
 }
-echo"<pre>".print_R($update,1);
-
-exit;
  
  /*
   * mySQL
   */
+  exec('mysqldump -u szentiras -p saritnezs11 bible tdverse > tmp/bible_tdverse_'.$trans.'_'.date('YmdHis').'.sql');
+  
  $tmpbook = '';
  foreach ($update as $up) {
 	set_time_limit(60);
-	if($up['s']['abbook'] != $tmpbook) {
-		$query = "DELETE FROM tdverse WHERE gepi LIKE '".(int) ($up['w']['gepi']{0}.$up['w']['gepi']{1}.$up['w']['gepi']{2}) ."%' AND reftrans = ".$up['w']['reftrans']." ";
+	if($up['s']['book'] != $tmpbook) {
+		$query = "DELETE FROM tdverse WHERE gepi LIKE '".(int) ($up['w']['gepi']{0}.$up['w']['gepi']{1}.$up['w']['gepi']{2}) ."%' AND trans = ".$up['w']['trans']." ";
+		db_query($query);
 		echo $query."<br>";
-		$tmpbook = $up['s']['abbook'];
+		$tmpbook = $up['s']['book'];
 	}
 	$set = array(); $where = array(); $insert = array();
 	foreach($up['s'] as $n=>$v) { $set[] = $n.' = "'.$v.'"'; $insert['name'][] = $n; $insert['value'][] = $v; }
@@ -135,6 +145,7 @@ exit;
 		$content = '';
 //	exit;
 }
+setvar('update_'.$trans,time());
  
 /* KNB csv bedolgozása *
 $result = db_query("SELECT abbrev, oldtest FROM tdbook WHERE reftrans = 3  AND oldtest = 1 ORDER BY oldtest DESC, bookorder");
