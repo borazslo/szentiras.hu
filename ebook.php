@@ -1,4 +1,7 @@
 <?php
+require_once('include/php-ga-1.1.1/src/autoload.php');
+use UnitedPrototype\GoogleAnalytics;
+
 if(!isset($reftrans)) $reftrans = $_REQUEST['reftrans'];
 if(!isset($abbook)) $abbook = $_REQUEST['abbook'];
 if(!isset($type)) $type = 'epub';
@@ -18,7 +21,7 @@ if (!(empty($reftrans) or empty($abbook))) {
 	$filexists = '/var/www/szentiras.hu/ebook/'.$filename.'.'.$type;
 	if(file_exists($filexists)) {
 		$tipps[] = 'EPUB';
-		insert_stat('feladat:'.$abbook.'|'.$type, $reftrans, 0);
+		//insert_stat('feladat:'.$abbook.'|'.$type, $reftrans, 0);
 		getdownload($filename.'.'.$type);
 		exit;
 	}
@@ -143,6 +146,27 @@ $tipps[] = 'EPUB';
 insert_stat('feladat:'.$abbook.'|'.$type, $reftrans, 0);
 
 
+
+// Initilize GA Tracker
+$tracker = new GoogleAnalytics\Tracker('UA-36302080-1', 'szentiras.hu');
+
+// Assemble Visitor information
+// (could also get unserialized from database)
+$visitor = new GoogleAnalytics\Visitor();
+
+// Assemble Session information
+// (could also get unserialized from PHP session)
+$session = new GoogleAnalytics\Session();
+
+/* Assemble Page information
+$page = new GoogleAnalytics\Page('/'.$type.'/'.$trans['abbrev'].'/'.$abbook);
+$page->setTitle('Szentírás ('.$trans['abbrev'].') - '.$abbook);*/
+
+$event = new GoogleAnalytics\Event('Download',$type,'/'.$type.'/'.$trans['abbrev'].'/'.$abbook);
+
+// Track page view
+$tracker->trackEvent($event, $session, $visitor);
+/* */
 
 if($type == 'epub') {
 	// Send the book to the client. ".epub" will be appended if missing.

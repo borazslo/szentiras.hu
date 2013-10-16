@@ -5,6 +5,9 @@
 Erre azért volna nagy szükség, mert többen többféle fordítást is használunk, és a keresőszó terén néha bizonytalanok vagyunk, 
 nem emlékezünk, hogy az adott fordításban éppen melyik kifejezést használja a szöveg. Ezért néha eredménytelen, 
 vagy sok vesződséget okoz egy keresett hely megtalálása.
+
+
+ebook-ban legyen benne a lábjegyzet is
 */
 
 

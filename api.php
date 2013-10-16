@@ -1,5 +1,12 @@
 <?php
+/*
+Ezdrás -> Ezekiel,
+Siralmak -> Sirák fia
+Filemon -> Filippi
+nkább bugreport: http://szentiras.hu/Ezd1,3 és http://szentiras.hu/Ezdr1,3 
 
+http://d7.aiee.eu/xxx/node/6
+*/
 
  $title = 'Fejlesztőknek';
  
@@ -100,7 +107,7 @@ $errors = array();
 if(isset($_REQUEST['forditas'])) {
 	foreach($translations as $tdtrans) {
 			if($tdtrans['abbrev'] == $_REQUEST['forditas']) {
-				$forcedtrans = $tdtrans['did']; 
+				$forcedtrans = $tdtrans['id']; 
 				break;
 			}
 		}
@@ -116,6 +123,7 @@ if(isset($_REQUEST['forditas'])) {
 if(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'forditasok') {
 		if(isset($_REQUEST['hivatkozas']) AND is_numeric($_REQUEST['hivatkozas'])) {
 			$results = db_query("SELECT * FROM tdverse WHERE gepi = ".$_REQUEST['hivatkozas']);
+			if(is_array($results)) {
 			foreach($results as $vers) {
 				$v['hely']['gepi'] = $vers['gepi'];
 				$v['hely']['szep'] = $vers['abbook']." ".$vers['numch'].",".$vers['numv'];
@@ -124,7 +132,7 @@ if(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'forditasok') {
 				$v['forditas']['rov'] = $translations[$vers['reftrans']]['abbrev'];
 				//$v['forditas']['nyelv'] = $translations[$vers['reftrans']]['lang'];
 				$verses[] = $v;
-			}
+			} }
 			$return = array(
 				'keres'=>array(
 					'feladat' => 'forditasok',
@@ -151,25 +159,28 @@ if(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'forditasok') {
 }
 elseif(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'idezet') {
 	if(isset($_REQUEST['hivatkozas'])) {
+		foreach($books as $br) $b[$br['id']] = $br['abbrev'];
 		if(isset($forcedtrans)) $code = isquotetion($_REQUEST['hivatkozas'],$forcedtrans);
-		else $code = isquotetion($_REQUEST['hivatkozas']);
-		if(is_array($code) AND isset($code['tag'][0]['numv'])) {
-			$results = quotetion(array('verses','array',"code"=>$code));
-			$verses = array();
-			foreach($results['verses'] as $vers) {
-				$v['hely']['gepi'] = $vers['gepi'];
-				$v['hely']['szep'] = $vers['abbook']." ".$vers['numch'].",".$vers['numv'];
-				$v['szoveg'] = $vers['verse'];
-				$fordit['nev'] = $translations[$vers['reftrans']]['name'];
-				$fordit['rov'] = $translations[$vers['reftrans']]['abbrev'];
-				//$fordit['nyelv'] = $translations[$vers['reftrans']]['lang'];
-				$verses[] = $v;
-			}
-			$return = array(
-				'keres'=>array(
-					'feladat' => 'idezet',
-					'hivatkozas' => $_REQUEST['hivatkozas']),
-				'valasz'=> array(
+		else $code = isquotetion($_REQUEST['hivatkozas']);		
+		
+		//if(is_array($code) AND isset($code['tag'][0]['numv'])) {
+		if(is_array($code)) {			
+				$results = quotetion(array('verses','array',"code"=>$code));
+				$verses = array();
+				foreach($results['verses'] as $vers) {
+					$v['hely']['gepi'] = $vers['gepi'];
+					$v['hely']['szep'] = $b[$vers['book']]." ".$vers['chapter'].",".$vers['numv'];
+					$v['szoveg'] = $vers['verse'];
+					$fordit['nev'] = $translations[$vers['trans']]['name'];
+					$fordit['rov'] = $translations[$vers['trans']]['abbrev'];
+					//$fordit['nyelv'] = $translations[$vers['reftrans']]['lang'];
+					$verses[] = $v;
+				}
+				$return = array(
+					'keres'=>array(
+						'feladat' => 'idezet',
+						'hivatkozas' => $_REQUEST['hivatkozas']),
+					'valasz'=> array(
 					'versek' =>$verses,
 					'forditas' => $fordit));
 			
@@ -203,7 +214,7 @@ elseif(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'idezet') {
 
 if(isset($return)) {
 	require_once("include/JSON.php");
-	if(!isset($_REQUEST['forma']) OR !in_array($_REQUEST['forma'],array('json','tomb'))) $forma = 'json'; else $forma = $_REQUEST['forma'];
+	if(!isset($_REQUEST['forma']) OR !in_array($_REQUEST['forma'],array('json','tomb','xml'))) $forma = 'json'; else $forma = $_REQUEST['forma'];
 	$return['keres']['forma'] = $forma;
 	
 	global $tipps;
@@ -219,7 +230,6 @@ if(isset($return)) {
 	}
 	
 	if($forma == 'json') {
-		
 		header('Content-type: application/json');
 		echo json_encode($return);
 		exit;
@@ -229,13 +239,57 @@ if(isset($return)) {
 		exit;
 	
 	}
+	elseif($forma == 'xml') {
+		$dom = new DOMDocument('1.0', 'utf-8');
+		$root = $dom->createElement("szentiras");
+		$attr1 = $dom->createAttribute('version'); $attr1->appendChild($dom->createTextNode('0.1'));
+		$root->appendChild($attr1);
+		
+		$keres = $dom->createElement('keres');
+		$root->appendChild($keres);
+		foreach($return['keres'] as $key => $value) {
+			$attr = $dom->createElement($key); 
+			$attr->appendChild($dom->createTextNode($value));
+			$keres->appendChild($attr);
+		}
+		
+
+	if($return['valasz'] != array()) {
+		$valasz = $dom->createElement('valasz');
+		$root->appendChild($valasz);
+		foreach($return['valasz']['versek'] as $key => $value) {
+			$attr = $dom->createElement('vers'); 
+			$vers = $valasz->appendChild($attr);		
+			foreach($value['hely'] as $k => $v) {
+				$attr = $dom->createAttribute($k); 
+				$attr->appendChild($dom->createTextNode($v));
+				$vers->appendChild($attr);
+			}
+			$vers->appendChild($dom->createTextNode($value['szoveg']));
+		}
+		
+		$attr = $dom->createAttribute('forditas-hosszu'); $attr->appendChild($dom->createTextNode($return['valasz']['forditas']['nev']));
+		$valasz->appendChild($attr);
+		$attr = $dom->createAttribute('forditas'); $attr->appendChild($dom->createTextNode($return['valasz']['forditas']['rov']));
+		$valasz->appendChild($attr);		
+	}	
+	
+	if(isset($return['hiba'])) {
+		$attr = $dom->createElement('hiba'); 
+		$hiba = $root->appendChild($attr);		
+		$hiba->appendChild($dom->createTextNode($return['hiba']));
+	}
+		header ("Content-Type:text/xml"); //header("Content-Type: text/plain");
+		echo $dom->saveXML($root); 
+		exit;
+	}
 }
 
  
  if($api!='') { 
 	header('Content-type: application/json');
 	require_once("JSON.php");
-	/*xml*/
+	/*xml*/	
 	$code = isquotetion($api,$forcedtrans);
 	global $tipps;
 	$tipps[] = 'API';

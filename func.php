@@ -137,7 +137,7 @@ class Menu {
 	function html() {
 		echo"
 		<table border='0' cellpadding='0' cellspacing='0' width='750'>";
-		
+		if(isset($this->items)) {
 		foreach($this->items as $item) {	
 		if($item=='pause') {
 			echo"<tr><td style='height:15px'></tr>";
@@ -157,7 +157,7 @@ class Menu {
                   </td>
                 </tr>";
 			}
-		}
+		}}
 		echo "</table>";
 	
 	}

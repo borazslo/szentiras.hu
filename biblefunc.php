@@ -525,8 +525,9 @@ function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
      }
 	 $return .= "&nbsp;</td>";
 	 
-	 $return .= "<td align='center' width='*'><span class='pager'>";
 	 $signs = ceil ($catcount / $rows);
+	 if($signs > 1) {
+	 $return .= "<td align='center' width='*'><span class='pager'>";
 	 for($i=1;$i<=$signs;$i++) {
 		$off = $rows * ( $i - 1 );
 		$prevrows = $rows;
@@ -536,6 +537,7 @@ function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
 		if($i < $signs) $return .= ' ';
 	}
 	$return .= '</span></td>';
+	}
 	 
 	 $return .= "<td align='right'  width='180px'>&nbsp;";
      if ($catcount > $offset+$rows) {
@@ -563,7 +565,7 @@ function gettransname($db, $reftrans,$rov = false) {
 }
 
 function getbookname($db, $reftrans, $abbook) {
- return dlookup($db, "name","tdbook","trans=$reftrans and abbrev='" . $abbook ."'");
+ return dlookup($db, "name","tdbook","trans=$reftrans and abbrev='" .$abbook ."'");
 }
 
 function shln($name,$url,$class) {
@@ -574,7 +576,9 @@ function shln($name,$url,$class) {
 
 function dlookup($db, $field,$table,$condition) {
    $querystring= "select $field from $table where $condition";
+   //echo $querystring."<br>";
    $rs = $db->execute($querystring);
+   //echo "<pre>"; print_r($rs);echo"</pre>";
    if ($rs->GetNumOfRows() > 0) {
          $rs->firstRow();
          return $rs->fields[$field];

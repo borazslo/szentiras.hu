@@ -1,6 +1,27 @@
 <?php
 include_once 'quote.php';
 
+/* verse -> simpeverse */
+$lepes = 1000;
+$kor = 150;
+for($i=0;$i<$kor;$i++) {
+	set_time_limit('120');
+	$result = array();
+	$from = $i * $lepes;
+	$to = ($i + 1) * $lepes;
+	$query = "SELECT did, verse FROM tdverse ORDER BY did LIMIT ".$from.",".$lepes.";";
+	$result = db_query($query);
+	if(is_array($result)) {
+	 foreach($result as $row) {
+		$simpleverse = preg_replace('/([^a-zA-zöőóúüűáéíÖ ŐÓÚÜŰÁÉÍ]*)/is','',$row['verse']);
+		db_query("UPDATE tdverse SET simpleverse = '".$simpleverse."' WHERE did = ".$row['did']." LIMIT 1;"); 
+		echo $row['did'].": ".$simpleverse."<br>\n";	
+	} }
+}
+echo "??"; exit;
+/* */
+
+
 /* KNB csv bedolgozása *
 $result = db_query("SELECT abbrev, oldtest FROM tdbook WHERE reftrans = 3  AND oldtest = 1 ORDER BY oldtest DESC, bookorder");
 foreach($result as $key => $res) $books[1][($key+1)] = $res['abbrev'];
@@ -164,7 +185,7 @@ foreach($rows as $key=>$row) {
 } } }
 /* */ 
 
-/* fejezetek ÉS VERSEK mennyisége */
+/* fejezetek ÉS VERSEK mennyisége *
 $books = db_query('SELECT * FROM tdbook');
 foreach($books as $book) {
 	$query = "SELECT chapter FROM tdverse WHERE trans = '".$book['trans']."' AND book = '".$book['id']."' ORDER BY chapter DESC LIMIT 1;";

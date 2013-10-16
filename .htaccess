@@ -19,6 +19,7 @@ RewriteCond %{REQUEST_URI} !/js/.*$
 RewriteCond %{REQUEST_URI} !/include/.*$
 #RewriteCond %{HTTP_HOST} szentiras.hu$ [NC]
 RewriteCond %{REQUEST_URI}   !hang/$
+RewriteCond %{REQUEST_URI}   !igenaptar/.*$
 RewriteCond %{REQUEST_URI}   !index.html$
 RewriteCond %{REQUEST_URI}   !^/index.php$
 RewriteRule ^(.*) index.php?rewrite=$1 [QSA]

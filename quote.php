@@ -47,7 +47,7 @@ function isquotetion($text,$forcedtrans = false) {
 		if(isset($matches[1])) $tmps[] = $matches[1];
 		
 		foreach($tmps as $tmp) {
-		$select = "SELECT * FROM szinonimak WHERE tipus = 'konyv' AND (binary szinonimak LIKE '%|".preg_replace('/ /','',$tmp)."|%' OR binary  szinonimak LIKE  '%|".preg_replace('/ /','',$tmp).":%');";
+		$select = "SELECT * FROM szinonimak WHERE tipus = 'konyv' AND (szinonimak LIKE '%|".preg_replace('/ /','',$tmp)."|%' OR  szinonimak LIKE  '%|".preg_replace('/ /','',$tmp).":%');";
 		$result = db_query($select); $szinonima = array();
 		if(is_array($result)) foreach($result as $r) {
 			$szinonima = array();
@@ -495,8 +495,41 @@ function getvar($name) {
 	return $result[0]['value'];
 }
 
-function insert_stat($texttosearch, $reftrans, $results) {
-	global $tipps, $original;
+function insert_stat($texttosearch, $reftrans, $results,$type = '') {
+	global $tipps, $original, $translations;
+	global $tracker;
+	
+	if(trim($tipps[0]) == 'API') $type = 'API';
+
+/* Assemble Page information *
+global $event, $session, $visitor;
+if($type == '') {
+	$event->setCategory('Search');
+	$event->setAction($translations[$reftrans]['abbrev']);
+	$event->setLabel($texttosearch);
+	$event->setValue($results);
+} elseif($type == 'API') {
+	$tmp = explode('|',$texttosearch);
+	$tmp2 = explode(':',$tmp[0]);	
+	$event->setCategory('API');
+	$event->setAction($tmp2[1]);
+	$event->setLabel($tmp[1]);
+	$event->setValue($tmp[2]);
+} elseif($type == 'rovid') {
+	$event->setCategory('Rövidítés');
+	$event->setAction($translations[$reftrans]['abbrev']);
+	$event->setLabel($texttosearch);
+	if($results == 0) $results = 1;
+	$event->setValue($results);
+}
+
+*/
+
+//	echo $event->getValue();
+//$event = new GoogleAnalytics\Event('Search',$trans['abbrev'],$texttosearch,$results);
+// Track page view
+//$tracker->trackEvent($event, $session, $visitor);
+	
 	
 	if(isset($_SERVER['HTTP_REFERER'])) $server = $_SERVER['HTTP_REFERER']; else $server = '';
 	

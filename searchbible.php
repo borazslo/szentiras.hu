@@ -45,6 +45,47 @@ if($texttosearch == '') {
 		elseif(   ) {
 		} */
 	
+	if($_REQUEST['beta'] == 'igen') {
+		$_SESSION['beta'] = 'igen';
+	} elseif($_REQUEST['beta'] == 'nem') {
+		$_SESSION['beta'] = 'nem';
+	}
+	
+	if($_SESSION['beta'] == 'igen') {
+		global $books;
+		
+		
+		$content .= "<div style='float:right'><a href='".$baseurl.$translations[$reftrans]['abbrev'].'/'.$texttosearch."?beta=nem'>béta kikapcsolása</a></div>";
+		
+		$results = search($texttosearch,$reftrans);
+		if(count($results)>0) {
+			$content .= "<div class='results2'><p class='title'><br/><strong>".count($results)." db béta találat</strong></p>";
+			
+			foreach($results as $result) { 
+				//echo "<pre>".print_r($books,1)."</pre>";
+				foreach($books as $b) {
+					if($b['trans'] == $reftrans  AND $b['id'] == (int) substr($result['gepi'],0,3))
+						$book = $b;
+				}
+				//$book = $books[(int) substr($result['gepi'],0,3)]; 
+				$szep = $book['abbrev'] ." ". (int) substr($result['gepi'],4,2).",".(int) substr($result['gepi'],7,2);
+				$link = "<a href='http://szentiras.hu/API/?feladat=forditasok&hivatkozas=".$result['gepi']."&forma=tomb'>".$result['gepi']."</a>";
+				
+				$href = $baseurl.$translations[$reftrans]['abbrev']."/".preg_replace('/ /','',$szep)."#".(int) substr($result['gepi'],9,2);
+				
+				$content .= '<img src="http://szentiras.hu/img/arrowright.jpg">&nbsp;';
+				$content .=  "<font color='red'><strong>".$result['point']."</strong></font> ";
+				$content .= "<a href='".$href."' class='link'>".$szep."</a> - ".substr(strip_tags($result['verse']),0,800)."<br>";
+				
+				$s++; if($s > 100) { $content .= '<br/><strong> ... és további '.(count($results)-$s)."</strong>" ; break; }
+				}
+			
+			$content .= "</div>";
+			
+			insert_stat('BÉTA|'.$texttosearch,$reftrans,count($results));
+		}
+	} else {
+	
 	
 	 if ($res2 > 0) {
         $begin=$res3+1;
@@ -54,6 +95,8 @@ if($texttosearch == '') {
            $end = $begin + $res4 -1;
         }
 		if($begin == 1) insert_stat($texttosearch,$reftrans,$res2);		
+	
+		$content .= "<div style='float:right'><a href='".$baseurl.$translations[$reftrans]['abbrev'].'/'.$texttosearch."?beta=igen'>béta bekapcsolása</a></div>";
 	
 	    $content .= "<p class='kiscim'> $begin - $end. találat az összesen $res2-ből.</p>";
 		foreach($tipps as $tipp) $content .= "<div id='tipp'><span class='hiba'>TIPP:</span> ".$tipp."</div>\n";
@@ -68,6 +111,9 @@ if($texttosearch == '') {
 		foreach($tipps as $tipp) $content .= "<div id='tipp'><span class='hiba'>TIPP:</span> ".$tipp."</div>\n";
 		insert_stat($texttosearch,$reftrans,-1);
 	}
+	
+	}
+	
 	/* END */
 	} else {
 	/*
@@ -104,9 +150,9 @@ if($texttosearch == '') {
 		
 		
 		if($error == array()) {
-			insert_stat($texttosearch,$reftrans,0);
+			insert_stat($texttosearch,$reftrans,0,'rovid');
 		} else {
-			insert_stat($texttosearch,$reftrans,-1);
+			insert_stat($texttosearch,$reftrans,-1,'rovid');
 		}
 		
 	

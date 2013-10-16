@@ -55,6 +55,18 @@
 	<!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements and feature detects -->
 	<script src="<?php echo $fileurl; ?>js/modernizr-2.5.3-min.js"></script>
 
+	<?php
+	if(isset($scripts)) {
+		foreach($scripts as $script) {
+		//echo $fileurl.'js/'.$script;
+		echo '<script src="'.$fileurl.'js/'.$script.'"></script>'."\n";
+		if(file_exists($fileurl.'js/'.$script)) {
+			//echo '<script src="'.$fileurl.'js/'.$script.'"></script>'."\n";
+		
+		}
+		}
+	}
+	?>
 	<style type="text/css">
 
 	/*  THIS IS JUST TO GET THE GRID TO SHOW UP.  YOU DONT NEED THIS IN YOUR CODE */
@@ -95,8 +107,8 @@
 		?>
 		<header>
 		<!--<?php if(isset($pagetitle)) echo "<h1>".$pagetitle."</h1>"; ?>-->
-		<h1>Szentírás</h1>
-		<h2>Magyar Keresztény Portál</h2>
+		<h1><?php if(isset($sitetitle)) echo $sitetitle; ?></h1>
+		<?php if(isset($subsitetitle)) echo "<h2>".$subsitetitle."</h2>"; ?>
 		<!--<p class="introtext">You're gonna have to view the source to grab the code here.</p>-->
 		</header>
 	</div>
@@ -119,7 +131,7 @@
 				
 				<div class="col span_1_of_2" style="position: relative;">
 				
-				<?php $menu->html(); ?>
+				<?php if(isset($menu->items)) $menu->html(); ?>
 				</div>
 				
 			</div>
@@ -149,12 +161,8 @@
 	
 		<footer class="group">
 			<div class="col span_1_of_2">
-				<p>&copy; <a href='http://www.kereszteny.hu/mkie' class='menulink'>MKIE</a> - 
-				<a href='http://www.oki-iroda.hu' class='menulink'>ÖKI</a> - 
-				<a href='http://kim.katolikus.hu' class='menulink'>KIM</a>
-				 2001-2010,<br>
-				 &copy; <a href='http://www.eleklaszlo.hu' class='menulink'>Elek László SJ</a> 2013.<br>
-				 Minden jog fenntartva.</p>
+				<?php if(isset($copyright)) echo $copyright; ?>
+			
 				
 			</div>
 			<div class="col span_2_of_2">

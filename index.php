@@ -1,4 +1,17 @@
 <?php 
+require_once('/var/www/szentiras.hu/include/php-ga-1.1.1/src/autoload.php');
+use UnitedPrototype\GoogleAnalytics;
+// Initilize GA Tracker
+//$tracker = new GoogleAnalytics\Tracker('UA-36302080-1', 'szentiras.hu');
+// Assemble Visitor information
+// (could also get unserialized from database)
+//$visitor = new GoogleAnalytics\Visitor();
+// Assemble Session information
+// (could also get unserialized from PHP session)
+//$session = new GoogleAnalytics\Session();
+
+//$event = new GoogleAnalytics\Event('','','');
+
 session_start();
 header('Content-type: text/html; charset=utf-8'); 
 
@@ -142,7 +155,7 @@ if(isset($_REQUEST['rewrite']) AND $_REQUEST['rewrite'] != '') {
 				else {
 					foreach($books as $book) {
 						if($book['abbrev'] == $uri[1] AND $book['trans'] == $tdtrans['id']) {
-							$q = 'showbook';
+							$q = 'showbook';							
 							$reftrans = $tdtrans['id'];
 							$abbook = $uri[1];
 							break;
