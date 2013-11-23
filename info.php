@@ -14,6 +14,7 @@ ebook-ban legyen benne a lábjegyzet is
 $title = 'Fejlesztések';
 $pagetitle = 'Fejlesztések | Szentírás';
 $content .= '<br>
+  <span class="cim">2013. 11. 12. </span><span class="alcim">Új szövegek </span><span class="alap"> mindegyik fordításban. Ehhez viszont adatbázis átalakítás is kellett, aminek eredményeként <font color="red">speciális keresésfunkciók ideiglenesen nem elérhetőek</font>.</span>
   <span class="cim">2013. 06. 05. </span><span class="alcim">Szöveg frissítés </span><span class="alap"> három fordításban (KNB, UF, KG)</span>
   <span class="cim">2013. 05. 18. </span><span class="alcim">ebook </span><span class="alap">.epub és .mobi változatban könyvenként elolvasható a Szentírás: /epub </span>
   <span class="cim">2013. 04. 23. </span><span class="alcim">Költözés </span><span class="alap">új virtuális szervert kaptunk a legfrissebb programokkal </span>

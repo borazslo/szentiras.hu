@@ -24,42 +24,34 @@ if($texttosearch == '') {
 	
 	$code = isquotetion($texttosearch);
 	if($code)  $texttosearch = $code['code'];
-	$pagetitle = $texttosearch." (".gettransname($db,$reftrans,'true').") | Szentírás"; 
+	$pagetitle = $texttosearch." (".gettransname($reftrans,'true').") | Szentírás"; 
 	 
 	if(!is_array($code)) {
 	/*
 	 * HA SZÖVEGET KERES
 	 */
-		$title .= "<a href='".$baseurl."index.php?q=searchbible'>Keresés</a>: „".$texttosearch."”\n";
-		$content .= "<span class='alap'>Fordítás: <a href='".$baseurl."index.php?q=showbible&reftrans=".$reftrans."'>". dlookup($db,"name","tdtrans","id=$reftrans") . "</a></span><br>\n";
+		$title .= "<a href='".BASE."index.php?q=searchbible'>Keresés</a>: „".$texttosearch."”\n";
+		$content .= "<span class='alap'>Fordítás: <a href='".BASE."index.php?q=showbible&reftrans=".$reftrans."'>". dlookup("name","tdtrans","id=$reftrans") . "</a></span><br>\n";
+
+        /*
 		list($res1, $res2, $res3, $res4)=advsearchbible($db,$texttosearch,$reftrans,$offset,$rows);
-		$tipps = get_tipps($texttosearch,$reftrans,$res2);	
-		
+		$tipps = get_tipps($texttosearch,$reftrans,$res2);			
 		//HA EGY SZÓBÓL ÁLL
 		if( ( $res2 > $min OR $res2 < $max OR $res2 < 0) AND count(explode(' ',$texttosearch)) == 1 ) {
 			getSzinonimaTipp($texttosearch);
 			//getSpellTipp($texttosearch); 
 			//get több szó
-		}/*
-		// több szó
-		elseif(   ) {
-		} */
-	
-	if($_REQUEST['beta'] == 'igen') {
-		$_SESSION['beta'] = 'igen';
-	} elseif($_REQUEST['beta'] == 'nem') {
-		$_SESSION['beta'] = 'nem';
-	}
-	
-	if($_SESSION['beta'] == 'igen') {
-		global $books;
+		}
+        */        
+		global $books;	
 		
-		
-		$content .= "<div style='float:right'><a href='".$baseurl.$translations[$reftrans]['abbrev'].'/'.$texttosearch."?beta=nem'>béta kikapcsolása</a></div>";
-		
-		$results = search($texttosearch,$reftrans);
+        if($texttosearch == '') { 
+		$content .= printSearchForm(); 
+        }
+        
+		$results = search($texttosearch,$reftrans,$offset,$rows);
 		if(count($results)>0) {
-			$content .= "<div class='results2'><p class='title'><br/><strong>".count($results)." db béta találat</strong></p>";
+			$content .= "<div class='results2'><p class='title'><br/><strong>".count($results)." db találat</strong></p>";
 			
 			foreach($results as $result) { 
 				//echo "<pre>".print_r($books,1)."</pre>";
@@ -69,13 +61,15 @@ if($texttosearch == '') {
 				}
 				//$book = $books[(int) substr($result['gepi'],0,3)]; 
 				$szep = $book['abbrev'] ." ". (int) substr($result['gepi'],4,2).",".(int) substr($result['gepi'],7,2);
-				$link = "<a href='http://szentiras.hu/API/?feladat=forditasok&hivatkozas=".$result['gepi']."&forma=tomb'>".$result['gepi']."</a>";
+				$link = "<a href='".BASE."API/?feladat=forditasok&hivatkozas=".$result['gepi']."&forma=tomb'>".$result['gepi']."</a>";
 				
-				$href = $baseurl.$translations[$reftrans]['abbrev']."/".preg_replace('/ /','',$szep)."#".(int) substr($result['gepi'],9,2);
+				//$href = BASE.$translations[$reftrans]['abbrev']."/".preg_replace('/ /','',$szep)."#".(int) substr($result['gepi'],9,2);
+                $href = BASE.$translations[$reftrans]['abbrev']."/".preg_replace('/ ([0-9]{1,3}),(.*?)/','$1#$2',$szep);
+				$szep = preg_replace('/^([^,]{0,8}).*?$/','$1',$szep);
 				
-				$content .= '<img src="http://szentiras.hu/img/arrowright.jpg">&nbsp;';
-				$content .=  "<font color='red'><strong>".$result['point']."</strong></font> ";
-				$content .= "<a href='".$href."' class='link'>".$szep."</a> - ".substr(strip_tags($result['verse']),0,800)."<br>";
+				$content .= '<img src="'.BASE.'img/arrowright.jpg" title="'.$result['point'].'">&nbsp;';
+				//$content .=  "<font color='red'><strong>".$result['point']."</strong></font> ";
+				$content .= "<a href='".$href."' class='link'>".$szep."</a> - ".substr(showverse($result['gepi'],$reftrans,'verseonly'),0,800)."<br>";
 				
 				$s++; if($s > 100) { $content .= '<br/><strong> ... és további '.(count($results)-$s)."</strong>" ; break; }
 				}
@@ -84,42 +78,14 @@ if($texttosearch == '') {
 			
 			insert_stat('BÉTA|'.$texttosearch,$reftrans,count($results));
 		}
-	} else {
 	
-	
-	 if ($res2 > 0) {
-        $begin=$res3+1;
-        if ($begin + $res4 > $res2 ) {
-           $end = $res2;
-        } else {
-           $end = $begin + $res4 -1;
-        }
-		if($begin == 1) insert_stat($texttosearch,$reftrans,$res2);		
-	
-		$content .= "<div style='float:right'><a href='".$baseurl.$translations[$reftrans]['abbrev'].'/'.$texttosearch."?beta=igen'>béta bekapcsolása</a></div>";
-	
-	    $content .= "<p class='kiscim'> $begin - $end. találat az összesen $res2-ből.</p>";
-		foreach($tipps as $tipp) $content .= "<div id='tipp'><span class='hiba'>TIPP:</span> ".$tipp."</div>\n";
-		if(!isset($script[0])) $script[0] = '';
-		$content .= showversesnextprev($script[0]."?q=searchbible&texttosearch=$texttosearch&reftrans=$reftrans", $res2, $res3, $res4,"&");	
-        $content  .= showverses($res1,"index.php?q=showchapter",$reftrans);
-        $content .= showversesnextprev($script[0]."?q=searchbible&texttosearch=$texttosearch&reftrans=$reftrans", $res2, $res3, $res4,"&");	
-    
-	} else {
-	
-		$content .= "<br><p>Nincs találat!</p>";
-		foreach($tipps as $tipp) $content .= "<div id='tipp'><span class='hiba'>TIPP:</span> ".$tipp."</div>\n";
-		insert_stat($texttosearch,$reftrans,-1);
-	}
-	
-	}
 	
 	/* END */
 	} else {
 	/*
 	 * HA IGEHELYET KERES
 	 */
-		$title = "<a href='".$baseurl."index.php?q=showtrans&reftrans=".$code['reftrans']."'>".dlookup($db,"name","tdtrans","id=".$code['reftrans']."")."</a> <img src='".$fileurl."img/arrowright.jpg'> ".$code['code']."\n";
+		$title = "<a href='".BASE."index.php?q=showtrans&reftrans=".$code['reftrans']."'>".dlookup("name","tdtrans","id=".$code['reftrans']."")."</a> <img src='".BASE."img/arrowright.jpg'> ".$code['code']."\n";
 		
 		$quotation = quotetion(array('verses','array','code'=>$code));
 		
@@ -138,8 +104,8 @@ if($texttosearch == '') {
 			$results = db_query($query);
 			if(count($results)>1) {
 			foreach($results as $result) {
-				$transcode = preg_replace('/ /','',preg_replace("/^".$code['book']."/",$result['abbrev'],$code['code']));
-				$url = $baseurl.$result['transabbrev']."/".$transcode;
+				$transcode = preg_replace('/ /','',preg_replace("/^".$code['book']."/",$code['bookurl'],$code['code']));
+				$url = BASE.$result['transabbrev']."/".$transcode;
 				
 				if($transcode = $code['code'] AND $code['reftrans'] == $result['trans']) $style = " style=\"background-color:#9DA7D8;color:white;\" "; else $style = '';
 				$change = "<a href=\"".$url."\" ".$style." class=\"button minilink\">".$result['transabbrev']."</a> \n";
@@ -168,10 +134,9 @@ if($texttosearch == '') {
 	if($results < 101) {
 	$better = get_better($texttosearch,$reftrans,$results);
 	if($better != array()) {
-			global $baseurl; global $db;
 			$trans = array(); foreach(db_query("SELECT * FROM tdtrans") as $list) $trans[$list['id']] = $list;
 			foreach($better as $bet) {
-			$return[] = "<a href='".$baseurl."index.php?q=searchbible&texttosearch=".$texttosearch."&reftrans=".$bet['reftrans']."' class=link>A ".$trans[$bet['reftrans']]['name']." fordításában több eredmény vár (".$bet['results']." találat)! </a>";
+			$return[] = "<a href='".BASE."index.php?q=searchbible&texttosearch=".$texttosearch."&reftrans=".$bet['reftrans']."' class=link>A ".$trans[$bet['reftrans']]['name']." fordításában több eredmény vár (".$bet['results']." találat)! </a>";
 			}		
 	}
 	/*
@@ -229,12 +194,12 @@ if($texttosearch == '') {
 	return $szinonima;
   }
   function getSzinonimaTipp($texttosearch) {
-	global $baseurl; global $reftrans;
+	 global $reftrans;
 	$szinonima = getSzinonima($texttosearch);
 	$return = "Talán próbáld más szavakkal: ";
 	$c = 1;
 	foreach($szinonima as $szin) {
-		$return .= " <a href='".$baseurl."index.php?q=searchbible&texttosearch=".$szin."&reftrans=".$reftrans."' class=link>".$szin."</a>";		
+		$return .= " <a href='".BASE."index.php?q=searchbible&texttosearch=".$szin."&reftrans=".$reftrans."' class=link>".$szin."</a>";		
 		if($c<count($szinonima)) $return .= ',';
 		$c++;
 	}
@@ -262,11 +227,11 @@ if($texttosearch == '') {
 	return $hunspell;
   }
   function getSpellTipp($texttosearch) {
-	global $baseurl; global $reftrans;
+	 global $reftrans;
 	$spell = getSpell($texttosearch,1);
 	$return = "Nem így gondoltad: ";
 	foreach($spell as $s) {
-		$return .= " <a href='".$baseurl."index.php?q=searchbible&texttosearch=".$s."&reftrans=".$reftrans."' class=link>".$s."</a>";		
+		$return .= " <a href='".BASE."index.php?q=searchbible&texttosearch=".$s."&reftrans=".$reftrans."' class=link>".$s."</a>";		
 	}
 	$return .= '?';
 	if($spell != array()) { global $tipps; $tipps[] = $return; return true; }
@@ -295,13 +260,13 @@ if($texttosearch == '') {
   }
   
     function get_more($texttosearch, $reftrans, $results) {
-		global $baseurl;
+		
 		$results = db_query("SELECT * FROM stats_search WHERE texttosearch regexp '".$texttosearch."' AND reftrans = ".$reftrans." AND results < ".$results." AND results > 0 ORDER BY texttosearch DESC, count DESC LIMIT 0,10");	
 		$return = 'Próbálkozz hosszabb kifejezéssel! ';
 		if(is_array($results)) {
 			$return .= 'Például: ';
 			foreach($results as $k => $result) {
-				$return .= " <a href='".$baseurl."index.php?q=searchbible&texttosearch=".$result['texttosearch']."&reftrans=".$reftrans."' class='link'>".$result['texttosearch']." (".$result['results']." találat)</a>";
+				$return .= " <a href='".BASE."index.php?q=searchbible&texttosearch=".$result['texttosearch']."&reftrans=".$reftrans."' class='link'>".$result['texttosearch']." (".$result['results']." találat)</a>";
 				if($k < (count($results)-1)) $return .= ', ';
 				else $return .= '.';
 			}
@@ -314,7 +279,7 @@ if($texttosearch == '') {
 		if(!is_numeric($results)) $results = 0;
 	
 		$return = false;
-		global $baseurl;
+		
 		$words = explode(' ',$texttosearch);
 		if(count($words)>1) {
 			$where = '(';
@@ -328,7 +293,7 @@ if($texttosearch == '') {
 			if(is_array($results)) {
 				$return = 'Próbálkozz rövidebb kifejezéssel! Például: ';
 				foreach($results as $k => $result) {
-					$return .= " <a href='".$baseurl."index.php?q=searchbible&texttosearch=".$result['texttosearch']."&reftrans=".$reftrans."' class='link'>".$result['texttosearch']." (".$result['results']." találat)</a>";
+					$return .= " <a href='".BASE."index.php?q=searchbible&texttosearch=".$result['texttosearch']."&reftrans=".$reftrans."' class='link'>".$result['texttosearch']." (".$result['results']." találat)</a>";
 					if($k < (count($results)-1)) $return .= ', ';
 					else $return .= '.';
 				}
@@ -340,13 +305,13 @@ if($texttosearch == '') {
 	}
 
 	function printSearchForm() {
-		global $db, $reftrans,$baseurl;
+		global $reftrans;
 		$return = "<p class='cim'>Keresés a Bibliában</p>";
-		$return .= "<form action='".$baseurl."index.php' method='get'>\n";
+		$return .= "<form action='".BASE."index.php' method='get'>\n";
 		$return .= "<input type='hidden' name='q' value='searchbible'>\n";
 		$return .= displaytextfield("texttosearch",30,80,"","Keresendő:","alap");
 		
-		$return .= displayoptionlist("reftrans",1,listbible($db),"id","name",$reftrans,"Fordítás:","alap");
+		$return .= displayoptionlist("reftrans",1,listbible(),"id","name",$reftrans,"Fordítás:","alap");
 		$return .= '<br><br>';
 		//$return .= "<input type=reset value='Törlés' class='alap'> &nbsp;&nbsp;\n";
 		$return .= "<input type=submit value='Küldés' class='alap'>\n";

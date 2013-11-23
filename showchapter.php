@@ -2,13 +2,14 @@
 //if (!(empty($reftrans) or empty($abbook) or empty($numch))) {
 if (!(empty($reftrans) or empty($abbook))) {
  
-	$pagetitle = $abbook." ".$numch." (".gettransname($db,$reftrans,'true').") | Szentírás"; 
+	$pagetitle = $abbook." ".$numch." (".gettransname($reftrans,'true').") | Szentírás"; 
 	
-	list($res1, $res2, $res3, $res4)=listchapter($db, $reftrans, $abbook, $numch);
-    $content .= showchapter($db, $res1, $res2, $res3, $res4);
+	$verses = listchapter($reftrans, $abbook, $numch);
+    $content .= showchapter($reftrans, $abbook, $numch, $verses);
   
-	list($res5,$res6,$res7)=listcomm($db,$res4,$reftrans);
-	$comments .= showcomms($db,$res5,$reftrans,$res6,$res7);
+	list($res5,$res6,$res7) = listcomm($verses,$reftrans);
+    
+    $comments .= showcomms($res5,$reftrans,$res6,$res7);
 	
  
 	global $content;
@@ -23,12 +24,12 @@ if (!(empty($reftrans) or empty($abbook))) {
 			}
 	
 	$meta = '<meta property="og:description" content="'.$description.'">'."\n";
-	global $texttosearch, $baseurl;
-	$meta .= '<meta property="og:url" content="'.$baseurl.urlencode(preg_replace('/ /i','',$abbook." ".$numch)).'/" />'."\n";
+	global $texttosearch;
+	$meta .= '<meta property="og:url" content="'.BASE.urlencode(preg_replace('/ /i','',$bookabbrevs[$reftrans][$abbook]['url']." ".$numch)).'/" />'."\n";
 		
 	global $texttosearch;
 	$meta .= '<meta property="og:title" content="Idézet a Szentírásból: '.$texttosearch.'">'."\n";
-		
+	
 	global $share;
 	
 	$share .= '
@@ -38,7 +39,7 @@ if (!(empty($reftrans) or empty($abbook))) {
 		</div>
 		 ';
 	
-	$share .= '<div id="twitter"><a href="https://twitter.com/share" class="twitter-share-button" data-related="jasoncosta" data-lang="hu"  data-count="none" data-hashtags="Biblia" data-url="'.$baseurl.urlencode(preg_replace('/ /','',$abbook." ".$numch)).'/" data-text="'.$datatext.'">Tweet</a>
+	$share .= '<div id="twitter"><a href="https://twitter.com/share" class="twitter-share-button" data-related="jasoncosta" data-lang="hu"  data-count="none" data-hashtags="Biblia" data-url="'.BASE.urlencode(preg_replace('/ /','',$bookabbrevs[$reftrans][$abbook]['url']." ".$numch)).'/" data-text="'.$datatext.'">Tweet</a>
 		<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></div>';
  
  

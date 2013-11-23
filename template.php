@@ -17,14 +17,14 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta property="fb:admins" content="1819502454" />
 	<title><?php if(isset($pagetitle)) echo $pagetitle; ?></title>
-	<!--<meta name="description" content="A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban">-->
-	<meta name="keywords" content="biblia, katolikus, protestáns, szentírás">
+	<meta name="description" content="A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban">
+	<meta name="keywords" content="biblia, katolikus, protestáns, szentírás, keresztény, keresztyén, református, hivatalos">
 
-	<meta name="author" content="www.kereszteny.hu">
+	<meta name="author" content="szentiras.hu">
 
 	<meta http-equiv="cleartype" content="on">
 
-	<meta property="og:image" content="http://szentiras.hu/biblia2/img/biblia.jpg">
+	<meta property="og:image" content="http://szentiras.hu/img/biblia.jpg">
 	<?php echo $meta ?>
 
 	
@@ -55,18 +55,7 @@
 	<!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements and feature detects -->
 	<script src="<?php echo $fileurl; ?>js/modernizr-2.5.3-min.js"></script>
 
-	<?php
-	if(isset($scripts)) {
-		foreach($scripts as $script) {
-		//echo $fileurl.'js/'.$script;
-		echo '<script src="'.$fileurl.'js/'.$script.'"></script>'."\n";
-		if(file_exists($fileurl.'js/'.$script)) {
-			//echo '<script src="'.$fileurl.'js/'.$script.'"></script>'."\n";
-		
-		}
-		}
-	}
-	?>
+	
 	<style type="text/css">
 
 	/*  THIS IS JUST TO GET THE GRID TO SHOW UP.  YOU DONT NEED THIS IN YOUR CODE */
@@ -89,7 +78,7 @@
 
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
 
@@ -99,15 +88,20 @@
 
 <div id="wrapper">
 	<div id="headcontainer">
-		<?php if($dolgozunk) 
+		<?php 
+        if(getvar('dolgozunk')=='true') 
 		echo '<div algin="center" style="background-color:red;color:white;text-align:center">Éppen fejlesztünk! Ha furcsa dolgot lát, kérjük frissítse az oldalt, vagy térjen vissza pár perc múlva!</div>'; 
 		
+        foreach($translations as $t) {            
+            if(getvar('frissitunk_'.$t['abbrev'])=='true') 
+                echo '<div algin="center" style="background-color:red;color:white;text-align:center">Éppen frissítjük a '.$t['abbrev'].' szövegeket! Az ebből fakadó hibákért elnézést kérünk!</div>'; 
+        }
 		//echo '<div algin="center" style="background-color:red;color:white;text-align:center">FIGYELEM! Ma éjjel (április 6.) 23:00 és hajnali 01:00 között teljes leállás várható adatbázis frissítés miatt.</div>'; 
 		
 		?>
 		<header>
 		<!--<?php if(isset($pagetitle)) echo "<h1>".$pagetitle."</h1>"; ?>-->
-		<h1><?php if(isset($sitetitle)) echo $sitetitle; ?></h1>
+		<h1><a href="<?php if(isset($baseurl)) echo $baseurl; ?>" style="color:white"><?php if(isset($sitetitle)) echo $sitetitle; ?></a></h1>
 		<?php if(isset($subsitetitle)) echo "<h2>".$subsitetitle."</h2>"; ?>
 		<!--<p class="introtext">You're gonna have to view the source to grab the code here.</p>-->
 		</header>
@@ -122,6 +116,13 @@
 				<?php if(isset($title)) echo "<h4>".$title."</h4>"; ?>
 				<?php if(isset($hir)) 
 					echo '<div algin="center" style="background-color:#373A8D;color:white;padding-left:3px;margin-bottom:3px">'.$hir.'</div>'; 
+				?>
+				<?php if(isset($hirek) and is_array($hirek)) { 
+					if(!is_array($hirek[0])) $hirek[0] = $hirek;
+					foreach($hirek as $hir) {
+						echo '<div algin="center" class="menu" style="background-color:#9DA7D8;color:white;padding-left:3px;margin-bottom:3px"><div class="menulink clicktoopen">'.$hir[0].'</div><div class="openit" style="display:none;">'.$hir[1].'</div></div>'; 
+					}
+					}
 				?>
 				<?php if(isset($content)) echo $content; 
 				
@@ -197,6 +198,18 @@
 	<script src="js/selectivizr-min.js"></script>
 	<![endif]-->
 
+	<?php
+	if(isset($scripts)) {
+		foreach($scripts as $script) {
+		//echo $fileurl.'js/'.$script;
+		echo '<script src="'.$fileurl.'js/'.$script.'"></script>'."\n";
+		if(file_exists($fileurl.'js/'.$script)) {
+			//echo '<script src="'.$fileurl.'js/'.$script.'"></script>'."\n";
+		
+		}
+		}
+	}
+	?>
 
 	<!-- More Scripts-->
 	<script src="<?php echo $fileurl; ?>js/responsivegridsystem.js"></script>

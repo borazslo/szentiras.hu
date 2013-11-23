@@ -1,30 +1,45 @@
 <?php
 header('Content-type: text/html; charset=utf-8'); 
 
+$starttime = time();
+
 ini_set('memory_limit', '512M');
 //echo phpinfo(); exit;
+$fpath = '/var/www/beta.szentiras.hu/';
 
+require_once('bibleconf.php');
+require_once("biblefunc.php");
+require_once('func.php');
+require_once('quote.php');
 
-include_once 'quote.php';
-include_once 'include/Dropbox-master/examples/bootstrap.php';
+if (PHP_SAPI === 'cli') {$cli = true;} else $cli = false;
+
+if(!$cli) include_once 'include/Dropbox-master/examples/bootstrap.php';
 include_once 'include/excel_reader2.php';
 
 $transs = array();
-$result = db_query("SELECT abbrev, id FROM tdtrans ORDER BY id");
-foreach($result as $key => $res) {	$transs[$res['id']] = $res['abbrev']; }
+$result = db_query("SELECT abbrev, id FROM ".DBPREF."tdtrans ORDER BY id");
+foreach($result as $key => $res) {	$transs[$res['id']] = $res['abbrev']; $transsk[$res['abbrev']] = $res['id'];}
 
-if(!isset($_REQUEST['trans']) OR !in_array($_REQUEST['trans'],$transs)) {
+if($cli == TRUE) {
+	$_REQUEST['trans'] = $argv[1];
+	$_REQUEST['gepi'] = $argv[2];
+}
+if( !isset($_REQUEST['trans']) OR !in_array($_REQUEST['trans'],$transs)) {
 	foreach($transs as $t) {
 	 echo "<a href='".$baseurl."index.php?q=update_szovegforras&trans=".$t."'>".$t."</a><br>\n";
 	}
 	exit;
-}
+} 
 else $trans = $_REQUEST['trans'];
 
-$tmp = "tmp/tmp_".$trans.".xls";
+setvar('update_'.$trans.'_hossz','start'.(int) ((time()-$starttime)/60));
+$tmp = "tmp/tmp_".$trans."_".date('YmdHis',$starttime).".xls";
+if($cli) $tmp = $fpath.$tmp;
 
+if ($cli != TRUE)  {
 /* Dropbox  */
-$path = 'Biblia_sajat_cucc/'.$trans.'/'.$trans.'_szovegforras.xls';
+$path = DROPBOXF.'/'.$trans.'/'.$trans.'_szovegforras.xls';
 $shares = $dropbox->shares($path, false);
 
 // Set the output file
@@ -37,8 +52,8 @@ try {
 	
 	if(getvar('update_'.$trans) < strtotime($file['meta']->modified) AND (!isset($_REQUEST['forced']) OR $_REQUEST['forced'] != true)) {
 		setvar('update_'.$trans,time());
-		echo "Nincs szükség frissítésre, mert a ".$path." nem rég lett frissítve. ".date('Y.m.d. H:i:s',strtotime($file['meta']->modified))." vs ".date('Y.m.d. H:i:s',getvar('update_'.$trans));
-		exit;
+		echo "Nincs szükség frissítésre, mert a ".$path." nem rég lett frissítve. ".date('Y.m.d. H:i:s',strtotime($file['meta']->modified))." vs ".date('Y.m.d. H:i:s',getvar('update_'.$trans))."<br/>";
+		//exit;
 	} 
 	if(file_exists($tmp)) unlink($tmp);
 	file_put_contents($tmp,$file['data']);
@@ -47,14 +62,34 @@ try {
 	exit;
 }
 /**/
-$books = array();
-$result = db_query("SELECT tdbook.abbrev, tdbook.id, trans FROM tdbook, tdtrans WHERE trans = tdtrans.id AND tdtrans.abbrev = '".$trans."' ORDER BY tdbook.id");
-foreach($result as $key => $res) {	$books[$res['id']] = $res; }
+echo 'file letöltve';
+exit;
+}
 
+/* find the most recent file */
+$path = $fpath."tmp";
+$latest_ctime = 0;
+$latest_filename = '';    
+$d = dir($path);
+while (false !== ($entry = $d->read())) {
+  $filepath = "{$path}/{$entry}";
+  // could do also other checks than just checking whether the entry is a file
+  if ((is_file($filepath) && filectime($filepath) > $latest_ctime) AND preg_match('/tmp_'.$trans.'_([0-9]{14})\.xls/',$filepath)) {
+    $latest_ctime = filectime($filepath);
+    $latest_filename = $entry;
+  }
+}
+if(!isset($latest_filename)) die ("Nincs forrás file!\n");
+$tmp = $path."/".$latest_filename;
+
+if($cli) echo "Használt file: ".$tmp."\n\n";
+
+$books = array();
+$result = db_query("SELECT ".DBPREF."tdbook.abbrev, ".DBPREF."tdbook.id, trans FROM ".DBPREF."tdbook, ".DBPREF."tdtrans WHERE trans = ".DBPREF."tdtrans.id AND ".DBPREF."tdtrans.abbrev = '".$trans."' ORDER BY ".DBPREF."tdbook.id");
+foreach($result as $key => $res) {	$books[$res['id']] = $res; }
 /*
  * Excel
  */
-
 $data = new Spreadsheet_Excel_Reader($tmp,false,'UTF-8//IGNORE');
 $data->setUTFEncoder('iconv');
 
@@ -64,294 +99,96 @@ foreach($data->boundsheets as $key => $sheet) {
 	}
 } if(!isset($sheetid)) exit;
 
+/* meg vannak-e a megfelelő oszlopok */
 for($col = 1; $col <= $data->colcount($sheetid);$col++) {
 	$cols[$data->val(1,$col,$sheetid)] = $col;
 }
+    $fields = array('did'=>'*Ssz','gepi'=>'DCB_hiv','hiv'=>'szephiv','old'=>'DCB_old','jelenseg'=>'jeltip','tip'=>'jelstatusz','verse'=>'jel','ido'=>'ido');
+    unset($errors); foreach($fields as $field) if(!isset($cols[$field])) $errors[] = $field;
+    if(isset($errors)) {
+        foreach($cols as $col => $val) {
+            if(preg_match('/[A-Z]{3}_hiv/',$col)) $fields['gepi'] = $col;
+            if(preg_match('/[A-Z]{3}_old/',$col)) $fields['old'] = $col;            
+        }
+        if(!isset($cols['ido'])) unset($fields['ido']);
+    }
+    unset($errors); foreach($fields as $field) if(!isset($cols[$field])) $errors[] = $field;
+    if(isset($errors)) {
+        echo 'A következő oszlopok hiányoznak az excel táblából: '.implode(', ',$errors)."<br/>\n";
+        echo "Létező oszlopok: ".print_r($cols,1);
+        //echo "Használt oszlopok: ".print_r($fields,1);        
+        exit;    }
 
-$max = 5; 
+
+
+$max = 8; 
 $max = $data->rowcount($sheetid);
+$insert = array();
 for($row = 3; $row <= $max; $row++) {
 	
+	$gepi = $data->val($row,$cols[$fields['gepi']],$sheetid);
+	if(isset($_REQUEST['gepi']) AND preg_match('/'.$_REQUEST['gepi'].'/i',$gepi)) {
+	
 	set_time_limit(60);
-	$DCC_hiv = strtolower($data->val($row,$cols['DCC_hiv'],$sheetid));
+    foreach($fields as $mysql => $excel) {
+        $value = $data->val($row,$cols[$excel],$sheetid);
+        if($excel == 'jel') { 
+			echo "VALUE: ".$value."\n";
+            if(!@iconv("UTF-8", "UTF-8", $value)) $value = iconv('windows-1250', 'UTF-8',$value); 
+            $insert[$row]['versesimple'] = simpleverse($value);
+            $insert[$row]['verseroot'] = rootverse($value);
+        } elseif ($excel == 'jeltip') {
+            if(!@iconv("UTF-8", "UTF-8", $value)) $value = iconv('windows-1250', 'UTF-8',$value); 
+        } elseif ($excel == 'szephiv') {
+            if(!@iconv("UTF-8", "UTF-8", $value)) $value = iconv('windows-1250', 'UTF-8',$value); 
+        } elseif ($excel == 'ido') {
+            $value = date('Y-m-d H:i:s',strtotime($value));
+        } elseif ($mysql == 'gepi') {        
+            $insert[$row]['book'] = (int) substr($value,0,3);
+            $insert[$row]['chapter'] = (int) substr($value,3,3);
+            $insert[$row]['numv'] = (int) substr($value,6,3);
+        
+        }
+        
+        $insert[$row][$mysql] = $value;
+        $insert[$row]['trans'] = $transsk[$trans];
+	}    
 	
-	$jel = $data->val($row,$cols['jel'],$sheetid);
-	$jelstatusz = $data->val($row,$cols['jelstatusz'],$sheetid);
-	
-	$update[$DCC_hiv]['w']['gepi'] = $DCC_hiv;	
-	$update[$DCC_hiv]['w']['trans'] = $books[(int)($DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2])]['trans'];
-	
-	$update[$DCC_hiv]['s']['book'] = $DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2];
-	$update[$DCC_hiv]['s']['chapter'] = (int)($DCC_hiv[3].$DCC_hiv[4].$DCC_hiv[5]);
-	/*
-	$update[$DCC_hiv]['s']['abbook'] = $books[(int)($DCC_hiv[0].$DCC_hiv[1].$DCC_hiv[2])]['abbrev'];
-	*/
-	$update[$DCC_hiv]['s']['chapter'] = (int)($DCC_hiv[3].$DCC_hiv[4].$DCC_hiv[5]);
-	$update[$DCC_hiv]['s']['numv'] = (int)($DCC_hiv[6].$DCC_hiv[7].$DCC_hiv[8]);
-	
-	preg_match('/[{]{1}(.*?)[}]{1}/',$jel,$match);
-	if(count($match)>1) $update[$DCC_hiv]['s']['refs'] = $match[1];
-		
-	if(!@iconv("UTF-8", "UTF-8", $jel))  {
-		$jel = iconv('windows-1250', 'UTF-8',$jel); 
+	#preg_match('/[{]{1}(.*?)[}]{1}/',$jel,$match);
+	#if(count($match)>1) $update[$DCC_hiv]['s']['refs'] = $match[1];	
+    if($cli) echo "excel ".(time() - $starttime)." ".$trans." ".$insert[$row]['hiv'].": ".substr($insert[$row]['verse'],0,130)."\n";
 	}
-	
-	if(in_array($jelstatusz,array(6,60))) {
-		$update[$DCC_hiv]['s']['verse'] = $jel;
-		$update[$DCC_hiv]['s']['simpleverse'] = simpleverse(strip_tags($jel));
-	}
-	elseif(in_array($jelstatusz,array(1,2,3,10,20,30))) {
-		if(isset($update[$DCC_hiv]['s']['title'])) $update[$DCC_hiv]['s']['title'] .= "<br>".$jel;
-		else $update[$DCC_hiv]['s']['title'] = $jel;
-	}
-	
-}
- 
+    setvar('update_'.$trans.'_hossz','excel_'.$row.'_'.(int) ((time()-$starttime)/ 60));
+   }
  /*
   * mySQL
   */
-  exec('mysqldump -u szentiras -p saritnezs11 bible tdverse > tmp/bible_tdverse_'.$trans.'_'.date('YmdHis').'.sql');
+  exec('mysqldump -u szentiras --password=saritnezs11 bible '.DBPREF.'tdverse > tmp/bible_'.DBPREF.'tdverse_'.$trans.'_'.date('YmdHis').'.sql');
   
- $tmpbook = '';
- foreach ($update as $up) {
+  setvar('update_'.$trans.'_hossz','mysql_'.(int) ((time()-$starttime)/60));
+  setvar('frissitunk_'.$trans,'true');
+  
+ $query = "DELETE FROM ".DBPREF."tdverse WHERE  trans = ".$transsk[$trans];
+ if(isset($_REQUEST['gepi'])) $query .= " AND gepi REGEXP '".$_REQUEST['gepi']."'";
+ $query .= "\n";
+ db_query($query);
+ if($cli) echo $query;
+ $content .= "<pre>". $query."<br>"; 
+ foreach ($insert as $ins) {
 	set_time_limit(60);
-	if($up['s']['book'] != $tmpbook) {
-		$query = "DELETE FROM tdverse WHERE gepi LIKE '".(int) ($up['w']['gepi']{0}.$up['w']['gepi']{1}.$up['w']['gepi']{2}) ."%' AND trans = ".$up['w']['trans']." ";
-		db_query($query);
-		echo $query."<br>";
-		$tmpbook = $up['s']['book'];
-	}
-	$set = array(); $where = array(); $insert = array();
-	foreach($up['s'] as $n=>$v) { $set[] = $n.' = "'.$v.'"'; $insert['name'][] = $n; $insert['value'][] = $v; }
-	foreach($up['w'] as $n=>$v) { $where[] = $n.' = "'.$v.'"'; $insert['name'][] = $n; $insert['value'][] = $v; }
-	/*
-	$query = "SELECT * FROM tdverse WHERE  ".implode(' AND ',$where)."  LIMIT 1";
-	echo $query."<br>\n";
-	$result = db_query($query);
-	if(is_Array($result)) {
-		$query = "UPDATE tdverse SET ".implode(', ',$set)." WHERE ".implode(' AND ',$where)." LIMIT 1";
-		db_query($query);
-		$content .= $query."<br>\n";
-	} else {
-		$query = "INSERT INTO tdverse (".implode(',',$insert['name']).") VALUES ('".implode("','",$insert['value'])."');";
-		db_query($query);
-		$content .= $query."<br>\n";
-	}*/
-	$query = "INSERT INTO tdverse (".implode(',',$insert['name']).") VALUES ('".implode("','",$insert['value'])."');";
+    $fields = array(); $values = array();
+	foreach($ins as $k=>$v) {
+        $fields[] = $k;
+        $values[] = $v;
+    }
+    $query = "INSERT INTO ".DBPREF."tdverse (".implode(',',$fields).") VALUES ('".implode("','",$values)."');";
 	db_query($query);
-	$content .= $query;
-	
-		echo '<span style="white-space: nowrap;">'.htmlentities($content).'</span><br>';
-		$content = '';
-//	exit;
-}
+	$content .= $query."<br>";
+    if($cli) echo "mysql ".(time() - $starttime)." ".$trans." ".$ins['hiv'].": ".substr($query,0,130)."\n";
+	}
+$content .= '</pre>';
 setvar('update_'.$trans,time());
- 
-/* KNB csv bedolgozása *
-$result = db_query("SELECT abbrev, oldtest FROM tdbook WHERE reftrans = 3  AND oldtest = 1 ORDER BY oldtest DESC, bookorder");
-foreach($result as $key => $res) $books[1][($key+1)] = $res['abbrev'];
-$result = db_query("SELECT abbrev, oldtest FROM tdbook WHERE reftrans = 3  AND oldtest = 0 ORDER BY oldtest DESC, bookorder");
-foreach($result as $key => $res) $books[2][($key+1)] = $res['abbrev'];
+setvar('update_'.$trans.'_hossz',(int) ((time()-$starttime)/60));
+setvar('frissitunk_'.$trans,'false');
 
-
-$file = file_get_contents("import/KNB_szovegforras.csv");
-$file = preg_replace("/(([\$]){1}\n|[\$]{1})/","",$file);
-$sorok = explode("\n", $file);
-
-unset($sorok[0]);
-unset($sorok[1]);
-
-
-foreach($sorok as $key=>$sor) {
-	//if($key>100) break;
-	set_time_limit(60);
-	if($sor != '') {
-		$fields = explode('	',$sor);
-		
-		$code = $fields[1];
-		
-		preg_match('/[{]{1}(.*?)[}]{1}/',$fields[6],$match);
-		if(count($match)>1) $update[$fields[1]]['w']['refs'] = $match[1];
-		
-		$update[$fields[1]]['w']['reftrans'] = 3;
-		$update[$fields[1]]['w']['abbook'] = $books[$code[0]][(int)($code[1].$code[2])];
-		$update[$fields[1]]['w']['numch'] = (int)($code[3].$code[4].$code[5]);
-		$update[$fields[1]]['w']['numv'] = (int)($code[6].$code[7].$code[8]);
-		
-		$update[$fields[1]]['s']['ref'] = $fields[1];
-		
-		if($fields[5]==6) $update[$fields[1]]['s']['verse'] = $fields[6];
-		elseif($fields[5] < 4) {
-			//$update[$fields[1]]['s']['title'] .= "<h".$fields[5].">".$fields[6]."</h".$fields[5].">";
-			if(isset($update[$fields[1]]['s']['title'])) $update[$fields[1]]['s']['title'] .= "<br>".$fields[6];
-			else $update[$fields[1]]['s']['title'] = $fields[6];
-		}
-		
-	}
-}
-
-foreach ($update as $up) {
-	$set = array(); $where = array(); $insert = array();
-	foreach($up['s'] as $n=>$v) { $set[] = $n.' = "'.$v.'"'; $insert['name'][] = $n; $insert['value'][] = $v; }
-	foreach($up['w'] as $n=>$v) { $where[] = $n.' = "'.$v.'"'; $insert['name'][] = $n; $insert['value'][] = $v; }
-	
-	$query = "SELECT * FROM tdverse WHERE  ".implode(' AND ',$where)."  LIMIT 1";
-	$result = db_query($query);
-	if(is_Array($result)) {
-		$query = "UPDATE tdverse SET ".implode(', ',$set)." WHERE ".implode(' AND ',$where)." LIMIT 1";
-		db_query($query);
-		$content .= $query."<br>\n";
-	} else {
-		$query = "INSERT INTO tdverse (".implode(',',$insert['name']).") VALUES ('".implode("','",$insert['value'])."');";
-		db_query($query);
-		$content .= $query."<br>\n";
-	}
-
-}
-/**/
-
-/* KG csv bedolgozása *
-$result = db_query("SELECT abbrev, oldtest FROM tdbook WHERE reftrans = 4  AND oldtest = 1 ORDER BY oldtest DESC, bookorder");
-foreach($result as $key => $res) $books[1][($key+1)] = $res['abbrev'];
-$result = db_query("SELECT abbrev, oldtest FROM tdbook WHERE reftrans = 4  AND oldtest = 0 ORDER BY oldtest DESC, bookorder");
-foreach($result as $key => $res) $books[2][($key+1)] = $res['abbrev'];
-
-
-$file = file_get_contents("import/KG_szovegforras.csv");
-$file = iconv('ISO-8859-2','UTF-8',$file);
-$file = preg_replace("/(([\$]){1}\n|[\$]{1})/","",$file);
-$sorok = explode("\n", $file);
-
-unset($sorok[0]);
-unset($sorok[1]);
-
-
-foreach($sorok as $key=>$sor) {
-	//if($key>100) break;
-	set_time_limit(60);
-	if($sor != '') {
-		$fields = explode('	',$sor);
-		//echo"<pre>".print_R($fields,1)."</pre>";
-		$code = $fields[1];
-		
-		preg_match('/[{]{1}(.*?)[}]{1}/',$fields[6],$match);
-		if(count($match)>1) $update[$fields[1]]['w']['refs'] = $match[1];
-		
-		$update[$fields[1]]['w']['reftrans'] = 4;
-		$update[$fields[1]]['w']['gepi'] = $code;
-		$update[$fields[1]]['w']['abbook'] = $books[$code[0]][(int)($code[1].$code[2])];
-		$update[$fields[1]]['w']['numch'] = (int)($code[3].$code[4].$code[5]);
-		$update[$fields[1]]['w']['numv'] = (int)($code[6].$code[7].$code[8]);
-		
-		//$update[$fields[1]]['s']['ref'] = $fields[1];
-		
-		if($fields[9]==6) $update[$fields[1]]['s']['verse'] = preg_replace('/(^"|"$)/','',$fields[10]);
-		elseif($fields[9] < 4) {
-			//$update[$fields[1]]['s']['title'] .= "<h".$fields[5].">".$fields[6]."</h".$fields[5].">";
-			if(isset($update[$fields[1]]['s']['title'])) $update[$fields[1]]['s']['title'] .= "<br>".$fields[10];
-			else $update[$fields[1]]['s']['title'] = $fields[10];
-		}
-		
-	}
-}
-
-foreach ($update as $up) {
-	$set = array(); $where = array(); $insert = array();
-	foreach($up['s'] as $n=>$v) { $set[] = $n.' = "'.$v.'"'; $insert['name'][] = $n; $insert['value'][] = $v; }
-	foreach($up['w'] as $n=>$v) { $where[] = $n.' = "'.$v.'"'; $insert['name'][] = $n; $insert['value'][] = $v; }
-	
-	$query = "SELECT * FROM tdverse WHERE  ".implode(' AND ',$where)."  LIMIT 1";
-	$result = db_query($query);
-	if(is_Array($result)) {
-		$query = "UPDATE tdverse SET ".implode(', ',$set)." WHERE ".implode(' AND ',$where)." LIMIT 1";
-		db_query($query);
-		$content .= $query."<br>\n";
-	} else {
-		$query = "INSERT INTO tdverse (".implode(',',$insert['name']).") VALUES ('".implode("','",$insert['value'])."');";
-		db_query($query);
-		$content .= $query."<br>\n";
-	}
-
-}
-/**/
-
-/* ékezetek kijavítása*
-for($i=1;$i<110;$i++) {
-$quer = 'SELECT * FROM tdverse LIMIT '.(($i-1)*1000).','.($i*1000);
-$rows = db_query($quer);
-
-
-if(is_array($rows)) {
-foreach($rows as $key=>$row) {
-	//if($key>100) break;
-	set_time_limit(60);
-	//echo $row['did']."<br>";
-	$newverse = $row['verse'];
-	$newtitle = $row['title'];
-	$ekezet=array("á" => "á", "é" => "é", "í" => "í", "ó" => "ó", "ú" => "ú", "ö" => "ö", "ő" => "ő", "ô" => "ő", "ô" => "ő", "õ" => "ő", "ü" => "ü", "ű" => "ű", "ũ" => "ű", "û" => "ű", "Á" => "Á", "É" => "É", "Í" => "Í", "Ó" => "Ó", "Ú" => "Ú", "Ö" => "Ö", "Ő" => "Ő", "Ô" => "Ő", "Õ" => "Ő", "Ô" => "Ő", "Ü" => "Ü", "Ű" => "Ű", "Ũ" => "Ű", "Û" => "Ű"); 
-	foreach($ekezet as $k => $v) { 
-		$newverse=str_replace($k,$v,$newverse); 
-		$newtitle=str_replace($k,$v,$newtitle); 
-	}
-	$newverse = preg_replace("/[']{1}/","\'",$newverse);
-	
-
-	if($newverse != $row['verse']) {
-			$query = "UPDATE tdverse SET verse = '".$newverse."' WHERE did = ".$row['did']." LIMIT 1";
-			echo $query."<br>\n";
-			db_query($query);
-	}
-	if($newtitle != $row['title']) {
-			$query = "UPDATE tdverse SET title = '".$newtitle."' WHERE did = ".$row['did']." LIMIT 1";
-			echo $query."<br>\n";
-			db_query($query);
-	}
-	
-} } }
-/* */ 
-
-/* fejezetek ÉS VERSEK mennyisége *
-$books = db_query('SELECT * FROM tdbook');
-foreach($books as $book) {
-	$numch = db_query("SELECT numch FROM tdverse WHERE reftrans = '".$book['reftrans']."' AND abbook = '".$book['abbrev']."' ORDER BY numch DESC LIMIT 1;");
-	if(is_array($numch)) {
-		$query = "UPDATE tdbook SET countch = ".$numch[0]['numch']." WHERE reftrans = '".$book['reftrans']."' AND abbrev = '".$book['abbrev']."' LIMIT 1";
-		db_query($query);
-	}
-}
-$chapters = db_query('SELECT * FROM tdbook');
-foreach($books as $book) {
-	$numch = db_query("SELECT numch FROM tdverse WHERE reftrans = '".$book['reftrans']."' AND abbook = '".$book['abbrev']."' ORDER BY numch DESC LIMIT 1;");
-	if(is_array($numch)) {
-		$query = "UPDATE tdbook SET countch = ".$numch[0]['numch']." WHERE reftrans = '".$book['reftrans']."' AND abbrev = '".$book['abbrev']."' LIMIT 1";
-		db_query($query);
-		
-		for($i=1;$i<=$numch[0]['numch'];$i++) {
-			$query = "SELECT numv FROM tdverse WHERE reftrans = '".$book['reftrans']."' AND abbook = '".$book['abbrev']."' AND numch = ".$i." ORDER BY ABS(numv) DESC LIMIT 1";
-			//echo $query."<br>\n";
-			$numv = db_query($query);
-			if(is_array($numv)) {
-			//TAKARÍTANI KELLENE ELŐBB!!
-				$query= "INSERT INTO tdchapter (reftrans, abbook, numch, lastv) VALUES (".$book['reftrans'].",'".$book['abbrev']."',".$i.",".$numv[0]['numv'].");";
-				db_query($query);
-
-			}
-		}	
-	}
-}
-
-
-// dicsőség
-/* */
-
-/* gépi kódok nagyon primitív előállítása *
-$results = db_query("SELECT * FROM tdverse WHERE gepi IS NOT NULL ORDER BY gepi;");
-foreach($results as $result) {
-	set_time_limit(60);
-	$query = "UPDATE tdverse SET gepi = ".$result['gepi']." WHERE abbook = '".$result['abbook']."' AND numch = ".$result['numch']." AND numv = ".$result['numv']." LIMIT 5 ";
-	echo $query."<br>\n";
-	db_query($query);
-}
-/**/
-exit;
 ?>

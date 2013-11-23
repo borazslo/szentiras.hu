@@ -1,23 +1,58 @@
 <?php
 function simpleverse($verse) {
+    $verse = strip_tags($verse);
 	$verse = preg_replace('/([^a-zA-zöőóúüűáéíÖ ŐÓÚÜŰÁÉÍ]*)/is','',$verse);
 	$verse = preg_replace('/( ){2,10}/is',' ',$verse);
+    $verse = strtolower($verse);
 	return $verse;
 }
+function rootverse($verse) {
+    $return = ''; $output = array();
+    exec('echo "'.$verse.'" | hunspell -d hu_HU -s -i UTF-8',$output);
+    
+    /* TODO: finomítandó, mert még mindig a legrosszabbat eszi meg (második ajánlat) */
+    foreach($output as $line) {
+        if($line == '' and isset($szo)) {
+          $tmp = explode(' ',$szo);
+          if(isset($tmp[1])) $return .= ' '.$tmp[1];
+          else $return .= ' '.$tmp[0];          
+        }
+        $szo = $line;     
+    }
+    //echo"<pre>"; print_R($output);
+    $return = strtolower(strip_tags($return));
+    return trim($return);
+
+}
+
 function search($text,$reftrans) {
 	  $results = array();
- 	  
-	  foreach(array('verse','simpleverse') as $cell) {
-		$tmp = dbsearchtext($cell." regexp '([ ,\"\']|^)".$text."([\"\' ,.;?!-]|$)' ",$reftrans);
+ 	        
+	  foreach(array('verse','versesimple','verseroot') as $cell) {
+        if($cell == 'versesimple') $text = simpleverse($text);
+        if($cell == 'verseroot') $text = rootverse($text);
+        
+        /* ahogy van */
+		$tmp = dbsearchtext($cell." regexp '([ ,\"\'„]|^)".$text."([\"\' ,.;?!-”]|$)' ",$reftrans);
 		$results = addresults($tmp,$results);
 	  
+        /* beolvadva akár */
+		$tmp = dbsearchtext($cell." regexp '([ ,\"\'„]|^)".$text."' ",$reftrans);
+		$results = addresults($tmp,$results);
+        
+        /* beolvadva akár */
+		$tmp = dbsearchtext($cell." regexp '".$text."([\"\' ,.;?!-”]|$)' ",$reftrans);
+		$results = addresults($tmp,$results);
+        
+        /* beolvadva akár */
 		$tmp = dbsearchtext($cell." regexp '".$text."' ",$reftrans);
 		$results = addresults($tmp,$results);
 		
+        /* részleteire bontva pontosan */
 		$segments = explode(' ',$text);
 		$resultstmp = array(); $resultstmp2 = array(); 
 		foreach($segments as $key => $segment) {
-			$tmp = dbsearchtext($cell." regexp '([ ,\"\']|^)".$segment."([\"\' ,.;?!-]|$)' ",$reftrans);
+			$tmp = dbsearchtext($cell." regexp '([ ,\"\'„]|^)".$segment."([\"\' ,.;?!-”]|$)' ",$reftrans);
 			foreach($tmp as $t) { 
 				$resultstmp[] = $t;
 				$resultstmp2[$t['gepi']] = $t;
@@ -35,7 +70,7 @@ function search($text,$reftrans) {
 		}
 		$results = addresults($resultstmp,$results);
 		
-		
+		/* részleteire bontva beolvadva akár */
 		$segments = explode(' ',$text);
 		$resultstmp = array(); $resultstmp2 = array(); 
 		foreach($segments as $key => $segment) {
@@ -71,6 +106,7 @@ function search($text,$reftrans) {
 	  foreach($results as $key=>$res) {
 				$order1[$key] = $res['point'];
 				$order2[$key] = $res['gepi'];
+                
 	 }
 	  array_multisort($order1,SORT_DESC, $order2, SORT_ASC, $results);
 	  
@@ -93,7 +129,8 @@ function addresults($news,$old) {
 
 function dbsearchtext($query,$reftrans) {
 	$return = array();
-	$query = "select * from tdverse  where (".$query.") and tdverse.trans=$reftrans";
+	$query = "select gepi from ".DBPREF."tdverse  where (".$query.") and ".DBPREF."tdverse.trans=$reftrans";
+    //echo $query."<br/>";
 	$results = db_query($query);
 	if(is_array($results)) 
 		foreach($results as $r) {
@@ -103,6 +140,20 @@ function dbsearchtext($query,$reftrans) {
 
 }
 
+function getnews() {
+	global $scripts;
+	$scripts[] = 'news.js';
+	$query = "select * from ".DBPREF."news where frontpage = 1 order by date DESC";
+	global $db;
+    $stmt = $db->prepare($query);
+	$stmt->execute();
+    $rs = $stmt->fetchAll(PDO::FETCH_CLASS);
+	$return = array();
+	foreach($rs as $r) {
+		$return[] = array($r->title,$r->text);
+	}
+	return $return;
+}
 
 class Menu {
 
@@ -143,13 +194,14 @@ class Menu {
 			echo"<tr><td style='height:15px'></tr>";
 		}
 		elseif(!is_array($item))  {
-			echo"<tr><td style='background-color:#9DA7D8;padding:5px;padding-left:40px'>".$item."</tr>";
+			/*echo"<tr><td style='background-color:#DD3C5B;padding:5px;padding-left:40px'>".$item."</tr>";*/
+            echo"<tr><td class='menu' >".$item."</tr>";
 		}
 		else {
 		echo"<tr>
             <td style='height:3px'></tr>
 			<tr>
-            <td background='../img/vmenucolorbg.gif' width='140' align='left' style='background-color:#9DA7D8;padding:5px;padding-left:40px'>";		  
+            <td background='../img/vmenucolorbg.gif' width='140' align='left' class='menu'>";		  
 					  
 		echo '<a href="'.url($item['url']).'" class="menulink">'.$item['title'].'</a>';
         

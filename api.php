@@ -19,11 +19,11 @@ Létező munkáját kérjük ossza meg velünk, hogy másoknak is hasznára lehe
 <p>Kellő jelentkező/igénylő/használó esetén kifejleszthetünk egy <a href="http://reftagger.com/">reftagger.com</a> szerű eszközt is. Kérjük jelezze, ha használna ilyet.</p>
 
 <br><p class="cim">API</p>
-<p>Az egyes szentírási szakaszokat távolról is el lehet érni <a href="http://hu.wikipedia.org/wiki/JSON">JSON</a> formátumban. Például: <a href="http://szentiras.hu/API/?feladat=idezet&hivatkozas=1Kor13,10-13">szentiras.hu/API/?feladat=<i>idezet</i>&hivatkozas=<i>1Kor13,10-13</i></a> hivatkozás bekérésével. További részletek, lehetőségek, és PHP-ben alkalmazásra példa lejjebb az API dokumentációban.</p>
+<p>Az egyes szentírási szakaszokat távolról is el lehet érni <a href="http://hu.wikipedia.org/wiki/JSON">JSON</a> formátumban. Például: <a href="BASEAPI/?feladat=idezet&hivatkozas=1Kor13,10-13">BASEAPI/?feladat=<i>idezet</i>&hivatkozas=<i>1Kor13,10-13</i></a> hivatkozás bekérésével. További részletek, lehetőségek, és PHP-ben alkalmazásra példa lejjebb az API dokumentációban.</p>
 <p>Kérésre elérhetővé tesszük XML vagy bármely más közismert formátumban is.</p>
 
 <br><p class="alcim">API: általános leírás</p>
-<p>A kéréseket a <a href="http://szentiras.hu/API/?feladat=idezet&hivatkozas=1Kor13,10-13">szentiras.hu/API/?feladat=<i>feladat</i>&<i>beállítás</i>=<i>beállításértéke</i></a> hivatkozás meghívásával kell elindítani. Ez a lekérés egyelőre mindig egy JSON objektummal tér vissza. 
+<p>A kéréseket a <a href="BASEAPI/?feladat=idezet&hivatkozas=1Kor13,10-13">BASEAPI/?feladat=<i>feladat</i>&<i>beállítás</i>=<i>beállításértéke</i></a> hivatkozás meghívásával kell elindítani. Ez a lekérés egyelőre mindig egy JSON objektummal tér vissza. 
 <ul>A visszatérő objektumban szerepel egy 
 	<li>'keres': ami tartalmazza a lekérdezés adatait</li>
 	<li>'valasz': ami az eredményeket tartalmazza, hiba esetén üres</li>
@@ -61,11 +61,11 @@ background-color: rgba(0,0,0,0.1);">
 <p><strong>feladat: idezet</strong><br>Adott szentírási szakasz megjelenítése.<br>
 <u>hivatkozas</u> (kötelező): pl. <i>1Kor13,10</i><br>
 <u>forditas</u>: pl. <i>KNB</i> vagy <i>UF</i><br>
-Példa: <a href='http://szentiras.hu/API/?feladat=idezet&hivatkozas=1Kor13,10-13'>http://szentiras.hu/API/?feladat=idezet&hivatkozas=1Kor13,10-13</a></p>
+Példa: <a href='BASEAPI/?feladat=idezet&hivatkozas=1Kor13,10-13'>BASEAPI/?feladat=idezet&hivatkozas=1Kor13,10-13</a></p>
 <p><strong>feladat: forditasok</strong><br>Egyetlen szentírási vers megjelenítése az összes elérhető fordításban<br>
 <u>hivatkozas</u> (kötelező): pl. <i>10100100200</i> (Jelenleg csak az úgynevezett <i>gépi kód</i>dal lehet verset keresni. 
 Ez 11 számjegyből áll: 1. Ószöv/Újszöv,  2-3. könyv, 4-6. fejezet, 7-9. vers, 10-11. alvers.)<br>
-Példa: <a href='http://szentiras.hu/API/?feladat=forditasok&hivatkozas=10100100100'>http://szentiras.hu/API/?feladat=forditasok&hivatkozas=10100100100</a></p>
+Példa: <a href='BASEAPI/?feladat=forditasok&hivatkozas=10100100100'>BASEAPI/?feladat=forditasok&hivatkozas=10100100100</a></p>
 
 <br><a name="php"></a><p class="alcim">API: PHP példa</p>
 <div style="font-sie: 13px;
@@ -73,8 +73,10 @@ line-heigt: 16px;
 background-color: rgba(0,0,0,0.1);">
 EOD;
 
+$content = preg_replace('/BASE/',BASE,$content);
+
 $content .= highlight_string("<?php
-	\$json = file_get_contents('http://szentiras.hu/API/?feladat=forditasok&hivatkozas=10100100100');
+	\$json = file_get_contents('".BASE."API/?feladat=forditasok&hivatkozas=10100100100');
 	\$data = json_decode(\$json, TRUE);
 	echo \"<pre>\".print_r(\$data,1).\"</pre>\";
 ?>",TrUE);
@@ -86,7 +88,7 @@ line-heigt: 16px;
 background-color: rgba(0,0,0,0.1);">';
 
 $content .= highlight_string("<?php
-	\$json = file_get_contents('http://szentiras.hu/API/?feladat=idezet&hivatkozas=1Kor2,10-14');
+	\$json = file_get_contents('".BASE."API/?feladat=idezet&hivatkozas=1Kor2,10-14');
     \$data = json_decode(\$json, TRUE);
 	
 	if(\$data['valasz'] == '') echo '<strong>Hiba történt:</strong> '.\$data['hiba'];
