@@ -1,4 +1,21 @@
 <?php
+/*
+- kereső tippek fosok, szinonimak
+- keresés csak a szövegben / címekben és lábjegyzetekben is
+
+
+*/
+
+/*
+ pontatlan hivatkozás esetén is varázsoljon
+ - kis-nagybetű
+ - ékezetes megosztásnlá lehet hogy fb share nem jól üzemel?
+ - felesleges szünetek
+ 
+ bug a napi evangélimban
+
+*/
+
 /* ÖTLETEK
  A "Keresés" menü működésével kapcsolatban egy felhasználói álom: vajon volna-e lehetőség olyan prediktív rendszerre, 
  hogy a begépelés során felkínálja a rendszer a Bibliában előforduló szavakat, melyek a megkezdett gépelés folytatásaként lehetségesek.
@@ -11,10 +28,30 @@ ebook-ban legyen benne a lábjegyzet is
 */
 
 
+/* FEJLESZTENI
+ * 
+ * KNB jelengés 50 - héber 
+ * http://beta.szentiras.hu/KNB/Csel15 {idézet}
+ * http://beta.szentiras.hu/KNB/Csel15#33 33 és (33)??
+ * igenaptár ékezet?
+ */
+
+
+/*
+Ezdrás -> Ezekiel,
+Siralmak -> Sirák fia
+Filemon -> Filippi
+nkább bugreport: http://szentiras.hu/Ezd1,3 és http://szentiras.hu/Ezdr1,3 
+
+http://d7.aiee.eu/xxx/node/6
+*/
+
+
 $title = 'Fejlesztések';
 $pagetitle = 'Fejlesztések | Szentírás';
 $content .= '<br>
-  <span class="cim">2013. 11. 12. </span><span class="alcim">Új szövegek </span><span class="alap"> mindegyik fordításban. Ehhez viszont adatbázis átalakítás is kellett, aminek eredményeként <font color="red">speciális keresésfunkciók ideiglenesen nem elérhetőek</font>.</span>
+  <span class="cim">2013. 12. 24. </span><span class="alcim">Átfogó fejlesztések </span><span class="alap">történtek. Leginkább a keresőben, de a megjelenítsében is. Valamint további szövegjavítások is történtek.</span>
+  <span class="cim">2013. 11. 12. </span><span class="alcim">Új szövegek </span><span class="alap"> mindegyik fordításban. Ehhez viszont adatbázis átalakítás is kellett, aminek eredményeként speciális keresésfunkciók ideiglenesen nem voltak elérhetőek.</span>
   <span class="cim">2013. 06. 05. </span><span class="alcim">Szöveg frissítés </span><span class="alap"> három fordításban (KNB, UF, KG)</span>
   <span class="cim">2013. 05. 18. </span><span class="alcim">ebook </span><span class="alap">.epub és .mobi változatban könyvenként elolvasható a Szentírás: /epub </span>
   <span class="cim">2013. 04. 23. </span><span class="alcim">Költözés </span><span class="alap">új virtuális szervert kaptunk a legfrissebb programokkal </span>

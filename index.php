@@ -15,20 +15,6 @@
 session_start();
 header('Content-type: text/html; charset=utf-8'); 
 
-/* FEJLESZTENI
- *
- * esetleg fejezenként lapozható lehessen
- * az 51-100-ak url rövidítése nem kóséer
- * keresésbe szótövek
- * keresésbe idézőjel esetén egyben ill. előre a szüneteseket
- 
- * KNB jelengés 50 - héber 
- * http://beta.szentiras.hu/KNB/Csel15 {idézet}
- * http://beta.szentiras.hu/KNB/Csel15#33 33 és (33)??
- * igenaptár ékezet?
- */
-
-
 require_once('bibleconf.php');
 require_once("biblefunc.php");
 require_once('func.php');
@@ -36,212 +22,30 @@ require_once('quote.php');
 
 
 /* Hosszú URL átirányítás RÖVIDRE */
+redirect_long2short();
 
-if(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'showtrans') {
-	if(isset($_REQUEST['reftrans']) AND is_numeric($_REQUEST['reftrans']) AND $_REQUEST['reftrans'] > 0 ) $reftrans = $_REQUEST['reftrans'];
-	else $reftrans = 1;
-	
-	foreach($translations as $tdtrans) {
-			if($tdtrans['id'] == $reftrans) {
-				Header( "HTTP/1.1 301 Moved Permanently" ); 
-				Header( "Location: ".$basurl.$tdtrans['abbrev']); 
-				break;
-			}
-	}
-} elseif(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'showbook' AND isset($_REQUEST['abbook']) ) {
-	if(isset($_REQUEST['reftrans']) AND is_numeric($_REQUEST['reftrans']) AND $_REQUEST['reftrans'] > 0 ) $reftrans = $_REQUEST['reftrans'];
-	else $reftrans = 1;
-	
-	foreach($translations as $tdtrans) {
-			if($tdtrans['id'] == $reftrans) {
-				foreach($books as $book) {
-					if($book['abbrev'] == $_REQUEST['abbook'] AND $tdtrans['id'] == $book['trans']) {
-						Header( "HTTP/1.1 301 Moved Permanently" ); 
-						Header( "Location: ".$basurl.$tdtrans['abbrev'].'/'.$_REQUEST['abbook']); 
-						break;
-					}
-				}
-			}
-	}
-} elseif(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'showchapter' AND isset($_REQUEST['abbook']) AND isset($_REQUEST['numch'])) {
-	if(isset($_REQUEST['reftrans']) AND is_numeric($_REQUEST['reftrans']) AND $_REQUEST['reftrans'] > 0 ) $reftrans = $_REQUEST['reftrans'];
-	else $reftrans = 1;
-	
-	foreach($translations as $tdtrans) {
-		//echo mb_detect_encoding($_REQUEST['abbook'],'UTF-8','ISO-8859-2');
-		//echo iconv('ISO-8859-2','UTF-8',urldecode($_REQUEST['abbook']));
-		
-			if($tdtrans['id'] == $reftrans) {
-				foreach($books as $book) {
-					if($book['abbrev'] == $_REQUEST['abbook'] AND $tdtrans['id'] == $book['trans']) {
-						Header( "HTTP/1.1 301 Moved Permanently" ); 
-						Header( "Location: ".$basurl.$tdtrans['abbrev'].'/'.$_REQUEST['abbook'].$_REQUEST['numch']); 
-						break;
-					}
-				}
-				foreach($books as $book) {
-					if($book['abbrev'] == iconv('ISO-8859-2','UTF-8',$_REQUEST['abbook']) AND $tdtrans['id'] == $book['trans']) {
-						Header( "HTTP/1.1 301 Moved Permanently" ); 
-						Header( "Location: ".$basurl.$tdtrans['abbrev'].'/'.iconv('ISO-8859-2','UTF-8',$_REQUEST['abbook']).$_REQUEST['numch']); 
-						break;
-					}
-				}
-			}
-	}
-} elseif(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'searchbible' AND isset($_REQUEST['texttosearch']) AND isset($_REQUEST['reftrans'])) {
-    
-        $texttosearch = $_REQUEST['texttosearch'];
-        $reftrans = (int) $_REQUEST['reftrans'];
-        $code = isquotetion($texttosearch);
-
-	if($code)  {
-		
-		Header( "HTTP/1.1 301 Moved Permanently" ); 
-		Header( "Location: ".$basurl.$translations[$_REQUEST['reftrans']]['abbrev'].'/'.preg_replace('/ /','',$code['code']));
-		break;
-	} else {
-		$extra = '';
-		if(isset($_REQUEST['offset'])) $extra .= '&offset='.$_REQUEST['offset'];
-		if(isset($_REQUEST['rows'])) $extra .= '&rows='.$_REQUEST['rows'];
-		
-		Header( "HTTP/1.1 301 Moved Permanently" ); 
-		Header( "Location: ".$basurl.$translations[$_REQUEST['reftrans']]['abbrev'].'/'.$texttosearch.$extra);
-		break;
-	
-	}
-}  elseif(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'searchbible') {
-	Header( "HTTP/1.1 301 Moved Permanently" ); 
-	//Header( "Location: ".$basurl.$translations[$_REQUEST['reftrans']]['abbrev'].'/'.preg_replace('/ /','',$code['code']));
-	Header( "Location: ".$basurl.'kereses');
-	break;
-	
-} if(isset($_REQUEST['q']) AND $_REQUEST['q'] == 'showallbible') {
-    Header( "HTTP/1.1 301 Moved Permanently" ); 
-	Header( "Location: ".$basurl.'forditasok');
-	break;
-}
 
 /* */
 
 if(isset($_REQUEST['reftrans']) AND is_numeric($_REQUEST['reftrans']) AND $_REQUEST['reftrans'] > 0 ) $reftrans = $_REQUEST['reftrans'];
 else $reftrans = 1;
 if(isset($_REQUEST['q'])) $q = $_REQUEST['q'];
-else {
-	$q = 'showbible';
-}
+else $q = 'showbible';
 if(isset($_REQUEST['texttosearch']) AND $_REQUEST['texttosearch'] != '') $texttosearch = $_REQUEST['texttosearch'];
 else $texttosearch = false; 
 
+$vars = url_short2vars();
+foreach($vars as $k=>$v) $$k = $v;
+if(isset($transid)) $reftrans = $transid;
+//print_r($vars);
 
-/* RÖVID URL-ból értelmezhető eredmények */
-if(isset($_REQUEST['rewrite']) AND $_REQUEST['rewrite'] != '') {
-	$uri = rtrim($_REQUEST['rewrite'],'/');
-	$uri = explode('/',$uri);
-
-	if(isset($uri[1])) $original = $uri[1];
-    if(count($uri)==1 AND $uri[0] == 'forditasok') {
-		$q = 'showallbible';		
-	}
-	elseif(count($uri)==2 AND $uri[0] == 'kereses') {
-		$q = 'searchbible';
-		$texttosearch = $uri[1];
-	} 
-	elseif(count($uri) == 2) {
-		$isit = isquotetion($uri[1]);
-		foreach($translations as $tdtrans) {
-			if($tdtrans['abbrev'] == $uri[0]) {
-				if($isit != false) {
-					foreach($books as $book) $urls[] = $book['url'];
-					if(preg_match('/^('.implode('|',$urls).')([0-9]{1,3})$/',$uri[1],$matches)) {
-						$q = 'showchapter';
-						$reftrans = $tdtrans['id']; 
-						$abbook = $bookurls[$reftrans][$matches[1]]['abbrev'];
-						$numch = $matches[2];				
-					} else {
-						$q = 'searchbible';
-						$reftrans = $tdtrans['id']; 
-						$texttosearch = $uri[1];
-					}
-					break;
-				}	
-				else {
-					foreach($books as $book) {
-						if($book['url'] == $uri[1] AND $book['trans'] == $tdtrans['id']) {
-							$q = 'showbook';	                            
-							$reftrans = $tdtrans['id'];
-							$abbook = $bookurls[$reftrans][$uri[1]]['abbrev'];
-							break;
-						}
-					}
-					if($q!='showbook') {
-					$q = 'searchbible';
-					$reftrans = $tdtrans['id'];
-					$texttosearch = $uri[1];
-					}
-				}
-			}
-		}
-		
-		
-		
-	
-		$isit = isquotetion($uri[1]);
-		foreach($translations as $tdtrans) {
-			
-		}
-	}
-	elseif(count($uri)==1 ) {
-		$go = false;
-		if($uri[0] == 'kereses') {
-			$go = true;
-			$q = 'searchbible';
-		}
-		if($go == false) {
-		foreach($translations as $tdtrans) {
-			if($tdtrans['abbrev'] == $uri[0]) {
-				$q = 'showtrans';
-				$reftrans = $tdtrans['id']; 
-				$go = true;
-				break;
-			}
-		} }
-		if($go == false) {
-			$isit = isquotetion($uri[0]);
-			if($isit != false) {
-				$q = 'searchbible';
-				$texttosearch = $uri[0];
-				$reftrans = $isit['reftrans'];
-			}
-		}
-	} elseif(count($uri) == 3) {
-		foreach($translations as $tdtrans) {	
-			if($tdtrans['abbrev'] == $uri[0]) {
-				foreach($books as $book) {
-					if($book['url'] == $uri[1] AND $tdtrans['id'] == $book['trans']) {
-						if($uri[2] == 'epub') $type = 'epub';
-						elseif($uri[2] == 'mobi') $type = 'mobi';
-						$reftrans = $tdtrans['id'];
-						$abbook = $bookurls[$reftrans][$uri[1]]['abbrev'];
-						$q = 'ebook';
-					}	 	
-				}
-			}
-		}
-		if(!isset($type)) $q = '404';
-	}
-	if($uri[0] == 'API') {
-		$q = 'api';
-		if(isset($uri[1])) $api = $uri[1]; else $api = '';
-	}
-	
-}
 //echo $q;
 if($q=='showbible') $hirek = getnews();
 
 if($q != false AND file_exists($q.'.php')) require_once($q.'.php');
 else {
 	$title = 'A kért oldal nem található!';
-	$content = 'Elnézést kérünk a kellemetlenségért.';
+	$content = 'Elnézést kérünk a kellemetlenségért.<br/>';
 }
                      
 if(!isset($original) OR $original == '') $original = print_R($_REQUEST,1);
@@ -255,29 +59,33 @@ $menu = new Menu();
             $menu->add_item($tdtrans['name']." (".$tdtrans['abbrev'].")",BASE.$tdtrans['abbrev']);
 		$translationIDs[$tdtrans['id']] = $tdtrans;
 	}
-    
+   
 	if(!isset($form)) $form = '';
 	$form .= "<form action='".BASE."index.php' method='get'>\n";
 		$form .= "<input type='hidden' name='q' value='searchbible'>\n";
-		$form .= "<input type='hidden' name='reftrans' value='".$reftrans."'>\n";
-		$form .= "<input type=text name='texttosearch' size=10 maxlength=80 value='".$texttosearch."' class='alap' style='width:92%;margin-bottom:5px'>\n";
+		$form .= "<input type='hidden' id='reftrans' name='reftrans' value='".$reftrans."'>\n";
+		$form .= "<input type=text name='texttosearch' id='texttosearch'  onkeyup=\"suggest(this.value);\" size=10 maxlength=80 value='".$text."' class='alap' style='width:92%;margin-bottom:5px'>\n";
 		$form .= "<input type=submit value='Keresés' class='alap'>\n";
+				$form .= '<div id="suggestions" class="suggestionsBox2" style="display: none;">
+<!-- <img style="position: relative; top: -12px; left: 30px;" src="arrow.png" alt="upArrow" />-->
+<div id="suggestionsList" class="suggestionList"></div>
+</div>';
 		$form .= "</form>\n";
 	
-	$menu->add_item("Görög újszövetségi honlap","http://www.ujszov.hu/");
 	$menu->add_item("Újszövetség: hangfájlok",BASE."hang/");
 	//$menu->add_item("A templom egere","http://templom-egere.kereszteny.hu/");
     $menu->add_item("További fordítások",BASE."forditasok");
-	
+
     $menu->add_pause();
     $menu->add_item("Keresés a Bibliában",BASE.'kereses');
-	$menu->add_text($form);    
+	if($q != 'searchbible' OR $text != '') { $menu->add_text($form); }    
 	$menu->add_pause();
     
 	$menu->add_item("FEJLESZTŐKNEK",BASE."API");
-	$menu->add_item("Újdonságaink","info");
+	$menu->add_item("Újdonságaink",BASE."info");
 	
     $menu->add_pause();
+	$menu->add_item("Görög újszövetségi honlap","http://www.ujszov.hu/");
 	$menu->add_item("Katolikus igenaptár","http://www.katolikus.hu/igenaptar/");
 	$menu->add_item("Zsolozsma","http://zsolozsma.katolikus.hu/");
 	
@@ -305,11 +113,11 @@ $menu = new Menu();
 		}
 	function url_showbook($m) {
 			global $translationIDs,$bookabbrevs;
-			return $m[1].BASE.$translationIDs[$m[2]]['abbrev']."/".$bookabbrevs[$m[2]][$m[3]]['url'].$m[1];
+			return $m[1].BASE.$translationIDs[$m[2]]['abbrev']."/".$bookabbrevs[$m[2]][$m[3]]['abbrev'].$m[1];
 		}
 	function url_showchapter($m) {
 			global $translationIDs,$bookabbrevs;
-			return $m[1].BASE.$translationIDs[$m[2]]['abbrev']."/".$bookabbrevs[$m[2]][$m[3]]['url'].$m[4].$m[1];
+			return $m[1].BASE.$translationIDs[$m[2]]['abbrev']."/".$bookabbrevs[$m[2]][$m[3]]['abbrev'].$m[4].$m[1];
 		}
 	function url_searchbible($m) {
 			//print_R($m);

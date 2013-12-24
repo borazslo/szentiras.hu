@@ -40,8 +40,9 @@
 	<link rel="stylesheet" href="<?php echo $fileurl; ?>css/responsivegridsystem.css" media="all">
 	<link rel="stylesheet" href="<?php echo $fileurl; ?>css/col.css" media="all">
 	<link rel="stylesheet" href="<?php echo $fileurl; ?>css/2cols.css" media="all">
-	<link rel="stylesheet" href="<?php echo $fileurl; ?>css/3cols.css" media="all">
-	<link rel="stylesheet" href="<?php echo $fileurl; ?>css/4cols.css" media="all">
+	<!--<link rel="stylesheet" href="<?php echo $fileurl; ?>css/3cols.css" media="all">
+	<link rel="stylesheet" href="<?php echo $fileurl; ?>css/4cols.css" media="all">-->
+	<link rel="stylesheet" href="<?php echo $fileurl; ?>css/search.css" media="all">
 	
 
 	<!-- Responsive Stylesheets 
@@ -71,6 +72,7 @@
 </head>
 
 <body>
+<script src="http://beta.szentiras.hu/js/search.js"></script>
 <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-36302080-1']);

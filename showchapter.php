@@ -1,6 +1,9 @@
 <?php
 //if (!(empty($reftrans) or empty($abbook) or empty($numch))) {
-if (!(empty($reftrans) or empty($abbook))) {
+if(!(empty($transid) or empty($bookid))) {
+	$reftrans = $transid;
+	$abbook = $GLOBALS['tdbook'][$transid][$bookid]['abbrev'];
+	$numch = $chapter;
  
 	$pagetitle = $abbook." ".$numch." (".gettransname($reftrans,'true').") | Szentírás"; 
 	
@@ -25,7 +28,7 @@ if (!(empty($reftrans) or empty($abbook))) {
 	
 	$meta = '<meta property="og:description" content="'.$description.'">'."\n";
 	global $texttosearch;
-	$meta .= '<meta property="og:url" content="'.BASE.urlencode(preg_replace('/ /i','',$bookabbrevs[$reftrans][$abbook]['url']." ".$numch)).'/" />'."\n";
+	$meta .= '<meta property="og:url" content="'.BASE.urlencode(preg_replace('/ /i','',$bookabbrevs[$reftrans][$abbook]['abbrev']." ".$numch)).'/" />'."\n";
 		
 	global $texttosearch;
 	$meta .= '<meta property="og:title" content="Idézet a Szentírásból: '.$texttosearch.'">'."\n";
@@ -39,7 +42,7 @@ if (!(empty($reftrans) or empty($abbook))) {
 		</div>
 		 ';
 	
-	$share .= '<div id="twitter"><a href="https://twitter.com/share" class="twitter-share-button" data-related="jasoncosta" data-lang="hu"  data-count="none" data-hashtags="Biblia" data-url="'.BASE.urlencode(preg_replace('/ /','',$bookabbrevs[$reftrans][$abbook]['url']." ".$numch)).'/" data-text="'.$datatext.'">Tweet</a>
+	$share .= '<div id="twitter"><a href="https://twitter.com/share" class="twitter-share-button" data-related="jasoncosta" data-lang="hu"  data-count="none" data-hashtags="Biblia" data-url="'.BASE.urlencode(preg_replace('/ /','',$bookabbrevs[$reftrans][$abbook]['abbrev']." ".$numch)).'/" data-text="'.$datatext.'">Tweet</a>
 		<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></div>';
  
  

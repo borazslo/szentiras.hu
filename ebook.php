@@ -3,31 +3,35 @@ require_once('include/php-ga-1.1.1/src/autoload.php');
 use UnitedPrototype\GoogleAnalytics;
 
 if(!isset($reftrans)) $reftrans = $_REQUEST['reftrans'];
-if(!isset($abbook)) $abbook = $_REQUEST['abbook'];
+if(!isset($bookid)) $bookid = $_REQUEST['bookid'];
 if(!isset($type)) $type = 'epub';
 
-if (!(empty($reftrans) or empty($abbook))) {
-	$transname = gettransname($db,$reftrans,'true');
+if(!isset($bookid) or $bookid == '') { $bookid = false; };
+if(!isset($reftrans) or $reftrans == '') { $reftrans = 1 ;};
 
+if($bookid != false) $abbook = $GLOBALS['tdbook'][$reftrans][$bookid]['abbrev'];
+
+$transname = $GLOBALS['tdtrans'][$reftrans]['abbrev'];
+foreach($translations as $tdtrans) { 
+		if($tdtrans['id'] == $reftrans) $trans = $tdtrans;}
+
+		
+if($bookid != false) $filename = "Szentiras_".$transname.'_'.$abbook."_".date('Y-m');		
+else $filename = "Szentiras_".$transname."_".date('Y-m');		
+/*
 	$pagetitle = $abbook." ".$numch." (".$transname.") ".$type." | Szentírás"; 
 	$title = $abbook." ".$numch." (".$transname.") .".$type; 
+*/
 
-	foreach($translations as $tdtrans) { 
-		if($tdtrans['id'] == $reftrans) $trans = $tdtrans;}
-	foreach($books as $bk) {
-		if($bk['trans'] == $reftrans AND $bk['abbrev'] == $abbook) $book = $bk;	}
-	
-	$filename = $transname.'_'.$abbook."_".date('Y-m-d');
-	$filexists = '/var/www/szentiras.hu/ebook/'.$filename.'.'.$type;
+	$filexists = FILE.'ebook/'.$filename.'.'.$type;
 	if(file_exists($filexists)) {
 		$tipps[] = 'EPUB';
-		//insert_stat('feladat:'.$abbook.'|'.$type, $reftrans, 0);
+		$count = 1;
+		insert_stat($transname." ".$abbook, $reftrans, array('tipus'=>$type,'uj'=>'nem'), 'ebook');
 		getdownload($filename.'.'.$type);
 		exit;
 	}
-	
 //epub
-
 $content_start =
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 . "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n"
@@ -35,9 +39,10 @@ $content_start =
 . "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
 . "<head>"
 . "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n"
-. "<link rel=\"stylesheet\" type=\"text/css\" href=\"styles.css\" />\n"
-. "<title>".$transname." - ".$book['name']."</title>\n"
-. "</head>\n"
+. "<link rel=\"stylesheet\" type=\"text/css\" href=\"styles.css\" />\n";
+if($bookid != false) $content_start .= "<title>".$transname." - ".$GLOBALS['tdbook'][$reftrans][$bookid]['name']."</title>\n";
+else $content_start .= "<title>".$transname."</title>\n";
+$content_start .= "</head>\n"
 . "<body>\n";
 
 $bookEnd = "</body>\n</html>\n";
@@ -45,11 +50,15 @@ $bookEnd = "</body>\n</html>\n";
 include_once("include/epub/EPub.php");
 $epub = new EPub();
 
-$description = "A Szentírásból <i>".$book['name']."</i> a <i>".$trans['publisher']."</i> fordításban a http://szentiras.hu oldalról letöltve.";
+//if($bookid != false) $description = "A Szentírásból <i>".$GLOBALS['tdbook'][$reftrans][$bookid]['name']."</i> a <i>".$trans['publisher']."</i> fordításban a http://szentiras.hu oldalról letöltve.";
+//else $description = "A http://szentiras.hu oldalról letöltve.";
+$description = '';
+
 $copyright = "A kiadó csak szentiras.hu oldalon való szövegközléshez járult hozzá!";
 
 // Title and Identifier are mandatory!
-$epub->setTitle($trans['name']." - ".$book['name']);
+if($bookid != false) $epub->setTitle($trans['name']." - ".$GLOBALS['tdbook'][$reftrans][$bookid]['name']);
+else $epub->setTitle($trans['name']);
 $epub->setIdentifier("http://szentiras.hu/".$transname."/".$abbook, EPub::IDENTIFIER_URI); // Could also be the ISBN number, prefered for published books, or a UUID.
 $epub->setLanguage("hu"); 
 $epub->setDescription($description);
@@ -59,68 +68,50 @@ $epub->setDate(time()); // Strictly not needed as the book date defaults to time
 $epub->setRights($copyright); 
 $epub->setSourceURL("http://szentiras.hu/".$transname."/".$abbook);
 
-$cover = $content_start . "<h1>Szentírás - ".$book['name']."</h1>\n<h2>".$trans['publisher']." fordításban</h2>
-	<br />*<br />
+$epub->addDublinCoreMetadata(DublinCore::CONTRIBUTOR, "PHP");
+$epub->setSubject("Szentírás");
+$epub->setSubject("Biblia");
+
+
+//$cssData = "body {\n  margin-left: .5em;\n  margin-right: .5em;\n  text-align: justify;\n}\n\np {\n  font-family: serif;\n  font-size: 10pt;\n  text-align: justify;\n  text-indent: 1em;\n  margin-top: 0px;\n  margin-bottom: 1ex;\n}\n\nh1, h2 {\n  font-family: sans-serif;\n  font-style: italic;\n  text-align: center;\n  background-color: #6b879c;\n  color: white;\n  width: 100%;\n}\n\nh1 {\n    margin-bottom: 2px;\n}\n\nh2 {\n    margin-top: -2px;\n    margin-bottom: 2px;\n}\n";
+$cssData = " .kiscim { \n font-weight: bold; \n} \n";
+$epub->addCSSFile("styles.css", "css1", $cssData);
+
+
+//$book->setCoverImage("Cover.jpg", file_get_contents("demo/cover-image.jpg"), "image/jpeg");
+
+$cover = $content_start . "<h1>Szentírás</h1>\n<h2>".$trans['publisher']." fordításában</h2>
+	<br />&nbsp;<br />
 	$description<br />
-	$copyright<br />
-	".date('Y.m.d')."\n" . $bookEnd;
-$epub->addChapter("Notices", "Cover.html", $cover);
+	".$trans['reference']."<br/>
+	<br/><center>$copyright<br />
+	<br/>".date('Y.m.d')."\n</center>" . $bookEnd;
+$epub->addChapter("Bevezető", "Cover.html", $cover);
+$epub->buildTOC(NULL, "toc", "Tartalomjegyzék", TRUE, TRUE);
 
-$rs = listbook($db, $reftrans, $abbook);
-   if ($rs->GetNumOfRows() > 0) {
-        $rs->firstRow();
-	 do {
-            $chaptertitle =  $rs->fields["chapter"] . ". fejezet";
-        
-			list($res1, $res2, $res3, $res4) = listchapter($db, $reftrans, $abbook, $rs->fields["chapter"]);
+foreach($GLOBALS['tdbook'][$reftrans] as $book) {
+	if($bookid == false OR $bookid == $book['id']) {
+	//$bookid = $book['id'];
 
-			if ($res4->GetNumOfRows() > 0) {
-			$return  =  '<p>';
-        
-        $res4->firstRow();
-	 do {
-            if (strlen(trim($res4->fields["title"]))>0) {
-				$strongs = preg_split('/\<br\>/',$res4->fields["title"]);
-				foreach($strongs as $key => $strong)
-						if($strong != '') {
-							if($key == 0) $return .= "</p>";
-							$return .= "<strong>" . preg_replace('/\<br\>/',' ',$strong). "</strong><p>";
-						}
-            }
-            $return .= "&nbsp;<sup>" . $res4->fields["numv"] . "</sup>";
-            
-			//if($reftrans == 3) $res4->fields["verse"] = preg_replace_callback("/{(.*)}/",'replace_hivatkozas',$res4->fields["verse"]);
-			
-			$res4->fields["verse"] = preg_replace('/\<br\>/','</p><p>',$res4->fields["verse"]);
-			
-			$res4->fields["verse"] = preg_replace('/>>>/','>»',$res4->fields["verse"]);
-			$res4->fields["verse"] = preg_replace('/>>/','»',$res4->fields["verse"]);
-			$res4->fields["verse"] = preg_replace('/<<</','«<',$res4->fields["verse"]);
-			$res4->fields["verse"] = preg_replace('/<</','«',$res4->fields["verse"]);
-			
-			$res4->fields["verse"] = preg_replace('/ "/',' „',$res4->fields["verse"]);
-			$res4->fields["verse"] = preg_replace('/"( |,|\.|$)/','”$1',$res4->fields["verse"]);
-			
-			
-			$return .= strip_tags($res4->fields["verse"],'<p>');
-			
-			$return = strip_tags($return,'<sup><strong><br><p>');
-            
-            $res4->nextRow();
-	 } while (!$res4->EOF);		   
-			
-			$chaptercontent = $content_start . "<h1>".$chaptertitle."</h1>" . $return ."</p>".$bookEnd;
-			
-			//echo 'FEJLŐD'.$return."<br>";
-			
-			$epub->addChapter($rs->fields['chapter'].". fejezet", "Chapter".sprintf('%08d', $rs->fields['chapter']).".html", $chaptercontent);
-	 
-	 $rs->nextRow();
-	 }
-	 } while (!$rs->EOF);
-    //$return .= showbookabbrevlist($db,$reftrans,$abbook);
-    }
-	
+	$booktitle =  $GLOBALS['tdbook'][$reftrans][$book['id']]['name'];	 
+	$bookcontent = $content_start . "<h1>".$booktitle."</h1>" . "" .$bookEnd;
+	$epub->addChapter($booktitle, "Szentiras".$book['id'].".html", $bookcontent);
+
+	$chapters = listbook($reftrans, $GLOBALS['tdbook'][$reftrans][$book['id']]['abbrev']);
+	$epub->subLevel();
+	foreach($chapters as $chapter) {     
+		$chaptertitle =  $chapter->chapter . ". fejezet";	 
+		$content = '';
+		$verses = listchapter($reftrans, $GLOBALS['tdbook'][$reftrans][$book['id']]['abbrev'], $chapter->chapter);	 
+		foreach($verses as $vers)
+			$content .= showverse($vers)."\n";
+	    $content = preg_replace('/<br>/i','<br/>',$content);
+		$chaptercontent = $content_start . "<h2>".$chaptertitle."</h2>" . $content .$bookEnd;
+		$epub->addChapter($chapter->chapter.". fejezet", "Szentiras".$book['id']."".sprintf('%03d', $chapter->chapter).".html", $chaptercontent);
+	}
+	$epub->backLevel();
+	}
+}
 $epub->finalize(); // Finalize the book, and build the archive.
 
 // This is not really a part of the EPub class, but IF you have errors and want to know about them,
@@ -143,8 +134,8 @@ if (ob_get_contents() !== false && ob_get_contents() != '') {
 $epub->saveBook($filename, './ebook');
 
 $tipps[] = 'EPUB';
-insert_stat('feladat:'.$abbook.'|'.$type, $reftrans, 0);
-
+$count = 1;
+insert_stat($transname." ".$abbook, $reftrans, array('tipus'=>$type,'uj'=>'igen'), 'ebook');
 
 
 // Initilize GA Tracker
@@ -170,7 +161,8 @@ $tracker->trackEvent($event, $session, $visitor);
 
 if($type == 'epub') {
 	// Send the book to the client. ".epub" will be appended if missing.
-	$zipData = $epub->sendBook('Szentírás ('.$trans['abbrev'].') - '.$abbook);
+	if($bookid != false ) $zipData = $epub->sendBook('Szentírás ('.$trans['abbrev'].') - '.$abbook);
+	else $zipData = $epub->sendBook('Szentírás - '.$trans['abbrev'].'');
 } elseif($type == 'mobi') {
 	exec('/var/www/kindlegen /var/www/szentiras.hu/ebook/'.$filename.'.epub -c2 -o '.$filename.'.mobi',$output,$return_var);
 	//print_R($return_var);	echo "XXX"; 	print_R($output);
@@ -179,7 +171,7 @@ if($type == 'epub') {
 	
 }	
 	
-}
+
 
 function getdownload($filename,$path = '') {
 	if($path == '') $path = '/var/www/szentiras.hu/ebook/';

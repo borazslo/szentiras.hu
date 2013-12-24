@@ -1,11 +1,13 @@
 <?php
-define('BASE','http://szentiras.hu/'); //base url of the site
-define('DBPREF','beta_'); // prefixes of the tables in the database
+define('BASE','http://beta.szentiras.hu/'); //base url of the site
+define('FILE','/var/www/beta.szentiras.hu/'); //base url of the site
+define('DBPREF','kar_'); // prefixes of the tables in the database
 define('DROPBOXF','Bibliafordítások'); // A dropbox foldere a megosztottaknak
+
 $fileurl = BASE;//"http://szentiras.hu/";
 $baseurl = BASE;//"http://szentiras.hu/";
 
-$sitetitle = 'Szentírás <sup>v3&#946;</sup>';
+$sitetitle = 'Szentírás <sup>v3</sup>';
 $subsitetitle = 'Katolikus Biblia fordítások az interneten';
 $content = '';
 $meta = '';
@@ -24,16 +26,6 @@ try {
 	echo '<br/>Részletek: '. $exception->getMessage(); 
    exit; 
 } 
-
-    
-    /*
-    $stmt = $db->prepare($tsql);
-	$stmt->execute();
-	if($stmt->rowCount() == 1) $login = 'Menza2013';
-	unset($stmt);
-    
-    $MENZA2013_config = array('mysql:host=localhost;dbname=menza2013','menza','2013aznem');
-    */
 
 /**/
 $copyright = "

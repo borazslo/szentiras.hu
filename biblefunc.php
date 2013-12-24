@@ -6,14 +6,25 @@ $se="</span>";
 $TMPtranslations = db_query('SELECT * FROM '.DBPREF.'tdtrans ORDER BY denom, name');
 foreach($TMPtranslations as $TMP) {
 	$translations[$TMP['id']] = $TMP;
+	$GLOBALS['tdtrans_abbrev'][$TMP['id']] = $TMP['abbrev'];
+	$GLOBALS['tdtrans'][$TMP['id']] = $TMP;
 }
-    
+  
 $books = db_query('SELECT * FROM '.DBPREF.'tdbook');
 foreach($books as $TMP) {
 	$bookabbrevs[$TMP['trans']][$TMP['abbrev']] = $TMP;
     $bookurls[$TMP['trans']][$TMP['url']] = $TMP;
+	$GLOBALS['tdbook_url'][$TMP['trans']][$TMP['id']] = $TMP['url'];
+	$GLOBALS['tdbook_abbrev'][$TMP['trans']][$TMP['id']] = $TMP['abbrev'];
+	$GLOBALS['tdbook'][$TMP['trans']][$TMP['id']] = $TMP;
 	
+	if($TMP['oldtest'] == 1) $oldtest[$TMP['trans']][] = " ".DBPREF."tdverse.book = '".$TMP['id']."'";
+	else $newtest[$TMP['trans']][] = " ".DBPREF."tdverse.book = '".$TMP['id']."'";
 }
+
+
+/* nem kell : */
+
 function listbible($denom = false) {
     global $db;
     $query = "select * from ".DBPREF."tdtrans";
@@ -45,7 +56,7 @@ function listbook($reftrans, $abbook) {
   return $rs;
 }
 
-function listchapter($reftrans, $abbook, $numch) {
+function listchapter($reftrans, $abbook, $numch, $max = 1000) {
    global $db;
   $query = "select gepi, ".DBPREF."tdverse.trans, did, numv, old, gepi, tip, verse FROM ".DBPREF."tdverse LEFT JOIN ".DBPREF."tdbook ON ".DBPREF."tdbook.id = ".DBPREF."tdverse.book  AND ".DBPREF."tdbook.trans = ".DBPREF."tdverse.trans WHERE ".DBPREF."tdverse.trans = $reftrans and abbrev='". $abbook . "' and chapter=$numch order by gepi, tip";
   $stmt = $db->prepare($query);
@@ -56,6 +67,7 @@ function listchapter($reftrans, $abbook, $numch) {
   foreach($rs as $gepi => $verse) {
     foreach($verse as $key => $jelenseg) {
         $tmp[$gepi][$jelenseg->tip] = $jelenseg;
+		if(count($tmp)>$max-1) return $tmp;
     }
   }
   return $tmp;
@@ -134,20 +146,12 @@ function showbook($reftrans, $abbook, $rs) {
             $return .= "<a href='" . BASE . "index.php?q=showchapter&reftrans=" . $reftrans . "&abbook=" . $abbook . "&numch=" . $row->chapter ."' class='link'>" . $row->chapter . ". fejezet</a><br>\n";
             $return .= $sb;
             
-            $verses = listchapter($reftrans, $abbook, $row->chapter);
-            
+            $verses = listchapter($reftrans, $abbook, $row->chapter,2);
+			
             if (count($verses) > 0) {
                 
             
-            /*    
-                showverse($verses);
-                
-                if (strlen(trim($verses[0]->title))>0) {
-                    $title2 = preg_replace("/<br>/",".",$verses[0]->title);
-                    $title2 = preg_replace("/\.\./",". ",$title2);
-                    $return .= "<i>$title2.</i> \n";
-                }
-                $verses2=$verses[0]->verse;*/              
+                      
                 $i = 0; $verses2 = '';
                 foreach($verses as $verse) {
                    $i++;
@@ -205,7 +209,7 @@ function showchapter($reftrans, $abbook, $numch, $rs) {
 	if(count($results)>1) {
 		foreach($results as $result) {
 			//$transcode = preg_replace('/ /','',preg_replace("/^".$abbook."/",$result['abbrev'],$code['code']));
-			$url = BASE.gettransname($result['trans'],'true')."/".$result['url'].$numch;
+			$url = BASE.gettransname($result['trans'],'true')."/".$result['abbrev'].$numch;
 			
 			if($reftrans == $result['trans']) $style = " style=\"background-color:#9DA7D8;color:white;\" "; else $style = '';
 			$change = "<a href=\"".$url."\" ".$style." class=\"button minilink\">".gettransname($result['trans'],'true')."</a> \n";
@@ -277,7 +281,7 @@ function showverse($verse,$trans = false,$type = false) {
    } elseif($trans == 2) {
         /* tip: 6,7,(8,9) */
         if(isset($verse[7])) {            
-            $sup = "<a title=\"Javasolt szöveg: ".$verse[7]->verse."\" id=\"".$verse[6]->numv."\">".$verse[6]->numv."</a>";
+            $sup = "<a title=\"Javasolt szöveg: ".strip_tags($verse[7]->verse)."\" id=\"".$verse[6]->numv."\">".$verse[6]->numv."</a>";
         } else $sup = "<a id=\"".$verse[6]->numv."\"></a>".$verse[6]->numv;
         $return .= "<sup>".$sup."</sup>".$verse[6]->verse." ";
     } elseif($trans == 1) {
@@ -304,7 +308,7 @@ function showverse($verse,$trans = false,$type = false) {
         if(isset($verse[30]) AND !isset($verseonly)) $return .= '<p class="kiscim cimsor3">'.$verse[30]->verse.'</p>';        
         
         if(isset($verse[70])) {            
-            $sup = "<a title=\"Javasolt szöveg: ".$verse[70]->verse."\" id=\"".$verse[60]->numv."\">".$verse[60]->numv."</a>";
+            $sup = "<a title=\"Javasolt szöveg: ".strip_tags($verse[70]->verse)."\" id=\"".$verse[60]->numv."\">".$verse[60]->numv."</a>";
         } else $sup = "<a id=\"".$verse[60]->numv."\"></a>".$verse[60]->numv;
            
         if(isset($verse[110])) $return .= "<sup><a title=\"Hiányzó vers\" id=\"".$verse[110]->numv."\">(".$verse[110]->numv.")</a></sup>";         
@@ -542,35 +546,6 @@ function advsearchbible($db, $texttosearch, $reftrans, $offset = 0, $rows = 50) 
       }
 }
 
-/*
-function showverse($db,$reftrans,$abbook,$numch,$fromnumv,$tonumv) {
-  $return = '';
-  $rs = $db->execute("select * FROM ".DBPREF."tdverse WHERE reftrans = $reftrans and abbook='". $abbook . "' and numch=$numch and numv>=". $fromnumv . " and numv <=" . $tonumv);
-  if ($rs->GetNumOfRows() > 0) {
-     $rs->firstRow();
-	 
-     $return .= "<p class='alap'><b>" . $rs->fields["abbook"] . " " . $rs->fields["numch"] . ",";
-     if ($fromnumv==$tonumv) {
-       $return .= $fromnumv . ":</b> \n";
-     } else {
-       $return .= $fromnumv . "-" . $tonumv . ":</b> \n";
-     }
-     do {
-		if($reftrans == 3) $rs->fields["verse"] = preg_replace_callback("/{(.*)}/",'replace_hivatkozas',$rs->fields["verse"]);
-
-        $return .= "&nbsp;<span class='kicsi'><sup>" . $rs->fields["numv"] . "</sup></span>";
-        $return .= $rs->fields["verse"] . "\n";
-        $rs->nextRow();
-     } while (!$rs->EOF);
-     $return .= "</p>";
-  } else {
-     $return .= "Nincs ilyen bibliai vers. Valószínűleg hibásan adta meg a könyvet, a fejezetet vagy a verset.";
-  }
-  $rs->close();
-  return $return;
-}
-*/
-
 function showverses($rs,$script,$reftrans) {
   global $sb, $se, $books,$translations;
 
@@ -593,31 +568,28 @@ function showverses($rs,$script,$reftrans) {
 }
 
 
-function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
+function showversesnextprev($request, $catcount, $page, $rows, $paramchr){
 	
 	$return = '';
-	//echo $request."-".$catcount."-".$offset."-".$rows."-".$paramchr."<br>";
+	//echo $request."-".$catcount."-".$page."-".$rows."-".$paramchr."<br>";
 	
   $return =  "<table><tr>";
 
   if (!empty($request) && !empty($catcount)) {
-     $request = preg_replace("/ /","_",$request);
-     if (empty($offset)) {$offset=0;}
+     //$request = preg_replace("/ /","_",$request);
+     if (empty($page)) {$page=1;}
      if (empty($rows)) {$rows=50;}
 	 
 	 $return .= "<td align='left' width='180px'>";
-     if ($offset > 0) {
-         if ($offset > $rows) {
-           $prevoffset = $offset - $rows;
-         } else {
-           $prevoffset = 0;
-         }
-         $prevrows = $rows;
-         $prevstring = $prevoffset+$prevrows;
-         $prevstring = (string) $prevstring;
-         $prevstring = $prevoffset+1 ." - " . $prevstring;
+     if ($page > 1 AND $catcount > ($page - 1 ) * $rows ) {             
+         $prevstring = ( ($page - 2) * $rows ) + 1 ." - ";
+		 if( ($page - 1 )* $rows < $catcount) $prevstring .= ( ($page - 1 )* $rows );		 
+		 else $prevstring .= $catcount;
 		 $return .= "<img src='".BASE."img/arrowleft.jpg'> ";
-         $return .= shln($prevstring , BASE."index.php".$request . $paramchr . "offset=$prevoffset&rows=$prevrows","link");
+		 $path = BASE.$request;
+		 if( ($page - 1 ) > 1) $path .= $paramchr . "page=". ( $page - 1 );
+		 if($rows != $GLOBALS['rows'])  $path .= "&rows=$rows";
+         $return .= shln($prevstring , $path,"link");
      }
 	 $return .= "&nbsp;</td>";
 	 
@@ -625,29 +597,30 @@ function showversesnextprev($request, $catcount, $offset, $rows, $paramchr){
 	 if($signs > 1) {
 	 $return .= "<td align='center' width='*'><span class='pager'>";
 	 for($i=1;$i<=$signs;$i++) {
-		$off = $rows * ( $i - 1 );
+		$off = $i;
 		$prevrows = $rows;
-		if($off == $offset) $return .= '<span style="background-color:#CFD4EC;padding:2px"><strong>';
-		$return .= shln($i , BASE."index.php".$request . $paramchr . "offset=$off&rows=$prevrows","link");
-		if($off == $offset) $return .= '</strong></span>';
+		if($off == $page) $return .= '<span style="background-color:#CFD4EC;padding:2px"><strong>';
+		$path = BASE.$request;
+		$path .= $paramchr . "page=". $off;
+		if($rows != $GLOBALS['rows'])  $path .= "&rows=$rows";
+		$return .= shln($i , $path,"link");
+		
+		if($off == $page) $return .= '</strong></span>';
 		if($i < $signs) $return .= ' ';
 	}
 	$return .= '</span></td>';
 	}
 	 
 	 $return .= "<td align='right'  width='180px'>&nbsp;";
-     if ($catcount > $offset+$rows) {
-         $nextoffset = $offset + $rows;
-         if ($catcount > $offset + 2*$rows) {
-           $nextrows = $rows;
-         } else {
-           $nextrows = $catcount - $offset - $rows;
-         }
-         $nextstring = $nextoffset+$nextrows;
-         $nextstring = (string) $nextstring;
-         $nextstring = $nextoffset + 1 ." - " . $nextstring;
-         $return .= shln($nextstring , BASE."index.php".$request .  $paramchr . "offset=$nextoffset&rows=$rows","link");
-		 $return .= " <img src='".BASE."img/arrowright.jpg'>";
+     if ($catcount > ($page )* $rows ) {
+		 $nextstring = ( ($page ) * $rows ) + 1 ." - " ;
+		 if($catcount < ($page + 1)* $rows ) $nextstring .= 'talán '; //$catcount;
+		 $nextstring .=  (($page + 1)* $rows );		 		
+		 $return .= "<img src='".BASE."img/arrowright.jpg'> ";
+		 $path = BASE.$request;
+		 $path .= $paramchr . "page=". ( $page + 1 );
+		 if($rows != $GLOBALS['rows'])  $path .= "&rows=$rows";
+         $return .= shln($nextstring , $path,"link");
      }
 	 $return .= "</td>";
      $return .= "</tr></table>";
@@ -697,7 +670,7 @@ function displaytextarea ($name,$cols,$rows,$value,$comment,$class){
 function displayoptionlist($name,$size,$rs,$valuefield,$listfield,$default,$comment,$class){
   $return = '';
   $return .= "<span class='alap'>$comment</span> <br>";
-  $return .= "<select name='". $name . "' size='" . $size . "' class='" .$class."'>\n";
+  $return .= "<select name='". $name . "' id='". $name . "' onchange='change_".$name."()' size='" . $size . "' class='" .$class."'>\n";
   if (count($rs) > 0) {
     
     $i=1;
@@ -815,7 +788,7 @@ function igenaptar($datum = false) {
 	
 	$olvasmanyok = explode(';',$olvasmany_rov);
 	$return .= '<p class="alcim">';
-	foreach($olvasmanyok as $olvasmany) {
+	foreach($olvasmanyok as $key => $olvasmany) {
 		if(preg_match('/Zs ([0-9]{1,3})/',$olvasmany,$matches)) {
 			$olvasmany = 'Zsolt'.(( (int) $matches[1]) + 1 );
 		}
@@ -848,6 +821,10 @@ function igenaptar($datum = false) {
 				$change = "<a href=\"".$url."\" ".$style." class=\"button minilink\">".$result['transabbrev']."</a>\n";
 				$content .= $change;//echo $url;
 			} }
+			
+			if($key > count($olvasmanyok) -2) $content .= "<a href=\"http://evangelium.katolikus.hu/audio/NE".date('Ymd').".mp3\" class=\"button minilink\" title=\"Evangélium és elmélkedés az evangelium365.hu honlapról.\" target=\"_blank\">mp3</a>";
+			
+			
 			$return .=  $content."</div><br>";
 		
 			}

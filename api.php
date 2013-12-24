@@ -19,12 +19,13 @@ Létező munkáját kérjük ossza meg velünk, hogy másoknak is hasznára lehe
 <p>Kellő jelentkező/igénylő/használó esetén kifejleszthetünk egy <a href="http://reftagger.com/">reftagger.com</a> szerű eszközt is. Kérjük jelezze, ha használna ilyet.</p>
 
 <br><p class="cim">API</p>
+<p><strong>Kérünk minden API fejlesztőt/használót, hogy egy emailben jelentkezzen, hogy értesíteni tudjuk az esetlegese API fejlesztésekről!</strong></p>
 <p>Az egyes szentírási szakaszokat távolról is el lehet érni <a href="http://hu.wikipedia.org/wiki/JSON">JSON</a> formátumban. Például: <a href="BASEAPI/?feladat=idezet&hivatkozas=1Kor13,10-13">BASEAPI/?feladat=<i>idezet</i>&hivatkozas=<i>1Kor13,10-13</i></a> hivatkozás bekérésével. További részletek, lehetőségek, és PHP-ben alkalmazásra példa lejjebb az API dokumentációban.</p>
 <p>Kérésre elérhetővé tesszük XML vagy bármely más közismert formátumban is.</p>
 
 <br><p class="alcim">API: általános leírás</p>
 <p>A kéréseket a <a href="BASEAPI/?feladat=idezet&hivatkozas=1Kor13,10-13">BASEAPI/?feladat=<i>feladat</i>&<i>beállítás</i>=<i>beállításértéke</i></a> hivatkozás meghívásával kell elindítani. Ez a lekérés egyelőre mindig egy JSON objektummal tér vissza. 
-<ul>A visszatérő objektumban szerepel egy 
+<ul class="alap">A visszatérő objektumban szerepel egy 
 	<li>'keres': ami tartalmazza a lekérdezés adatait</li>
 	<li>'valasz': ami az eredményeket tartalmazza, hiba esetén üres</li>
 	<li>'hiba': abban az esetben, ha valami hiba törént. </li></ul>
@@ -40,15 +41,18 @@ background-color: rgba(0,0,0,0.1);">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"forma":"json"<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>
 &nbsp;&nbsp;&nbsp;"valasz":<br>
-&nbsp;&nbsp;&nbsp;[&nbsp;&nbsp;{<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"hely":<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"gepi": "20701301000"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"szep": "1Kor 13,10"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"szoveg": "amikor pedig eljön majd a tökéletes, a töredékes véget fog érni."<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"versek":<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"hely":<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"gepi": "20701301000"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"szep": "1Kor 13,10"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"szoveg": "amikor pedig eljön majd a tökéletes, a töredékes véget fog érni."<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;],<br>
+
 &nbsp;&nbsp;&nbsp;"forditas":<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"nev":"Káldi-Neovulgáta",<br>
@@ -128,10 +132,10 @@ if(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'forditasok') {
 			if(is_array($results)) {
 			foreach($results as $vers) {
 				$v['hely']['gepi'] = $vers['gepi'];
-				$v['hely']['szep'] = $vers['abbook']." ".$vers['numch'].",".$vers['numv'];
+				$v['hely']['szep'] = $GLOBALS['tdbook'][$vers['trans']][$vers['book']]['abbrev']." ".$vers['chapter'].",".$vers['numv'];
 				$v['szoveg'] = $vers['verse'];
-				$v['forditas']['nev'] = $translations[$vers['reftrans']]['name'];
-				$v['forditas']['rov'] = $translations[$vers['reftrans']]['abbrev'];
+				$v['forditas']['nev'] = $GLOBALS['tdtrans'][$vers['trans']]['name'];
+				$v['forditas']['rov'] = $GLOBALS['tdtrans'][$vers['trans']]['abbrev'];
 				//$v['forditas']['nyelv'] = $translations[$vers['reftrans']]['lang'];
 				$verses[] = $v;
 			} }
@@ -221,14 +225,17 @@ if(isset($return)) {
 	
 	global $tipps;
 	$tipps[] = 'API ';
-	foreach(array('feladat','hivatkozas','forditas','forma') as $var) if(isset($_REQUEST[$var])) $insert .= $var.":".$_REQUEST[$var]."|";
+	foreach(array('feladat','forditas','forma') as $var) if(isset($_REQUEST[$var])) $apinotes .= '|'.$var.":".$_REQUEST[$var];
+	foreach(array('hivatkozas') as $var) if(isset($_REQUEST[$var])) $insert .= $_REQUEST[$var];
 	
 	if(isset($return['hiba'])) {
 		$tipps[] = json_encode($return['hiba']);
-		insert_stat($insert,$reftrans,-1);
+		$count = '-1';
+		insert_stat($insert,$reftrans,$return,'api');
 	} else {
 		$tipps[] = json_encode($return['valasz']);
-		insert_stat($insert,$reftrans,0);
+		$count = 1;
+		insert_stat($insert,$reftrans,$return,'api');
 	}
 	
 	if($forma == 'json') {
@@ -259,6 +266,9 @@ if(isset($return)) {
 	if($return['valasz'] != array()) {
 		$valasz = $dom->createElement('valasz');
 		$root->appendChild($valasz);
+	
+		/* xml idézet */
+		if($_REQUEST['feladat'] == 'idezet') {
 		foreach($return['valasz']['versek'] as $key => $value) {
 			$attr = $dom->createElement('vers'); 
 			$vers = $valasz->appendChild($attr);		
@@ -273,7 +283,27 @@ if(isset($return)) {
 		$attr = $dom->createAttribute('forditas-hosszu'); $attr->appendChild($dom->createTextNode($return['valasz']['forditas']['nev']));
 		$valasz->appendChild($attr);
 		$attr = $dom->createAttribute('forditas'); $attr->appendChild($dom->createTextNode($return['valasz']['forditas']['rov']));
-		$valasz->appendChild($attr);		
+		$valasz->appendChild($attr);
+		}
+		
+		if($_REQUEST['feladat'] == 'forditasok') {
+			foreach($return['valasz'] as $key => $value) {
+			//print_r($value);
+				$attr = $dom->createElement('forditas'); 
+				$forditas = $valasz->appendChild($attr);
+				
+				$attr = $dom->createAttribute('forditas-hosszu'); 
+				$attr->appendChild($dom->createTextNode($value['forditas']['nev']));
+				$forditas->appendChild($attr);
+				
+				$attr = $dom->createAttribute('forditas'); 
+				$attr->appendChild($dom->createTextNode($value['forditas']['rov']));
+				$forditas->appendChild($attr);
+				
+				$forditas->appendChild($dom->createTextNode($value['szoveg']));
+				
+			}
+		}
 	}	
 	
 	if(isset($return['hiba'])) {
@@ -287,11 +317,11 @@ if(isset($return)) {
 	}
 }
 
- 
+ /*
  if($api!='') { 
 	header('Content-type: application/json');
 	require_once("JSON.php");
-	/*xml*/	
+	
 	$code = isquotetion($api,$forcedtrans);
 	global $tipps;
 	$tipps[] = 'API';
@@ -310,5 +340,5 @@ if(isset($return)) {
 	
 	exit;
 }
- 
+ */
 ?>

@@ -1,8 +1,11 @@
 <?php
 
+
+
 /*
 * LINE 43, 44 körül reftrans átállítás meghallva, mert fostalicska
 */
+
 
 function isquotetion($text,$forcedtrans = false) {
 	
@@ -105,7 +108,7 @@ function isquotetion($text,$forcedtrans = false) {
 				//echo $matches[1];
 				
 		$quote['book'] = $bookabbrevs[$reftrans][$matches[1]]['abbrev'];
-		$quote['bookurl'] = $bookabbrevs[$reftrans][$matches[1]]['url'];
+		$quote['bookurl'] = $bookabbrevs[$reftrans][$matches[1]]['abbrev'];
 		$quote['code'] = preg_replace("/^(".implode("|",$abbrevs).")/",'$1 ',$text);
 		$quote['reftrans'] = $reftrans;
 		$pattern = "/^(".implode("|",$abbrevs).")([0-9]{1,3})$/i";
@@ -208,8 +211,9 @@ function print_quotetion($args) {
 		
 		// TODO: fejezetváltásokkor
 		$verses = print_verses($verses);
-		//echo"<pre>".print_r($averses,1);
-
+//		echo"<pre>".print_r($averses,1);		
+		if($averses == array()) $error[] = 'Nincs megjeleníthető vers!';
+		
 		$tmpverses = array();
 		$verses = '';
 		foreach($averses as $v) {
@@ -285,7 +289,7 @@ function print_quotetion($args) {
 	$comments .= showcomms($rs, $reftrans,100,100);	
 
 	
-	if(in_array('errors',$args)) {$return .="<br>".print_errors($error); }
+	if(in_array('errors',$args) OR is_array($error)) {$return .="<br>".print_errors($error); }
 	return $return;
 }
 	
@@ -547,9 +551,18 @@ function getvar($name) {
 function insert_stat($texttosearch, $reftrans, $results,$type = '') {
 	global $tipps, $original, $translations;
 	global $tracker;
+			
+	global $rows,$page;
+	/*$tmp = array();
+	for($i=(($page-1)*$rows)+1;$i<=$page*$rows;$i++) {
+		$tmp[$i] = $results[$i];
+	}
+	$results = $tmp; */
+	global $count; //$count = count($results);
+	if($type == 'quote') $count =  $results;
 	
-	if(trim($tipps[0]) == 'API') $type = 'API';
-
+	if(!is_array($results)) $results = array();
+	
 /* Assemble Page information *
 global $event, $session, $visitor;
 if($type == '') {
@@ -585,16 +598,63 @@ if($type == '') {
 	$tipp = strip_tags(implode('\n',$tipps));
 	db_query("SET NAMES 'utf8'");
 	db_query("SET CHARACTER SET 'utf8'");
-	if(isset($_REQUEST['texttosearch']) AND $_REQUEST['texttosearch'])
-			db_query("INSERT INTO ".DBPREF."stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,original,referrer)VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$original."','".$server."');");
-	else 
-		db_query("INSERT INTO ".DBPREF."stats_texttosearch (texttosearch,reftrans,date,result,session,tipp,original,referrer) VALUES ('".$texttosearch."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$results.",'".session_id()."','".$tipp."','".$original."','".$server."');");
-		
-	$result = db_query("SELECT * FROM ".DBPREF."stats_search WHERE texttosearch = '".$texttosearch."' AND reftrans = ".$reftrans." ORDER BY texttosearch, count DESC LIMIT 0,1",1);
-	if(is_array($result))
-		db_query("UPDATE ".DBPREF."stats_search SET count = ".($result[0]['count']+1).", results = ".$results." WHERE texttosearch = '".$texttosearch."' AND reftrans = ".$reftrans.";",1);
-	else
-		db_query("INSERT INTO ".DBPREF."stats_search VALUES ('".$texttosearch."',".$reftrans.",".$results.",1);");
+	global $searchtype;
+	if($type == 'quote') $notes = 'searchtype:quote';
+	elseif($type == 'api') {
+		global $apinotes;
+		$notes = 'searchtype:api'.$apinotes;
+	}
+	elseif($type == 'ebook') {
+		$notes = 'type:'.$results['tipus'].'|uj:'.$results['uj'];
+	}
+	else $notes = 'searchtype:'.$searchtype.'|rows:'.$rows.'|page:'.$page;
+	
+	$query = "INSERT INTO ".DBPREF."stats_texttosearch 
+		(texttosearch,notes,reftrans,date,result,session,tipp,original,referrer)
+		VALUES ('".$texttosearch."','".$notes."',".$reftrans.",'".date('Y-m-d H:i:s')."',".$count.",'".session_id()."','".$tipp."','".$original."','".$server."');";
+	db_query($query);
+	if($type == 'quote') $stype = 'quote';
+	elseif($type == 'api') $stype = 'api';
+	elseif($type == 'ebook') $stype = 'ebook';
+	else $stype = $searchtype;
+	
+	$query = 
+		"SELECT texttosearch, searchcount 
+			FROM ".DBPREF."stats_search 
+			WHERE 
+				texttosearch = '".$texttosearch."' 
+				AND reftrans = ".$reftrans." 
+				AND rows = '".$rows."'
+				AND page = '".$page."'
+				AND searchtype = '".$stype."'
+			ORDER BY texttosearch DESC LIMIT 1";
+	$result = db_query($query,1);
+	
+	//echo '--'.$GLOBALS['fullsearch'].'--'.print_r($result,1);
+	if(is_array($result)) {	
+		if($GLOBALS['fullsearch'] == 1) {} else {};
+			$query = 
+				"UPDATE ".DBPREF."stats_search 
+					SET 
+						searchcount = ".($result[0]['searchcount']+1)." ,						
+						resultarray = '".serialize($results)."', 
+						resultupdated = '".date('Y-m-d H:i:s')."',
+						resultcount = ".$count."
+					WHERE 
+						texttosearch = '".$texttosearch."' 
+						AND reftrans = ".$reftrans."
+						AND rows = '".$rows."'
+						AND page = '".$page."'
+						AND searchtype = '".$stype."'						
+						;";		
+			db_query($query,1);
+	} else {
+		if($GLOBALS['fullsearch'] == 1) {} else {};
+			$query =
+				"INSERT INTO ".DBPREF."stats_search 
+					(texttosearch,reftrans,searchcount,resultcount,resultarray,resultupdated,rows,page,searchtype) 
+				VALUES ('".$texttosearch."',".$reftrans.",1,".$count.",'".serialize($results)."','".date('Y-m-d H:i:s')."','".$rows."','".$page."','".$stype."');";
+			db_query($query);
+	}
   }
-  
 ?>

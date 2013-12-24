@@ -1,9 +1,10 @@
 <?php
   $script = explode("&",$_SERVER['REQUEST_URI']);
 
-  if(!(empty($reftrans) or empty($abbook))) {
-	$pagetitle = $abbook." (".gettransname($reftrans,'true').") | Szentírás"; 
-	$content .= showbook($reftrans,$abbook,listbook($reftrans, $abbook));
+  if(!(empty($transid) or empty($bookid))) {
+  
+	$pagetitle = $GLOBALS['tdbook'][$transid][$bookid]['abbrev']." (".gettransname($transid,'true').") | Szentírás"; 
+	$content .= showbook($transid,$GLOBALS['tdbook'][$transid][$bookid]['abbrev'],listbook($transid, $GLOBALS['tdbook'][$transid][$bookid]['abbrev']));
  }
 
 ?>
