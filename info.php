@@ -1,9 +1,9 @@
 <?php
 /*
-- kereső tippek fosok, szinonimak
+- kereső tippek fosok, (szinonimak)
 - keresés csak a szövegben / címekben és lábjegyzetekben is
 
-
+- a cache most végtelenedik, ha rendszeresen nézik, de sosem frissül
 */
 
 /*

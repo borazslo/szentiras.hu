@@ -141,8 +141,8 @@ function addresults($news,$old,$num = false) {
 	//if(count($news)>0) echo $num."+";
 	foreach($news as $gepi => $new) {
 		
-		global $searchtype;
-		if($searchtype == 'byverse') $key = $gepi;		
+		global $searchby;
+		if($searchby == 'byverse') $key = $gepi;		
 		else $key = substr($gepi, 0, 6);	
 	
 		if(array_key_exists($key,$old)) {
@@ -323,7 +323,7 @@ function url($url) {
 
 
 function redirect_long2short() {
-	if(isset($_REQUEST['searchtype'])) $_SESSION['searchtype'] = $_REQUEST['searchtype'];
+	if(isset($_REQUEST['searchby'])) $_SESSION['searchby'] = $_REQUEST['searchby'];
    /* 
     * A hosszú url-ből kitalája, hogy mi lenne röviden
 	* és oda átirányítja

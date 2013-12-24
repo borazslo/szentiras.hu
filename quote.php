@@ -598,16 +598,16 @@ if($type == '') {
 	$tipp = strip_tags(implode('\n',$tipps));
 	db_query("SET NAMES 'utf8'");
 	db_query("SET CHARACTER SET 'utf8'");
-	global $searchtype;
-	if($type == 'quote') $notes = 'searchtype:quote';
+	global $searchby;
+	if($type == 'quote') $notes = 'searchby:quote';
 	elseif($type == 'api') {
 		global $apinotes;
-		$notes = 'searchtype:api'.$apinotes;
+		$notes = 'searchby:api'.$apinotes;
 	}
 	elseif($type == 'ebook') {
 		$notes = 'type:'.$results['tipus'].'|uj:'.$results['uj'];
 	}
-	else $notes = 'searchtype:'.$searchtype.'|rows:'.$rows.'|page:'.$page;
+	else $notes = 'searchby:'.$searchby.'|rows:'.$rows.'|page:'.$page;
 	
 	$query = "INSERT INTO ".DBPREF."stats_texttosearch 
 		(texttosearch,notes,reftrans,date,result,session,tipp,original,referrer)
@@ -616,7 +616,7 @@ if($type == '') {
 	if($type == 'quote') $stype = 'quote';
 	elseif($type == 'api') $stype = 'api';
 	elseif($type == 'ebook') $stype = 'ebook';
-	else $stype = $searchtype;
+	else $stype = $searchby;
 	
 	$query = 
 		"SELECT texttosearch, searchcount 

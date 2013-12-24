@@ -269,8 +269,8 @@ function showverse($verse,$trans = false,$type = false) {
             }        
         $verse = $tmp;
     }
-
     if(count($verse)>0 AND $trans == false) { $trans = array_shift(array_values($verse))->trans; }   
+
     if($trans == 4) {
         /* tip: 6,13 */
         if(isset($verse[13])) {
@@ -337,7 +337,6 @@ function showverse($verse,$trans = false,$type = false) {
     } 
     //$return .= "<pre>".print_r($verse,1)."</pre>";
     }
-    
     if(!isset($verseonly)) $return = preg_replace('/\\\n/','</p><p>',$return);
     else $return = preg_replace('/\\\n/',' ',$return);
     
