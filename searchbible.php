@@ -280,8 +280,13 @@ function printSearchForm() {
 		$return .= "</form>\n";
 		
 		$return .= <<<EOD
-			<p class="kiscim">A keresőről</p>
-			<p><i>Majd egyszer újra megírom, most hogy *** elveszett</i></p>
+			<p class="kiscim">A keresőről:</p><br/>
+			<p>A <strong>Szentírás szövegében lehet keresni</strong> vagy <strong>konkrét versre, versekre lehet hivatkozni</strong>.</p>
+			<p>Az igehelyekre a „<i>Könyv</i> <i>fejezetszám</i>, <i>verszám</i>” formával lehet. Például: <a href="" class='link'>1Kor 13,1-7.9-11</a>. (Tehát a részt a verstől elválasztó kettőspontot nem tudja értelmezni a rendszer.) Figyeljünk arra, hogy a fordításnak megfelelő könyvrövidítést használjuk!</p>
+			<p>A szövegrészleteket a <strong>súlyozva</strong> jeleníti meg. <strong>Fejezetenként vagy versenként csoportosítva</strong>.</p>
+			<p>Lehetőség van arra, hogy <strong>egy-egy könyvre szűkítsük</strong> le a keresést vagy a teljes Ó- ill. Újszövetségre. Ehhez a kereső kifejezés végére(!) kell írni például azt, hogy „ in:Lk”</p>
+			<p><strong>Idézőjelek</strong> segítségével lehet kötelezni a keresőt, hogy adott kifejezéseket együtt kezeljen.</p>
+			<p>A kereső igyekszik szinonímákat és alternatívákt is ajánlani, ill. zárójeles felső indexbe megjeleníteni az adott változatban/fordításban várható találatok számát. Valamint a találatokat a gyorsabb újrakeresés érdekében tároljuk. Ha nem talál a pontos kifejezésnek megfelelőt, akkor megpróbál a keresőszó szótöve alapján újabb találatokat előásni.</p>
 		
 EOD;
 		

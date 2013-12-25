@@ -427,8 +427,9 @@ if($_REQUEST['q'] == 'showtrans') {
 	exit;
 }  elseif($_REQUEST['q'] == 'info') {
 	Header( "HTTP/1.1 301 Moved Permanently" ); 
-	Header( "Location: ".BASE.'info');
+	Header( "Location: ".BASE.'info');	
 	exit;
+	
 	
 } elseif($_REQUEST['q'] == 'showallbible') {
     Header( "HTTP/1.1 301 Moved Permanently" ); 

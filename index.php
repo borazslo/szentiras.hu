@@ -22,6 +22,7 @@ require_once('quote.php');
 
 
 /* Hosszú URL átirányítás RÖVIDRE */
+
 redirect_long2short();
 
 
@@ -41,7 +42,6 @@ if(isset($transid)) $reftrans = $transid;
 
 //echo $q;
 if($q=='showbible') $hirek = getnews();
-
 if($q != false AND file_exists($q.'.php')) require_once($q.'.php');
 else {
 	$title = 'A kért oldal nem található!';
@@ -82,7 +82,7 @@ $menu = new Menu();
 	$menu->add_pause();
     
 	$menu->add_item("FEJLESZTŐKNEK",BASE."API");
-	$menu->add_item("Újdonságaink",BASE."info");
+	$menu->add_item("Újdonságaink",BASE."info/");
 	
     $menu->add_pause();
 	$menu->add_item("Görög újszövetségi honlap","http://www.ujszov.hu/");

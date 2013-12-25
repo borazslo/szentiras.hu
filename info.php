@@ -1,7 +1,7 @@
 <?php
 /*
+- valami nem megy a /info -val
 - kereső tippek fosok, (szinonimak)
-- szinonímák in:valami taggel vagy több részes izével
 - keresés csak a szövegben / címekben és lábjegyzetekben is
 
 - a cache most végtelenedik, ha rendszeresen nézik, de sosem frissül
@@ -46,7 +46,6 @@ nkább bugreport: http://szentiras.hu/Ezd1,3 és http://szentiras.hu/Ezdr1,3
 
 http://d7.aiee.eu/xxx/node/6
 */
-
 
 $title = 'Fejlesztések';
 $pagetitle = 'Fejlesztések | Szentírás';
