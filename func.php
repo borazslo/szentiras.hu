@@ -441,6 +441,35 @@ function url_short2vars() {
 
 	if(!isset($_REQUEST['rewrite']) OR $_REQUEST['rewrite'] == '') return array();
  
+	//echo utf8_decode($_REQUEST['rewrite']);
+	$teszt = iconv('UTF-8', 'UTF-8//IGNORE', utf8_decode($_REQUEST['rewrite']));
+	if($teszt != '') {
+		$_REQUEST['rewrite'] = $teszt;
+	}
+	
+	/*
+	// TODO: Talán átirányíthatna a hülyén kapja meg
+	if(mb_check_encoding( utf8_decode($_REQUEST['rewrite']),'UTF-8')) {
+		//$_REQUEST['rewrite'] = utf8_decode($_REQUEST['rewrite']);
+		//$_REQUEST['rewrite'] = iconv('ISO-8859-2','UTF-8',utf8_decode($_REQUEST['rewrite']));		
+	} else {
+
+	}
+	echo '-'.urldecode($_REQUEST['rewrite']);
+	//echo $string = mb_convert_encoding($_REQUEST['rewrite'],'HTML-ENTITIES','utf-8');
+
+	if (preg_match('!!u', $string))
+{
+echo "utf8";
+   // this is utf-8
+}
+else 
+{
+echo "not utf8";
+   // definitely not utf-8
+}
+ */
+	
 	$uri = explode('/',rtrim($_REQUEST['rewrite'],'/'));
    
 	if($uri[0] == 'API') {
@@ -460,13 +489,12 @@ function url_short2vars() {
 		}
 		
 	} elseif(count($uri) == 2) {
-	
 		/* megnézzük, hogy az első fordítás-e */
 		$istransid = array_search($uri[0], $GLOBALS['tdtrans_abbrev']);
 		if($istransid != false) $transid = $istransid;
 		else return array('q'=>'404');
 		
-		$isbookid = array_search($uri[1], $GLOBALS['tdbook_abbrev'][$transid]);
+		$isbookid = array_search($uri[1], $GLOBALS['tdbook_abbrev'][$transid]);		
 		/* ha másodk epub/mobi */
 		if($uri[1] == 'epub' OR $uri[2] == 'mobi') {
 			$q = 'ebook';
@@ -479,6 +507,20 @@ function url_short2vars() {
 		}
 		
 		else {		
+		/* Ha ékezetmentes véletlen */
+		// nem egészen értem, no
+		$t = $transid;	global $bookurls, $transid;	$transid = $t;
+		$patternurl = '/^('.implode('|',$GLOBALS['tdbook_url'][$transid]).')([0-9]{1,3})/i';
+		$uri[1] = preg_replace_callback(
+				$patternurl,
+				function ($matches) {
+					global $bookurls, $reftrans, $transid;
+					$abbrev = $bookurls[$transid][$matches[1]]['abbrev'];
+					return $abbrev.$matches[2];
+
+				},
+				$uri[1]);
+		
 		/* ha a második fejezet */
 		$pattern1 = '/^('.implode('|',$GLOBALS['tdbook_abbrev'][$transid]).')([0-9]{1,3})$/i';
 		$pattern2 = "/^(".implode("|",$GLOBALS['tdbook_abbrev'][$transid]).")([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1}(;([0-9]{1,3})((((,|:)[0-9]{1,2}[a-f]{0,1})((-[0-9]{1,2}[a-f]{0,1})|(\.[0-9]{1,2}[a-f]{0,1}))*)|(-[0-9]{1,2})|((:|,)[0-9]{1,2}-[0-9]{1,2}(:|,)[0-9]{1,2})){0,1})*$/i";	

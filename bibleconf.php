@@ -1,6 +1,6 @@
 <?php
-define('BASE','http://beta.szentiras.hu/'); //base url of the site
-define('FILE','/var/www/beta.szentiras.hu/'); //base url of the site
+define('BASE','http://szentiras.hu/'); //base url of the site
+define('FILE','/var/www/szentiras.hu/'); //base url of the site
 define('DBPREF','kar_'); // prefixes of the tables in the database
 define('DROPBOXF','Bibliafordítások'); // A dropbox foldere a megosztottaknak
 

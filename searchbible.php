@@ -138,7 +138,8 @@ function getIdezetTipp($texttosearch) {
 				if(isset($matches[1])) {
 						$jokonyv = $GLOBALS['tdbook'][$reftrans][$book['id']]['abbrev'];
 						$jotext = preg_replace('/^'.$matches[1].'(.*?)$/',$jokonyv.'$1',$texttosearch);
-						$tipps[] = 'Így értetted: <a href="'.BASE.$GLOBALS['tdtrans_abbrev'][$reftrans]."/".$jotext.'">'.$jotext.'</a>?';
+						$tipps[] = 'Ebben a fordításban inkább így használd: <a href="'.BASE.$GLOBALS['tdtrans_abbrev'][$reftrans]."/".$jotext.'">'.$jotext.'</a> !';
+						return;
 				
 				}
 			}

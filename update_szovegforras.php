@@ -5,7 +5,7 @@ $starttime = time();
 
 ini_set('memory_limit', '512M');
 //echo phpinfo(); exit;
-$fpath = '/var/www/beta.szentiras.hu/';
+$fpath = '/var/www/szentiras.hu/';
 
 require_once('bibleconf.php');
 require_once("biblefunc.php");

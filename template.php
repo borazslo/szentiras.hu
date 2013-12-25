@@ -10,8 +10,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 
 <head>
-
-	<meta charset="utf8">
+	<!--<meta charset="utf8">-->
+	<meta charset="utf-8">
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -93,7 +93,7 @@ ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'st
 		<?php 
         if(getvar('dolgozunk')=='true') 
 		echo '<div algin="center" style="background-color:red;color:white;text-align:center">Éppen fejlesztünk! Ha furcsa dolgot lát, kérjük frissítse az oldalt, vagy térjen vissza pár perc múlva!</div>'; 
-		
+				
         foreach($translations as $t) {            
             if(getvar('frissitunk_'.$t['abbrev'])=='true') 
                 echo '<div algin="center" style="background-color:red;color:white;text-align:center">Éppen frissítjük a '.$t['abbrev'].' szövegeket! Az ebből fakadó hibákért elnézést kérünk!</div>'; 

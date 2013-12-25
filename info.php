@@ -1,6 +1,7 @@
 <?php
 /*
 - kereső tippek fosok, (szinonimak)
+- szinonímák in:valami taggel vagy több részes izével
 - keresés csak a szövegben / címekben és lábjegyzetekben is
 
 - a cache most végtelenedik, ha rendszeresen nézik, de sosem frissül
