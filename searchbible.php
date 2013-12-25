@@ -99,6 +99,7 @@ $share .= "</div>";
 	/*tippek*/
 	getSzinonimaTipp($texttosearch);
 	getIdezetTipp($texttosearch);
+	$tipps = array_unique($tipps);
 	foreach($tipps as $tipp) 
 		$content .= '<div id="tipp"><font color="red">TIPP:</font> '.$tipp.'</div>';
 	
@@ -174,27 +175,8 @@ function getSzinonima($texttosearch,$max = 2) {
 			if($s[0] != '' AND $s[0] != $texttosearch AND !in_array($s[0],$szinonima) ) {
 				global $reftrans;
 				if(!isset($s[1]) OR (isset($s[1]) AND $s[1] == $reftrans ))
-					global $searchby;
-					$query = "
-						SELECT resultcount 
-						FROM ".DBPREF."stats_search
-						WHERE
-							searchtype = '".$searchby."'
-							AND reftrans = '".$reftrans."'
-							AND texttosearch = '".$s[0]."'
-						ORDER BY resultcount DESC
-						LIMIT 1";
-					$result = db_query($query);	
-			
-					if(isset($result[0]) AND $result[0]['resultcount'] > 0) {
-						$szinonima[] = array('szo'=>$s[0],'resultcount'=>$result[0]['resultcount']);
-					} elseif(!isset($result[0])) {
-					
-						$szinonima[] = array('szo'=>$s[0],'resultcount'=>0);
-					} else {
-					
-					}
-				}
+					$szinonima[] = $s[0];
+			}
 		}
 	}
 	
@@ -203,20 +185,51 @@ function getSzinonima($texttosearch,$max = 2) {
   }
   function getSzinonimaTipp($texttosearch) {
 	 global $reftrans;
-	$szinonima = getSzinonima($texttosearch);
-	$return = "Talán próbáld más szavakkal: ";
-	$c = 1;
-	foreach($szinonima as $szin) {
-		if($szin['resultcount']>0) $extra = ' <sup>('.$szin['resultcount'].')</sup>';
-		else $extra = '';
-		$return .= " <a href='".BASE.$GLOBALS['tdtrans_abbrev'][$reftrans]."/".$szin['szo']."' class=link>".$szin['szo'].$extra."</a>";		
-		if($c<count($szinonima)) $return .= ',';
-		$c++;
+	 
+	 $valtozatok = array();
+	 //TODO: jó ez?
+	 preg_match_all('/(^| |")([^ "]{1,100})/',$texttosearch,$matches,PREG_SET_ORDER);
+	 foreach($matches as $match) {
+		$szo = $match[2];
+		$szinonimak = getSzinonima($szo);
+		foreach($szinonimak as $szinonima) {
+			$valtozatok[] = preg_replace('/(^| |")('.$szo.')( |"|$)/','$1'.$szinonima.'$3',$texttosearch);
+		}
 	}
-	$return .= '!';
-	if($szinonima != array()) { global $tipps; $tipps[] = $return; return true; }
-	else return false;
+	$valtozatokhtml = array();
+	foreach($valtozatok as $valtozat) {
+		$valt = '';
 	
+		global $searchby;
+		$query = "
+			SELECT resultcount 
+			FROM ".DBPREF."stats_search
+			WHERE
+				searchtype = '".$searchby."'
+				AND reftrans = '".$reftrans."'
+				AND texttosearch = '".$valtozat."'
+			ORDER BY resultcount DESC
+			LIMIT 1";
+		$result = db_query($query);	
+		//echo $query."<br>";
+		if(isset($result[0]) AND $result[0]['resultcount'] > 0) {
+			$extra = '<sup>('.$result[0]['resultcount'].')</sup>';
+		} else 
+			$extra = '';
+			
+		if((isset($result[0]) AND $result[0]['resultcount'] > 0) OR !isset($result[0])) {		
+				$valtozatokhtml[] = " <a href='".BASE.$GLOBALS['tdtrans_abbrev'][$reftrans]."/".urlencode($valtozat)."' class=link>".$valtozat.$extra."</a>";		
+			}
+	
+	}
+	if($valtozatokhtml != array()) {
+			$return = "Talán próbáld más szavakkal: ";
+			$tmp = array_chunk($valtozatokhtml, 5, true);
+			$return .= implode(', ',$tmp[0]);
+			$return .= '!';
+			global $tipps; $tipps[] = $return;
+	}
+				
   }
 
 function printSearchForm() {

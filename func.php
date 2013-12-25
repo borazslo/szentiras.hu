@@ -26,8 +26,19 @@ function rootverse($verse) {
 }
 
 function search($text,$reftrans, $min) {
+	//TODO: " in:Újszöv "
+	global $bookabbrevs;
+		if(preg_match('/ in:([^ ]*)$/',$text,$match)) {
+			$text = preg_replace('/(.*) in:'.$match[1].'$/','$1',$text);
+			$in = $match[1];	
+		
+			if(preg_match("/^(Újszöv|Új|Újszövetség|Ótestamentum|Ótestámentum)$/i",$in)) $inwhere = " AND gepi LIKE '2%' ";
+			elseif(preg_match("/^(Ó|Ószöv|Ószövetség|Újtestamentum|Újtestámentum)$/i",$in)) $inwhere = " AND gepi LIKE '2%' ";
+			elseif(preg_match("/^(Lk)$/i",$in,$m)) $inwhere = "AND gepi LIKE '".$bookabbrevs[$reftrans][$m[1]]['id']."%' ";
+		}
+		
   $results = array();
-   
+
    $reward = array(
 	'cs_nonwrapped_verse' => 40000,
 	'cs_nonwrapped_versesimple' => 6000,
@@ -48,7 +59,9 @@ function search($text,$reftrans, $min) {
    $text_versesimple = simpleverse($text);
    $text_verseroot = rootverse($text);
    
-   $mysqlrows = dbsearchtext(" verse LIKE '%".$text_verse."%' OR versesimple LIKE '%".$text_versesimple."%' OR verseroot LIKE '%".$text_verseroot."%'  ",$reftrans);
+   $where = " (verse LIKE '%".$text_verse."%' OR versesimple LIKE '%".$text_versesimple."%' OR verseroot LIKE '%".$text_verseroot."%')  ";
+   if(isset($inwhere)) $where .= $inwhere;
+   $mysqlrows = dbsearchtext($where,$reftrans);
    foreach($mysqlrows as $row) {
 		foreach(array('cs','cis') as $csens) { //CaseSensitive or CaseInSensitive
 			foreach(array('wrapped','nonwrapped') as $wrap) {
@@ -87,7 +100,8 @@ function search($text,$reftrans, $min) {
    $where['verseroot'][] = " verseroot LIKE '%".$segments2[$key]['text_verseroot']."%' ";
    }
   
-  $query = " (".implode(' AND ',$where['verse']).") OR (".implode(' AND ',$where['versesimple']).") OR (".implode(' AND ',$where['verseroot']).") ";
+  $query = "( (".implode(' AND ',$where['verse']).") OR (".implode(' AND ',$where['versesimple']).") OR (".implode(' AND ',$where['verseroot']).") )";
+  if(isset($inwhere)) $query .= $inwhere;
   $mysqlrows = dbsearchtext($query,$reftrans);   
  
    foreach($mysqlrows as $row) {
@@ -115,6 +129,7 @@ function search($text,$reftrans, $min) {
 			}
 		}
    }
+   if(isset($in)) $text .= ' in:'.$in;
    if(count($results) > $min * 1.1 ) return resultsorder($results);
    /* darabokan vége */
    $GLOBALS['fullsearch'] = 1;
