@@ -1,1 +1,9 @@
 ﻿phpDB-mysql.lib
+tmp/*
+!tmp/README.md
+ebook/*
+!ebook/README.md
+include/*
+!include/README.md
+cache/*
+!cache/README.md
