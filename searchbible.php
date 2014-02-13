@@ -20,7 +20,7 @@ $pagetitle = $texttosearch." (".gettransname($reftrans,'true').") | Szentírás"
 $title .= "<a href='".BASE."kereses'>Keresés</a>: „".$texttosearch."”\n";
 $content .= "<form action='".BASE."index.php' method='get'>\n";
 		$content .= "<input type='hidden' name='q' value='searchbible'>\n";
-		$content .= "<input type=hidden name='texttosearch' id='texttosearch' value='".$texttosearch."' class='alap'>";
+		$content .= "<input type=hidden name='texttosearch'  value='".$texttosearch."' class='alap'>";
 		$content .= "<span class='alap'>Fordítás:</span> ";					
 		$content .= "<select id='reftrans' name='reftrans' class='alap' onChange=\"this.form.submit();\">";
 		foreach($GLOBALS['tdtrans'] as $trans) {
@@ -53,7 +53,7 @@ $query = "
 		ORDER BY resultcount DESC
 		LIMIT 1";
 	$result = db_query($query);
-	if(isset($result[0]) AND getvar('cache_on') == 'on') {
+	if(isset($result[0]) AND getvar('cache_on') == 'on' AND $result[0]['searchcount']>1) {
 		$verses = unserialize($result[0]['resultarray']);
 		$count = $result[0]['resultcount'];
 	} else {
@@ -79,9 +79,9 @@ foreach($GLOBALS['tdtrans'] as $trans) {
 		SELECT resultcount 
 		FROM ".DBPREF."stats_search
 		WHERE
-			searchtype = '".$searchby."'
+			texttosearch = '".$texttosearch."'
 			AND reftrans = '".$trans['id']."'
-			AND texttosearch = '".$texttosearch."'
+			AND searchtype = '".$searchby."'
 		ORDER BY resultcount DESC
 		LIMIT 1";
 	$result = db_query($query);
@@ -108,7 +108,7 @@ $share .= "</div>";
 	$content .= "<div class=\"results2\">";
 	foreach($verses as $verse) {
 		if($verse != '') {
-		$content .= "<img src='".BASE."img/arrowright.jpg' title ='".$verse['point']."'> ";
+		$content .= "<img src='".BASE."img/arrowright.jpg' alt='->' title ='".$verse['point']."'> ";
 		$vfirst = array_shift(array_values($verse['verses']));
 	    $szep = $GLOBALS['tdbook_abbrev'][$transid][substr($vfirst['gepi'],0,3)]." ".(int) substr($vfirst['gepi'],3,3);
 		$content .= "<a href=\"".preg_replace('/ /i','',BASE.$GLOBALS['tdtrans_abbrev'][$transid]."/".$szep."#".(int) substr($vfirst['gepi'],6,3))."\" class=\"link\">".$szep."</a> - ";
@@ -140,6 +140,11 @@ function getIdezetTipp($texttosearch) {
 						$jokonyv = $GLOBALS['tdbook'][$reftrans][$book['id']]['abbrev'];
 						$jotext = preg_replace('/^'.$matches[1].'(.*?)$/',$jokonyv.'$1',$texttosearch);
 						$tipps[] = 'Ebben a fordításban inkább így használd: <a href="'.BASE.$GLOBALS['tdtrans_abbrev'][$reftrans]."/".$jotext.'">'.$jotext.'</a> !';
+						
+						Header( "HTTP/1.1 301 Moved Permanently" ); 
+						Header( "Location: ".BASE.$GLOBALS['tdtrans_abbrev'][$reftrans]."/".$jotext); 
+						exit;
+						
 						return;
 				
 				}

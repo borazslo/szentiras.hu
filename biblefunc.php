@@ -423,10 +423,10 @@ function showhier ($reftrans, $abbook, $numch) {
          //$output = $output . " <img src='".BASE."img/arrowright.jpg'> ";
          $output = $output . "<a href='" . BASE . "index.php?q=showtrans&reftrans=" . $reftrans . "' > " . gettransname($reftrans) . "</a>\n";
          if (!empty($abbook)) {
-              $output = $output . " <img src='".BASE."img/arrowright.jpg'> ";
+              $output = $output . " <img src='".BASE."img/arrowright.jpg' alt='->'> ";
               $output = $output . "<a href='" . BASE . "index.php?q=showbook&reftrans=" . $reftrans . "&abbook=" . $abbook . "' >" . getbookname($abbook,$reftrans) . "</a>\n";
               if (!empty($numch)) {
-                 $output = $output . " <img src='".BASE."img/arrowright.jpg'> ";
+                 $output = $output . " <img src='".BASE."img/arrowright.jpg' alt='->'> ";
                  $output = $output . "<a href='" . BASE . "index.php?q=showchapter&reftrans=" . $reftrans . "&abbook=" . $abbook . "&numch=" . $numch . "' >" . $numch . ". fejezet</a>\n";
               }
         }
@@ -554,7 +554,7 @@ function showverses($rs,$script,$reftrans) {
 	 do {
 			if($reftrans == 3) $rs->fields["verse"] = preg_replace_callback("/{(.*)}/",'replace_hivatkozas',$rs->fields["verse"]);
 			//print_R($rs->fields);
-            $return .= "<img src=".BASE."img/arrowright.jpg>&nbsp;";
+            $return .= "<img alt='->' src='".BASE."img/arrowright.jpg'>&nbsp;";
 			//$return .= shln($rs->fields["abbrev"] . " " . $rs->fields["chapter"] . "," . $rs->fields["numv"],BASE.$script . "&reftrans=" . $rs->fields['trans'] . "&abbook=" . $rs->fields["abbrev"] . "&numch=" . $rs->fields["chapter"] . "#" . $rs->fields["numv"],"link") . "\n";
 			$return .= shln($rs->fields["abbrev"] . " " . $rs->fields["chapter"] . "," . $rs->fields["numv"],BASE.$translations[$rs->fields['trans']]['abbrev'] .'/'.$rs->fields["abbrev"] . $rs->fields["chapter"] . "#" . $rs->fields["numv"],"link") . "\n";
             $return .= " - $sb" . $rs->fields["verse"] . $se . "\n";
@@ -615,7 +615,7 @@ function showversesnextprev($request, $catcount, $page, $rows, $paramchr){
 		 $nextstring = ( ($page ) * $rows ) + 1 ." - " ;
 		 if($catcount < ($page + 1)* $rows ) $nextstring .= 'talán '; //$catcount;
 		 $nextstring .=  (($page + 1)* $rows );		 		
-		 $return .= "<img src='".BASE."img/arrowright.jpg'> ";
+		 $return .= "<img src='".BASE."img/arrowright.jpg' alt='->'> ";
 		 $path = BASE.$request;
 		 $path .= $paramchr . "page=". ( $page + 1 );
 		 if($rows != $GLOBALS['rows'])  $path .= "&rows=$rows";
@@ -777,6 +777,7 @@ function igenaptar($datum = false) {
 	$fn2 = "http://katolikus.hu/igenaptar/".date('Ymd',strtotime($datum)).".html";
 
 	//$file = iconv("UTF-8", "ISO-8859-2",file_get_contents($fn2));
+	//if(!file_exists($fn2)) return;
 	$file = file_get_contents($fn2);
 
 	preg_match('/<!-- helyek:(.*)-->/',$file,$tmp);

@@ -414,6 +414,11 @@ if($_REQUEST['q'] == 'showtrans') {
 		if(isset($_REQUEST['offset'])) $extra .= '&offset='.$_REQUEST['offset'];
 		if(isset($_REQUEST['rows'])) $extra .= '&rows='.$_REQUEST['rows'];
 		
+		if(isset($_REQUEST['searchby'])) {
+			if($_REQUEST['searchby'] == 'byverse' )
+					$extra .= '&by=verse';
+		}
+		
 		if(isset($_REQUEST['in']) AND $_REQUEST['in'] != '') $texttosearch .= ' in:'.$_REQUEST['in'];
 		
 		Header( "HTTP/1.1 301 Moved Permanently" ); 
@@ -512,9 +517,9 @@ echo "not utf8";
 		
 		$isbookid = array_search($uri[1], $GLOBALS['tdbook_abbrev'][$transid]);		
 		/* ha másodk epub/mobi */
-		if($uri[1] == 'epub' OR $uri[2] == 'mobi') {
+		if($uri[1] == 'epub' OR $uri[1] == 'mobi') {
 			$q = 'ebook';
-			$type = $uri[2];
+			$type = $uri[1];
 				
 		/* ha a második könyv */		
 		} elseif($isbookid != false) {

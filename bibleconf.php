@@ -4,6 +4,7 @@ define('FILE','/var/www/szentiras.hu/'); //base url of the site
 define('DBPREF','kar_'); // prefixes of the tables in the database
 define('DROPBOXF','Bibliafordítások'); // A dropbox foldere a megosztottaknak
 
+//Redundancia miatt szükség van erre
 $fileurl = BASE;//"http://szentiras.hu/";
 $baseurl = BASE;//"http://szentiras.hu/";
 
@@ -35,4 +36,6 @@ $copyright = "
 				 2001-2010,<br>-->
 				 &copy; <a href='http://www.eleklaszlo.hu' class='menulink'>Elek László SJ</a> (<a href='http://jezsuita.hu'>JTMR</a>) 2013.<br>
 				 Minden jog fenntartva.</p>";
+
+//mysqldump --opt --where="true LIMIT 10000" bible -u szentiras -p > mysql_sample.sql				 
 ?>

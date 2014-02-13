@@ -5,7 +5,8 @@ include 'bibleconf.php';
 		where 
 			searchtype <> 'quote'
 			AND reftrans = ".$_REQUEST['reftrans']." 
-			AND resultcount > 0	
+			AND resultcount > 0
+			AND resultcount < 500
 			AND texttosearch LIKE '%".$_REQUEST['queryString']."%' 
 			group by texttosearch 
 			order by resultcount DESC LIMIT 7";

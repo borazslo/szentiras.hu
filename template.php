@@ -72,7 +72,7 @@
 </head>
 
 <body>
-<script src="http://beta.szentiras.hu/js/search.js"></script>
+<script src="http://szentiras.hu/js/search.js"></script>
 <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-36302080-1']);

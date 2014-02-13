@@ -27,7 +27,7 @@ function suggest(inputString){
             $('#suggestions').fadeOut();
         } else {
         $('#texttosearch').addClass('load');
-            $.post("http://beta.szentiras.hu/autosuggest.php", {queryString: ""+inputString+"",reftrans: ""+$('#reftrans').val()+""}, function(data){
+            $.post("http://szentiras.hu/autosuggest.php", {queryString: ""+inputString+"",reftrans: ""+$('#reftrans').val()+""}, function(data){
                 if(data.length >0) {
                     $('#suggestions').fadeIn();
                     $('#suggestionsList').html(data);
@@ -37,7 +37,7 @@ function suggest(inputString){
         }
     }
  
-    function fill(thisValue) {
+function fill(thisValue) {
         $('#texttosearch').val(thisValue);
         setTimeout("$('#suggestions').fadeOut();", 600);
-    }
+}

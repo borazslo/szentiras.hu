@@ -67,7 +67,8 @@ function isquotetion($text,$forcedtrans = false) {
 		preg_match($pattern2,$text,$matches);
 		if(isset($matches[1])) $tmps[] = $matches[1];
 		
-		foreach($tmps as $tmp) {
+		
+		if(is_array($tmps)) foreach($tmps as $tmp) {
 		$select = "SELECT * FROM ".DBPREF."szinonimak WHERE tipus = 'konyv' AND (szinonimak LIKE '%|".preg_replace('/ /','',$tmp)."|%' OR  szinonimak LIKE  '%|".preg_replace('/ /','',$tmp).":%');";
 		$result = db_query($select); $szinonima = array();
 		if(is_array($result)) foreach($result as $r) {
@@ -631,13 +632,17 @@ if($type == '') {
 	$result = db_query($query,1);
 	
 	//echo '--'.$GLOBALS['fullsearch'].'--'.print_r($result,1);
+	$searchcount = ($result[0]['searchcount']+1);
+	if($searchcount > 1) $resultarray = $results;
+	else $resultarray = array();
+	
 	if(is_array($result)) {	
 		if($GLOBALS['fullsearch'] == 1) {} else {};
 			$query = 
 				"UPDATE ".DBPREF."stats_search 
 					SET 
-						searchcount = ".($result[0]['searchcount']+1)." ,						
-						resultarray = '".serialize($results)."', 
+						searchcount = ".$searchcount." ,						
+						resultarray = '".serialize($resultarray)."', 
 						resultupdated = '".date('Y-m-d H:i:s')."',
 						resultcount = ".$count."
 					WHERE 
@@ -653,7 +658,7 @@ if($type == '') {
 			$query =
 				"INSERT INTO ".DBPREF."stats_search 
 					(texttosearch,reftrans,searchcount,resultcount,resultarray,resultupdated,rows,page,searchtype) 
-				VALUES ('".$texttosearch."',".$reftrans.",1,".$count.",'".serialize($results)."','".date('Y-m-d H:i:s')."','".$rows."','".$page."','".$stype."');";
+				VALUES ('".$texttosearch."',".$reftrans.",1,".$count.",'".serialize($resultarray)."','".date('Y-m-d H:i:s')."','".$rows."','".$page."','".$stype."');";
 			db_query($query);
 	}
   }

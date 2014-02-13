@@ -1,6 +1,9 @@
 RewriteEngine On
 RewriteBase /
 
+RewriteCond %{HTTP_HOST} ^www.(.+)$ [NC]
+RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
 #RewriteCond %{REMOTE_ADDR} !^81\.182\.240\.247
 #RewriteCond %{REQUEST_URI} !^/karbantartunk\.html$
 #RewriteCond %{REQUEST_URI} !^/img/.*$
@@ -10,7 +13,6 @@ RewriteBase /
 
 #RewriteCond %{REQUEST_FILENAME} !-f
 #RewriteCond %{REQUEST_FILENAME} !-d
-
 
 RewriteCond %{REQUEST_URI} !mp3$
 RewriteCond %{REQUEST_URI} !/img/.*$
@@ -26,4 +28,51 @@ RewriteCond %{REQUEST_URI}   !^/autosuggest.php$
 RewriteCond %{REQUEST_URI}   !^/index.php$
 RewriteRule ^(.*) index.php?rewrite=$1 [QSA]
 
+###
+### http://gtmetrix.com/add-expires-headers.html
+###
+
+## EXPIRES CACHING ##
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType image/jpg "access plus 1 year"
+ExpiresByType image/jpeg "access plus 1 year"
+ExpiresByType image/gif "access plus 1 year"
+ExpiresByType image/png "access plus 1 year"
+ExpiresByType text/css "access plus 1 month"
+ExpiresByType application/pdf "access plus 1 month"
+ExpiresByType text/x-javascript "access plus 1 month"
+ExpiresByType application/x-shockwave-flash "access plus 1 month"
+ExpiresByType image/x-icon "access plus 1 year"
+ExpiresDefault "access plus 2 days"
+
+# Javascript
+ExpiresByType application/javascript "access plus 1 month"
+
+</IfModule>
+## EXPIRES CACHING ##
+
+
+
+
+###
+### http://gtmetrix.com/enable-gzip-compression.html
+###
+# compress text, HTML, JavaScript, CSS, and XML
+AddOutputFilterByType DEFLATE text/plain
+AddOutputFilterByType DEFLATE text/html
+AddOutputFilterByType DEFLATE text/xml
+AddOutputFilterByType DEFLATE text/css
+AddOutputFilterByType DEFLATE application/xml
+AddOutputFilterByType DEFLATE application/xhtml+xml
+AddOutputFilterByType DEFLATE application/rss+xml
+AddOutputFilterByType DEFLATE application/javascript
+AddOutputFilterByType DEFLATE application/x-javascript
+
+
+# remove browser bugs
+BrowserMatch ^Mozilla/4 gzip-only-text/html
+BrowserMatch ^Mozilla/4\.0[678] no-gzip
+BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+#Header append Vary User-Agent
 

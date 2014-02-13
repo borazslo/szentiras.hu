@@ -3,7 +3,7 @@ header('Content-type: text/html; charset=utf-8');
 
 $starttime = time();
 
-ini_set('memory_limit', '512M');
+ini_set('memory_limit', '1024M');
 //echo phpinfo(); exit;
 $fpath = '/var/www/szentiras.hu/';
 
@@ -158,6 +158,8 @@ for($i = 2;$i<$max;$i++) {
 	set_time_limit(60);
     foreach($fields as $mysql => $excel) {		
 		$value = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($cols[$excel], $i)->getValue(); //CalculatedValue(); //getValue();
+		if($mysql == 'did') $value = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($cols[$excel], $i)->getCalculatedValue(); //getValue();
+
         if($excel == 'jel') { 
 			//echo "VALUE: ".$value."\n";
             //if(!@iconv("UTF-8", "UTF-8", $value)) $value = iconv('windows-1250', 'UTF-8',$value); 
