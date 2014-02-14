@@ -8,18 +8,18 @@ Minden az index.php-n kereszül megy.
 Nem CMS, de egy template.php-n keresztül megy a megjelenítés nem elhanyagolható része.
 
 ###Könyvtár struktúra
-cache - az egresszív cache file-ok tárolására (néha üríteni kell)
-css - responsive miatt vannak használatlanok
-ebook - a generált ebookok (epub/mobi) tárolására (üríthető, néha üríteni kell egy részét)
-img - a sminkben használt képek (egy része talán nem használt)
-include - külső, máshonnan szerzett php és egyéb cuccok
-info - valamiért kellett, hogy a szentiras.hu/info működjön :(
-js - a scriptecskék és szemeteik
-tmp - importer használja + db backup (részben üríthető alkalmankén)
+- cache - az egresszív cache file-ok tárolására (néha üríteni kell)
+- css - responsive miatt vannak használatlanok
+- ebook - a generált ebookok (epub/mobi) tárolására (üríthető, néha üríteni kell egy részét)
+- img - a sminkben használt képek (egy része talán nem használt)
+- include - külső, máshonnan szerzett php és egyéb cuccok
+- info - valamiért kellett, hogy a szentiras.hu/info működjön :(
+- js - a scriptecskék és szemeteik
+- tmp - importer használja + db backup (részben üríthető alkalmankén)
 
 ###A függvények főbb helyei:
--quote.php - már az enyém. isquotation(), print_quotation(), quotation() - vagyis, hogy mikor idézet hivatkozás valami és azt rakja össze, hogy milyen versek vannak benne
--searchbible.php - a keresés függvényei a keresés motorján kívül getIdezetTipp(), getSzinonima(), getSzinonimaTIpp(), printsearchform()
+- quote.php - már az enyém. isquotation(), print_quotation(), quotation() - vagyis, hogy mikor idézet hivatkozás valami és azt rakja össze, hogy milyen versek vannak benne
+- searchbible.php - a keresés függvényei a keresés motorján kívül getIdezetTipp(), getSzinonima(), getSzinonimaTIpp(), printsearchform()
 - biblefunc.php -  főként az eredeti réges régi biblia honlap függvényei. részben átdolgozva, de itt maradtak részban csak szemét
 - func.php - hát újabb search függbények (simpleverse, rootverse, search, resultorder, addresults, searchsimple, dbsearchtext) és egyebek getnews() (főoldalra hírek), class menu, url(), redirect függvények (hosszú ill rövid url-ek alakítgatás és értelmezése)
 

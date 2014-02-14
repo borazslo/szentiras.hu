@@ -17,6 +17,10 @@ $comments = '';
 $title = false;
 $tipps = array();	
 
+$mysqlhost = 'localhost';
+$mysqldb = 'bible';
+$mysqlpw = 'saritnezs11';
+$mysqluser = 'szentiras';
 $database = array('mysql:host=localhost;dbname=bible','szentiras','saritnezs11');
 
 try { 

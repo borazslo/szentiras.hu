@@ -1,6 +1,8 @@
 ﻿phpDB-mysql.lib
 tmp/*
 !tmp/README.md
+!tmp/mysql_schema.sql
+!tmp/mysql_sample.sql
 ebook/*
 !ebook/README.md
 include/*

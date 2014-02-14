@@ -18,9 +18,8 @@ redirect_long2short();
    A végén van egy kis kód még, ami kell hozzá. (Az ment.) 
 */
 $uri = $_SERVER["REQUEST_URI"];
-$cachefile = 'cache/cached-'.md5($uri).'.html';
-$cachetime = 18000;
-$cachetime = 18000;
+$cachefile = 'cache/cached-'.urlencode($uri).'.html'; //md5
+$cachetime = getvar('cache_html_lifetime');
 
 if (file_exists($cachefile) && time() - $cachetime < filemtime($cachefile)) {
     echo "<!-- Cached copy, generated ".date('Y-m-d H:i', filemtime($cachefile))." -->\n";
