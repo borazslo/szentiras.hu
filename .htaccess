@@ -14,6 +14,8 @@ RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
 #RewriteCond %{REQUEST_FILENAME} !-f
 #RewriteCond %{REQUEST_FILENAME} !-d
 
+RewriteCond %{REQUEST_URI} !favicon.ico$
+RewriteCond %{REQUEST_URI} !robots.txt$
 RewriteCond %{REQUEST_URI} !mp3$
 RewriteCond %{REQUEST_URI} !/img/.*$
 RewriteCond %{REQUEST_URI} !/css/.*$

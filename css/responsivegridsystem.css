@@ -21,7 +21,8 @@ padding : 0;
 font : 100%/1.4 'lucida sans unicode', 'lucida grande', 'Trebuchet MS', verdana, arial, helvetica, helve, sans-serif; 	
 color : #000; 
 text-align: center;
-background: #fff url(/images/bodyback.png) left top;
+/*background: #fff url(/images/bodyback.png) left top;*/
+background: #fff;
 }
 
 button, 
@@ -418,7 +419,7 @@ background-color : #ccc; }
 
 	#headcontainer {
 		width: 100%;
-		background: url(/images/headerback.png) no-repeat center top;
+		/*background: url(/images/headerback.png) no-repeat center top;*/
 		background-color: #9DA7D8; 
 		/* background-color: #383A8D;*/
 		margin-bottom: 5px;
@@ -490,7 +491,8 @@ background-color : #ccc; }
 	#footercontainer {
 		width: 100%;	
 		border-top: 1px solid #000;
-		background: #222 url(/images/footerback.png) left top;
+		/*background: #222 url(/images/footerback.png) left top;*/
+		background: #222;
 	}
 	
 		footer {
@@ -669,7 +671,7 @@ strong.code {
 .note.rounded:before {
 	border-width:8px;
 	border-color:#ff #ff transparent transparent;
-	background: url(/images/bodyback.png);
+	/*background: url(/images/bodyback.png);*/
 	-webkit-border-bottom-left-radius:5px;
 	-moz-border-radius:0 0 0 5px;
 	border-radius:0 0 0 5px;
@@ -681,7 +683,7 @@ strong.code {
 	max-width: 90%;
 	padding: 5%;
 	margin: 0 0 1em 0;
-	background: transparent url(/images/stripe-bg.png);
+	/*background: transparent url(/images/stripe-bg.png);*/
 	-webkit-transition: background 0.3s ease;
 	-moz-transition: background 0.3s ease;
 	-o-transition: background 0.3s ease;
@@ -689,7 +691,8 @@ strong.code {
 }
 
 .siteimage:hover {
-	background: #bbb url(/images/stripe-bg.png);
+	/*background: #bbb url(/images/stripe-bg.png);*/
+	background: #bbb;
 	position: relative;
 	top: -2px;
 	
@@ -734,12 +737,14 @@ strong.code {
 				
 }
 .button:hover {
-	background: #dd2233 url(/images/glass.png) repeat-x 0 50%;
+	/*background: #dd2233 url(/images/glass.png) repeat-x 0 50%;*/
+	background: #dd2233;
 	color: #fff;
 	text-decoration: none;
 }
 .button:active {
-	background: #dd2233 url(/images/glass.png) repeat-x 0 50%;
+	/*background: #dd2233 url(/images/glass.png) repeat-x 0 50%;*/
+	background: #dd2233;
 	color: #fff;
 	position: relative;
 	top: 1px;

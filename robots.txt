@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /cache/
+Disallow: /css/
+Disallow: /ebook/
+Disallow: /img/
+Disallow: /include/
+Disallow: /js/
+Disallow: /tmp/
