@@ -23,7 +23,7 @@ foreach($books as $TMP) {
 }
 
 
-/* nem kell : */
+
 
 function listbible($denom = false) {
     global $db;
@@ -36,15 +36,6 @@ function listbible($denom = false) {
     $rs = $stmt->fetchAll(PDO::FETCH_CLASS);
     
     return $rs;
-}
-
-function listtrans($reftrans) {
-   global $db;
-  $query = "select name, abbrev, oldtest FROM ".DBPREF."tdbook where trans = $reftrans order by id";
-  $stmt = $db->prepare($query);
-  $stmt->execute();
-  $rs = $stmt->fetchAll(PDO::FETCH_CLASS);
-  return $rs;
 }
 
 function listbook($reftrans, $abbook) {
@@ -323,19 +314,8 @@ function showverse($verse,$trans = false,$type = false) {
     }
     else {
     foreach($verse as $jel) {
-                $return .= "<sup>".$jel->tip."</sup>".$jel->verse." ";
-            
-    /*                
-			$row->verse = preg_replace('/>>>/','>»',$row->verse);
-			$row->verse = preg_replace('/>>/','»',$row->verse);
-			$row->verse = preg_replace('/<<</','«<',$row->verse);
-			$row->verse = preg_replace('/<</','«',$row->verse);
-			
-			$row->verse = preg_replace('/ "/',' „',$row->verse);
-			$row->verse = preg_replace('/"( |,|\.|$)/','”$1',$row->verse);
-    */
+                $return .= "<sup>".$jel->tip."</sup>".$jel->verse." ";         
     } 
-    //$return .= "<pre>".print_r($verse,1)."</pre>";
     }
     if(!isset($verseonly)) $return = preg_replace('/\\\n/','</p><p>',$return);
     else $return = preg_replace('/\\\n/',' ',$return);
@@ -385,8 +365,6 @@ function showcomm($db, $reftrans, $did) {
                 $ptitle .= $rs->fields["ebook"] . " " . $rs->fields["echap"] . "," . $rs->fields["everse"] . "</a>";
              }
 			 global $q;
-//			 if($q != 'showcomm') $return .= $ptitle;
-             //$return .=  "<br>$sb";
              $return .= showverselinks($rs->fields["comm"],$reftrans) . "<br><br>";
              $return .= $se;
     }
@@ -418,9 +396,7 @@ function showverselinks($text, $reftrans) {
 
 function showhier ($reftrans, $abbook, $numch) { 
     $output = ""; // "<a href='" . BASE . "index.php?q=showbible' >Bibliák</a>\n";
-	//$output = "<a href='" . BASE . "showbible.php' class='link'>Bibliák</a>\n";
     if (!empty($reftrans)) {
-         //$output = $output . " <img src='".BASE."img/arrowright.jpg'> ";
          $output = $output . "<a href='" . BASE . "index.php?q=showtrans&reftrans=" . $reftrans . "' > " . gettransname($reftrans) . "</a>\n";
          if (!empty($abbook)) {
               $output = $output . " <img src='".BASE."img/arrowright.jpg' alt='->'> ";
@@ -460,89 +436,6 @@ function shownextprev ($reftrans, $abbook, $numch) {
    }
    $return .= "</tr></table>";
    return $return;
-}
-
-function advsearchbible($db, $texttosearch, $reftrans, $offset = 0, $rows = 50) {
-        return array(false, 0, 0, 0);
-        /* IDEIGLENES TODO OUT*/
-        
-      #$rs1 = $db->execute("select count(*) as cnt from tdverse where MATCH (verse) AGAINST ('" . $texttosearch . "') and reftrans=$reftrans");
-      //$rs1 = $db->execute("select count(*) as cnt from tdverse where verse regexp '" . $texttosearch . "' and reftrans=$reftrans");
-	  
-	  $rs = $db->execute("SELECT oldtest, trans, abbrev, id FROM ".DBPREF."tdbook WHERE trans = $reftrans ORDER BY trans ");
-	  do {
-		if($rs->fields['abbrev'] != '') {
-			$books[$rs->fields['trans']][] = preg_replace('/ /','',$rs->fields['abbrev']);
-			$abbrevs[preg_replace('/ /','',$rs->fields['abbrev'])] = preg_replace('/ /','',$rs->fields['abbrev']);
-			$pattern = '/^'.preg_replace('/ /','',$rs->fields['abbrev']).'([0-9]{1,2}|$)/i';
-			if($rs->fields['oldtest'] == 1) $oldtest[] = " ".DBPREF."tdverse.book = '".$rs->fields['id']."'";
-			else $newtest[] = " ".DBPREF."tdverse.book = '".$rs->fields['id']."'";
-		}
-        $rs->nextRow();
-	 } while (!$rs->EOF);
-	  
-	  //print_R($newtest);
-	  
-	   $pattern = "/in:(".implode("|",$abbrevs).")$/i";
-	   $patternNew = "/in:(Újszöv|Új|Újszövetség|Ótestamentum|Ótestámentum)$/i";
-	   $patternOld = "/in:(Ó|Ószöv|Ószövetség|Újtestamentum|Újtestámentum)$/i";
-	   if(preg_match($pattern,$texttosearch,$matches)) {
-			$texttosearch = trim(preg_replace($pattern,'',$texttosearch));
-			$isinbook = " AND ".DBPREF."tdbook.abbrev = '".$matches[1]."' ";
-	   } elseif(preg_match($patternOld,$texttosearch,$matches)) {
-			$texttosearch = trim(preg_replace($patternOld,'',$texttosearch));
-			$isinbook = " AND (".implode(' OR ',$oldtest).")";
-	   } elseif(preg_match($patternNew,$texttosearch,$matches)) {
-			$texttosearch = trim(preg_replace($patternNew,'',$texttosearch));
-			$isinbook = " AND (".implode(' OR ',$newtest).")";
-	   } else $isinbook = '';
-	  
-	  
-	  $words = explode(' ',$texttosearch);
-	  $where = ''; $query = ''; $query2 = '';
-	  foreach($words as $k=>$word) {
-		$query .= "verse regexp '".$word."' ";
-		if($k < (count($words)-1)) $query .= ' AND ';
-		
-		$query2 .= "title regexp '".$word."' ";
-		if($k < (count($words)-1)) $query2 .= ' AND ';
-	  }
-	  $query = "select count(*) as cnt from ".DBPREF."tdverse LEFT JOIN ".DBPREF."tdbook ON ".DBPREF."tdbook.trans = ".DBPREF."tdverse.trans AND ".DBPREF."tdbook.id = ".DBPREF."tdverse.book where ((".$query.") OR (".$query2.")) ".$isinbook." and ".DBPREF."tdverse.trans=$reftrans";
-	  //echo $query;
-	  $rs1 = $db->execute($query);
-	  
-      $rs1->firstRow();
-      $resultcount = $rs1->fields["cnt"];
-      $rs1->close();
-
-      if ($resultcount > 0) {
-       if (empty($rows)) {$rows = 50;}
-       elseif ($rows>100) {$rows=100;}
-       elseif ($rows<0) {$rows=50;}
-
-       if (empty($offset)) {$offset = 0;}
-       elseif ($offset>$resultcount) {$offset = (resultcount - ($resultcount % $rows));}
-       elseif ($offset<0) {$offset = 0;}
-
-       #$querystring = "select * from tdverse where MATCH (verse) AGAINST ('" . $texttosearch . "')>1 and reftrans=$reftrans order by did limit $offset, $rows";
-       $querystring = "select * FROM ".DBPREF."tdverse LEFT JOIN ".DBPREF."tdbook ON ".DBPREF."tdbook.trans = ".DBPREF."tdverse.trans AND ".DBPREF."tdbook.id = ".DBPREF."tdverse.book  where (verse regexp '" . $texttosearch . "' OR title regexp '" . $texttosearch . "') and ".DBPREF."tdverse.trans=$reftrans order by gepi limit $offset, $rows";
-
-		$words = explode(' ',$texttosearch);
-		$query = ''; $query2 = '';
-	  foreach($words as $k=>$word) {
-		$query .= "verse regexp '".$word."' ";
-		if($k < (count($words)-1)) $query .= ' AND ';
-		
-		$query2 .= "title regexp '".$word."' ";
-		if($k < (count($words)-1)) $query2 .= ' AND ';
-	  }
-	  $querystring = "select * from ".DBPREF."tdverse LEFT JOIN ".DBPREF."tdbook ON ".DBPREF."tdbook.trans = ".DBPREF."tdverse.trans AND ".DBPREF."tdbook.id = ".DBPREF."tdverse.book where ((".$query.") OR (".$query2.")) ".$isinbook." and ".DBPREF."tdverse.trans=$reftrans order by gepi limit $offset, $rows";
-	   
-       //echo "<br>" . $querystring . "<br>\n";
-       $rs = $db->execute($querystring);
-	   //echo "<pre>".print_R($rs,1);
-       return array($rs, $resultcount, $offset, $rows);
-      }
 }
 
 function showverses($rs,$script,$reftrans) {
@@ -657,36 +550,6 @@ function dlookup($field,$table,$condition) {
    
 }
 
-function displaytextfield ($name,$size,$maxlength,$value,$comment,$class){
-  return "<span class='alap'>$comment</span><br><input type=text name='". $name ."' size=$size maxlength=$maxlength value='" . $value . "' class='" .$class."'>\n";
-}
-
-
-function displaytextarea ($name,$cols,$rows,$value,$comment,$class){
-  return "<span class='alap'>$comment</span><br><textarea name='" .$name ."' cols=$cols rows=$rows wrap class='" .$class."'>" . $value . "</textarea><br>\n";
-}
-
-function displayoptionlist($name,$size,$rs,$valuefield,$listfield,$default,$comment,$class){
-  $return = '';
-  $return .= "<span class='alap'>$comment</span> <br>";
-  $return .= "<select name='". $name . "' id='". $name . "' onchange='change_".$name."()' size='" . $size . "' class='" .$class."'>\n";
-  if (count($rs) > 0) {
-    
-    $i=1;
-    foreach($rs as $row) {
-       $return .= "<option ";
-          if (!empty($default)){
-            if ($default == $row->$valuefield) {$return .= "selected ";}
-          }
-          $return .= "value ='" . $row->$valuefield . "' class='" .$class."'>" . $row->$listfield . "</option>\n";
-          
-       $i++;
-    } 
-  }
-  //if(isset($rs->close)) $rs->close();
-  $return .= "</select>\n";
-  return $return;
-}
 
 /* 
  * Adatbázis kezelő függvények. Általában db.php néven...
@@ -791,7 +654,7 @@ function igenaptar($datum = false) {
 	foreach($olvasmanyok as $key => $olvasmany) {
 		if(preg_match('/Zs ([0-9]{1,3})/',$olvasmany,$matches)) {
 			$olvasmany = 'Zsolt'.(( (int) $matches[1]) + 1 );
-		}
+		}		
 		$code = isquotetion(preg_replace('/ /','',$olvasmany));
 		//echo"<pre>valami: ".$olvasmany; print_r($code); echo "<br><br>"; 
 		if(is_array($code)) {
@@ -808,9 +671,11 @@ function igenaptar($datum = false) {
 				 ORDER BY ".DBPREF."tdtrans.denom, ".DBPREF."tdtrans.name";
 			$results = db_query($query);
 		
+			$content = "</div>";
+			
 			if(count($results)>1) {
 		
-			$content = "</div><div style='float:right;margin-top:-30px'>";
+			$content .= "<div style='float:right;margin-top:-30px'>";
 			foreach($results as $result) {
 				
 				$transcode = preg_replace('/ /','',preg_replace("/^".$code['book']."/",$code['bookurl'],$code['code']));
@@ -824,10 +689,9 @@ function igenaptar($datum = false) {
 			
 			if($key > count($olvasmanyok) -2) $content .= "<a href=\"http://evangelium.katolikus.hu/audio/NE".date('Ymd').".mp3\" class=\"button minilink\" title=\"Evangélium és elmélkedés az evangelium365.hu honlapról.\" target=\"_blank\">mp3</a>";
 			
-			
-			$return .=  $content."</div><br>";
 		
 			}
+			$return .=  $content."</div><br>";
 		}
 		
 	

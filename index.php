@@ -122,28 +122,6 @@ $menu = new Menu();
 /**/
 
 
-/**SEGÉD FÜGGVÉNYEK**/
-/* Ugyan, miért itt vannak ezek? */	
-	function url_showtrans($m) {
-			global $translationIDs;
-			return $m[1].BASE.$translationIDs[$m[2]]['abbrev'].$m[1];
-		}
-	function url_showbook($m) {
-			global $translationIDs,$bookabbrevs;
-			return $m[1].BASE.$translationIDs[$m[2]]['abbrev']."/".$bookabbrevs[$m[2]][$m[3]]['abbrev'].$m[1];
-		}
-	function url_showchapter($m) {
-			global $translationIDs,$bookabbrevs;
-			return $m[1].BASE.$translationIDs[$m[2]]['abbrev']."/".$bookabbrevs[$m[2]][$m[3]]['abbrev'].$m[4].$m[1];
-		}
-	function url_searchbible($m) {
-			//print_R($m);
-			global $translationIDs;
-			if(!isset($m[5])) $m[5] = '';
-			return $m[1].BASE.$translationIDs[$m[3]]['abbrev']."/".$m[2].$m[4].$m[5].$m[1];
-		}
-/**/
-
 /**Akkor kiírjuk azt, ami eddig bejött.**/
 include 'template.php';	
 

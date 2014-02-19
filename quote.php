@@ -294,37 +294,7 @@ function print_quotetion($args) {
 	return $return;
 }
 	
-function print_form() {
-		global $code;
-		global $reftrans;
-		global $query;
-			
-		global $base;
-		$return = '<form name="input" action="'.$_SERVER['PHP_SELF'].'" method="get">
-			<input type="text" name="quotation" value="'.$query.'" /><br />';
-			
-			$reftranss = db_query("SELECT * FROM ".DBPREF."tdtrans");
-			
-			/* RADIO BUTTON type *
-			foreach($reftranss as $t) {
-				$return .= '<input type="radio" name="reftrans" value="'.$t['did'].'" ';
-				if($reftrans == $t['did']) $return .= "checked"; 
-			$return .= '/> <span class="alap">'.$t['name'].' </span>';
-			/* */
-			
-			/* SELECT type */
-			$return .='<select name="reftrans">';
-			foreach($reftranss as $t) {
-				$return .= '<option value="'.$t['did'].'"';
-				if($reftrans == $t['did']) $return .= " selected=\"selected\" "; 
-				$return .= '>'.$t['name'].'</option>';
-			}
-			$return .='</select>';
-			/* */
-			
-		$return .= '</form>';
-		return $return;
-}
+
 
 function quotetion($argss)  {
 	$args = array();
@@ -529,25 +499,6 @@ function xml_encode($array) {
 	return $xml;*/
 }
 
-
-	
-function setvar($name,$value) {
-	$test = getvar($name);
-	if( $test == false) {
-		$query="INSERT INTO ".DBPREF."vars (name, value) VALUES ('$name','$value')";
-	} else {	
-		$query='UPDATE '.DBPREF.'vars SET value = \''.$value.'\' WHERE name = \''.$name.'\'';
-	}
-	db_query($query);
-}
-
-function getvar($name) {
-	$query="SELECT * FROM ".DBPREF."vars WHERE name = '".$name."' LIMIT 0,1";
-	$result = db_query($query);
-	
-	if(!$result) return false; 
-	return $result[0]['value'];
-}
 
 function insert_stat($texttosearch, $reftrans, $results,$type = '') {
 	global $tipps, $original, $translations;

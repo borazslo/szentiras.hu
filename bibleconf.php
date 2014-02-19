@@ -38,8 +38,6 @@ $copyright = "
 				<a href='http://www.oki-iroda.hu' class='menulink'>ÖKI</a> - 
 				<a href='http://kim.katolikus.hu' class='menulink'>KIM</a>
 				 2001-2010,<br>-->
-				 &copy; <a href='http://www.eleklaszlo.hu' class='menulink'>Elek László SJ</a> (<a href='http://jezsuita.hu'>JTMR</a>) 2013.<br>
+				 &copy; <a href='http://www.eleklaszlo.hu' class='menulink'>Elek László SJ</a> (<a href='http://jezsuita.hu' alt='Jézus Társasága Magyarországi Rendtartománya'>JTMR</a>) 2013-2014.<br>
 				 Minden jog fenntartva.</p>";
-
-//mysqldump --opt --where="true LIMIT 10000" bible -u szentiras -p > mysql_sample.sql				 
 ?>

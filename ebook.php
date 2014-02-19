@@ -173,22 +173,6 @@ if($type == 'epub') {
 	
 
 
-function getdownload($filename,$path = '') {
-	if($path == '') $path = '/var/www/szentiras.hu/ebook/';
-	
-	header("Content-Disposition: attachment; filename=" . urlencode($filename));    
-	header("Content-Type: application/force-download");
-	header("Content-Type: application/download");
-	$fp = fopen($path.$filename, "r"); 
-	while (!feof($fp))
-	{
-		echo fread($fp, 65536); 
-		flush(); // this is essential for large downloads
-	}  
-	fclose($fp); 
-	
-
-}
 
 
 ?>
