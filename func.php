@@ -19,7 +19,6 @@ function rootverse($verse) {
         }
         $szo = $line;     
     }
-    //echo"<pre>"; print_R($output);
     $return = strtolower(strip_tags($return));
     return trim($return);
 
@@ -122,7 +121,6 @@ function search($text,$reftrans, $min) {
 					}
 					if($ok == count($segments2)) {
 							$num = ($reward[$csens."_".$wrap."_".$cell]) / ( count($segments2) * 2 );
-							//echo $csens."-".$wrap."-".$cell.": => ".$num."\n";
 							$results = addresults(array($row['gepi']=>$row),$results,$num);
 					}
 				}
@@ -594,38 +592,7 @@ echo "not utf8";
 		if(isset($$name)) $return[$name] = $$name;
 	return $return;
 }
-/*
-// http://stackoverflow.com/questions/12850886/count-number-of-queries-each-page-load-with-pdo
 
-class PDOEx extends PDO
-{
-    private $queryCount = 0;
-
-    public function query($query)
-    {
-    // Increment the counter.
-        ++$this->queryCount;
-
-    // Run the query.
-        return parent::query($query);
-    }
-
-    public function exec($statement)
-    {
-    // Increment the counter.
-        ++$this->queryCount;
-
-    // Execute the statement.
-        return parent::exec($statement);
-    }
-
-    public GetCount()
-    {
-        return $this->queryCount;
-    }
-}
-
-*/
 
 function setvar($name,$value) {
 	$test = getvar($name);
@@ -699,20 +666,7 @@ function getIdezetTipp($texttosearch) {
 function getSzinonima($texttosearch,$max = 2) {
 	$szinonima = array();
 	global $reftrans;
-	/* opendir szinoníma szótárból *
-	$url = "http://opendir.hu/szinonima-szotar/api.php?t=json&q=".iconv("ISO-8859-2",'UTF-8',$texttosearch);
-	$file = file_get_contents($url,0);
-	if($file != iconv("ISO-8859-2",'UTF-8','Nincs találat!')) {
-		$json = json_decode($file,true); $c = 1;
-	
-		foreach($json as $k=>$i) {
-			$szo = iconv('UTF-8',"ISO-8859-2",$k);
-			if($szo != $texttosearch) {
-				$szinonima[] = $szo;
-				$c++; if($c > $max) break;
-			}
-		}
-	}
+
 	/* saját adatbázisból */
 	$query = "SELECT * FROM ".DBPREF."szinonimak WHERE tipus = 'szo' AND (szinonimak LIKE '%|".$texttosearch."|%' OR szinonimak LIKE  '%|".$texttosearch.":%');";
 	$result = db_query($query);

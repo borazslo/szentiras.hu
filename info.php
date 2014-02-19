@@ -3,31 +3,14 @@
 - valami nem megy a /info -val
 - kereső tippek fosok, (szinonimak)
 - keresés csak a szövegben / címekben és lábjegyzetekben is
-
-- a cache most végtelenedik, ha rendszeresen nézik, de sosem frissül
-*/
-
-/*
  pontatlan hivatkozás esetén is varázsoljon
  - kis-nagybetű
  - ékezetes megosztásnlá lehet hogy fb share nem jól üzemel?
  - felesleges szünetek
- 
- bug a napi evangélimban
-
-*/
-
-/* ÖTLETEK
- A "Keresés" menü működésével kapcsolatban egy felhasználói álom: vajon volna-e lehetőség olyan prediktív rendszerre, 
- hogy a begépelés során felkínálja a rendszer a Bibliában előforduló szavakat, melyek a megkezdett gépelés folytatásaként lehetségesek.
-Erre azért volna nagy szükség, mert többen többféle fordítást is használunk, és a keresőszó terén néha bizonytalanok vagyunk, 
-nem emlékezünk, hogy az adott fordításban éppen melyik kifejezést használja a szöveg. Ezért néha eredménytelen, 
-vagy sok vesződséget okoz egy keresett hely megtalálása.
-
+  bug a napi evangélimban
 
 ebook-ban legyen benne a lábjegyzet is
 */
-
 
 /* FEJLESZTENI
  * 

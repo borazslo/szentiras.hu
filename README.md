@@ -19,7 +19,6 @@ Nem CMS, de egy template.php-n keresztül megy a megjelenítés nem elhanyagolha
 
 ###A függvények főbb helyei:
 - quote.php - már az enyém. isquotation(), print_quotation(), quotation() - vagyis, hogy mikor idézet hivatkozás valami és azt rakja össze, hogy milyen versek vannak benne
-- searchbible.php - a keresés függvényei a keresés motorján kívül getIdezetTipp(), getSzinonima(), getSzinonimaTIpp(), printsearchform()
 - biblefunc.php -  főként az eredeti réges régi biblia honlap függvényei. részben átdolgozva, de itt maradtak részban csak szemét
 - func.php - hát újabb search függbények (simpleverse, rootverse, search, resultorder, addresults, searchsimple, dbsearchtext) és egyebek getnews() (főoldalra hírek), class menu, url(), redirect függvények (hosszú ill rövid url-ek alakítgatás és értelmezése)
 
@@ -31,7 +30,6 @@ Nem CMS, de egy template.php-n keresztül megy a megjelenítés nem elhanyagolha
 - stats_texttosearch -> teljes keresési talán szinte log féle
 - szinonmiak -> szinoníma és alternatív lista kézzel összeállítva. néha 0/1/2/3-al jelölve, hogy melyik fordításban melyik a használatos
 - tdbook -> könyvek listája
-- tdchapter -> melyik könyvben hány fejezet és melyik az utolsó vers. nincs használatban!
 - tdtrans -> a fordítások listája. a fordításra általában $reftrans, vagy $transid-vel hivatkounk
 - tdverse -> a nagyon-nagyon okos végtelen vers és fejezetcím tábla, nem minden oszlop van használatban, csak az átalakításoknál benne marad
 - vars -> különféle beállítások változó a getvars() és setvars() saját függvényeknek. Minél több minden idekerül, hogy könnyen lehessen állítani. Pl. hogy mi mikor volt utoljára update és update közben - mert az hosszú néha - "frissítünk" felirat jelenik meg a honlap tetején

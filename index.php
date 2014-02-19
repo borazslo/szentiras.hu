@@ -113,7 +113,6 @@ $menu = new Menu();
 		$text = preg_replace_callback($pattern,'url_showbook',$text);
 		$pattern = '/(\\\'|")'.addcslashes(BASE,'./').'index\.php\?q=showchapter&reftrans=([0-9]{1,2})&abbook=(.*?)&numch=([0-9]{1,3})(\\\'|")/i';
 		$text = preg_replace_callback($pattern,'url_showchapter',$text);
-		//$pattern = '/(\\\'|")'.addcslashes(BASE,'./').'index\.php\?q=searchbible&reftrans=([0-9]{1,2})&texttosearch=(.*?)/i';
 		$pattern = '/(\\\'|")'.addcslashes(BASE,'./').'index\.php\?q=searchbible&texttosearch=(.*?)&reftrans=([0-9]{1,2})(.*)$/i';
 		$text = preg_replace_callback($pattern,'url_searchbible',$text);
 		

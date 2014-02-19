@@ -51,7 +51,6 @@ function listchapter($reftrans, $abbook, $numch, $max = 1000) {
    global $db;
   $query = "select gepi, ".DBPREF."tdverse.trans, did, numv, old, gepi, tip, verse FROM ".DBPREF."tdverse LEFT JOIN ".DBPREF."tdbook ON ".DBPREF."tdbook.id = ".DBPREF."tdverse.book  AND ".DBPREF."tdbook.trans = ".DBPREF."tdverse.trans WHERE ".DBPREF."tdverse.trans = $reftrans and abbrev='". $abbook . "' and chapter=$numch order by gepi, tip";
   $stmt = $db->prepare($query);
-  //echo $query;
   $stmt->execute();
   $tmp = array();
   $rs = $stmt->fetchAll(PDO::FETCH_CLASS|PDO::FETCH_GROUP);
@@ -85,7 +84,6 @@ function showbible($rs,$type='') {
 	
 	$return = '';
     if (count($rs) > 0) {
-        //$title = showhier($db, "", "", "");
         $return .= "<blockquote>";
         foreach($rs as $row) {
 			if($type == 'simple') {
@@ -107,7 +105,6 @@ function showtrans($reftrans, $rs) {
 		
         $title = showhier($reftrans, "", "");
         $return .= showbookabbrevlist($reftrans,"");
-        #echo "<blockquote>";
         $return .= "<p class='kiscim'>Ószövetség</p>";
         $oldtest=1;
     
@@ -119,7 +116,6 @@ function showtrans($reftrans, $rs) {
             $return .= "<a href='" . BASE . "index.php?q=showbook&reftrans=" . $reftrans . "&abbook=" . $row->abbrev . "' class='link'>" . $row->name . "</a><br>\n";
             $return .= $sb; 
 	 } 
-        #echo "</blockquote>";
 		$return .="$se<br>";
         //$return .= showbookabbrevlist($db,$reftrans,"");
     }
@@ -166,9 +162,8 @@ function showchapter($reftrans, $abbook, $numch, $rs) {
     if (count($rs) > 0) {
         $title = showhier($reftrans, $abbook, $numch);
         $return .=shownextprev($reftrans, $abbook, $numch);
-        //$return .= "<br><br>";
     
-    
+    /* érdekes kísérlet a kétoszloposításra*/
     //if($reftrans == 1) { global $scripts;   $scripts[] = '2columns.js';   }
     $return .= '<div id="c2" class="chapter c2"></div><div id="data" class="chapter c1"><p>';
 	 foreach($rs as $row) {
@@ -180,20 +175,10 @@ function showchapter($reftrans, $abbook, $numch, $rs) {
 	 } 
 	 $return .= '</p></div>';
         $return .= shownextprev( $reftrans, $abbook, $numch);
-		
-        /*
-		if(isset($oldmin)) { 
-            global $translations;
-            $return .= '<font size="-2">';
-            $return .= $translations[$reftrans]['reference'].", ".$oldmin;
-            if($oldmax > $oldmin) $return .= '-'.$oldmax;
-            $return .= '. oldal</font><br/><br/>'; }
-		*/
 		$query = "SELECT id FROM ".DBPREF."tdbook WHERE abbrev = '".$abbook."' AND trans =  ".$reftrans;
 	$results = db_query($query);
 	if(count($results)>0) { 
 	$bookid = $results[0]['id'];
-	//$abbook." ".$numch." (".gettransname($reftrans,'true').")	
 	$query = "SELECT * FROM ".DBPREF."tdbook WHERE id = '".$bookid."'";
 	$results = db_query($query);
 	if(!isset($content)) $content = '';
@@ -446,9 +431,8 @@ function showverses($rs,$script,$reftrans) {
          $rs->firstRow();
 	 do {
 			if($reftrans == 3) $rs->fields["verse"] = preg_replace_callback("/{(.*)}/",'replace_hivatkozas',$rs->fields["verse"]);
-			//print_R($rs->fields);
+
             $return .= "<img alt='->' src='".BASE."img/arrowright.jpg'>&nbsp;";
-			//$return .= shln($rs->fields["abbrev"] . " " . $rs->fields["chapter"] . "," . $rs->fields["numv"],BASE.$script . "&reftrans=" . $rs->fields['trans'] . "&abbook=" . $rs->fields["abbrev"] . "&numch=" . $rs->fields["chapter"] . "#" . $rs->fields["numv"],"link") . "\n";
 			$return .= shln($rs->fields["abbrev"] . " " . $rs->fields["chapter"] . "," . $rs->fields["numv"],BASE.$translations[$rs->fields['trans']]['abbrev'] .'/'.$rs->fields["abbrev"] . $rs->fields["chapter"] . "#" . $rs->fields["numv"],"link") . "\n";
             $return .= " - $sb" . $rs->fields["verse"] . $se . "\n";
             $return .= "<br>\n";
@@ -468,7 +452,6 @@ function showversesnextprev($request, $catcount, $page, $rows, $paramchr){
   $return =  "<table><tr>";
 
   if (!empty($request) && !empty($catcount)) {
-     //$request = preg_replace("/ /","_",$request);
      if (empty($page)) {$page=1;}
      if (empty($rows)) {$rows=50;}
 	 
@@ -563,11 +546,8 @@ function dlookup($field,$table,$condition) {
 	$password="saritnezs11";
 	$database="bible";
 
-	//if($_SERVER['HTTP_HOST'] == 'localhost') $password = '';
 	$db_link = mysql_connect('localhost:3306',$user,$password) or die ("Can't connect to mysql");
-	//mysql_set_charset('utf8',$db_link);
 	mysql_query("SET CHARACTER SET 'utf8'");
-	//mysql_set_charset('utf-8');
 	mysql_query("SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'", $db_link);
 	
 	if ($db_link) @mysql_select_db($database);
@@ -603,9 +583,7 @@ function db_query($query,$debug = '',$return = '') {
 	if(is_bool($result)) return;
 	$rows = array();
 	while(($row = mysql_fetch_array($result,  MYSQL_ASSOC))) {
-	//echo"<br>--";print_R($row);
 		foreach($row as $k => $i) {
-			//$row[$k] = $i;
 			$row[$k] = $i;
 		}
 		$rows[] = $row;
@@ -614,7 +592,6 @@ function db_query($query,$debug = '',$return = '') {
 	if($rows!=array()) return $rows;
 	mysql_free_result($result);
 	
-	//echo "++".mysql_affected_rows()."++";
 	/*
 	 * Ezt itten kivételeztem.
 	 */
@@ -681,7 +658,6 @@ function igenaptar($datum = false) {
 				$transcode = preg_replace('/ /','',preg_replace("/^".$code['book']."/",$code['bookurl'],$code['code']));
 				$url = BASE.$result['transabbrev']."/".$transcode;
 				
-				//if($transcode = $code['code'] AND $code['reftrans'] == $['trans']) $style = " style=\"background-color:#9DA7D8;color:white;\" "; else $style = '';
 				$style = '';
 				$change = "<a href=\"".$url."\" ".$style." class=\"button minilink\">".$result['transabbrev']."</a>\n";
 				$content .= $change;//echo $url;

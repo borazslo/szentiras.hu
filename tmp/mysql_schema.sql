@@ -148,22 +148,6 @@ CREATE TABLE `kar_tdbook` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `kar_tdchapter`
---
-
-DROP TABLE IF EXISTS `kar_tdchapter`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `kar_tdchapter` (
-  `trans` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `book` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `chapter` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `lastv` varchar(8) CHARACTER SET utf8 NOT NULL DEFAULT '0',
-  PRIMARY KEY (`chapter`,`book`,`trans`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `kar_tdtrans`
 --
 
@@ -219,7 +203,8 @@ DROP TABLE IF EXISTS `kar_vars`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `kar_vars` (
   `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
-  `value` text CHARACTER SET latin1 NOT NULL,
+  `value` text CHARACTER SET utf8 NOT NULL,
+  `description` text CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -233,4 +218,4 @@ CREATE TABLE `kar_vars` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-02-15  0:36:48
+-- Dump completed on 2014-02-19 21:56:07
