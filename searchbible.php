@@ -49,7 +49,7 @@ $query = "
 			AND page = '".$page."'
 			AND reftrans = '".$transid."'
 			AND texttosearch = '".$texttosearch."'
-			AND resultupdated > '".date('Y-m-d H:i:s',strtotime("-".getvar('cache_lifetime')))."'
+			AND resultupdated > '".date('Y-m-d H:i:s',strtotime("-".getvar('cache_mysql_lifetime')))."'
 		ORDER BY resultcount DESC
 		LIMIT 1";
 	$result = db_query($query);

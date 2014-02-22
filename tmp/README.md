@@ -1,4 +1,3 @@
-A dropbox importer dologzik ebbe a mappába. 
-
-Egyrészt az ideiglenesen letöltött xlsbe konvertált file-t tárolja.
-Illetve importáláskor adatbázis részt ment. Ezek jó működés esetén előbb-utóbb törölhetőek.
+* (importer) Egyrészt az ideiglenesen letöltött xlsbe konvertált file-t tárolja.
+* (importer) Illetve importáláskor adatbázis részt ment. Ezek jó működés esetén előbb-utóbb törölhetőek.
+* (ebook) A kész ebbok file-k lelőhelye.: Szentiras_{fordítás rövidítás}_{ev-honap}.{epub|mobi} (Mivel minden hónapban újakat generál, ezért a régiek mindig törölhetőek volnának. Esetleg nem is kell a file névbe az időpont, hanem a file létrejötte szerint ellenőrizhető a kora.)

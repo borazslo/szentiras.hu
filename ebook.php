@@ -15,6 +15,8 @@ $transname = $GLOBALS['tdtrans'][$reftrans]['abbrev'];
 foreach($translations as $tdtrans) { 
 		if($tdtrans['id'] == $reftrans) $trans = $tdtrans;}
 
+
+$ebookfolder = 'tmp';
 		
 if($bookid != false) $filename = "Szentiras_".$transname.'_'.$abbook."_".date('Y-m');		
 else $filename = "Szentiras_".$transname."_".date('Y-m');		
@@ -23,7 +25,7 @@ else $filename = "Szentiras_".$transname."_".date('Y-m');
 	$title = $abbook." ".$numch." (".$transname.") .".$type; 
 */
 
-	$filexists = FILE.'ebook/'.$filename.'.'.$type;
+	$filexists = FILE.$ebookfolder.'/'.$filename.'.'.$type;
 	if(file_exists($filexists)) {
 		$tipps[] = 'EPUB';
 		$count = 1;
@@ -120,7 +122,7 @@ $epub->finalize(); // Finalize the book, and build the archive.
 //  However you might want to dump the output to a log, this example section can do that:
 /*
 if (ob_get_contents() !== false && ob_get_contents() != '') {
-	$f = fopen ('./ebook/log.txt', 'a') or die("Unable to open log.txt.");
+	$f = fopen ('./'.$ebookfolder.'/log.txt', 'a') or die("Unable to open log.txt.");
 	fwrite($f, "\r\n" . date("D, d M Y H:i:s T") . ": Error in " . __FILE__ . ": \r\n");
 	fwrite($f, ob_get_contents() . "\r\n");
 	fclose($f);
@@ -131,7 +133,7 @@ if (ob_get_contents() !== false && ob_get_contents() != '') {
 // Notice that the extions .epub will be added by the script.
 // The second parameter is a directory name which is '.' by default. Don't use trailing slash!
 
-$epub->saveBook($filename, './ebook');
+$epub->saveBook($filename, './'.$ebookfolder);
 
 $tipps[] = 'EPUB';
 $count = 1;
@@ -164,7 +166,7 @@ if($type == 'epub') {
 	if($bookid != false ) $zipData = $epub->sendBook('Szentírás ('.$trans['abbrev'].') - '.$abbook);
 	else $zipData = $epub->sendBook('Szentírás - '.$trans['abbrev'].'');
 } elseif($type == 'mobi') {
-	exec('/var/www/kindlegen /var/www/szentiras.hu/ebook/'.$filename.'.epub -c2 -o '.$filename.'.mobi',$output,$return_var);
+	exec('/var/www/kindlegen /var/www/szentiras.hu/'.$ebookfolder.'/'.$filename.'.epub -c2 -o '.$filename.'.mobi',$output,$return_var);
 	//print_R($return_var);	echo "XXX"; 	print_R($output);
 	getdownload($filename.'.mobi');
 	//echo $redirect;

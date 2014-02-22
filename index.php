@@ -21,7 +21,7 @@ $uri = $_SERVER["REQUEST_URI"];
 $cachefile = 'cache/cached-'.urlencode($uri).'.html'; //md5
 $cachetime = getvar('cache_html_lifetime');
 
-if (file_exists($cachefile) && time() - $cachetime < filemtime($cachefile)) {
+if (file_exists($cachefile) && strtotime("-".getvar('cache_html_lifetime')) < filemtime($cachefile)) {
     echo "<!-- Cached copy, generated ".date('Y-m-d H:i', filemtime($cachefile))." -->\n";
     include($cachefile);
     exit;
