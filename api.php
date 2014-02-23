@@ -239,8 +239,14 @@ if(isset($return)) {
 	}
 	
 	if($forma == 'json') {
-		header('Content-type: application/json');
-		echo json_encode($return);
+		if(isset($_REQUEST['callback'])){
+			header('Content-type: application/javascript');
+			echo $_REQUEST['callback'].'('.json_encode($return).');';
+		}
+		else{
+			header('Content-type: application/json');
+			echo json_encode($return);
+		}
 		exit;
 	}
 	elseif($forma == 'tomb') {
