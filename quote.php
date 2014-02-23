@@ -132,14 +132,14 @@ function isquotetion($hivatkozas, $forditas) {
 		return false;
 	}
 	
+	$text = $matches[2];
+	
 	$quote = array (
 		'book' => $book['abbrev'],
 		'bookurl' => $book['url'],
 		'reftrans' => $forditas,
 		'code' => $book['abbrev'] . ' ' . $text  // TODO ez eddig is így volt, de nem jó (a hibás részeket ki kellen hagyni)
 	);
-	
-	$text = $matches[2];
 	
 	$pattern = "/^[0-9]{1,3}$/i";
 	if (preg_match($pattern, $text, $match)) {

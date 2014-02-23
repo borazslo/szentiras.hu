@@ -196,7 +196,7 @@ elseif(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'idezet') {
 					'feladat' => 'idezet',
 					'hivatkozas' => $_REQUEST['hivatkozas']),
 				'valasz'=> false,
-				'hiba' => 'Hibás hivatkozás vagy nem mefelelő fordítás!');
+				'hiba' => 'Hibás hivatkozás vagy nem megfelelő fordítás!');
 		}
 		if(isset($forcedtrans)) $return['keres']['forditas'] = $translations[$forcedtrans]['abbrev'];
 		
@@ -207,7 +207,7 @@ elseif(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'idezet') {
 					'feladat' => 'idezet',
 					'hivatkozas' => false),
 				'valasz'=> false,
-				'hiba' => 'Nem atdál meg hivatkozást!');
+				'hiba' => 'Nem adtál meg hivatkozást!');
 	}
 } elseif(isset($_REQUEST['feladat'])) {
 	$return = array(
