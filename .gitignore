@@ -9,3 +9,4 @@ cache/*
 !cache/README.md
 /.buildpath
 /.project
+nbproject/*
