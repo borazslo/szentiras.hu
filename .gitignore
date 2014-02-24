@@ -1,5 +1,4 @@
 ﻿phpDB-mysql.lib
-tmp/*
 !tmp/README.md
 !tmp/mysql_schema.sql
 !tmp/mysql_sample.sql
@@ -7,3 +6,5 @@ include/*
 !include/README.md
 cache/*
 !cache/README.md
+/.buildpath
+/.project
