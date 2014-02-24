@@ -148,6 +148,20 @@ CREATE TABLE `kar_tdbook` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `kar_tdbook_hibas`
+--
+
+DROP TABLE IF EXISTS `kar_tdbook_hibas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `kar_tdbook_hibas` (
+  `id` tinyint(3) unsigned NOT NULL,
+  `abbrev` varchar(100) CHARACTER SET utf8 NOT NULL,
+  PRIMARY KEY (`abbrev`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `kar_tdtrans`
 --
 

@@ -167,7 +167,7 @@ elseif(isset($_REQUEST['feladat']) AND $_REQUEST['feladat'] == 'idezet') {
 	if(isset($_REQUEST['hivatkozas'])) {
 		foreach($books as $br) $b[$br['id']] = $br['abbrev'];
 		if(isset($forcedtrans)) $code = isquotetion($_REQUEST['hivatkozas'],$forcedtrans);
-		else $code = isquotetion($_REQUEST['hivatkozas']);		
+		else $code = isquotetion($_REQUEST['hivatkozas'],$reftrans);		
 		
 		//if(is_array($code) AND isset($code['tag'][0]['numv'])) {
 		if(is_array($code)) {			

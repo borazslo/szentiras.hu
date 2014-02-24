@@ -400,7 +400,7 @@ if($_REQUEST['q'] == 'showtrans') {
     
         $texttosearch = $_REQUEST['texttosearch'];
         $reftrans = (int) $_REQUEST['reftrans'];
-        $code = isquotetion($texttosearch);
+        $code = isquotetion($texttosearch,$reftrans);
 
 	if($code)  {
 		

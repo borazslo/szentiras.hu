@@ -632,7 +632,7 @@ function igenaptar($datum = false) {
 		if(preg_match('/Zs ([0-9]{1,3})/',$olvasmany,$matches)) {
 			$olvasmany = 'Zsolt'.(( (int) $matches[1]) + 1 );
 		}		
-		$code = isquotetion(preg_replace('/ /','',$olvasmany));
+		$code = isquotetion(preg_replace('/ /','',$olvasmany),3);
 		//echo"<pre>valami: ".$olvasmany; print_r($code); echo "<br><br>"; 
 		if(is_array($code)) {
 			$olvasmany = $code['code'];

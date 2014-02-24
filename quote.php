@@ -463,7 +463,7 @@ function replace_hivatkozas($m) {
 function replace_hivatkozas2link($m) {
 	global $translations;
 	$return = '';
-	$quote = isquotetion($m[0]);
+	$quote = isquotetion($m[0],3);
 	// print_R($quore);
 	if (is_array($quote)) {
 		$return = "<a href='" . BASE . $translations[$quote['reftrans']]['abbrev'] . "/" . $quote['code'] . "' class='hivatkozas' style='/*font-size: 21px;*/color: #6274B5;'>[" . $quote['code'] . "]</a>";

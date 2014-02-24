@@ -1,6 +1,6 @@
 <?php
 		$texttosearch = $text;
-	$code = isquotetion($texttosearch);
+	$code = isquotetion($texttosearch,$reftrans);
 	if($code)  $texttosearch = $code['code'];
 	$pagetitle = $texttosearch." (".gettransname($reftrans,'true').") | Szentírás"; 
 
