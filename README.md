@@ -91,3 +91,4 @@ Nem CMS, de egy template.php-n keresztül megy a megjelenítés nem elhanyagolha
 - mysql cache: a kereséseket logolja és cacheli, hogy az alternítvákat jól mutassa és lássam mi megy az életben
 - rövid urlek (és régi-régi linkek hosszú url-jeit is értelmezi)
 - GoogleAnalytics egyelőre igénytelenül (pl. kereséseket nem követ)
+- cron napi/heti/havi: adatbázis karbantartás, felesleges fájlok törlése

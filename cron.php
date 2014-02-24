@@ -8,7 +8,6 @@ case "hourly":
 	exec("find cache -regextype posix-extended -regex '^(cache/cached-).*' -newermt \"".date('Y-m-d H:i:s',strtotime("-".getvar('cache_html_lifetime')))."\" -delete");
 	echo "html cache ürítve\n";
 	break;
-exit;
 
 /* DAILY cron */
 case "daily":
@@ -42,7 +41,7 @@ case "weekly":
 
 /* */
 default:
-	echo "nem csináltam semmit...\n";
+	echo "Én nem csináltam semmit...\n";
 break;
 }
 
