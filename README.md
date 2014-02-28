@@ -19,9 +19,9 @@ Nem CMS, de egy template.php-n keresztül megy a megjelenítés nem elhanyagolha
 - **tmp** - *importer* és *ebook* használja + db backup/schema/sample (üríthető alkalmanként)
 
 ###A függvények főbb helyei:
-- **quote.php** - már az enyém. `isquotation()`, `print_quotation()`, `quotation()` - vagyis, hogy mikor idézet hivatkozás valami és azt rakja össze, hogy milyen versek vannak benne
-- **biblefunc.php** -  főként az eredeti réges régi biblia honlap függvényei. részben átdolgozva, de itt maradtak részban csak szemét
-- **func.php** - hát újabb search függvények (simpleverse, rootverse, search, resultorder, addresults, searchsimple, dbsearchtext) és egyebek getnews() (főoldalra hírek), class menu, url(), redirect függvények (hosszú ill rövid url-ek alakítgatás és értelmezése)
+- **quote.php** - `isquotation()`, `print_quotation()`, `quotation()` - vagyis, hogy mikor idézet hivatkozás valami és azt rakja össze, hogy milyen versek vannak benne
+- **biblefunc.php** -  főként az eredeti réges-régi biblia honlap függvényei. részben átdolgozva, de itt maradtak részben csak szemét. + mysql db függvények (a nem elegáns régiek)
+- **func.php** - újabb search függvények (simpleverse, rootverse, search, resultorder, addresults, searchsimple, dbsearchtext) és egyebek getnews() (főoldalra hírek), class menu, url(), redirect függvények (hosszú ill rövid url-ek alakítgatás és értelmezése). általában tisztességes leírással
 
 ###Az adatbázisról még
 - **dropbox_oauth_tokens** -> dropboxban xlsx-ben vannak az szövegforrások, onnan frissítünk néha. ezt tudják a szöveggondozók kezelni
@@ -31,6 +31,7 @@ Nem CMS, de egy template.php-n keresztül megy a megjelenítés nem elhanyagolha
 - **stats_texttosearch** -> teljes keresési talán szinte log féle
 - **szinonmiak** -> szinoníma és alternatív lista kézzel összeállítva. néha 0/1/2/3-al jelölve, hogy melyik fordításban melyik a használatos
 - **tdbook** -> könyvek listája
+- **tdbook_hibas** -> hibás könyvrövidítések gyűjteménye, hogy kezelni tudjuk
 - **tdtrans** -> a fordítások listája. a fordításra általában `$reftrans`, vagy `$transid`-vel hivatkounk
 - **tdverse** -> a nagyon-nagyon okos végtelen vers és fejezetcím tábla, nem minden oszlop van használatban, csak az átalakításoknál benne marad
 - **vars** -> különféle beállítások változó a `getvars()` és `setvars()` saját függvényeknek. Minél több minden idekerül, hogy könnyen lehessen állítani. Pl. hogy mi mikor volt utoljára update és update közben - mert az hosszú néha - "frissítünk" felirat jelenik meg a honlap tetején

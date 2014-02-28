@@ -97,7 +97,7 @@ $share .= "</div>";
 /* lássuk, mi az eremény */	
 	$content .= "<br/><p class='title'><strong>".$count." találat</strong></p>";
 	/*tippek*/
-	getSzinonimaTipp($texttosearch);
+	getSzinonimaTipp($texttosearch,$transid);
 	getIdezetTipp($texttosearch);
 	$tipps = array_unique($tipps);
 	foreach($tipps as $tipp) 

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Egy szövegből kisbetűs csak betűket és szünetet tartalmazó szöveget gyárt.
+ * @param string $verse Bejövő szöveg. Általban szentírási vers.
+ * @return sring Egyszerűsített szöveg.
+ */
 function simpleverse($verse) {
     $verse = strip_tags($verse);
 	$verse = preg_replace('/([^a-zA-zöőóúüűáéíÖ ŐÓÚÜŰÁÉÍ]*)/is','',$verse);
@@ -6,6 +11,12 @@ function simpleverse($verse) {
     $verse = strtolower($verse);
 	return $verse;
 }
+
+/**
+ * Egy szövegben megpróbálja az összes szót kicserélni a szótövére
+ * @param string $verse Bejövő szöveg
+ * @return string Kisbetűs egyszerű szöveg lehetőleg szótövekkel
+ */
 function rootverse($verse) {
     $return = ''; $output = array();
     exec('echo "'.$verse.'" | hunspell -d hu_HU -s -i UTF-8',$output);
@@ -24,6 +35,17 @@ function rootverse($verse) {
 
 }
 
+/**
+ * Egy fordításban rákeres egy szóra vagy kifejezésre
+ * Megnézi, hogy van-e pontos egyezés, vagy szóeleji-szóvégi vagy a 
+ * **simpleverse** vagy a **rootverse** függvényekkel ugyan ez.
+ * @param string $text Kereső szöveg, akár filterrel. pl. "egér in:Újszöv"
+ * @param integer $reftrans A használni kívánt fordítás kódja.
+ * @param string $min A minimálisan elérendő találatszám, amíg küzd.
+ * @return array [<br/>
+ * 				'{verse-id}' 		=> egy-egy vers és mindenféle adata<br/>
+ * 			]<br/>
+ */
 function search($text,$reftrans, $min) {
 	//TODO: " in:Újszöv "
 	global $bookabbrevs;
@@ -135,6 +157,12 @@ function search($text,$reftrans, $min) {
    return resultsorder($results);
 }
 
+/**
+ * Keresési eredmények többdimenziós tömbjét rendezi sorba az alapján, hogy
+ * mennyi pontot kapott egy-egy vers.
+ * @param array $results Egy hivatkozás, pl. 1Kor 13, 1-13
+ * @return array
+ */
 function resultsorder($results) {
 		$order1 = array(); $order2 = array();
 	  foreach($results as $key=>$res) {
@@ -148,7 +176,14 @@ function resultsorder($results) {
 	  return $results;
 }
 
-
+/**
+ * Keresési eredmények nagy tömbjéhez hozzáilleszt még egyet. Ha már megvan, 
+ * akkor csak a pontszámát növeli.
+ * @param array $news Új eredmények. Egyetlen tömbben több eredmény is érkezhet
+ * @param array $old Az eddigi erdmények
+ * @param integer $num Mennyi pontot kapjon ezért a találatért. A súlyozáshoz kell.
+ * @return array Az eredmények multitömbje.
+ */
 function addresults($news,$old,$num = false) {
 	if($num == false) $num = 1;
 	//if(count($news)>0) echo $num."+";
@@ -227,6 +262,12 @@ function searchsimple($name,$text,$reftrans) {
 
 }
 
+/**
+ * Rákeres egy kifejezésre a mysql adatbázisban
+ * @param string $query A kereső kifejezés.
+ * @param string $reftrans A használni kívánt fordítás kódja.
+ * @return array Az egyes versek gépikódja a kulcs.
+ */
 function dbsearchtext($query,$reftrans) {
 	$return = array();
 	$query = "select gepi, verse, versesimple, verseroot from ".DBPREF."tdverse  where (".$query.") and ".DBPREF."tdverse.trans=$reftrans";
@@ -242,6 +283,10 @@ function dbsearchtext($query,$reftrans) {
 
 }
 
+/**
+ * Összeszedi a híreket, ha vannak. Általában a főoldalon.
+ * @return array Egyesével a címoldali hírek.
+ */
 function getnews() {
 	global $scripts;
 	$scripts[] = 'news.js';
@@ -317,6 +362,11 @@ class Menu {
 	}
 }
 
+//TODO: Ezt itten kiírtani. Gyanúsan hülyeség.
+/**
+ * URL-eket rendez
+ * Ha külsőre mutat, akkor nem bántja. Egyébként hosszúvá teszi
+ */
 function url($url) {
 	if(!preg_match('/(http:\/\/|^\/)/i',$url)) {
 		$tmp = explode('?',$url);
@@ -334,7 +384,15 @@ function url($url) {
 	return $newurl; 
 }
 
-
+/**
+ * Ha hosszú url-el hívták meg az oldalt, akkor átirányít az elegáns rövid
+ * megfelelőjére általában Error 301-el
+ *
+ * Egy jó részére azért van szükség, mert régi honlapok még a régi hosszú 
+ * url-ekre mutatnak. De valószínűleg a keresésnél is kell, mert a kereső form
+ * csak hosszúra küld.
+ * 
+ */
 function redirect_long2short() {
 	if(isset($_REQUEST['searchby'])) $_SESSION['searchby'] = $_REQUEST['searchby'];
    /* 
@@ -448,6 +506,11 @@ if($_REQUEST['q'] == 'showtrans') {
 
 }
 
+/**
+ * Feldolgoz egy urlt és megtalálja a szükséges változókat belőle. Nem valid
+ * címeket pedig eldob.
+ * @return array A kulcsból lesz változónév az értékből pedig változó.
+ */
 function url_short2vars() {
 	/*
 	* $_REQUEST['rewrite']-ból 
@@ -593,7 +656,11 @@ echo "not utf8";
 	return $return;
 }
 
-
+/**
+ * Változót ment/frissít adatbázisba
+ * @param string $name A változó neve.
+ * @param string $value A változó értéke.
+ */
 function setvar($name,$value) {
 	$test = getvar($name);
 	if( $test == false) {
@@ -604,6 +671,11 @@ function setvar($name,$value) {
 	db_query($query);
 }
 
+/**
+ * Változó értékét szerzi meg az adatbázisból
+ * @param string $name A változó neve
+ * @return string A változó értéke
+ */
 function getvar($name) {
 	$query="SELECT * FROM ".DBPREF."vars WHERE name = '".$name."' LIMIT 0,1";
 	$result = db_query($query);
@@ -640,6 +712,12 @@ function getvar($name) {
  *
  */
 
+ //TODO: Törölhető??
+ //TODO: Itt is itt van a nagy központi kereső pattern. Csak nem friss.
+/**
+ * Egy idézet alternatíváit keresi. És egyből átirányít oda.
+ * @param string $texttosearch Egy idézet kódja.
+ */ 
 function getIdezetTipp($texttosearch) {
 	global $reftrans, $tipps;
 	foreach($GLOBALS['tdtrans'] as $trans) {
@@ -663,9 +741,16 @@ function getIdezetTipp($texttosearch) {
 	}
 }
 
-function getSzinonima($texttosearch,$max = 2) {
-	$szinonima = array();
-	global $reftrans;
+//TODO: global $reftrans; kiírtása
+/**
+ * Szinonímákat keres egy szóhoz ill. a fordításnak megfelelő szót/nevet.
+ * @param string $texttosearch A keresett szó
+ * @param integer $reftrans A fordítás azonosítója
+ * @param integer $max Ennyi szinonímánál megáll.
+ * @return array Egy-egy szinoníma szót tartalmaz.
+ */
+function getSzinonima($texttosearch,$reftrans,$max = 2) {
+	$szinonima = array();	
 
 	/* saját adatbázisból */
 	$query = "SELECT * FROM ".DBPREF."szinonimak WHERE tipus = 'szo' AND (szinonimak LIKE '%|".$texttosearch."|%' OR szinonimak LIKE  '%|".$texttosearch.":%');";
@@ -686,15 +771,23 @@ function getSzinonima($texttosearch,$max = 2) {
 	return $szinonima;
   }
 
-function getSzinonimaTipp($texttosearch) {
-	 global $reftrans;
+ //TODO: global $tipps kiírtása?
+ /**
+ * Szinoníma tippeket ad egy keresésre
+ * Megkeresi a szinonímákat, majd megnézni, hogy kerestek-e már arra.
+ * @param string $texttosearch A keresett szó
+ * @param integer $reftrans A fordítás azonosítója
+ * Vissza nem tér, csak a global $tipps-be pakolgatja.
+ */
+function getSzinonimaTipp($texttosearch,$reftrans) {
+	 
 	 
 	 $valtozatok = array();
 	 //TODO: jó ez?
 	 preg_match_all('/(^| |")([^ "]{1,100})/',$texttosearch,$matches,PREG_SET_ORDER);
 	 foreach($matches as $match) {
 		$szo = $match[2];
-		$szinonimak = getSzinonima($szo);
+		$szinonimak = getSzinonima($szo,$reftrans);
 		foreach($szinonimak as $szinonima) {
 			$valtozatok[] = preg_replace('/(^| |")('.$szo.')( |"|$)/','$1'.$szinonima.'$3',$texttosearch);
 		}
@@ -735,6 +828,11 @@ function getSzinonimaTipp($texttosearch) {
 				
   }
 
+/**
+ * A Kereső teljes nagy Form-ot írja ki ajánlatokkal és tippekkel
+ * Csak a searchbible.php használja
+ * @return string HTML formázott szöveg, rögtön képernyőre írható
+ */  
 function printSearchForm() {
 
 		global $reftrans, $transid;
@@ -798,7 +896,11 @@ EOD;
 		return $return;
 	}
 
-/* quote.php segédfüggvény, a keresés oldalán a form, ha már van találat*/
+/**
+ * A kereső találati oldal tetején a magyarázó és új kereső formot szedi össze
+ * Csak a searchbible.php használja
+ * @return string HTML formázott kész szöveg
+ */
 function print_form() {
 		global $code;
 		global $reftrans;
@@ -831,11 +933,12 @@ function print_form() {
 		return $return;
 }	
 
-/*
- * ebook.php segédfüggvények
-*/
-
-/* kész file letöltése */
+/**
+ * Egy filet kínál fel letöltésre (gyakorlatilag kiírja)
+ * Az ebook.php használja
+ * @param string $filename A fájl neve
+ * @param string $path A fájl elérhetősége
+ */
 function getdownload($filename,$path = '') {
 	if($path == '') $path = '/var/www/szentiras.hu/ebook/';
 	
@@ -849,8 +952,6 @@ function getdownload($filename,$path = '') {
 		flush(); // this is essential for large downloads
 	}  
 	fclose($fp); 
-	
-
 }
  
 ?>
