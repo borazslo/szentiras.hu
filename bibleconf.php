@@ -19,9 +19,9 @@ $tipps = array();
 
 $mysqlhost = 'localhost';
 $mysqldb = 'bible';
-$mysqlpw = 'saritnezs11';
-$mysqluser = 'szentiras';
-$database = array('mysql:host=localhost;dbname=bible','szentiras','saritnezs11');
+$mysqlpw = "$_ENV['MYSQL_SZENTIRAS_PWD']";
+$mysqluser = "$_ENV['MYSQL_SZENTIRAS_USER']";
+$database = array('mysql:host=localhost;dbname=bible',"$_ENV['MYSQL_SZENTIRAS_PWD']","$_ENV['MYSQL_SZENTIRAS_PWD']");
 
 try { 
 	$db = new PDO($database[0], $database[1], $database[2],array('charset'=>'UTF-8',PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
