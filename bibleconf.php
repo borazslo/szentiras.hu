@@ -16,12 +16,11 @@ $share = '';
 $comments = '';
 $title = false;
 $tipps = array();	
-
 $mysqlhost = 'localhost';
 $mysqldb = 'bible';
-$mysqlpw = "$_ENV['MYSQL_SZENTIRAS_PWD']";
-$mysqluser = "$_ENV['MYSQL_SZENTIRAS_USER']";
-$database = array('mysql:host=localhost;dbname=bible',"$_ENV['MYSQL_SZENTIRAS_PWD']","$_ENV['MYSQL_SZENTIRAS_PWD']");
+$mysqlpw = getenv('MYSQL_SZENTIRAS_PWD');
+$mysqluser = getenv('MYSQL_SZENTIRAS_USER');
+$database = array('mysql:host=localhost;dbname=bible',getenv('MYSQL_SZENTIRAS_USER'),getenv('MYSQL_SZENTIRAS_PWD'));
 
 try { 
 	$db = new PDO($database[0], $database[1], $database[2],array('charset'=>'UTF-8',PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));

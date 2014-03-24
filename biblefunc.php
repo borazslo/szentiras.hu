@@ -542,8 +542,8 @@ function dlookup($field,$table,$condition) {
  
  function db_connect() {
 	
-	$user="szentiras";
-	$password="saritnezs11";
+	$user=getenv('MYSQL_SZENTIRAS_USER');
+	$password=getenv('MYSQL_SZENTIRAS_PWD');
 	$database="bible";
 
 	$db_link = mysql_connect('localhost:3306',$user,$password) or die ("Can't connect to mysql");

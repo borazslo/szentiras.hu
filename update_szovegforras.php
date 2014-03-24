@@ -194,7 +194,7 @@ for($i = 2;$i<$max;$i++) {
   * mySQL
   */
   echo "Mysql adatbázis lementése...\n";
-  exec('mysqldump -u szentiras --password=saritnezs11 bible '.DBPREF.'tdverse > tmp/bible_'.DBPREF.'tdverse_'.$trans.'_'.date('YmdHis').'.sql');
+  exec('mysqldump -u '.getenv('MYSQL_SZENTIRAS_USER').' --password='.getenv('MYSQL_SZENTIRAS_PWD').' bible '.DBPREF.'tdverse > tmp/bible_'.DBPREF.'tdverse_'.$trans.'_'.date('YmdHis').'.sql');
   
   setvar('update_'.$trans.'_hossz','mysql_'.(int) ((time()-$starttime)/60));
   setvar('frissitunk_'.$trans,'true');
