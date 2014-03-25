@@ -10,3 +10,5 @@ cache/*
 /.buildpath
 /.project
 nbproject/*
+vendor/bin
+composer.lock
