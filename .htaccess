@@ -28,6 +28,7 @@ RewriteCond %{REQUEST_URI}   !igenaptar/.*$
 RewriteCond %{REQUEST_URI}   !index.html$
 RewriteCond %{REQUEST_URI}   !^/autosuggest.php$
 RewriteCond %{REQUEST_URI}   !^/index.php$
+RewriteCond %{REQUEST_URI}   !^/pi.php$
 RewriteRule ^(.*) index.php?rewrite=$1 [QSA]
 
 ###
