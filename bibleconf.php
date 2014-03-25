@@ -1,12 +1,11 @@
 <?php
-define('BASE','http://szentiras.hu/'); //base url of the site
-define('FILE','/var/www/szentiras.hu/'); //base url of the site
+
+define(FILE, getenv("DOCUMENT_ROOT"));
+$baseurl = "http://".getenv("HTTP_HOST");
+$fileurl = $baseurl;
+
 define('DBPREF','kar_'); // prefixes of the tables in the database
 define('DROPBOXF','Bibliafordítások'); // A dropbox foldere a megosztottaknak
-
-//Redundancia miatt szükség van erre
-$fileurl = BASE;//"http://szentiras.hu/";
-$baseurl = BASE;//"http://szentiras.hu/";
 
 $sitetitle = 'Szentírás <sup>v3</sup>';
 $subsitetitle = 'Katolikus Biblia fordítások az interneten';
