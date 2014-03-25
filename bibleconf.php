@@ -1,7 +1,8 @@
 <?php
 
-define(FILE, getenv("DOCUMENT_ROOT"));
-$baseurl = "http://".getenv("HTTP_HOST");
+define(FILE, getenv("DOCUMENT_ROOT")."/");
+define(BASE, "http://".getenv("HTTP_HOST")."/");
+$baseurl = BASE;
 $fileurl = $baseurl;
 
 define('DBPREF','kar_'); // prefixes of the tables in the database
