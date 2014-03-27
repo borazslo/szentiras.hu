@@ -7,7 +7,7 @@
 	<meta name="HandheldFriendly" content="True">
 	<meta name="MobileOptimized" content="320">
         
-        <title>{{ $pagetitle or "" }}</title>
+        <title>{{ $pageTitle or "" }}</title>
 
 	<meta property="fb:admins" content="1819502454" />
 	<meta name="description" content="A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban">
@@ -44,8 +44,8 @@
         <div id="wrapper">
                 <div id="headcontainer">
                     <header>
-                        <h1><a href="<?php if(isset($baseurl)) echo $baseurl; ?>" style="color:white"><?php if(isset($sitetitle)) echo $sitetitle; ?></a></h1>
-                            <?php if(isset($subsitetitle)) echo "<h2>".$subsitetitle."</h2>"; ?>
+                        <h1><a href="/" style="color:white">Szentírás.hu <sup>v4</sup></a></h1>
+                            <h2>Katolikus bibliafordítások az interneten</h2>
                     </header>
                 </div>
                 <div id="maincontentcontainer">
@@ -84,5 +84,6 @@
         </div>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 	<script>window.jQuery || document.write('<script src="js/jquery-1.7.2.min.js"><\/script>')</script>
+        <script src="/js/news.js"></script>
     </body>
 </html>
