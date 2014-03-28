@@ -3,7 +3,9 @@
 	"description": "Szentiras.hu web application",
 	"license": "MIT",
 	"require": {
-		"laravel/framework": "4.1.*"
+		"laravel/framework": "4.1.*",
+                "rcrowe/twigbridge": "0.5.*",
+		"twig/extensions": "1.0.*"
 	},
 	"autoload": {
 		"classmap": [

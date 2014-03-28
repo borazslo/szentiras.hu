@@ -1,0 +1,14 @@
+{% if abbrevs|length > 0 %}
+<blockquote>
+    <p class='kicsi' align='center'>
+        {% for abbrev in abbrevs %}
+            {% if (abbrev == currentBook) %}
+                <b>{{abbrev}}</b>
+            {% else %}
+                <a href="/book/{{abbrev}}" class='minilink'>{{abbrev}}</a>
+            {% endif %}
+            {% if (not loop.last) %} - {% endif %}
+        {% endfor %}
+    </p>
+</blockquote>
+{% endif %}

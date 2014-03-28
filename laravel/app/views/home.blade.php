@@ -55,5 +55,8 @@
         <br />
     @endforeach
 </blockquote>
+@stop
 
+@section('abbrevlist')
+    @include('bookAbbrevList')
 @stop
