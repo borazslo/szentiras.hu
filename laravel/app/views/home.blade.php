@@ -24,7 +24,7 @@
 
 <br />
 
-<h4><a href="http://www.bences.hu/igenaptar/{{ date('Ym')}}.html">Napi olvasmányok</a></h4>
+<h4><a href="http://www.katolikus.hu/igenaptar/{{ date('Ym')}}.html">Napi olvasmányok</a></h4>
 
 <p class="alcim">
     @foreach($olvasmanyok as $key => $olvasmany)
