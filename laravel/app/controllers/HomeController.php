@@ -23,14 +23,18 @@ class LectureDownloader {
     }    
   
     public function getLectures() {
+        $resultLectures = array();
+
         $fn2 = "http://katolikus.hu/igenaptar/{$this->date}.html";
-	$text = file_get_contents($fn2);
+	try {
+            $text = file_get_contents($fn2);
+        } catch (Exception $e) {
+            return $resultLectures;
+        }
         preg_match('/<!-- helyek:(.*)-->/', $text, $places);
         $referenceString = isset($places[1]) ? trim($places[1]) : '';
 	$references = explode(';', $referenceString);
-        
-        $resultLectures = array();
-        
+                
         foreach ($references as $reference) {
             // extract and convert Psalm numbering
             if(preg_match('/Zs ([0-9]{1,3})/', $reference, $matches)) {
