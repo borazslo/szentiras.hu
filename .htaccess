@@ -4,6 +4,32 @@ RewriteBase /
 RewriteCond %{HTTP_HOST} ^www.(.+)$ [NC]
 RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
 
+#RewriteCond %{REMOTE_ADDR} !^81\.182\.240\.247
+#RewriteCond %{REQUEST_URI} !^/karbantartunk\.html$
+#RewriteCond %{REQUEST_URI} !^/img/.*$
+#RewriteCond %{REQUEST_URI} !^/css/.*$
+#RewriteRule ^(.*)$ http://szentiras.hu/karbantartunk.html [R=301,L]
+
+
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteCond %{REQUEST_URI} !favicon.ico$
+RewriteCond %{REQUEST_URI} !robots.txt$
+RewriteCond %{REQUEST_URI} !mp3$
+RewriteCond %{REQUEST_URI} !/img/.*$
+RewriteCond %{REQUEST_URI} !/css/.*$
+RewriteCond %{REQUEST_URI} !/js/.*$
+RewriteCond %{REQUEST_URI} !/include/.*$
+#RewriteCond %{HTTP_HOST} szentiras.hu$ [NC]
+RewriteCond %{REQUEST_URI}   !hang/$
+RewriteCond %{REQUEST_URI}   !ebook/.*$
+RewriteCond %{REQUEST_URI}   !igenaptar/.*$
+RewriteCond %{REQUEST_URI}   !index.html$
+RewriteCond %{REQUEST_URI}   !^/autosuggest.php$
+RewriteCond %{REQUEST_URI}   !^/index.php$
+RewriteRule ^(.*) index.php?rewrite=$1 [QSA]
+
 ###
 ### http://gtmetrix.com/add-expires-headers.html
 ###
