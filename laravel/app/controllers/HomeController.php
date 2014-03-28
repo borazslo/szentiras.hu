@@ -4,10 +4,14 @@ class Lecture {
     public $link;
     public $extLinks = array();
     public $ref;
+    public $translationId;
+    public $bookAbbrev;
 }
 
 class ExtLink {
-    
+    public $url;
+    public $title;
+    public $label;
 }
 
 class LectureDownloader {
@@ -33,11 +37,33 @@ class LectureDownloader {
                 $vulgataNum = (int)$matches[1];
                 $reference = 'Zsolt '.$this->getHebrewPsalmNum($vulgataNum);
             }
-            $normalizedReference = (new ReferenceHandler())->normalizeReference($reference);
+            $normalizedReference = (new ReferenceHandler())->normalizeReference($reference, 4);
             $lecture = new Lecture();
             $lecture->ref = $normalizedReference['code'];
             $lecture->link = $normalizedReference['url'];
+            $lecture->translationId = $normalizedReference['reftrans'];
+            $lecture->bookAbbrev = $normalizedReference['book'];
             
+            $extLinks = array();
+            
+            $verse = Verse::where('trans', $lecture->translationId)
+                    ->whereHas('book', function($q) use ($lecture) {
+                        $q->where('abbrev', $lecture->bookAbbrev);
+                    })->select('gepi')->first();
+            if ($verse) {            
+                $availableTranslatedVerses = Verse::whereIn('tip', array(60, 6, 901))
+                        ->where('gepi', $verse->gepi)->get();
+                foreach ($availableTranslatedVerses as $verse) {
+                    $translation = $verse->translation;
+                    $extLink = new ExtLink();          
+                    $extLink->label = $translation->abbrev;
+                    $extLink->url = "/{$translation->abbrev}/{$normalizedReference['url']}";
+                    $extLinks[] = $extLink;
+                }
+            }
+            
+            
+            $lecture->extLinks = $extLinks;
             $resultLectures[] = $lecture;
         }
         return $resultLectures;

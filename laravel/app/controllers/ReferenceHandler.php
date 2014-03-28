@@ -4,6 +4,7 @@
  * Utility methods to process bible references.
  *
  * @author berti
+ * 
  */
 class ReferenceHandler {
     
@@ -31,6 +32,7 @@ public function normalizeReference($reference, $translationId = 3) {
 		return false;
 	}        
         $abbrev = $matches[1];
+	$numbers = $matches[2];
         
         $book = Book::
                     where('abbrev', $abbrev)
@@ -44,15 +46,24 @@ public function normalizeReference($reference, $translationId = 3) {
                     ->first();
         }
         
-	$numbers = $matches[2];
-	
-	$quote = array (
+        if (!$book) {
+            $quote = array(
+                'book' => $abbrev,
+                'bookurl' => '',
+                'code' => "{$abbrev} {$numbers}",
+                'url' => '',
+                'reftrans' => $translationId
+            );        
+        } else {
+            $quote = array (
             'book' => $book->abbrev,
             'bookurl' => $book->url,
             'reftrans' => $translationId,
             'code' => "{$book->abbrev} {$numbers}",  // TODO ez eddig is így volt, de nem jó (a hibás részeket ki kellen hagyni)
             'url' => "{$book->url}{$numbers}"
-        );
+        );            
+
+        
 	
         // only one chapter number
 	$pattern = "/^[0-9]+$/";
@@ -149,6 +160,8 @@ public function normalizeReference($reference, $translationId = 3) {
                     break;
             }
         }
+        
+                            }
 
         return $quote;
     }

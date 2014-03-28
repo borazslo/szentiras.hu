@@ -27,17 +27,26 @@
 <h4><a href="http://www.bences.hu/igenaptar/{{ date('Ym')}}.html">Napi olvasmányok</a></h4>
 
 <p class="alcim">
-@foreach($olvasmanyok as $olvasmany)
+    @foreach($olvasmanyok as $key => $olvasmany)
 <div style='height:20px'>
+    @if ($olvasmany->link != '')
     <a href='{{ $olvasmany->link }}' class='link'>{{ $olvasmany->ref }}</a>
+    @else {{$olvasmany->ref}}
+    @endif
     <div style='float:right;margin-top:-30px'>
         @foreach ($olvasmany->extLinks as $extLink)
-            <a href="{{ $extLink->url }}" title="{{ $extlink->title }}" class="button minilink"> {{ $extLink->label }}</a>
-        @endforeach
+        <a href="{{ $extLink->url }}" title="{{ $extLink->title }}" class="button minilink"> {{ $extLink->label }}</a>
+            @endforeach
+            @if ($key > count($olvasmanyok)-2)
+            <a href="http://evangelium.katolikus.hu/audio/NE{{ date('Ymd') }}.mp3" class="button minilink" title="Evangélium és elmélkedés az evangelium365.hu honlapról." target="_blank">mp3</a>
+            @endif
     </div>
 </div>
 @endforeach
-		
+
+<br />
+<p />
+
 <span class='alcim'><a href='/forditasok'>További fordítások</a></span>
 <br>
 <blockquote>

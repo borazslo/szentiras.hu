@@ -12,4 +12,5 @@ class Translation extends Eloquent {
         $q  = $denom ? Translation::where('denom', 'katolikus') : Translation::all();
         return $q->orderBy('denom')->orderBy('name')->get();
     }
+    
 }
