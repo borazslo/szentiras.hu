@@ -22,18 +22,40 @@ class LectureDownloader {
         $fn2 = "http://katolikus.hu/igenaptar/{$this->date}.html";
 	$text = file_get_contents($fn2);
         preg_match('/<!-- helyek:(.*)-->/', $text, $places);
-        $olvasmany_rov = isset($places[1]) ? trim($places[1]) : '';
-	$olvasmanyok = explode(';',$olvasmany_rov);
+        $referenceString = isset($places[1]) ? trim($places[1]) : '';
+	$references = explode(';', $referenceString);
         
         $resultLectures = array();
         
-        foreach ($olvasmanyok as $olvasmany) {
-            // convert Psalm numbering
+        foreach ($references as $reference) {
+            // extract and convert Psalm numbering
+            if(preg_match('/Zs ([0-9]{1,3})/', $reference, $matches)) {
+                $vulgataNum = (int)$matches[1];
+                $reference = 'Zsolt '.$this->getHebrewPsalmNum($vulgataNum);
+            }
+            $normalizedReference = (new ReferenceHandler())->normalizeReference($reference);
             $lecture = new Lecture();
-            $lecture->ref = $olvasmany;
+            $lecture->ref = $normalizedReference['code'];
+            $lecture->link = $normalizedReference['url'];
+            
             $resultLectures[] = $lecture;
         }
         return $resultLectures;
+    }
+    
+    private function getHebrewPsalmNum($vulgataNum) {
+        // see http://en.wikipedia.org/wiki/Psalms#Numbering
+        if ($vulgataNum >= 10 && $vulgataNum <= 113
+                || $vulgataNum >= 116 && $vulgataNum <= 145) {
+            $hebrewNum = $vulgataNum + 1;
+        } else if ($vulgataNum == 114 || $vulgataNum == 115) {
+            $hebrewNum = 116;
+        } else if ($vulgataNum == 146 || $vulgataNum == 147) {
+            $hebrewNum = 146;
+        } else {
+            $hebrewNum = $vulgataNum;
+        }
+        return $hebrewNum;
     }
 }
 
@@ -44,8 +66,6 @@ class LectureDownloader {
  */
 class HomeController extends BaseController {
 
-
-    
     public function index() {
         return View::make("home", array(
             'news' => News::where('frontpage','1')->orderBy('date','desc')->get(),
