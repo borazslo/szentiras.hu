@@ -151,15 +151,15 @@ public function normalizeReference($reference, $translationId = 3) {
 	$pattern = "/^[0-9]+$/";
 	if (preg_match($pattern, $numbers, $match)) {
             $chapter = $match[0];
-            $lastVerseNum = 
+            $lastVerse =
                     Verse::whereHas('book', function ($q) use ($book) {
                         $q->where('trans', $book->trans);
                     })
                     ->where('chapter', $chapter)->orderBy('numv', 'desc')->first();
-            if ($lastVerseNum && $lastVerseNum > 0) {
-                $quote['tag'][1]['code'] = "{$chapter},1-{$lastVerseNum}";
+            if ($lastVerse && $lastVerse->numv > 0) {
+                $quote['tag'][1]['code'] = "{$chapter},1-{$lastVerse->numv}";
                 $quote['tag'][1]['chapter'] = $chapter;
-                for($s = 1; $s <= $lastVerseNum; $s++) {
+                for($s = 1; $s <= $lastVerse->numv; $s++) {
                     $quote['tag'][1]['numv'][] = $s;
                 }
             }
