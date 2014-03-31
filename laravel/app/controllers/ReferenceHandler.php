@@ -61,10 +61,24 @@
  * ]
  */
 class CanonicalReference {
-    public $bookAbbrev;
+    public $bookRefs;
 
     public function getCode() {
-        return "{$this->bookAbbrev} ";
+        $code = "{$this->bookAbbrev}";
+    }
+
+    public static function fromCanonicalString($s) {
+        $ref = new CanonicalReference();
+        $bookAbbrevRegex = '(\d?\p{L}+)';
+        $bookReferenceRegex  = "{$bookAbbrevRegex}";
+        $canonicalReferenceRegex = "{$bookReferenceRegex}(; {$bookReferenceRegex})*";
+        if (preg_match("/^{$canonicalReferenceRegex}/u", $s, $matcher)) {
+            $ref->bookRefs = array();
+            print_r($matcher);
+            $ref->bookRefs[] = array('bookAbbrev'=>$matcher[1]);
+        }
+
+        return $ref;
     }
 }
 
