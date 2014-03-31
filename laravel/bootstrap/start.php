@@ -24,12 +24,12 @@ $app = new Illuminate\Foundation\Application;
 |
 */
 
-$env = $app->detectEnvironment(array(
+$env = $app->detectEnvironment(function() {
 
-	'local' => array('dev.szentiras.hu', 'dev2.szentiras.hu'),
-    'staging' => array('staging.szentiras.hu', 'staging2.szentiras.hu')
+    $env = getenv('SZENTIRAS_WEBAPP_ENVIRONMENT');
+    return $env ? $env : 'production';
 
-));
+});
 
 /*
 |--------------------------------------------------------------------------
