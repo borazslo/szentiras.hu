@@ -1,6 +1,74 @@
 <?php
 
 /**
+ * Class CanonicalReference to represent a unique reference to some Bible verses.
+ * Examples of possible formats:
+ * - 1Kor - full book
+ * - 1Kor 13 - a full chapter
+ * - 1Kor 13,1 - a verse
+ * - 1Kor 13,1-10 - a verse range
+ * - 1Kor 13,1.2-10.24-30 - multiple ranges
+ * - 1Kor 13,1a-3.5b-14 - multiple ranges with verse parts
+ * - 1Kor 13;25 - multiple chapters
+ * - 1Kor 13,1a-3.5b-14;14,23.24-26 - multiple chapters
+ * - 1Kor; Jn; 2Fil - multiple books, note the space
+ * - 1Kor 13,1a-3.5b-14.6a;14,23; Jn 14,22-39 - everything combined
+ * So generally we have the following grammar here:
+ * CanonicalReference = BookReference ("; " BookReference)*
+ * BookReference = BookId (" " ChapterReference)
+ * ChapterReference = ChapterId ("," VerseReference)? (";" ChapterReference)*
+ * VerseReference = VerseRange ("." VerseRange)*
+ * VerseRange = VerseId ("-" VerseId)?
+ * VerseId = [0-9]+[a-z]?
+ * BookId = [0-9]?Alpha+
+ * ChapterId = [0-9]+
+ *
+ * So as an example:
+ * - 1Kor 13,1a-3.5b-14.6a;14,23; Jn 14,22-39
+ * BookReference
+ *  BookId("1Kor")
+ *  ChapterReference
+ *   ChapterId("13")
+ *   VerseReference
+ *     VerseRange
+ *       VerseId("1a")
+ *       VerseId("3")
+ *     VerseRange
+ *       VerseId("5b")
+ *       VerseId("14")
+ *     VerseRange
+ *       VerseId("6a")
+ *  ChapterReference
+ *   Chapterid("14")
+ *    VerseReference("23")
+ * BookReference
+ *   ...
+ *
+ * This can be represented in JSON in a simpler way:
+ * [
+ *  {
+ *      'bookId' : '1Kor',
+ *      'chapters': [
+ *          {
+ *              'chapterId': '13',
+ *              'verses': [{ 'from':'1a', 'to':'3' },{ 'from':'5b', 'to':'14' },{ 'from':'6a'}]
+ *          }, {
+ *              'chapterId': '14', 'verses': [{'from':'23'}]
+ *          }
+ *      ]
+ *  },
+ *  ....
+ * ]
+ */
+class CanonicalReference {
+    public $bookAbbrev;
+
+    public function getCode() {
+        return "{$this->bookAbbrev} ";
+    }
+}
+
+/**
  * Utility methods to process bible references.
  *
  * @author berti
@@ -10,7 +78,7 @@ class ReferenceHandler {
     
  /**
  * Return a normalized standard version of a bible reference.
- * @param string $reference E.g. '1Kor 13, 1-13'
+ * @param string $reference E.g. '1Kor 13, 1-13', '2Kor 2,3b.4-10;4,2-10a'
  * @param string $translation The translation to provide the normalization according to.
  * @return array [<br/>
  * 				'book' 		=> correct abbreviation of book<br/>
@@ -96,7 +164,7 @@ public function normalizeReference($reference, $translationId = 3) {
                             $lastVerseNum = Verse::whereHas('book', function ($q) use ($book) {
                                                 $q->where('trans', $book->trans);
                                             })
-                                            ->where('chapter', $c)->orderBy('numv', 'desc')->first();
+                                            ->where('chapter', $c)->orderBy('numv', 'desc')->first()->numv;
 
                             if ($lastVerseNum && $lastVerseNum > 0) {
                                 $quote['tag'][$key * 100 + $c]['code'] ="{$c},1-{$lastVerseNum}";
@@ -138,7 +206,7 @@ public function normalizeReference($reference, $translationId = 3) {
                     $lastVerseNum = Verse::whereHas('book', function ($q) use ($book) {
                                         $q->where('trans', $book->trans);
                                     })
-                                    ->where('chapter', $c)->orderBy('numv', 'desc')->first();
+                                    ->where('chapter', $c)->orderBy('numv', 'desc')->first()->numv;
                     if ($lastVerseNum && $lastVerseNum > 0) {
                         $quote['tag'][$key * 100]['chapter'] = $c;
                         $quote['tag'][$key * 100]['code'] = $tag;
