@@ -12,3 +12,7 @@ cache/*
 nbproject/*
 vendor/bin
 composer.lock
+.idea
+*.iml
+_ide_helper.php
+.env.testing.php
