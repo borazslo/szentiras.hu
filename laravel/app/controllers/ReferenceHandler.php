@@ -1,5 +1,61 @@
 <?php
 
+class ReferenceParser {
+
+    const PARSE_BOOK = 1;
+    const PARSE_CHAPTER = 2;
+    const PARSE_VERSE = 3;
+
+    private $lexer;
+    private $stateStack = [];
+
+    public function __construct(ReferenceLexer $lexer) {
+        $this->lexer = $lexer;
+    }
+
+    public function bookRefs() {
+        array_push($this->stateStack, self::PARSE_BOOK);
+
+        $bookRefs = [];
+
+        while ($this->lexer->moveNext()) {
+            $token = $this->lexer->lookahead;
+            switch (last($this->stateStack)) {
+                case self::PARSE_BOOK:
+                    // skip any whitespace when waiting for book id
+                    if ($token['value']==' ') break;
+                    $bookId = $this->bookId();
+                    $bookRefs[] = ['bookId'=>$bookId];
+                    array_push($this->stateStack, self::PARSE_CHAPTER);
+                    break;
+                case self::PARSE_CHAPTER:
+                    // if in this state we get a ';', an other book is coming
+                    if ($token['value']==';') {
+                        array_pop($this->stateStack);
+                    }
+            }
+        }
+        return $bookRefs;
+    }
+
+    public function bookId() {
+        $bookId = '';
+        $token = $this->lexer->lookahead;
+        if ($token['type']===ReferenceLexer::T_NUMERIC) {
+            $bookId = $bookId.$token['value'];
+            $this->lexer->moveNext();
+            $token = $this->lexer->lookahead;
+        }
+        $bookId = $bookId.$token['value'];
+        return $bookId;
+    }
+
+    private function pushState($state) {
+        array_push($this->stateStack, $state);
+    }
+
+}
+
 /**
  * Class CanonicalReference to represent a unique reference to some Bible verses.
  * Examples of possible formats:
@@ -61,6 +117,7 @@
  * ]
  */
 class CanonicalReference {
+
     public $bookRefs;
 
     public function getCode() {
@@ -69,16 +126,15 @@ class CanonicalReference {
 
     public static function fromCanonicalString($s) {
         $ref = new CanonicalReference();
-        $bookAbbrevRegex = '(\d?\p{L}+)';
-        $bookReferenceRegex  = "{$bookAbbrevRegex}";
-        $canonicalReferenceRegex = "{$bookReferenceRegex}(; {$bookReferenceRegex})*";
-        if (preg_match("/^{$canonicalReferenceRegex}/u", $s, $matcher)) {
-            $ref->bookRefs = array();
-            print_r($matcher);
-            $ref->bookRefs[] = array('bookAbbrev'=>$matcher[1]);
-        }
-
+        $lexer = new ReferenceLexer($s);
+        $parser = new ReferenceParser($lexer);
+        $bookRefs = $parser->bookRefs();
+        $ref->bookRefs = $bookRefs;
         return $ref;
+    }
+
+    private function parseBook() {
+
     }
 }
 
