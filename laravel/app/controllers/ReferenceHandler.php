@@ -36,12 +36,25 @@ class ChapterRef {
 }
 
 class VerseRange {
+    /**
+     * @var VerseRef
+     */
     public $verseRef;
+
+    /**
+     * @var VerseRef
+     */
     public $untilVerseRef;
 }
 
 class VerseRef {
     public $verseId;
+
+    function __construct($verseId)
+    {
+        $this->verseId = $verseId;
+    }
+
 }
 
 class ReferenceParser {
@@ -113,16 +126,24 @@ class ReferenceParser {
             $this->lexer->moveNext();
             $this->lexer->moveNext();
             $range->untilChapterRef = $this->chapterRef();
+        // a bit hard to understand, but this is used when the ranges are through chapters, 2,3-3,4
+        } else if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR) {
+            $range->untilChapterRef = $this->chapterRef();
         }
         return $range;
     }
 
     public function chapterRef() {
-        $chapterRef = new ChapterRef($this->chapterId());
+        $chapterRef = new ChapterRef($this->chapterOrVerseId());
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR) {
+            $this->lexer->moveNext();
+            $this->lexer->moveNext();
+            $chapterRef->verseRanges = $this->verseRanges();
+        }
         return $chapterRef;
     }
 
-    public function chapterId() {
+    public function chapterOrVerseId() {
         $token = $this->lexer->lookahead;
         $chapterId = $token['value'];
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_TEXT) {
@@ -131,6 +152,39 @@ class ReferenceParser {
         }
         return $chapterId;
     }
+
+    public function verseRanges() {
+        $verseRanges = [];
+        $verseRanges[] = $this->verseRange();
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR) {
+            $this->lexer->moveNext();
+            $this->lexer->moveNext();
+            $verseRanges = array_merge($verseRanges, $this->verseRanges());
+        }
+        return $verseRanges;
+    }
+
+    public function verseRange() {
+        $range = new VerseRange();
+        $range->verseRef = $this->verseRef();
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_RANGE_OPERATOR) {
+            $this->lexer->moveNext();
+            $this->lexer->moveNext();
+            /**
+             * This is some specialty: 12,5-13,14 -> range is through chapters
+             */
+            if ($this->lexer->glimpse()['type'] != ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR) {
+                $range->untilVerseRef = $this->verseRef();
+            }
+        }
+        return $range;
+    }
+
+    public function verseRef() {
+        $ref = new VerseRef($this->chapterOrVerseId());
+        return $ref;
+    }
+
 
     private function pushState($state) {
         array_push($this->stateStack, $state);
@@ -220,9 +274,6 @@ class CanonicalReference {
         return $ref;
     }
 
-    private function parseBook() {
-
-    }
 }
 
 /**

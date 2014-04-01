@@ -3,7 +3,7 @@
 class ReferenceLexer extends AbstractLexer{
 
     const T_CHAPTER_VERSE_SEPARATOR = 1;
-    const T_VERSE_SEPARATOR = 2;
+    const T_VERSE_RANGE_SEPARATOR = 2;
     const T_RANGE_OPERATOR = 3;
     const T_TEXT = 4;
     const T_NUMERIC = 5;
@@ -52,7 +52,7 @@ class ReferenceLexer extends AbstractLexer{
             switch ($value) {
                 case ',' :
                 case ':' : return self::T_CHAPTER_VERSE_SEPARATOR;
-                case '.' : return self::T_VERSE_SEPARATOR;
+                case '.' : return self::T_VERSE_RANGE_SEPARATOR;
                 case '-' : return self::T_RANGE_OPERATOR;
                 case ';' : return self::T_BOOK_SEPARATOR;
                 case '|' : return self::T_CHAPTER_RANGE_SEPARATOR;

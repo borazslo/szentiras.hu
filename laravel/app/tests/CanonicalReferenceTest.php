@@ -65,14 +65,60 @@ class CanonicalReferenceTest extends TestCase {
         $bookRef = $ref->bookRefs[1];
         $this->assertEquals("2Kor", $bookRef->bookId);
         $this->assertEquals("13", $bookRef->chapterRanges[0]->chapterRef->chapterId);
-
-
     }
 
     public function testCanonicalBookWithChapterVerses() {
         $bookRef = CanonicalReference::fromCanonicalString("Kor 13,1")->bookRefs[0];
         $this->assertEquals("Kor", $bookRef->bookId);
-        $this->assertEquass("13", $bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $this->assertEquals("13", $bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $this->assertEquals("1", $bookRef->chapterRanges[0]->chapterRef->verseRanges[0]->verseRef->verseId);
+
+        $bookRef = CanonicalReference::fromCanonicalString("Kor 13:1")->bookRefs[0];
+        $this->assertEquals("Kor", $bookRef->bookId);
+        $this->assertEquals("13", $bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $this->assertEquals("1", $bookRef->chapterRanges[0]->chapterRef->verseRanges[0]->verseRef->verseId);
+
+        $bookRef = CanonicalReference::fromCanonicalString("Kor 13,1a-4b")->bookRefs[0];
+        $this->assertEquals("Kor", $bookRef->bookId);
+        $this->assertEquals("13", $bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $this->assertEquals("1a", $bookRef->chapterRanges[0]->chapterRef->verseRanges[0]->verseRef->verseId);
+        $this->assertEquals("4b", $bookRef->chapterRanges[0]->chapterRef->verseRanges[0]->untilVerseRef->verseId);
+
+        $bookRef = CanonicalReference::fromCanonicalString("Kor 13,1a-14,2b")->bookRefs[0];
+        $this->assertEquals("Kor", $bookRef->bookId);
+        $this->assertEquals("13", $bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $this->assertEquals("1a", $bookRef->chapterRanges[0]->chapterRef->verseRanges[0]->verseRef->verseId);
+        $this->assertEquals("14", $bookRef->chapterRanges[0]->untilChapterRef->chapterId);
+        $this->assertEquals("2b", $bookRef->chapterRanges[0]->untilChapterRef->verseRanges[0]->verseRef->verseId);
+
+    }
+
+    public function testCanonicalBookChapterVerseComplicated() {
+        $ref = CanonicalReference::fromCanonicalString("2Sám 7,4-5a.12-14a.16; Zs 88,2-29; 2Kor 4,13a.14b-5,1b.6-8.7|2,3.4-5,6.7-12");
+        $this->assertCount(3, $ref->bookRefs);
+        $bookRef = $ref->bookRefs[0];
+        $this->assertEquals("2Sám", $bookRef->bookId);
+        $this->assertCount(1,$bookRef->chapterRanges);
+        $this->assertEquals("7",$bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $this->assertCount(3,$bookRef->chapterRanges[0]->chapterRef->verseRanges);
+        $this->assertEquals("4", $bookRef->chapterRanges[0]->chapterRef->verseRanges[0]->verseRef->verseId);
+        $this->assertEquals("5a", $bookRef->chapterRanges[0]->chapterRef->verseRanges[0]->untilVerseRef->verseId);
+        $this->assertEquals("12", $bookRef->chapterRanges[0]->chapterRef->verseRanges[1]->verseRef->verseId);
+        $this->assertEquals("14a", $bookRef->chapterRanges[0]->chapterRef->verseRanges[1]->untilVerseRef->verseId);
+        $this->assertEquals("16", $bookRef->chapterRanges[0]->chapterRef->verseRanges[2]->verseRef->verseId);
+        $this->assertNull($bookRef->chapterRanges[0]->chapterRef->verseRanges[2]->untilVerseRef);
+        $bookRef = $ref->bookRefs[1];
+        $this->assertEquals("Zs", $bookRef->bookId);
+        $this->assertEquals("88",$bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $bookRef = $ref->bookRefs[2];
+        $this->assertEquals("2Kor", $bookRef->bookId);
+        $this->assertCount(2,$bookRef->chapterRanges[0]->chapterRef->verseRanges);
+        $this->assertCount(3,$bookRef->chapterRanges[0]->untilChapterRef->verseRanges);
+        $this->assertEquals("5", $bookRef->chapterRanges[0]->untilChapterRef->chapterId);
+        $this->assertEquals("8", $bookRef->chapterRanges[0]->untilChapterRef->verseRanges[1]->untilVerseRef->verseId);
+        $this->assertCount(2,$bookRef->chapterRanges[1]->untilChapterRef->verseRanges);
+        $this->assertEquals("12",$bookRef->chapterRanges[1]->untilChapterRef->verseRanges[1]->untilVerseRef->verseId);
+
     }
 
 
