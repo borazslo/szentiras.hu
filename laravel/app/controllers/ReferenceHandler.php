@@ -1,5 +1,49 @@
 <?php
 
+class BookRef {
+    public $bookId;
+    /**
+     * @var ChapterRange[]
+     */
+    public $chapterRanges = [];
+    public function __construct($bookId) { $this->bookId = $bookId; }
+}
+
+class ChapterRange {
+    /**
+     * @var ChapterRef
+     */
+    public $chapterRef;
+    /**
+     * @var ChapterRef
+     */
+    public $untilChapterRef;
+}
+
+class ChapterRef {
+    public $chapterId;
+    /**
+     * @var VerseRange[]
+     */
+    public $verseRanges = [];
+
+    function __construct($chapterId)
+    {
+        $this->chapterId = $chapterId;
+    }
+
+
+}
+
+class VerseRange {
+    public $verseRef;
+    public $untilVerseRef;
+}
+
+class VerseRef {
+    public $verseId;
+}
+
 class ReferenceParser {
 
     const PARSE_BOOK = 1;
@@ -22,17 +66,18 @@ class ReferenceParser {
             $token = $this->lexer->lookahead;
             switch (last($this->stateStack)) {
                 case self::PARSE_BOOK:
-                    // skip any whitespace when waiting for book id
-                    if ($token['value']==' ') break;
                     $bookId = $this->bookId();
-                    $bookRefs[] = ['bookId'=>$bookId];
+                    $bookRefs[] = new BookRef($bookId);
                     array_push($this->stateStack, self::PARSE_CHAPTER);
                     break;
                 case self::PARSE_CHAPTER:
                     // if in this state we get a ';', an other book is coming
                     if ($token['value']==';') {
                         array_pop($this->stateStack);
+                        break;
                     }
+                    $currentBookRef = end($bookRefs);
+                    $currentBookRef->chapterRanges = $this->chapterRanges();
             }
         }
         return $bookRefs;
@@ -50,9 +95,47 @@ class ReferenceParser {
         return $bookId;
     }
 
+    public function chapterRanges() {
+        $chapterRanges = [];
+        $chapterRanges[] = $this->chapterRange();
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR) {
+            $this->lexer->moveNext();
+            $this->lexer->moveNext();
+            $chapterRanges = array_merge($chapterRanges, $this->chapterRanges());
+        }
+        return $chapterRanges;
+    }
+
+    public function chapterRange() {
+        $range = new ChapterRange();
+        $range->chapterRef = $this->chapterRef();
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_RANGE_OPERATOR) {
+            $this->lexer->moveNext();
+            $this->lexer->moveNext();
+            $range->untilChapterRef = $this->chapterRef();
+        }
+        return $range;
+    }
+
+    public function chapterRef() {
+        $chapterRef = new ChapterRef($this->chapterId());
+        return $chapterRef;
+    }
+
+    public function chapterId() {
+        $token = $this->lexer->lookahead;
+        $chapterId = $token['value'];
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_TEXT) {
+            $this->lexer->moveNext();
+            $chapterId.=$this->lexer->lookahead['value'];
+        }
+        return $chapterId;
+    }
+
     private function pushState($state) {
         array_push($this->stateStack, $state);
     }
+
 
 }
 
@@ -63,12 +146,13 @@ class ReferenceParser {
  * - 1Kor 13 - a full chapter
  * - 1Kor 13,1 - a verse
  * - 1Kor 13,1-10 - a verse range
+ * - 1Kor 13,2-14,3 - crosschapter ranges
  * - 1Kor 13,1.2-10.24-30 - multiple ranges
  * - 1Kor 13,1a-3.5b-14 - multiple ranges with verse parts
  * - 1Kor 13;25 - multiple chapters
  * - 1Kor 13,1a-3.5b-14;14,23.24-26 - multiple chapters
  * - 1Kor; Jn; 2Fil - multiple books, note the space
- * - 1Kor 13,1a-3.5b-14.6a;14,23; Jn 14,22-39 - everything combined
+ * - 1Kor 13,1a-3.5b-14.6a;14,23-15,22; Jn 14,22-39 - everything combined
  * So generally we have the following grammar here:
  * CanonicalReference = BookReference ("; " BookReference)*
  * BookReference = BookId (" " ChapterReference)
@@ -83,17 +167,17 @@ class ReferenceParser {
  * - 1Kor 13,1a-3.5b-14.6a;14,23; Jn 14,22-39
  * BookReference
  *  BookId("1Kor")
- *  ChapterReference
- *   ChapterId("13")
- *   VerseReference
+ *  ChapterRange
+ *   ChapterReference
+ *     ChapterId("13")
  *     VerseRange
- *       VerseId("1a")
- *       VerseId("3")
- *     VerseRange
- *       VerseId("5b")
- *       VerseId("14")
- *     VerseRange
- *       VerseId("6a")
+         VerseId("1a")
+         VerseId("3")
+       VerseRange
+         VerseId("5b")
+         VerseId("14")
+       VerseRange
+         VerseId("6a")
  *  ChapterReference
  *   Chapterid("14")
  *    VerseReference("23")
@@ -118,6 +202,9 @@ class ReferenceParser {
  */
 class CanonicalReference {
 
+    /**
+     * @var BookRef[]
+     */
     public $bookRefs;
 
     public function getCode() {

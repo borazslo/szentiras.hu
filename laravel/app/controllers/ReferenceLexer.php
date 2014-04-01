@@ -5,12 +5,13 @@ class ReferenceLexer extends AbstractLexer{
     const T_CHAPTER_VERSE_SEPARATOR = 1;
     const T_VERSE_SEPARATOR = 2;
     const T_RANGE_OPERATOR = 3;
-    const T_SPACE = 4;
-    const T_TEXT = 5;
-    const T_NUMERIC = 6;
+    const T_TEXT = 4;
+    const T_NUMERIC = 5;
+    const T_BOOK_SEPARATOR = 6;
+    const T_CHAPTER_RANGE_SEPARATOR = 7;
 
     public function __construct($input) {
-        $this->setInput($input);
+        $this->setInput(trim($input));
     }
 
     /**
@@ -23,7 +24,7 @@ class ReferenceLexer extends AbstractLexer{
         return [
             '\d+',
             '\p{L}+',
-            '[,: -.]',
+            '[,:\-\.;\|]',
         ];
     }
 
@@ -34,7 +35,7 @@ class ReferenceLexer extends AbstractLexer{
      */
     protected function getNonCatchablePatterns()
     {
-        return array();
+        return array('\s+','(.)');
     }
 
     /**
@@ -53,7 +54,8 @@ class ReferenceLexer extends AbstractLexer{
                 case ':' : return self::T_CHAPTER_VERSE_SEPARATOR;
                 case '.' : return self::T_VERSE_SEPARATOR;
                 case '-' : return self::T_RANGE_OPERATOR;
-                case ' ' : return self::T_SPACE;
+                case ';' : return self::T_BOOK_SEPARATOR;
+                case '|' : return self::T_CHAPTER_RANGE_SEPARATOR;
                 default: return self::T_TEXT;
             }
         }
