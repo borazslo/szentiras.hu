@@ -127,6 +127,7 @@ class CanonicalReferenceTest extends TestCase {
         $this->assertEquals("2Sám 3; 1Kor 2-5; 2Kor 5|6", CanonicalReference::fromString("2Sám 3; 1Kor2-5;2Kor5|6")->toString());
         $this->assertEquals("2Kor 3,1", CanonicalReference::fromString("2Kor 3, 1")->toString());
         $this->assertEquals("Zs 88,2-29", CanonicalReference::fromString("Zs 88:2-29")->toString());
+        $this->assertEquals("Bölcs 2,1a.12-22", CanonicalReference::fromString("Bölcs 2,1a.12-22")->toString());
 
         $complicatedString = ("2Sám7:4-5a.12-14a.16;Zs88,2-29;2Kor4:13a.14b-5:1b.6-8.7|2,3.4-5,6.7-12");
         $this->assertEquals("2Sám 7,4-5a.12-14a.16; Zs 88,2-29; 2Kor 4,13a.14b-5,1b.6-8.7|2,3.4-5,6.7-12", CanonicalReference::fromString($complicatedString)->toString());
