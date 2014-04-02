@@ -12,10 +12,6 @@ class CanonicalReference {
      */
     public $bookRefs;
 
-    public function getCode() {
-        $code = "{$this->bookAbbrev}";
-    }
-
     public static function fromString($s) {
         $ref = new CanonicalReference();
         $parser = new ReferenceParser($s);
