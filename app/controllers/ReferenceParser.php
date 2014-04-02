@@ -109,7 +109,7 @@ class ReferenceParser {
     }
 
     public function chapterRef() {
-        $chapterRef = new ChapterRef($this->chapterOrVerseId());
+        $chapterRef = new ChapterRef($this->chapterId());
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR) {
             $this->lexer->moveNext();
             $this->lexer->moveNext();
@@ -118,7 +118,7 @@ class ReferenceParser {
         return $chapterRef;
     }
 
-    public function chapterOrVerseId() {
+    public function chapterId() {
         $token = $this->lexer->lookahead;
         $chapterId = $token['value'];
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_TEXT) {
@@ -156,12 +156,22 @@ class ReferenceParser {
     }
 
     public function verseRef() {
-        $ref = new VerseRef($this->chapterOrVerseId());
+        $ref = new VerseRef($this->verseId());
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_TEXT) {
+            $this->lexer->moveNext();
+            $ref->versePart = $this->lexer->lookahead['value'];
+        }
+
         return $ref;
     }
 
+    public function verseId() {
+        $token = $this->lexer->lookahead;
+        $verseId = $token['value'];
+        return $verseId;
+    }
 
-    private function pushState($state) {
+        private function pushState($state) {
         array_push($this->stateStack, $state);
     }
 }
@@ -262,13 +272,14 @@ class VerseRange {
 
 class VerseRef {
     public $verseId;
+    public $versePart;
 
     function __construct($verseId) {
         $this->verseId = $verseId;
     }
 
     public function toString() {
-        return $this->verseId;
+        return $this->verseId.$this->versePart;
     }
 
 }
