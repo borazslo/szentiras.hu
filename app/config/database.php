@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 	'fetch' => PDO::FETCH_CLASS,
 	'default' => 'bible',
 	'connections' => array(
@@ -17,4 +17,4 @@ return array(
 	),
 
 	'migrations' => 'migrations',
-);
+];

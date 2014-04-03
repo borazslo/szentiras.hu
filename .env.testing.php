@@ -1,5 +1,5 @@
 <?php
 
-return array(
+return [
     'MYSQL_SZENTIRAS_USER' => 'root',
-);
+];
