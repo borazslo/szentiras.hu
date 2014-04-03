@@ -1,17 +1,26 @@
 language: php
+
 php:
-- 5.4
+  - 5.4
+
 before_script:
-- php composer.phar install
+  - php composer.phar install
+
 script:
-- phpunit --configuration phpunit.xml
+  - phpunit --configuration phpunit.xml
+
 after_success:
-- echo -n $id_rsa_{00..30} >> ~/.ssh/id_rsa_base64
-- base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
-- chmod 600 ~/.ssh/id_rsa
-- echo -e "Host szentiras.hu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-- git remote add deploy szentiras_hu_git@szentiras.hu:/home/szentiras_hu_git/github/borazslo/szentiras.hu.git
-- git push --all deploy
+  - echo -n $id_rsa_{00..30} >> ~/.ssh/id_rsa_base64
+  - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
+  - chmod 600 ~/.ssh/id_rsa
+  - echo -e "Host szentiras.hu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - git remote add deploy szentiras_hu_git@szentiras.hu:/home/szentiras_hu_git/github/borazslo/szentiras.hu.git
+  - git push --all deploy
+
+cache:
+  directories:
+    - vendor
+
 env:
   global:
   - secure: EMWhgRZT6WGhjmFlhw63hivKAr1zq3MfW4TNErwer8XAllXTWuV+T1KSb+1aNsH4JG34Y4KOn20mGBLEG29WiZ0k8dx99afnlJtw5xY76vHfTT+RvST9MFLo17mlthdIu40MIxnyMKUVgS4y0kohAUT7uFD+LTWjx0G0V8QVF4w=

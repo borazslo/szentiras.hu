@@ -1,3 +1,12 @@
 #!/bin/sh
-cd /home/szentiras_hu_git/github/borazslo/szentiras.hu
-php artisan down
+echo Shutting down the app
+cd /home/szentiras_hu_git/github/borazslo/
+if [ ! -f szentiras.hu ]
+then
+  git clone szentiras.hu.git
+fi
+cd szentiras.hu
+if [ -f composer.lock ]
+then
+    php artisan down
+fi

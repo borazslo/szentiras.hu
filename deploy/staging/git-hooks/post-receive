@@ -1,6 +1,10 @@
-#!/bin/sh
-cd /home/szentiras_hu_git/github/borazslo/szentiras.hu
-git checkout -f
+#!/bin/bash
+echo Updating deployment
+DIR=/home/szentiras_hu_git/github/borazslo/szentiras.hu
+cd $DIR
+unset GIT_DIR
+git checkout mvc
+git pull
 php composer.phar update
 php composer.phar install
 php artisan up
