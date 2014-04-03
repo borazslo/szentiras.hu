@@ -1,7 +1,7 @@
 #!/bin/sh
 echo Shutting down the app
 cd /home/szentiras_hu_git/github/borazslo/
-if [ ! -f szentiras.hu ]
+if [ ! -d szentiras.hu ]
 then
   git clone szentiras.hu.git
 fi

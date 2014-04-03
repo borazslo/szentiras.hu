@@ -2,6 +2,7 @@
 echo Updating deployment
 DIR=/home/szentiras_hu_git/github/borazslo/szentiras.hu
 cd $DIR
+echo $PWD
 unset GIT_DIR
 git checkout mvc
 git pull
