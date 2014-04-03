@@ -4,7 +4,7 @@ php:
 before_script:
 - php composer.phar install
 script:
-- phpunit --configuration phpunitn.xml
+- phpunit --configuration phpunit.xml
 after_success:
 - echo -n $id_rsa_{00..30} >> ~/.ssh/id_rsa_base64
 - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
