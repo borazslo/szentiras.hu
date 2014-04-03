@@ -1,6 +1,6 @@
 <?php
 
-require('views/Composers/viewComposers.php');
+require('./views/Composers/viewComposers.php');
 
 Route::get('/', "SzentirasHu\\Controllers\\Home\\HomeController@index");
 
