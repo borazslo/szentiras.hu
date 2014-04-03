@@ -1,5 +1,7 @@
 <?php
 
+use SzentirasHu\Lib\Reference\CanonicalReference;
+
 class CanonicalReferenceTest extends TestCase {
 
     public function testCanonicalBookString() {

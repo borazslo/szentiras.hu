@@ -1,5 +1,6 @@
 <?php
 
+use SzentirasHu\Controllers\Home\LectureSelector;
 
 class LectureSelectorTest extends TestCase {
 
@@ -13,14 +14,14 @@ class LectureSelectorTest extends TestCase {
 
     public function testEmpty() {
         $this->downloader->shouldReceive('getReferenceString')->andReturn("");
-        $selector = new LectureSelector("20140403");
+        $selector = new LectureSelector();
         $lectures = $selector->getLectures();
         $this->assertEmpty($lectures);
     }
 
     public function testSimple() {
         $this->downloader->shouldReceive('getReferenceString')->andReturn('1Ter 4,5; 1Jn 2-3');
-        $selector = new LectureSelector("");
+        $selector = new LectureSelector();
         $lectures = $selector->getLectures();
         $this->assertCount(2, $lectures);
     }

@@ -1,5 +1,7 @@
 <?php
 
+namespace SzentirasHu\Controllers\Search;
+
 /**
  * Description of SearchForm
  *

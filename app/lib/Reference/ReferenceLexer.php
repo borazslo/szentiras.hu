@@ -1,6 +1,10 @@
 <?php
 
-class ReferenceLexer extends AbstractLexer{
+namespace SzentirasHu\lib\Reference;
+
+use SzentirasHu\Lib\Reference\AbstractLexer;
+
+class ReferenceLexer extends AbstractLexer {
 
     const T_CHAPTER_VERSE_SEPARATOR = 1;
     const T_VERSE_RANGE_SEPARATOR = 2;
@@ -19,8 +23,7 @@ class ReferenceLexer extends AbstractLexer{
      *
      * @return array
      */
-    protected function getCatchablePatterns()
-    {
+    protected function getCatchablePatterns() {
         return [
             '\d+',
             '\p{L}+',
@@ -33,9 +36,8 @@ class ReferenceLexer extends AbstractLexer{
      *
      * @return array
      */
-    protected function getNonCatchablePatterns()
-    {
-        return array('\s+','(.)');
+    protected function getNonCatchablePatterns() {
+        return array('\s+', '(.)');
     }
 
     /**
@@ -44,19 +46,24 @@ class ReferenceLexer extends AbstractLexer{
      * @param string $value
      * @return integer
      */
-    protected function getType(&$value)
-    {
+    protected function getType(&$value) {
         if (is_numeric($value)) {
             return self::T_NUMERIC;
         } else {
             switch ($value) {
                 case ',' :
-                case ':' : return self::T_CHAPTER_VERSE_SEPARATOR;
-                case '.' : return self::T_VERSE_RANGE_SEPARATOR;
-                case '-' : return self::T_RANGE_OPERATOR;
-                case ';' : return self::T_BOOK_SEPARATOR;
-                case '|' : return self::T_CHAPTER_RANGE_SEPARATOR;
-                default: return self::T_TEXT;
+                case ':' :
+                    return self::T_CHAPTER_VERSE_SEPARATOR;
+                case '.' :
+                    return self::T_VERSE_RANGE_SEPARATOR;
+                case '-' :
+                    return self::T_RANGE_OPERATOR;
+                case ';' :
+                    return self::T_BOOK_SEPARATOR;
+                case '|' :
+                    return self::T_CHAPTER_RANGE_SEPARATOR;
+                default:
+                    return self::T_TEXT;
             }
         }
     }

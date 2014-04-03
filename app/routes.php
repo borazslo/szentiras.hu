@@ -1,8 +1,8 @@
 <?php
 
-require('views/composers/viewComposers.php');
+require('views/Composers/viewComposers.php');
 
-Route::get('/', "HomeController@index");
+Route::get('/', "SzentirasHu\\Controllers\\Home\\HomeController@index");
 
 Route::resource("search", "SearchController");
 

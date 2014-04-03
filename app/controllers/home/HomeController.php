@@ -1,5 +1,11 @@
 <?php
 
+namespace SzentirasHu\Controllers\Home;
+
+use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Models\Entities\News;
+use SzentirasHu\Models\Entities\Translation;
+
 class Lecture {
     public $link;
     public $extLinks = array();
@@ -14,26 +20,6 @@ class ExtLink {
     public $label;
 }
 
-class LectureDownloader {
-
-    public $date;
-
-    public function __construct($date) {
-        $this->date = $date;
-    }
-
-    public function getReferenceString() {
-        $fn2 = "http://katolikus.hu/igenaptar/{$this->date}.html";
-        try {
-            $text = file_get_contents($fn2);
-            preg_match('/<!-- helyek:(.*)-->/', $text, $places);
-            $referenceString = isset($places[1]) ? trim($places[1]) : '';
-            return $referenceString;
-        } catch (Exception $e) {
-            return null;
-        }
-    }
-}
 
 class LectureSelector {
 
@@ -46,7 +32,7 @@ class LectureSelector {
     public function getLectures() {
         $resultLectures = array();
 
-        $lectureDownloader = App::make('LectureDownloader', [ $this->date ]);
+        $lectureDownloader = \App::make('SzentirasHu\Lib\LectureDownloader', [ $this->date ]);
         $referenceString = $lectureDownloader->getReferenceString();
         if (!$referenceString) {
             return $resultLectures;
@@ -117,17 +103,17 @@ class LectureSelector {
  * Controller for the home page.
  * Note that many parts on the home view are coming from view composers.
  */
-class HomeController extends BaseController {
+class HomeController extends \BaseController {
 
     public function index() {
-        return View::make("home", array(
+        return \View::make("home", [
             'news' => News::where('frontpage', '1')->orderBy('date', 'desc')->get(),
             'pageTitle' => 'Fordítások | Szentírás',
             'title' => 'Katolikus bibliafordítások',
             'cathBibles' => Translation::getByDenom('katolikus'),
             'otherBibles' => Translation::getByDenom('protestáns'),
             'olvasmanyok' => (new LectureSelector())->getLectures()
-        ));
+        ]);
     }
 
 }

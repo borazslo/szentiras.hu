@@ -4,4 +4,4 @@
  * 
  */
 
-View::composer('menu', '\MenuComposer');
+View::composer('menu', '\SzentirasHu\Views\Composers\MenuComposer');

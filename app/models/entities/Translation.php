@@ -1,5 +1,8 @@
 <?php
 
+namespace SzentirasHu\Models\Entities;
+use Eloquent;
+
 /**
  * Domain object representing a translation.
  *

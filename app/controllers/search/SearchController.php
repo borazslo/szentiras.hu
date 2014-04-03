@@ -1,11 +1,11 @@
-<?php
+<?php namespace SzentirasHu\Controller\Search;
 
 /**
  * Controller for searching. Based on REST conventions.
  *
  * @author berti
  */
-class SearchController extends BaseController {
+class SearchController extends \BaseController {
 
     public function index() {
         return View::make("search", array("searchForm" => new SearchForm()));

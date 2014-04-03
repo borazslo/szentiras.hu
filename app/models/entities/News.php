@@ -1,5 +1,8 @@
 <?php
 
+namespace SzentirasHu\Models\Entities;
+use Eloquent;
+
 /**
  * Model for News
  *

@@ -1,5 +1,7 @@
 <?php
 
+namespace SzentirasHu\Lib\Reference;
+
 /**
  * Examples of possible formats:
  * - 1Kor - full book
@@ -171,7 +173,7 @@ class ReferenceParser {
         return $verseId;
     }
 
-        private function pushState($state) {
+    private function pushState($state) {
         array_push($this->stateStack, $state);
     }
 }
@@ -279,7 +281,6 @@ class VerseRef {
     }
 
     public function toString() {
-        return $this->verseId.$this->versePart;
+        return $this->verseId . $this->versePart;
     }
-
 }
