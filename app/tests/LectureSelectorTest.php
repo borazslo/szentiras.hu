@@ -8,8 +8,8 @@ class LectureSelectorTest extends TestCase {
 
     public function setUp() {
         parent::setUp();
-        $this->downloader = Mockery::mock('LectureDownloader');
-        $this->app->instance('LectureDownloader', $this->downloader);
+        $this->downloader = Mockery::mock('SzentirasHu\Lib\LectureDownloader');
+        $this->app->instance('SzentirasHu\Lib\LectureDownloader', $this->downloader);
     }
 
     public function testEmpty() {
