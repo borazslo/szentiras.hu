@@ -1,4 +1,4 @@
-nlanguage: php
+language: php
 php:
 - 5.4
 before_script:
