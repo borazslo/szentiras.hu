@@ -1,0 +1,6 @@
+#!/bin/sh
+cd /home/szentiras_hu_git/github/borazslo/szentiras.hu
+git checkout -f
+php composer.phar update
+php composer.phar install
+php artisan up

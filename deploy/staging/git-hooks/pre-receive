@@ -1,0 +1,3 @@
+#!/bin/sh
+cd /home/szentiras_hu_git/github/borazslo/szentiras.hu
+php artisan down
