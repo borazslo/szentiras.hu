@@ -10,7 +10,7 @@ after_success:
 - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
 - chmod 600 ~/.ssh/id_rsa
 - echo -e "Host szentiras.hu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-- git remote add deploy szentiras_hu_git@szentiras.hu:/home/szentiras_hu_git/github/borazslo/szentiras.hu
+- git remote add deploy szentiras_hu_git@szentiras.hu:/home/szentiras_hu_git/github/borazslo/szentiras.hu.git
 - git push --all deploy
 env:
   global:
