@@ -6,6 +6,8 @@ echo $PWD
 unset GIT_DIR
 git checkout mvc
 git pull
+export MYSQL_SZENTIRAS_USER=
+export MYSQL_SZENTIRAS_PASSWORD=
 export SZENTIRAS_WEBAPP_ENVIRONMENT=staging
 php composer.phar update
 php composer.phar install
