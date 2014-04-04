@@ -11,7 +11,7 @@ use Eloquent;
 class BookAbbrev extends Eloquent {
 
     public function books() {
-        return $this->belongsTo('SzentirasHu\\Models\\Entities\\Book','bookId');
+        return $this->belongsTo('SzentirasHu\\Models\\Entities\\Book');
     }
     
 }

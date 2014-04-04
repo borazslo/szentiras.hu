@@ -1,6 +1,7 @@
 <?php
 
 namespace SzentirasHu\Lib\Reference;
+
 use SzentirasHu\Models\Entities\BookAbbrev;
 
 /**
@@ -8,14 +9,16 @@ use SzentirasHu\Models\Entities\BookAbbrev;
  * This reference is agnostic of translations, uses the primary
  *
  */
-class CanonicalReference {
+class CanonicalReference
+{
 
     /**
      * @var BookRef[]
      */
     public $bookRefs;
 
-    public static function fromString($s) {
+    public static function fromString($s)
+    {
         $ref = new CanonicalReference();
         $parser = new ReferenceParser($s);
         $bookRefs = $parser->bookRefs();
@@ -23,13 +26,14 @@ class CanonicalReference {
         return $ref;
     }
 
-    public function toString() {
+    public function toString()
+    {
         $s = '';
         $lastBook = end($this->bookRefs);
         foreach ($this->bookRefs as $bookRef) {
-            $s.=$bookRef->toString();
+            $s .= $bookRef->toString();
             if ($lastBook !== $bookRef) {
-                $s.="; ";
+                $s .= "; ";
             }
         }
         return $s;
@@ -42,12 +46,13 @@ class CanonicalReference {
      *
      * @return BookRef
      */
-    public static function toTranslated(BookRef $bookRef, $translationId) {
+    public static function toTranslated(BookRef $bookRef, $translationId)
+    {
         $abbrev = BookAbbrev::where('abbrev', $bookRef->bookId)->first();
         if (!$abbrev) {
             \Log::warning("Book abbrev not found in database: {$abbrev}");
         }
-        $book = $abbrev->books()->first();
+        $book = $abbrev->books()->where('translation_id', $translationId)->first();
 
         $bookRef = new BookRef($book->abbrev);
         return $bookRef;
