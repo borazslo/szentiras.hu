@@ -9,7 +9,7 @@ git pull
 export MYSQL_SZENTIRAS_USER=
 export MYSQL_SZENTIRAS_PASSWORD=
 export SZENTIRAS_WEBAPP_ENVIRONMENT=staging
-php composer.phar update
+# only install is needed, as dependency versions should be locked
 php composer.phar install
 php artisan migrate
 php artisan up
