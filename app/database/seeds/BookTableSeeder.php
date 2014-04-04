@@ -15,6 +15,13 @@ class BookTableSeeder extends Seeder
         $book->id = 104;
         $book->translation()->associate($translation);
         $book->save();
+
+        $book = new \SzentirasHu\Models\Entities\Book();
+        $book->abbrev = "Ter";
+        $book->id = 101;
+        $book->translation()->associate($translation);
+        $book->save();
+
     }
 
 

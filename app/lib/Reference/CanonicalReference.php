@@ -17,6 +17,10 @@ class CanonicalReference
      */
     public $bookRefs;
 
+    public function __construct($bookRefs = []) {
+        $this->bookRefs = $bookRefs;
+    }
+
     public static function fromString($s)
     {
         $ref = new CanonicalReference();
@@ -46,16 +50,30 @@ class CanonicalReference
      *
      * @return BookRef
      */
-    public static function toTranslated(BookRef $bookRef, $translationId)
+    public static function translateBookRef(BookRef $bookRef, $translationId)
     {
+        $result = $bookRef;
+
         $abbrev = BookAbbrev::where('abbrev', $bookRef->bookId)->first();
         if (!$abbrev) {
             \Log::warning("Book abbrev not found in database: {$abbrev}");
+        } else {
+            $book = $abbrev->books()->where('translation_id', $translationId)->first();
+            if ($book) {
+                $result = new BookRef($book->abbrev);
+                $result->chapterRanges = $bookRef->chapterRanges;
+            } else {
+                \Log::warning("Book not found in database: abbrev: {$abbrev->abbrev}, book id: {$abbrev->books_id}");
+            }
         }
-        $book = $abbrev->books()->where('translation_id', $translationId)->first();
+        return $result;
+    }
 
-        $bookRef = new BookRef($book->abbrev);
-        return $bookRef;
+    public function toTranslated($translationId) {
+        $bookRefs = array_map(function($bookRef) use ($translationId) {
+           return self::translateBookRef($bookRef, $translationId);
+        }, $this->bookRefs);
+        return new CanonicalReference($bookRefs);
     }
 
 }

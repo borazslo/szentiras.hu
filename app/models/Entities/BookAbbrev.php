@@ -6,6 +6,8 @@ use Eloquent;
 /**
  * Model for possible book abbreviations. They can represent bad abbreviations as well.
  *
+ * @property books_id
+ * @property abbrev
  * @author berti
  */
 class BookAbbrev extends Eloquent {
