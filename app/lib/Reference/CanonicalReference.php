@@ -1,7 +1,7 @@
 <?php
 
 namespace SzentirasHu\Lib\Reference;
-use SzentirasHu\Models\Entities\Translation;
+use SzentirasHu\Models\Entities\BookAbbrev;
 
 /**
  * Class CanonicalReference to represent a unique reference to some Bible verses.
@@ -39,10 +39,18 @@ class CanonicalReference {
      *
      * Takes a bookref and get an other bookref according
      * to the given translation.
+     *
+     * @return BookRef
      */
     public static function toTranslated(BookRef $bookRef, $translationId) {
+        $abbrev = BookAbbrev::where('abbrev', $bookRef->bookId)->first();
+        if (!$abbrev) {
+            \Log::warning("Book abbrev not found in database: {$abbrev}");
+        }
+        $book = $abbrev->books()->first();
 
-       return null;
+        $bookRef = new BookRef($book->abbrev);
+        return $bookRef;
     }
 
 }

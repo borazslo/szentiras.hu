@@ -139,5 +139,12 @@ class CanonicalReferenceTest extends TestCase {
         $this->assertEquals("2Sám 7,4-5a.12-14a.16; Zs 88,2-29; 2Kor 4,13a.14b-5,1b.6-8.7|2,3.4-5,6.7-12", CanonicalReference::fromString($complicatedString)->toString());
     }
 
+    public function testTranslatedBookId() {
+        $bookRef = CanonicalReference::fromString("Szamok")->bookRefs[0];
+        $translatedRef = CanonicalReference::toTranslated($bookRef, 1);
+        $this->assertEquals("Szám", $translatedRef->bookId);
+
+    }
+
 }
  

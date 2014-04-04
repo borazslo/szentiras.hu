@@ -9,11 +9,9 @@ use Eloquent;
  * @author berti
  */
 class BookAbbrev extends Eloquent {
-    
-    protected $table = "tdbook_hibas";
 
-    public function book() {
-        return $this->belongsTo('Book','id');
+    public function books() {
+        return $this->belongsTo('SzentirasHu\\Models\\Entities\\Book','bookId');
     }
     
 }

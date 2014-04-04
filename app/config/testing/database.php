@@ -3,7 +3,7 @@
 return [
     'connections' => [
         'bible' => [
-            'prefix'    => 'staging_'
+            'prefix'    => 'testing_'
         ],
     ],
 
