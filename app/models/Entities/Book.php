@@ -6,6 +6,8 @@ use Eloquent;
 /**
  * Description of Book
  *
+ * @property string abbrev
+ * @property int id
  * @author berti
  */
 class Book extends Eloquent {

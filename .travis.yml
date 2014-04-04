@@ -6,7 +6,8 @@ php:
 before_script:
   - mysql -e 'create database bible;'
   - php composer.phar install
-  - php artisan migrate --seed
+# migrate needs environment specification
+  - php artisan migrate --seed --env=testing
 
 script:
   - phpunit --configuration phpunit.xml
