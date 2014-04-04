@@ -1,9 +1,11 @@
 <?php
 
 namespace SzentirasHu\Lib\Reference;
+use SzentirasHu\Models\Entities\Translation;
 
 /**
  * Class CanonicalReference to represent a unique reference to some Bible verses.
+ * This reference is agnostic of translations, uses the primary
  *
  */
 class CanonicalReference {
@@ -31,6 +33,16 @@ class CanonicalReference {
             }
         }
         return $s;
+    }
+
+    /**
+     *
+     * Takes a bookref and get an other bookref according
+     * to the given translation.
+     */
+    public static function toTranslated(BookRef $bookRef, $translationId) {
+
+       return null;
     }
 
 }
