@@ -29,10 +29,7 @@
 <p class="alcim">
     @foreach($olvasmanyok as $key => $olvasmany)
 <div style='height:20px'>
-    @if ($olvasmany->link != '')
     <a href='{{ $olvasmany->link }}' class='link'>{{ $olvasmany->ref }}</a>
-    @else {{$olvasmany->ref}}
-    @endif
     <div style='float:right;margin-top:-30px'>
         @foreach ($olvasmany->extLinks as $extLink)
         <a href="{{ $extLink->url }}" title="{{ $extLink->title }}" class="button minilink"> {{ $extLink->label }}</a>

@@ -17,7 +17,7 @@ class CreateBookAbbrevTable extends Migration {
 		{
 			$table->increments('id');
             $table->string("abbrev");
-            $table->tinyInteger("bookId");
+            $table->unsignedInteger("bookId");
         });
         Log::info("Insert data...");
         $migrationsPath = app_path('database/migrations');

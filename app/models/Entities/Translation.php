@@ -11,7 +11,7 @@ use Eloquent;
 class Translation extends Eloquent {
 
     public static function getByDenom($denom = false) {
-        $q  = $denom ? Translation::where('denom', 'katolikus') : Translation::all();
+        $q  = $denom ? Translation::where('denom', $denom) : Translation::all();
         return $q->orderBy('denom')->orderBy('name')->get();
     }
     

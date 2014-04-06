@@ -13,7 +13,7 @@ class MigrateTdbook extends Migration
         if (Schema::hasTable('tdbook')) {
             $prefix= Config::get('database.connections.bible.prefix');
             DB::insert("
-            INSERT INTO {$prefix}books (`id`, `translation_id`, `name`, `abbrev`, link, created_at, updated_at)
+            INSERT INTO {$prefix}books (`id`, `translation_id`, `name`, `abbrev`, `link`, `created_at`, `updated_at`)
             SELECT `id`, `trans`, `name`, `abbrev`, `url`, now(), now() FROM {$prefix}tdbook
             ");
         } else {

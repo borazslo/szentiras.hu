@@ -3,6 +3,7 @@
 namespace SzentirasHu\Controllers\Home;
 
 use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\News;
 use SzentirasHu\Models\Entities\Translation;
 
@@ -38,19 +39,21 @@ class LectureSelector {
             return $resultLectures;
         }
 
-        $references = CanonicalReference::fromString($referenceString)->bookRefs;
+        $defaultTranslationId = 3;
+        $translationId = $defaultTranslationId;
+        $bookRefs = CanonicalReference::fromString($referenceString)->toTranslated($translationId)->bookRefs;
 
-        foreach ($references as $reference) {
+        foreach ($bookRefs as $bookRef) {
             // extract and convert Psalm numbering
-            if (preg_match('/Zs.*/', $reference->bookId, $matches)) {
-                $vulgataNum = $reference->chapterRanges[0]->chapterRef->chapterId;
-                $reference->chapterRanges[0]->chapterRef->chapterId = $this->getHebrewPsalmNum($vulgataNum);
+            if (preg_match('/Zs.*/', $bookRef->bookId, $matches)) {
+                $vulgataNum = $bookRef->chapterRanges[0]->chapterRef->chapterId;
+                $bookRef->chapterRanges[0]->chapterRef->chapterId = $this->getHebrewPsalmNum($vulgataNum);
             }
             $lecture = new Lecture();
-            $lecture->ref = $reference->toString();
-            $lecture->link = '';
-            $lecture->translationId = '';
-            $lecture->bookAbbrev = $reference->bookId;
+            $lecture->ref = $bookRef->toString();
+            $lecture->link = str_replace(' ', '', $lecture->ref);
+            $lecture->translationId = $translationId;
+            $lecture->bookAbbrev = $bookRef->bookId;
 
             $extLinks = array();
 
