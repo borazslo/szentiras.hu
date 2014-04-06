@@ -28,7 +28,7 @@ class CreateBooksTable extends Migration
         });
 
 		Schema::create('books', function (Blueprint $table) {
-            $table->tinyInteger('id');
+            $table->tinyInteger('id')->unsigned();
             $table->timestamps();
             $table->unsignedInteger('translation_id')->foreign('translation_id')->references('id')->on('translations');
             $table->primary(['id', 'translation_id']);
