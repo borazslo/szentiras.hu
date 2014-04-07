@@ -7,7 +7,7 @@ class SmokeTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function testBasicExample()
+	public function testBasicHomePage()
 	{
 		$crawler = $this->client->request('GET', '/');
 

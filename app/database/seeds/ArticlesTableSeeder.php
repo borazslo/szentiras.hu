@@ -10,6 +10,7 @@ class ArticlesTableSeeder extends Seeder
         $article->text = 'Front page article text';
         $article->publish_date = '2014-01-01';
         $article->save();
+        
     }
 }
 

@@ -1,50 +1,22 @@
 Szentírás .hu
 ========
 
-A [szentiras.hu](http://szentiras.hu) teljes kódja. 
+A [szentiras.hu](http://szentiras.hu) teljes kódja.
 
-A régi kereszteny.hu/biblia átvételével egyre sajátosodó össze-vissza programozott valami.
-Minden az index.php-n kereszül megy. 
-Nem CMS, de egy template.php-n keresztül megy a megjelenítés nem elhanyagolható része.
+[![Build Status](https://travis-ci.org/borazslo/szentiras.hu.png)](https://travis-ci.org/borazslo/szentiras.hu)
 
 #Felépítés
 
+## Framework
+A Laravel keretrendszert használjuk.
+
 ###Könyvtár struktúra
-- **cache** - az egresszív cache file-ok tárolására (*cron* ürítgeti)
-- **css** - responsive miatt vannak használatlanok
-- **img** - a sminkben használt képek (egy része talán nem használt)
-- **include** - külső, máshonnan szerzett php és egyéb cuccok (részletek lennebb)
-- **info** - valamiért kellett, hogy a [/info](http://szentiras.hu/info) működjön :(
-- **js** - a scriptecskék és szemeteik
-- **tmp** - *importer* és *ebook* használja + db backup/schema/sample (üríthető alkalmanként)
-
-###A függvények főbb helyei:
-- **quote.php** - `isquotation()`, `print_quotation()`, `quotation()` - vagyis, hogy mikor idézet hivatkozás valami és azt rakja össze, hogy milyen versek vannak benne
-- **biblefunc.php** -  főként az eredeti réges-régi biblia honlap függvényei. részben átdolgozva, de itt maradtak részben csak szemét. + mysql db függvények (a nem elegáns régiek)
-- **func.php** - újabb search függvények (simpleverse, rootverse, search, resultorder, addresults, searchsimple, dbsearchtext) és egyebek getnews() (főoldalra hírek), class menu, url(), redirect függvények (hosszú ill rövid url-ek alakítgatás és értelmezése). általában tisztességes leírással
-
-###Az adatbázisról még
-- **dropbox_oauth_tokens** -> dropboxban xlsx-ben vannak az szövegforrások, onnan frissítünk néha. ezt tudják a szöveggondozók kezelni
-- **igenaptar** -> nem üzemel, törölhető (az bencés igenaptárat tudom ide importálni és van egy kísérleti igenaptar mappám, ahol ez megnyitható, szerkeszthető)
-- **news** -> hírek a címlapon ill. talán info fileban is.
-- **stats_search** -> keresési statisztikák, a keresési tippek és a cache alapja
-- **stats_texttosearch** -> teljes keresési talán szinte log féle
-- **szinonmiak** -> szinoníma és alternatív lista kézzel összeállítva. néha 0/1/2/3-al jelölve, hogy melyik fordításban melyik a használatos
-- **tdbook** -> könyvek listája
-- **tdbook_hibas** -> hibás könyvrövidítések gyűjteménye, hogy kezelni tudjuk
-- **tdtrans** -> a fordítások listája. a fordításra általában `$reftrans`, vagy `$transid`-vel hivatkounk
-- **tdverse** -> a nagyon-nagyon okos végtelen vers és fejezetcím tábla, nem minden oszlop van használatban, csak az átalakításoknál benne marad
-- **vars** -> különféle beállítások változó a `getvars()` és `setvars()` saját függvényeknek. Minél több minden idekerül, hogy könnyen lehessen állítani. Pl. hogy mi mikor volt utoljára update és update közben - mert az hosszú néha - "frissítünk" felirat jelenik meg a honlap tetején
-
-###Külső programok és scriptek (elérgetőséggel)
-- *importer* - [include/Dropbox-master](https://github.com/BenTheDesigner/Dropbox)
-- *importer* - [include/excel_reader2.php](http://code.google.com/p/php-excel-reader)
-- *importer* - [include/PHPExcel-develop](http://www.codeplex.com/PHPExcel)
-- *api* - [include/JSON.php](http://mike.teczno.com/JSON/JSON.phps)
-- *ebook* - [include/epub/EPub.php](http://www.phpclasses.org/package/6115)
-- *ebook* - [include/php-ga-1.1.1](http://code.google.com/p/php-ga)
-- *ebook* - [../kindlegen](http://www.amazon.com/gp/feature.html?docId=1000765211)
-- *search* - [hunspell](http://hunspell.sourceforge.net/)
+- **app** - Maga a webalkalmazás.
+- **bootstrap** - Framework beizzítás
+- **deploy** - deployment konfigurációk és scriptek (apache, git hook stb.)
+- **old** - a régi, össze-vissza programozott szentiras.hu kódja
+- **public** - a közvetlenül kiszolgált fájlok, az index.php, css, js és hasonlók
+- **tmp** - tesztadatbázis-példa
 
 #Alapvető funkciók
 
