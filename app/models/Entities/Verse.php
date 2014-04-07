@@ -11,17 +11,14 @@ use Eloquent;
 class Verse extends Eloquent {
     
     protected $table = 'tdverse';
+    public $timestamps = false;
     
-    public function book() {
-        return $this->belongsTo('Book', 'book');
+    public function books() {
+        return $this->belongsTo('SzentirasHu\Models\Entities\Book', 'book');
     }
     
     public function translation() {
-        return $this->belongsTo('Translation','trans');
+        return $this->belongsTo('SzentirasHu\Models\Entities\Translation','trans');
     }
-    
-    public function getGepiAttribute($value) {
-        return $value;
-    }
-    
+
 }

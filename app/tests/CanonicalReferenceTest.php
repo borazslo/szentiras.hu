@@ -140,16 +140,16 @@ class CanonicalReferenceTest extends TestCase {
     }
 
     public function testTranslatedBookId() {
-        $ref = CanonicalReference::fromString("Szamok");
+        $ref = CanonicalReference::fromString("2Moz");
         $translatedRef = $ref->toTranslated(1);
-        $this->assertEquals("Szám", $translatedRef->bookRefs[0]->bookId);
+        $this->assertEquals("Kiv", $translatedRef->bookRefs[0]->bookId);
 
-        $ref = CanonicalReference::fromString("Szamok 2:3.4-5; 1Moz 4,5-6,12");
+        $ref = CanonicalReference::fromString("Kivonulas 2:3.4-5; 1Moz 4,5-6,12");
         $translatedRef = $ref->toTranslated(1);
-        $this->assertEquals("Szám", $translatedRef->bookRefs[0]->bookId);
+        $this->assertEquals("Kiv", $translatedRef->bookRefs[0]->bookId);
         $this->assertEquals("Ter", $translatedRef->bookRefs[1]->bookId);
 
-        $this->assertEquals("Szám 2,3.4-5; Ter 4,5-6,12", $translatedRef->toString());
+        $this->assertEquals("Kiv 2,3.4-5; Ter 4,5-6,12", $translatedRef->toString());
     }
     
     public function isValidBookRef() {
