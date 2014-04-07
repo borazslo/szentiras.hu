@@ -150,7 +150,24 @@ class CanonicalReferenceTest extends TestCase {
         $this->assertEquals("Ter", $translatedRef->bookRefs[1]->bookId);
 
         $this->assertEquals("Szám 2,3.4-5; Ter 4,5-6,12", $translatedRef->toString());
+    }
+    
+    public function isValidBookRef() {
+        $this->assertTrue(CanonicalReference::isValid("Jn 3,2-5"));
+        $this->assertFalse(CanonicalReference::isValid("Jn 3,2,5"));
+        $this->assertFalse(CanonicalReference::isValid("Jn 3,2-5,,"));
+        $this->assertFalse(CanonicalReference::isValid("Jn 3,2-5.-6"));
+        
+        $this->assertTrue(CanonicalReference::isValid("9Sira 10,2-5"));
+        $this->assertFalse(CanonicalReference::isValid("Jn3"));
 
+    }
+    
+    public function testIsExistingBookRef() {
+        // $this->assertTrue(CanonicalReference::isExistingBookRef('Szám 2,3.4-5'));
+        //this->assertTrue(CanonicalReference::fromString('1Moz 2,3.4-5')->isExistingBookRef());
+        //this->assertFalse(CanonicalReference::fromString('999')->isExistingBookRef());
+        //this->assertFalse(CanonicalReference::fromString('ne félj')->isExistingBookRef());
     }
 
 }

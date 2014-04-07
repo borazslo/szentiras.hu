@@ -19,7 +19,7 @@ class MenuComposer
         
         foreach ($translations as $translation) {
             $translationTitle = $translation['name']." (".$translation['abbrev'].")";
-            $translationUrl = "/biblia/${translation['abbrev']}";
+            $translationUrl = "/${translation['abbrev']}";
             $items[]  = [$translationTitle,$translationUrl];
         }
 

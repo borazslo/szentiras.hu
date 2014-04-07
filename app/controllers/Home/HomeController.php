@@ -39,8 +39,7 @@ class LectureSelector {
             return $resultLectures;
         }
 
-        $defaultTranslationId = 3;
-        $translationId = $defaultTranslationId;
+        $translationId = \Config::get('settings.defaultTranslationId');
         $bookRefs = CanonicalReference::fromString($referenceString)->toTranslated($translationId)->bookRefs;
 
         foreach ($bookRefs as $bookRef) {

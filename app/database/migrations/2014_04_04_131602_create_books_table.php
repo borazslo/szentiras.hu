@@ -27,7 +27,7 @@ class CreateBooksTable extends Migration
 
         });
 
-		Schema::create('books', function (Blueprint $table) {
+        Schema::create('books', function (Blueprint $table) {
             $table->tinyInteger('id')->unsigned();
             $table->timestamps();
             $table->unsignedInteger('translation_id')->foreign('translation_id')->references('id')->on('translations');
@@ -35,6 +35,7 @@ class CreateBooksTable extends Migration
             $table->string('name', 100);
             $table->string('abbrev', 10);
             $table->string('link', 10);
+            $table->boolean('old_testament');
         });
 	}
 

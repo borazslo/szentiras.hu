@@ -1,4 +1,6 @@
-<?php namespace SzentirasHu\Controller\Search;
+<?php namespace 
+
+SzentirasHu\Controllers\Search;
 
 /**
  * Controller for searching. Based on REST conventions.
@@ -8,13 +10,13 @@
 class SearchController extends \BaseController {
 
     public function index() {
-        return View::make("search", array("searchForm" => new SearchForm()));
+        return \View::make("search", array("searchForm" => new SearchForm()));
     }
         
     public function show($textToSearch) {
         $form = new SearchForm();
         $form->textToSearch = $textToSearch;
-        return View::make("search", array("searchForm" => $form, 
+        return \View::make("search", array("searchForm" => $form, 
             'pageTitle' => 'Szentírás | Keresés: '.$textToSearch));
     }
     

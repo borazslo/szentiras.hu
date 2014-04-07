@@ -43,6 +43,23 @@ class CanonicalReference
         return $s;
     }
 
+    private static function findStoredBookRef($bookRef, $translationId) {
+        $result = false;
+        $abbrev = BookAbbrev::where('abbrev', $bookRef->bookId)->first();
+        if (!$abbrev) {
+            \Log::debug("Book abbrev not found in database: {$abbrev}");
+        } else {
+            $book = $abbrev->books()->where('translation_id', $translationId)->first();
+            if ($book) {
+                $result = new BookRef($book->abbrev);
+                $result->chapterRanges = $bookRef->chapterRanges;
+            } else {
+                \Log::debug("Book not found in database: abbrev: {$abbrev->abbrev}, book id: {$abbrev->books_id}");
+            }
+        }
+        return $result;
+    }
+    
     /**
      *
      * Takes a bookref and get an other bookref according
@@ -52,21 +69,8 @@ class CanonicalReference
      */
     public static function translateBookRef(BookRef $bookRef, $translationId)
     {
-        $result = $bookRef;
-
-        $abbrev = BookAbbrev::where('abbrev', $bookRef->bookId)->first();
-        if (!$abbrev) {
-            \Log::warning("Book abbrev not found in database: {$abbrev}");
-        } else {
-            $book = $abbrev->books()->where('translation_id', $translationId)->first();
-            if ($book) {
-                $result = new BookRef($book->abbrev);
-                $result->chapterRanges = $bookRef->chapterRanges;
-            } else {
-                \Log::warning("Book not found in database: abbrev: {$abbrev->abbrev}, book id: {$abbrev->books_id}");
-            }
-        }
-        return $result;
+        $result = self::findStoredBookRef($bookRef, $translationId);
+        return $result ? $result : $bookRef;
     }
 
     public function toTranslated($translationId) {
@@ -74,6 +78,17 @@ class CanonicalReference
            return self::translateBookRef($bookRef, $translationId);
         }, $this->bookRefs);
         return new CanonicalReference($bookRefs);
+    }
+    
+    public static function isExistingBookRef($referenceString) {
+        $ref = self::fromString($referenceString);
+        $translationId=\Config::get("settings.defaultTranslationId");
+        return self::findStoredBookRef($ref->bookRefs[0], $translationId);
+    }
+    
+    public static function isValid($referenceString) {
+        $ref = self::fromString($referenceString);
+        return count($ref->bookRefs)>0;
     }
 
 }
