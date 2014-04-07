@@ -4,12 +4,10 @@ namespace SzentirasHu\Models\Entities;
 use Eloquent;
 
 /**
- * Model for News
+ * Model for articles
  *
  * @author berti
  */
-class News extends Eloquent {
-    
-    protected $table = 'news';
-    
+class Article extends Eloquent {
+       
 }

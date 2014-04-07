@@ -110,7 +110,7 @@ class HomeController extends \BaseController {
 
     public function index() {
         return \View::make("home", [
-            'news' => News::where('frontpage', '1')->orderBy('date', 'desc')->get(),
+            'news' => \SzentirasHu\Models\Entities\Article::where('frontpage', true)->orderBy('publish_date', 'desc')->get(),
             'pageTitle' => 'Fordítások | Szentírás',
             'title' => 'Katolikus bibliafordítások',
             'cathBibles' => Translation::getByDenom('katolikus'),
