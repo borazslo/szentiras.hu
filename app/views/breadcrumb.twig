@@ -1,0 +1,13 @@
+<h4>
+    {% if translation is defined %}
+        <a href="/{{ translation.abbrev }}">{{ translation.name }}</a>
+        {% if book is defined %}
+            <img src='/img/arrowright.jpg' alt='->' />
+            <a href="/{{ translation.abbrev }}/{{ book.abbrev }}">{{ book.name }}</a>
+            {% if chapter is defined %}
+                <img src='/img/arrowright.jpg' alt='->' />
+                <a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</h4>

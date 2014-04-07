@@ -1,1 +1,31 @@
 {% extends 'layout' %}
+
+{% block menu %}
+    {% include 'menu' %}
+{% endblock %}
+
+{% set pageTitle %}
+{{ translation.name }} | Szentírás
+{% endset %}
+
+{% macro bookLink(translation, book) %}
+    <a href="/{{ translation.abbrev }}/{{ book.abbrev }}" class="link">{{ book.name }}</a>
+    <br>
+{% endmacro %}
+
+{% import _self as temp %}
+
+{% block content %}
+    {% include 'breadcrumb' %}
+    {% include 'bookAbbrevList' with { 'translation' : translation } %}
+    <p class='kiscim'>Ószövetség</p>
+    {% for book in books if book.old_testament %}
+        {{ temp.bookLink(translation, book) }}
+    {% endfor %}
+
+    <p class='kiscim'>Újszövetség</p>
+    {% for book in books if not book.old_testament %}
+        {{ temp.bookLink(translation, book) }}
+    {% endfor %}
+
+{% endblock %}

@@ -4,7 +4,7 @@
     "license": "MIT",
     "require": {
         "laravel/framework": "4.1.*",
-        "rcrowe/twigbridge": "0.5.*",
+        "barryvdh/laravel-twigbridge": "dev-master",
         "twig/extensions": "1.0.*",
         "doctrine/dbal": "2.3.*"
     },

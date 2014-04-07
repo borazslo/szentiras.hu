@@ -1,6 +1,7 @@
 <?php
 
 namespace SzentirasHu\Controllers\Display;
+use SzentirasHu\Models\Entities\Translation;
 
 /**
  *
@@ -9,8 +10,11 @@ namespace SzentirasHu\Controllers\Display;
 class TextDisplayController extends \BaseController {
     
     public function showTranslation($translationAbbrev) {
-        $translation = \SzentirasHu\Models\Entities\Translation::where('abbrev', $translationAbbrev)->first();
-        return \View::make('translation', ['translation' => $translation]);
+        $translation = Translation::where('abbrev', $translationAbbrev)->first();
+        $books = $translation->books()->orderBy('id')->get();
+        return \View::make('translation',
+            ['translation' => $translation,
+            'books' => $books]);
     }
     
     public function showReferenceText($reference) {

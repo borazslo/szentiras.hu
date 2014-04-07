@@ -14,5 +14,8 @@ class Translation extends Eloquent {
         $q  = $denom ? Translation::where('denom', $denom) : Translation::all();
         return $q->orderBy('denom')->orderBy('name')->get();
     }
-    
+
+    public function books() {
+        return $this->hasMany('SzentirasHu\Models\Entities\Book');
+    }
 }
