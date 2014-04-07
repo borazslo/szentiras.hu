@@ -8,3 +8,5 @@ Thumbs.db
 *.iml
 _ide_helper.php
 .env.staging.php
+nbproject
+*~

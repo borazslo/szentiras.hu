@@ -7,7 +7,7 @@
 	<meta name="HandheldFriendly" content="True">
 	<meta name="MobileOptimized" content="320">
         
-        <title>{{ $pageTitle or "" }}</title>
+        <title>{{ pageTitle }}</title>
 
 	<meta property="fb:admins" content="1819502454" />
 	<meta name="description" content="A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban">
@@ -16,7 +16,7 @@
 	<meta http-equiv="cleartype" content="on">
 
 	<meta property="og:image" content="http://szentiras.hu/img/biblia.jpg">
-        {{ $meta or "" }}
+        {{ meta }}
 	
 
         <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/img/favicon.ico">
@@ -52,20 +52,20 @@
                     <div id="maincontent">
                         <div class="section group">	
                             <div class="col span_2_of_2" style="float: right;position: relative;">
-                                <div id="share">{{ $share or "" }}</div>
-                                {{ isset($title) ? "<h4>${title}</h4>":"" }}
-                                @yield('hirek')
-                                @yield('content')
+                                <div id="share">{{ share }}</div>
+                                {% if title is defined %}<h4>{{ title }}</h4>"{% endif %}
+                                {% block news %}{% endblock %}
+                                {% block content %}{% endblock %}
                                 <br />
-                                @yield('abbrevlist')
+                                {% block abbrevlist %}{% endblock %}
                             </div>
                             <div class="col span_1_of_2" style="position: relative;">
-                                @yield('menu')
+                                {% block menu %}{% endblock %}
                             </div>
                         </div>			
                         <div class="section group" style="margin-top:30px">	
                             <div class="col span_2_of_2" style="float: right;position: relative;">
-                                @yield('comments')
+                                {% block comments %}{% endblock %}
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
             <div id="footercontainer">
                 <footer class="group">
                     <div class="col span_1_of_2">
-                        {{ $copyright or "" }}
+                        {{ copyright }}
                     </div>
                     <div class="col span_2_of_2">
                         <p>Kérdések, ötletek, problémák: <a href='mailto:eleklaszlosj@gmail.com'>Elek László SJ</a> (<a href="http://jezsuita.hu">JTMR</a>)</p>

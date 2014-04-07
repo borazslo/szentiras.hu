@@ -1,0 +1,12 @@
+{{ form_model(form, { 'route' : ['search.store']}) }}
+    {{ form_text(
+        'textToSearch', 
+        form_getValueAttribute(
+            "textToSearch"), 
+            {'onkeyup': 'suggest(this.value)', 'size' : 10, 'maxlength' : 80, 'class':'alap', 'style':'width:92%;margin-bottom:5px'}) }}
+    {{ form_hidden('reftrans') }}
+    {{ form_submit('Keresés') }}
+    <div id="suggestions" class="suggestionsBox2" style="display: none;">
+        <div id="suggestionsList" class="suggestionList"></div>
+    </div>    
+{{ form_close() }}

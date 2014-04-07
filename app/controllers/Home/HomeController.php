@@ -115,7 +115,7 @@ class HomeController extends \BaseController {
             'title' => 'Katolikus bibliafordítások',
             'cathBibles' => Translation::getByDenom('katolikus'),
             'otherBibles' => Translation::getByDenom('protestáns'),
-            'olvasmanyok' => (new LectureSelector())->getLectures()
+            'lectures' => (new LectureSelector())->getLectures()
         ]);
     }
 

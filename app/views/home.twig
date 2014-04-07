@@ -1,0 +1,59 @@
+{% extends "layout" %}
+
+{% block menu %}
+    {% include 'menu' %}
+{% endblock %}
+
+{% block news %}
+  {% for n in news %}
+    <div align="center" class="menu" style="background-color:#9DA7D8;color:white;padding-left:3px;margin-bottom:3px">
+      <div class="menulink clicktoopen">{{ n.title }}</div>
+      <div class="openit" style="display:none;">{{ n.text }}</div>        
+    </div>
+  {% endfor %}
+{% endblock %}
+
+{% block content %}
+<br>
+<blockquote>
+    {% for row in cathBibles %}
+        <p><span class='alcim'><a href='/showtrans/{{ row.id }}' class='alcim'>{{ row.name }} ({{ row.denom }})</a></span>
+        <br><span class='catlinksmall'>{{ row.copyright }}</span></p>
+    {% endfor %}
+</blockquote>
+
+<br />
+
+<h4><a href="http://www.katolikus.hu/igenaptar/{{ "now"|date("Ym") }}.html">Napi olvasmányok</a></h4>
+
+<p class="alcim">
+    {% for lecture in lectures %}
+        <div style='height:20px'>
+            <a href='{{ lecture.link}}' class='link'>{{ lecture.ref }}</a>
+            <div style='float:right;margin-top:-30px'>
+                {% for extLink in lecture.extLinks %}
+                    <a href="{{ extLink.url }}" title="{{ extLink.title }}" class="button minilink"> {{ extLink.label }}</a>
+                {% endfor %}
+                {% if loop.last %}
+                    <a href="http://evangelium.katolikus.hu/audio/NE{{ "now"|date('Ymd') }}.mp3" class="button minilink" title="Evangélium és elmélkedés az evangelium365.hu honlapról." target="_blank">mp3</a>
+                {% endif %}
+            </div>
+        </div>
+     {% endfor %}
+
+<br />
+<p />
+
+<span class='alcim'><a href='/forditasok'>További fordítások</a></span>
+<br>
+<blockquote>
+    {% for row in otherBibles %}
+        <a href='/showtrans/{{ row.id }}'>{{ row.name }} ({{ row.denom }})</a>
+        <br />
+    {% endfor %}
+</blockquote>
+{% endblock %}
+
+{% block abbrevlist %}
+    {% include 'bookAbbrevList' %}
+{% endblock %}
