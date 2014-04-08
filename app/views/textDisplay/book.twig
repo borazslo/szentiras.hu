@@ -1,0 +1,19 @@
+{% extends 'layout' %}
+
+{% set pageTitle %}
+{{ book.name }} | {{ translation.name }} | Szentírás
+{% endset %}
+
+{% block content %}
+
+    {% include 'textDisplay.breadcrumb' %}
+
+    {% for firstVerse in firstVerses %}
+        <a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ firstVerse.chapter }}">{{ firstVerse.chapter }}. fejezet</a>
+
+        <br />
+    {{ firstVerse.verse }}
+        <br />
+    {% endfor %}
+
+{% endblock %}

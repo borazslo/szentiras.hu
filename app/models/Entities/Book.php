@@ -13,11 +13,11 @@ use Eloquent;
 class Book extends Eloquent {
 
     public function abbrevs() {
-        return $this->hasMany('BookAbbrev', 'id');
+        return $this->hasMany('SzentirasHu\Models\Entities\BookAbbrev', 'id');
     }
 
     public function verses() {
-        return $this->hasMany('Verse', 'book');
+        return $this->hasMany('SzentirasHu\Models\Entities\Verse', 'book');
     }
 
     public function translation() {

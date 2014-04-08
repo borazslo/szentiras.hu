@@ -1,6 +1,7 @@
 <?php
 
 return [
-    'defaultTranslationId' => 4,
-    'translationAbbrevRegex' => 'KNB|SZIT',
+    'defaultTranslationId' => 3,
+    'defaultTranslationAbbrev' => 'KNB',
+    'translationAbbrevRegex' => 'KNB|SZIT|UF|KG',
 ];

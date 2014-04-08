@@ -1,9 +1,5 @@
 {% extends 'layout' %}
 
-{% block menu %}
-    {% include 'menu' %}
-{% endblock %}
-
 {% set pageTitle %}
 {{ translation.name }} | Szentírás
 {% endset %}
@@ -16,7 +12,7 @@
 {% import _self as temp %}
 
 {% block content %}
-    {% include 'breadcrumb' %}
+    {% include 'textDisplay.breadcrumb' %}
     {% include 'bookAbbrevList' with { 'translation' : translation } %}
     <p class='kiscim'>Ószövetség</p>
     {% for book in books if book.old_testament %}

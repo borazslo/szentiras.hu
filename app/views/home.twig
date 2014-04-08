@@ -1,9 +1,5 @@
 {% extends "layout" %}
 
-{% block menu %}
-    {% include 'menu' %}
-{% endblock %}
-
 {% block news %}
   {% for n in news %}
     <div align="center" class="menu" style="background-color:#9DA7D8;color:white;padding-left:3px;margin-bottom:3px">
@@ -17,8 +13,8 @@
 <br>
 <blockquote>
     {% for row in cathBibles %}
-        <p><span class='alcim'><a href='/showtrans/{{ row.id }}' class='alcim'>{{ row.name }} ({{ row.denom }})</a></span>
-        <br><span class='catlinksmall'>{{ row.copyright }}</span></p>
+        <p><span class='alcim'><a href='/{{ row.abbrev }}' class='alcim'>{{ row.name }} ({{ row.denom }})</a></span>
+        <br><span class='catlinksmall'>{{ row.copyright|raw }}</span></p>
     {% endfor %}
 </blockquote>
 
@@ -48,7 +44,7 @@
 <br>
 <blockquote>
     {% for row in otherBibles %}
-        <a href='/showtrans/{{ row.id }}'>{{ row.name }} ({{ row.denom }})</a>
+        <a href='/{{ row.abbrev }}'>{{ row.name }} ({{ row.denom }})</a>
         <br />
     {% endfor %}
 </blockquote>
