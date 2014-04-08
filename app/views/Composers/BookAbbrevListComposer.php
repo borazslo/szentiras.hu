@@ -18,6 +18,6 @@ class BookAbbrevListComposer
         \Log::debug("Translation id: ", [$translation]);
         $books = $translation->books()->get();
         $view
-            ->with(['books'=>$books, 'translation'=>$translation]);
+            ->with(['books' => $books, 'translation' => $translation]);
     }
 }
