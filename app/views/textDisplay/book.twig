@@ -8,12 +8,17 @@
 
     {% include 'textDisplay.breadcrumb' %}
 
-    {% for firstVerse in firstVerses %}
-        <a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ firstVerse.chapter }}">{{ firstVerse.chapter }}. fejezet</a>
+    {% for chapter, verses in groupedVerses %}
+        <a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a>
 
         <br />
-    {{ firstVerse.verse }}
+        {% for num in '1'..'2' %}
+            <sup>{{ verses[num].numv }}</sup>{{ verses[num].verse }}
+        {% endfor %}
+        <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter}}' class='link'>&gt;&gt;</a><br>
         <br />
     {% endfor %}
+
+    {% include 'bookAbbrevList' %}
 
 {% endblock %}

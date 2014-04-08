@@ -2,7 +2,7 @@
 <blockquote>
     <p class='kicsi' align='center'>
         {% for b in books %}
-            {% if (b == currentBook) %}
+            {% if (b == book) %}
                 <b>{{b.abbrev}}</b>
             {% else %}
                 <a href="/{{ translation.abbrev }}/{{b.abbrev}}" class='minilink'>{{b.abbrev}}</a>
