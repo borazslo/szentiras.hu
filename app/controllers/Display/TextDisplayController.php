@@ -5,6 +5,7 @@ namespace SzentirasHu\Controllers\Display;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Translation;
+use SzentirasHu\Models\Entities\Verse;
 
 /**
  *
@@ -33,15 +34,50 @@ class TextDisplayController extends \BaseController
         if ($canonicalRef->isBookLevel()) {
             return $this->bookView($translationAbbrev, $canonicalRef);
         }
-        return \View::make('textDisplay.verses');
+        $translation = Translation::byAbbrev($translationAbbrev);
+        $translatedRef = $canonicalRef->toTranslated($translation->id);
+        $verseContainers = [];
+        foreach ($translatedRef->bookRefs as $bookRef) {
+            $verseContainer = [];
+            $book = Book::where('abbrev', $bookRef->bookId)->where('translation_id', $translation->id)->first();
+            $verseContainer['book'] = $book;
+            $verseContainer['verses'] = [];
+            foreach ($bookRef->chapterRanges as $chapterRange) {
+                $searchedChapters = [];
+                $currentChapter = $chapterRange->chapterRef->chapterId;
+                do {
+                    $searchedChapters[] = $currentChapter;
+                    $currentChapter++;
+                } while ($chapterRange->untilChapterRef && $currentChapter <= $chapterRange->untilChapterRef->chapterId);
+                $verses = Verse::where('book', $book->id)->
+                whereIn('chapter', $searchedChapters)->
+                where('trans', $translation->id)->
+                    orderBy('gepi')
+                    ->get();
+                foreach ($verses as $verse) {
+                    if ($chapterRange->hasVerse($verse->chapter, $verse->numv)) {
+                        $verseContainer['verses'][]=$verse;
+                    }
+                }
+            }
+            $verseContainers[] = $verseContainer;
+        }
+        return \View::make('textDisplay.verses')->with([
+            'verseContainers' => $verseContainers,
+            'translation' => $translation
+        ]);
 
     }
 
-    private function bookView($translationAbbrev, $canonicalRef) {
+    private function bookView($translationAbbrev, $canonicalRef)
+    {
         $bookRef = $canonicalRef->bookRefs[0];
-        $translation = Translation::where('abbrev', $translationAbbrev)->first();
+        $translation = Translation::byAbbrev($translationAbbrev);
         $translatedRef = $canonicalRef->toTranslated($translation->id);
-        $book = Book::where('abbrev', $translatedRef->bookRefs[0]->bookId)->where('translation_id', $translation->id)->first();
+        $book = Book::
+        where('abbrev', $translatedRef->bookRefs[0]->bookId)->
+        where('translation_id', $translation->id)
+            ->first();
         $firstVerses = $book
             ->verses()
             ->where('trans', $translation->id)
@@ -52,7 +88,7 @@ class TextDisplayController extends \BaseController
             ->get();
         $groupedVerses = [];
         foreach ($firstVerses as $verse) {
-            $groupedVerses[$verse['chapter']][$verse['numv']]=$verse;
+            $groupedVerses[$verse['chapter']][$verse['numv']] = $verse;
         }
 
         return \View::make('textDisplay.book', [

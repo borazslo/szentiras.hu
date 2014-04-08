@@ -15,6 +15,11 @@ class Translation extends Eloquent {
         return $q->orderBy('denom')->orderBy('name')->get();
     }
 
+    public static function byAbbrev($translationAbbrev)
+    {
+        return self::where('abbrev', $translationAbbrev)->first();
+    }
+
     public function books() {
         return $this->hasMany('SzentirasHu\Models\Entities\Book');
     }

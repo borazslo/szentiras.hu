@@ -1,2 +1,10 @@
 {% extends 'layout' %}
 
+{% block content %}
+    {% for verseContainer in verseContainers %}
+        {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book} %}
+        {% for verse in verseContainer.verses %}
+            {{ verse.verse }}
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

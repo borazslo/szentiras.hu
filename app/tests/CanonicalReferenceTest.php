@@ -39,11 +39,12 @@ class CanonicalReferenceTest extends TestCase {
 
         $bookRef = CanonicalReference::fromString("1Móz 2b;")->bookRefs[0];
         $this->assertEquals("1Móz", $bookRef->bookId);
-        $this->assertEquals("2b", $bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $this->assertEquals("2", $bookRef->chapterRanges[0]->chapterRef->chapterId);
 
         $bookRef = CanonicalReference::fromString("1Móz2b;")->bookRefs[0];
         $this->assertEquals("1Móz", $bookRef->bookId);
-        $this->assertEquals("2b", $bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $this->assertEquals("2", $bookRef->chapterRanges[0]->chapterRef->chapterId);
+        $this->assertEquals("b", $bookRef->chapterRanges[0]->chapterRef->chapterPart);
 
         $bookRef = CanonicalReference::fromString("1Móz 3-4")->bookRefs[0];
         $this->assertEquals("1Móz", $bookRef->bookId);
@@ -168,6 +169,30 @@ class CanonicalReferenceTest extends TestCase {
         //this->assertTrue(CanonicalReference::fromString('1Moz 2,3.4-5')->isExistingBookRef());
         //this->assertFalse(CanonicalReference::fromString('999')->isExistingBookRef());
         //this->assertFalse(CanonicalReference::fromString('ne félj')->isExistingBookRef());
+    }
+
+    public function testChapterRange() {
+        $range = CanonicalReference::fromString("Mt 2,1-5")->bookRefs[0]->chapterRanges[0];
+        $this->assertFalse($range->hasVerse(1,1));
+        $this->assertFalse($range->hasVerse(5,1));
+        $this->assertFalse($range->hasVerse(2,6));
+        $this->assertTrue($range->hasVerse(2,3));
+
+        $range = CanonicalReference::fromString("Mt 2-4")->bookRefs[0]->chapterRanges[0];
+        $this->assertFalse($range->hasVerse(1,1));
+        $this->assertFalse($range->hasVerse(5,1));
+        $this->assertTrue($range->hasVerse(3,99));
+        $this->assertTrue($range->hasVerse(2,1));
+        $this->assertTrue($range->hasVerse(4,99));
+
+        $range = CanonicalReference::fromString("Mt 1,2-3,4.6-8")->bookRefs[0]->chapterRanges[0];
+        $this->assertFalse($range->hasVerse(1,1));
+        $this->assertTrue($range->hasVerse(1,2));
+        $this->assertTrue($range->hasVerse(2,99));
+        $this->assertTrue($range->hasVerse(3,3));
+        $this->assertTrue($range->hasVerse(3,4));
+        $this->assertTrue($range->hasVerse(3,7));
+        $this->assertFalse($range->hasVerse(3,5));
     }
 
 }

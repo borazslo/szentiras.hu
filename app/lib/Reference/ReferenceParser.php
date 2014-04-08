@@ -29,7 +29,8 @@ namespace SzentirasHu\Lib\Reference;
  * - 1Kor 13,1a-3.5b-14.6a|14,23; Jn 14,22-39
  * will become an object tree, which is at the root is an array of BookRef objects.
  */
-class ReferenceParser {
+class ReferenceParser
+{
 
     const PARSE_BOOK = 1;
     const PARSE_CHAPTER = 2;
@@ -38,11 +39,13 @@ class ReferenceParser {
     private $lexer;
     private $stateStack = [];
 
-    public function __construct($referenceString) {
+    public function __construct($referenceString)
+    {
         $this->lexer = new ReferenceLexer($referenceString);
     }
 
-    public function bookRefs() {
+    public function bookRefs()
+    {
         array_push($this->stateStack, self::PARSE_BOOK);
 
         $bookRefs = [];
@@ -68,7 +71,8 @@ class ReferenceParser {
         return $bookRefs;
     }
 
-    public function bookId() {
+    public function bookId()
+    {
         $bookId = '';
         $token = $this->lexer->lookahead;
         if ($token['type'] === ReferenceLexer::T_NUMERIC) {
@@ -83,7 +87,8 @@ class ReferenceParser {
         return $bookId;
     }
 
-    public function chapterRanges() {
+    public function chapterRanges()
+    {
         $chapterRanges = [];
         $chapterRanges[] = $this->chapterRange();
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR) {
@@ -94,7 +99,8 @@ class ReferenceParser {
         return $chapterRanges;
     }
 
-    public function chapterRange() {
+    public function chapterRange()
+    {
         $range = new ChapterRange();
         $range->chapterRef = $this->chapterRef();
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_RANGE_OPERATOR) {
@@ -110,8 +116,13 @@ class ReferenceParser {
         return $range;
     }
 
-    public function chapterRef() {
+    public function chapterRef()
+    {
         $chapterRef = new ChapterRef($this->chapterId());
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_TEXT) {
+            $this->lexer->moveNext();
+            $chapterRef->chapterPart .= $this->lexer->lookahead['value'];
+        }
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR) {
             $this->lexer->moveNext();
             $this->lexer->moveNext();
@@ -120,17 +131,15 @@ class ReferenceParser {
         return $chapterRef;
     }
 
-    public function chapterId() {
+    public function chapterId()
+    {
         $token = $this->lexer->lookahead;
         $chapterId = $token['value'];
-        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_TEXT) {
-            $this->lexer->moveNext();
-            $chapterId .= $this->lexer->lookahead['value'];
-        }
         return $chapterId;
     }
 
-    public function verseRanges() {
+    public function verseRanges()
+    {
         $verseRanges = [];
         $verseRanges[] = $this->verseRange();
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR) {
@@ -141,7 +150,8 @@ class ReferenceParser {
         return $verseRanges;
     }
 
-    public function verseRange() {
+    public function verseRange()
+    {
         $range = new VerseRange();
         $range->verseRef = $this->verseRef();
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_RANGE_OPERATOR) {
@@ -157,7 +167,8 @@ class ReferenceParser {
         return $range;
     }
 
-    public function verseRef() {
+    public function verseRef()
+    {
         $ref = new VerseRef($this->verseId());
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_TEXT) {
             $this->lexer->moveNext();
@@ -167,29 +178,34 @@ class ReferenceParser {
         return $ref;
     }
 
-    public function verseId() {
+    public function verseId()
+    {
         $token = $this->lexer->lookahead;
         $verseId = $token['value'];
         return $verseId;
     }
 
-    private function pushState($state) {
+    private function pushState($state)
+    {
         array_push($this->stateStack, $state);
     }
 }
 
-class BookRef {
+class BookRef
+{
     public $bookId;
     /**
      * @var ChapterRange[]
      */
     public $chapterRanges = [];
 
-    public function __construct($bookId) {
+    public function __construct($bookId)
+    {
         $this->bookId = $bookId;
     }
 
-    public function toString() {
+    public function toString()
+    {
         $s = $this->bookId;
         if (count($this->chapterRanges) > 0) {
             $s .= ' ';
@@ -205,7 +221,8 @@ class BookRef {
     }
 }
 
-class ChapterRange {
+class ChapterRange
+{
     /**
      * @var ChapterRef
      */
@@ -215,28 +232,80 @@ class ChapterRange {
      */
     public $untilChapterRef;
 
-    public function toString() {
+    public function toString()
+    {
         $s = $this->chapterRef->toString();
         if ($this->untilChapterRef) {
             $s .= "-{$this->untilChapterRef->toString()}";
         }
         return $s;
     }
+
+    public function hasVerse($chapter, $verse)
+    {
+        // inside range (regardless of verse)
+        if ($chapter > $this->chapterRef->chapterId && $this->untilChapterRef && $chapter < $this->untilChapterRef->chapterId) {
+            return true;
+        }
+        // outside range (regardless of verse)
+        if ($chapter < $this->chapterRef->chapterId
+            || $chapter > $this->chapterRef->chapterId && !$this->untilChapterRef
+            || $this->untilChapterRef && $chapter > $this->untilChapterRef->chapterId) {
+            return false;
+        }
+        // if no verses, all verses are good.
+        if (count($this->chapterRef->verseRanges) === 0) {
+            return true;
+        }
+        // can be inside range depending on verse
+        if ($chapter == $this->chapterRef->chapterId) {
+            foreach ($this->chapterRef->verseRanges as $verseRange) {
+                if ($verseRange->contains($verse)) {
+                    return true;
+                }
+            }
+        }
+        if ($this->untilChapterRef) {
+            foreach ($this->untilChapterRef->verseRanges as $verseRange) {
+                if ($verseRange->contains($verse)) {
+                    return true;
+                }
+            }
+            if ($chapter == $this->chapterRef->chapterId) {
+                if ($verse >= last($this->chapterRef->verseRanges)->verseRef->verseId) {
+                    return true;
+                }
+            } else if ($chapter == $this->untilChapterRef->chapterId) {
+                if ($verse <= head($this->untilChapterRef->verseRanges)->verseRef->verseId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
 
-class ChapterRef {
+class ChapterRef
+{
     public $chapterId;
+    public $chapterPart;
+
     /**
      * @var VerseRange[]
      */
     public $verseRanges = [];
 
-    function __construct($chapterId) {
+    function __construct($chapterId)
+    {
         $this->chapterId = $chapterId;
     }
 
-    public function toString() {
+    public function toString()
+    {
         $s = $this->chapterId;
+        if ($this->chapterPart) {
+            $s .= $this->$chapterPart;
+        }
         if (count($this->verseRanges) > 0) {
             $s .= ',';
             $last = end($this->verseRanges);
@@ -252,7 +321,8 @@ class ChapterRef {
 
 }
 
-class VerseRange {
+class VerseRange
+{
     /**
      * @var VerseRef
      */
@@ -263,24 +333,35 @@ class VerseRange {
      */
     public $untilVerseRef;
 
-    public function toString() {
+    public function toString()
+    {
         $s = $this->verseRef->toString();
         if ($this->untilVerseRef) {
-            $s.="-{$this->untilVerseRef->toString()}";
+            $s .= "-{$this->untilVerseRef->toString()}";
         }
         return $s;
     }
+
+    public function contains($verse)
+    {
+        $inside = $verse >= $this->verseRef->verseId && $this->untilVerseRef && $verse <= $this->untilVerseRef->verseId;
+        $exact = $verse === $this->verseRef->verseId;
+        return $inside || $exact;
+    }
 }
 
-class VerseRef {
+class VerseRef
+{
     public $verseId;
     public $versePart;
 
-    function __construct($verseId) {
+    function __construct($verseId)
+    {
         $this->verseId = $verseId;
     }
 
-    public function toString() {
+    public function toString()
+    {
         return $this->verseId . $this->versePart;
     }
 }
