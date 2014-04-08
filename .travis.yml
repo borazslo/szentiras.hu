@@ -18,7 +18,7 @@ after_success:
   - chmod 600 ~/.ssh/id_rsa
   - echo -e "Host szentiras.hu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - git remote add deploy szentiras_hu_git@szentiras.hu:/home/szentiras_hu_git/github/borazslo/szentiras.hu.git
-  - git push --all deploy
+  - git push deploy $TRAVIS_BRANCH
 
 cache:
   directories:
