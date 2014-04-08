@@ -82,7 +82,7 @@ class TextDisplayController extends \BaseController
             ->verses()
             ->where('trans', $translation->id)
             ->whereIn('numv', ['1', '2'])
-            ->where('tip', 6)
+            ->whereIn('tip', [6, 401, 501, 601, 701, 704, 5, 10, 20, 30, 60])
             ->orderBy('chapter')
             ->orderBy('numv')
             ->get();
