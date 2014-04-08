@@ -30,6 +30,14 @@ class TextDisplayController extends \BaseController
     public function showTranslatedReferenceText($translationAbbrev, $reference)
     {
         $canonicalRef = CanonicalReference::fromString($reference);
+        if ($canonicalRef->isBookLevel()) {
+            return $this->bookView($translationAbbrev, $canonicalRef);
+        }
+        return \View::make('textDisplay.verses');
+
+    }
+
+    private function bookView($translationAbbrev, $canonicalRef) {
         $bookRef = $canonicalRef->bookRefs[0];
         $translation = Translation::where('abbrev', $translationAbbrev)->first();
         $translatedRef = $canonicalRef->toTranslated($translation->id);
@@ -53,6 +61,7 @@ class TextDisplayController extends \BaseController
             'book' => $book,
             'groupedVerses' => $groupedVerses
         ]);
+
     }
 
 }
