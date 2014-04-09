@@ -56,7 +56,11 @@ class TextDisplayController extends \BaseController
                     ->get();
                 foreach ($verses as $verse) {
                     if ($chapterRange->hasVerse($verse->chapter, $verse->numv)) {
-                        $verseContainer['verses'][]=$verse;
+                        $verseContainer['verses'][]= [
+                            'text' => $verse->verse,
+                            'numv' => $verse->numv,
+                            'type' => $verse->getType()
+                        ];
                     }
                 }
             }
@@ -82,13 +86,15 @@ class TextDisplayController extends \BaseController
             ->verses()
             ->where('trans', $translation->id)
             ->whereIn('numv', ['1', '2'])
-            ->whereIn('tip', [6, 401, 501, 601, 701, 704, 5, 10, 20, 30, 60])
             ->orderBy('chapter')
             ->orderBy('numv')
             ->get();
         $groupedVerses = [];
         foreach ($firstVerses as $verse) {
-            $groupedVerses[$verse['chapter']][$verse['numv']] = $verse;
+            $type = $verse->getType();
+            if ($type == 'text') {
+                $groupedVerses[$verse['chapter']][$verse['numv']] = $verse;
+            }
         }
 
         return \View::make('textDisplay.book', [
