@@ -39,7 +39,12 @@ class Verse extends Eloquent {
                 }
             }
         }
-        return self::$typeMap[$this->tip];
+        if (array_key_exists($this->tip, self::$typeMap)) {
+            return self::$typeMap[$this->tip];
+        } else {
+            return 'unknown';
+        }
+
     }
 
 }

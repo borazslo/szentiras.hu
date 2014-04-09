@@ -14,6 +14,9 @@ class VerseTest extends TestCase {
         $verse->tip=5;
         $this->assertEquals('heading0', $verse->getType());
 
+        $verse = new Verse();
+        $verse->tip=9999;
+        $this->assertEquals('unknown', $verse->getType());
 	}
 
 }
