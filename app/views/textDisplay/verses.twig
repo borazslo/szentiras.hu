@@ -4,10 +4,7 @@
     {% for verseContainer in verseContainers %}
         {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book} %}
         {% for verse in verseContainer.verses %}
-            {% if verse.type == 'text' %}
-                <sup>{{ verse.numv }}</sup>
-                {{ verse.text }}
-            {% endif %}
+            <sup>{{ verse.numv }}</sup>{{ verse.text }}
         {% endfor %}
     {% endfor %}
 {% endblock %}

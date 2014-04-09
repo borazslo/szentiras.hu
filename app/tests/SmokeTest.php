@@ -9,9 +9,14 @@ class SmokeTest extends TestCase {
 	 */
 	public function testBasicHomePage()
 	{
-		$crawler = $this->client->request('GET', '/');
-
+		$this->client->request('GET', '/');
 		$this->assertTrue($this->client->getResponse()->isOk());
+
 	}
+
+    public function testBasicTranslationPage() {
+        $this->client->request('GET', '/TESTTRANS');
+        $this->assertTrue($this->client->getResponse()->isOk());
+    }
 
 }
