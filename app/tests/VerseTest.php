@@ -12,7 +12,7 @@ class VerseTest extends TestCase {
 
         $verse = new Verse();
         $verse->tip=5;
-        $this->assertEquals('headings0', $verse->getType());
+        $this->assertEquals('heading0', $verse->getType());
 
 	}
 
