@@ -3,6 +3,7 @@
 namespace SzentirasHu\Controllers\Display;
 
 use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Lib\Reference\ChapterRange;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Entities\Verse;
@@ -148,21 +149,21 @@ class TextDisplayController extends \BaseController
     }
 
     /**
-     * @param $chapterRange
+     * @param ChapterRange $chapterRange
      * @return array
      */
-    private function collectChapterIds($chapterRange)
+    public function collectChapterIds($chapterRange)
     {
         $searchedChapters = [];
         $currentChapter = $chapterRange->chapterRef->chapterId;
         do {
             $searchedChapters[] = $currentChapter;
             $currentChapter++;
-            return $searchedChapters;
         } while ($chapterRange->untilChapterRef && $currentChapter <= $chapterRange->untilChapterRef->chapterId);
+        return $searchedChapters;
     }
 
-    private function getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation)
+    public function getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation)
     {
         $allChapterVerses = $this->getChapterVerses($book, $searchedChapters, $translation);
         $chapterRangeVerses = [];
