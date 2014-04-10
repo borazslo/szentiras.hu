@@ -11,6 +11,8 @@
 |
 */
 
+use SzentirasHu\Controllers\Display\VerseParsers\KGVerseParser;
+
 ClassLoader::addDirectories(array(
 
 	app_path().'/commands',
@@ -83,3 +85,7 @@ require app_path().'/filters.php';
 Event::listen("illuminate.query", function($query, $bindings, $time, $name){
     Log::debug($query.' bindings:'.implode(',',$bindings));
 });
+
+App::instance("verseParsers", [
+    4 => new KGVerseParser()
+]);

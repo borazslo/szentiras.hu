@@ -2,6 +2,7 @@
 
 namespace SzentirasHu\Controllers\Display;
 
+use SzentirasHu\Controllers\Display\VerseParsers\VerseParser;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ChapterRange;
 use SzentirasHu\Models\Entities\Book;
@@ -9,60 +10,46 @@ use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Entities\Verse;
 
 
-class XRef
-{
-    public $position;
-    public $text;
-}
-
-class VerseData
-{
-    public $chapter;
-    public $numv;
-    /**
-     * @var XRef[]
-     */
-    public $xrefs;
-    public $text;
-
-    function __construct($chapter, $numv)
-    {
-        $this->chapter = $chapter;
-        $this->numv = $numv;
-    }
-
-}
-
 class VerseContainer
 {
-
     /**
      * @var Book
      */
     public $book;
+
+
     /**
-     * @var VerseData[]
+     * @var VerseParser
      */
-    public $verses;
+    private $verseParser;
+
+    /**
+     * @var string[Verse][]
+     */
+    private $rawVerses;
 
     function __construct($book)
     {
         $this->book = $book;
-        $this->verses = [];
+        $this->rawVerses = [];
+        $this->verseParser = \App::make('verseParsers')[$book->translation_id];
     }
 
     public function addVerse(Verse $verse)
     {
         $verseKey = $verse->gepi;
-        if (!array_key_exists($verseKey, $this->verses)) {
-            $verseData = new VerseData($verse->chapter, $verse->numv);
-            $this->verses[$verseKey] = $verseData;
-        } else {
-            $verseData = $this->verses[$verseKey];
+        if (!array_key_exists($verseKey, $this->rawVerses)) {
+            $this->rawVerses[$verseKey] = [];
         }
-        if ($verse->getType() == 'text') {
-            $verseData->text = $verse->verse;
+        $this->rawVerses[$verseKey][]=$verse;
+    }
+
+    public function getParsedVerses() {
+        $verseData = [];
+        foreach ($this->rawVerses as $gepi => $rawVerses) {
+            $verseData[] = $this->verseParser->parse($rawVerses, $this->book);
         }
+        return $verseData;
     }
 
 }

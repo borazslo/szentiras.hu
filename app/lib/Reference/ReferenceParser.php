@@ -32,12 +32,7 @@ namespace SzentirasHu\Lib\Reference;
 class ReferenceParser
 {
 
-    const PARSE_BOOK = 1;
-    const PARSE_CHAPTER = 2;
-    const PARSE_VERSE = 3;
-
     private $lexer;
-    private $stateStack = [];
 
     public function __construct($referenceString)
     {
@@ -46,29 +41,29 @@ class ReferenceParser
 
     public function bookRefs()
     {
-        array_push($this->stateStack, self::PARSE_BOOK);
-
         $bookRefs = [];
-
         while ($this->lexer->moveNext()) {
             $token = $this->lexer->lookahead;
-            switch (last($this->stateStack)) {
-                case self::PARSE_BOOK:
-                    $bookId = $this->bookId();
-                    $bookRefs[] = new BookRef($bookId);
-                    array_push($this->stateStack, self::PARSE_CHAPTER);
-                    break;
-                case self::PARSE_CHAPTER:
-                    // if in this state we get a ';', an other book is coming
-                    if ($token['value'] == ';') {
-                        array_pop($this->stateStack);
-                        break;
-                    }
-                    $currentBookRef = end($bookRefs);
-                    $currentBookRef->chapterRanges = $this->chapterRanges();
+            if ($token['type'] == ReferenceLexer::T_NUMERIC
+                || $token['type'] == ReferenceLexer::T_TEXT
+            ) {
+                $bookRefs[] = $this->bookRef();
             }
         }
         return $bookRefs;
+    }
+
+    public function bookRef()
+    {
+        $bookRef = new BookRef($this->bookId());
+        $bookRefs[] = $bookRef;
+        if ($this->lexer->moveNext()) {
+            $token = $this->lexer->lookahead;
+            if ($token['type'] == ReferenceLexer::T_NUMERIC) {
+                $bookRef->chapterRanges = $this->chapterRanges();
+            }
+        }
+        return $bookRef;
     }
 
     public function bookId()
@@ -91,7 +86,8 @@ class ReferenceParser
     {
         $chapterRanges = [];
         $chapterRanges[] = $this->chapterRange();
-        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR) {
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR
+        || $this->lexer->glimpse()['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR) {
             $this->lexer->moveNext();
             $this->lexer->moveNext();
             $chapterRanges = array_merge($chapterRanges, $this->chapterRanges());
@@ -142,10 +138,21 @@ class ReferenceParser
     {
         $verseRanges = [];
         $verseRanges[] = $this->verseRange();
-        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR) {
-            $this->lexer->moveNext();
-            $this->lexer->moveNext();
-            $verseRanges = array_merge($verseRanges, $this->verseRanges());
+        $nextToken = $this->lexer->peek();
+        if ($nextToken['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR
+        || $nextToken['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR) {
+            if ($this->lexer->peek()['type'] == ReferenceLexer::T_NUMERIC
+                && $this->lexer->peek()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR
+            ) {
+                $this->lexer->resetPeek();
+            } else {
+                $this->lexer->resetPeek();
+                $this->lexer->moveNext();
+                if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_NUMERIC) {
+                    $this->lexer->moveNext();
+                    $verseRanges = array_merge($verseRanges, $this->verseRanges());
+                }
+            }
         }
         return $verseRanges;
     }
@@ -250,7 +257,8 @@ class ChapterRange
         // outside range (regardless of verse)
         if ($chapter < $this->chapterRef->chapterId
             || $chapter > $this->chapterRef->chapterId && !$this->untilChapterRef
-            || $this->untilChapterRef && $chapter > $this->untilChapterRef->chapterId) {
+            || $this->untilChapterRef && $chapter > $this->untilChapterRef->chapterId
+        ) {
             return false;
         }
         // if no verses, all verses are good.

@@ -6,7 +6,10 @@ use Eloquent;
 /**
  * Model for verses.
  *
- * @property tip
+ * @property string verse
+ * @property int tip
+ * @property int chapter
+ * @property int numv
  * @author berti
  */
 class Verse extends Eloquent {
