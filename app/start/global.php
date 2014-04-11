@@ -87,5 +87,9 @@ Event::listen("illuminate.query", function($query, $bindings, $time, $name){
 });
 
 App::instance("verseParsers", [
-    4 => new KGVerseParser()
+    1 => App::make('SzentirasHu\Controllers\Display\VerseParsers\DefaultVerseParser'),
+    2 => App::make('SzentirasHu\Controllers\Display\VerseParsers\DefaultVerseParser'),
+    3 => App::make('SzentirasHu\Controllers\Display\VerseParsers\DefaultVerseParser'),
+    4 => App::make('SzentirasHu\Controllers\Display\VerseParsers\KGVerseParser'),
+
 ]);

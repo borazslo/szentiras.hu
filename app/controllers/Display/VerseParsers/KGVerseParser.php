@@ -4,57 +4,15 @@ namespace SzentirasHu\Controllers\Display\VerseParsers;
 
 use SzentirasHu\Lib\Reference\CanonicalReference;
 
-class KGVerseParser implements VerseParser
+class KGVerseParser extends AbstractVerseParser
 {
     public static $xrefSigns = ["•","†"];
 
-    public function parse($rawVerses, $book)
-    {
-        \Log::debug("Parsing verse data", [$rawVerses]);
-        $verse = $this->initVerseData($rawVerses);
-        foreach ($rawVerses as $rawVerse) {
-            $this->parseRawVerses($book, $rawVerse, $verse);
-        }
-        foreach ($verse->xrefs as $key => $xref) {
-            if (!$xref->text) {
-                unset($verse->xrefs[$key]);
-            }
-        }
-
-        return $verse;
-    }
-
-    /**
-     * @param $rawVerses
-     * @return VerseData
-     */
-    private function initVerseData($rawVerses)
-    {
-        $chapter = $rawVerses[0]->chapter;
-        $numv = $rawVerses[0]->numv;
-        $verse = new VerseData($chapter, $numv);
-        return $verse;
-    }
-
-    /**
-     * @param $book
-     * @param $rawVerse
-     * @param $verse
-     */
-    private function parseRawVerses($book, $rawVerse, $verse)
-    {
-        if ($rawVerse->getType() == 'text') {
-            $this->parseTextVerse($rawVerse, $verse);
-        } else if ($rawVerse ->getType() == 'xref') {
-            $this->parseXrefVerse($book, $rawVerse, $verse);
-        }
-    }
-
     /**
      * @param $rawVerse
      * @param $verse
      */
-    private function parseTextVerse($rawVerse, $verse)
+    protected function parseTextVerse($rawVerse, $verse)
     {
         $verse->text = $rawVerse->verse;
         foreach (self::$xrefSigns as $xrefSign) {
@@ -72,7 +30,7 @@ class KGVerseParser implements VerseParser
      * @param $rawVerse
      * @param $verse
      */
-    private function parseXrefVerse($book, $rawVerse, $verse)
+    protected function parseXrefVerse($book, $rawVerse, $verse)
     {
         $xrefParts = preg_split("/([•†][^•†]+)/u", $rawVerse->verse, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE);
         // " • A † B" becomes [ [" ", 0"], ["• A ", 1], ["† B", 5] ]
