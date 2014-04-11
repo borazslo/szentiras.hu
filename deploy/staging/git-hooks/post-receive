@@ -1,15 +1,24 @@
 #!/bin/bash
-echo Updating deployment
-DIR=/home/szentiras_hu_git/github/borazslo/szentiras.hu
-cd $DIR
-echo $PWD
-unset GIT_DIR
-git checkout mvc
-git pull
-export MYSQL_SZENTIRAS_USER=
-export MYSQL_SZENTIRAS_PASSWORD=
-export SZENTIRAS_WEBAPP_ENVIRONMENT=staging
-# only install is needed, as dependency versions should be locked
-php composer.phar install
-php artisan migrate
-php artisan up
+while read oldrev newrev refname
+do
+    branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+    echo Received ref $refname as $branch
+    if [ "mvc" == "$branch" ]; then
+        echo Updating deployment
+        DIR=/home/szentiras_hu_git/github/borazslo/staging.szentiras.hu
+        cd $DIR
+        echo $PWD
+        unset GIT_DIR
+        git checkout mvc
+        git pull
+        export MYSQL_SZENTIRAS_USER=szentiras
+        export MYSQL_SZENTIRAS_PASSWORD=krumpli12
+        export SZENTIRAS_WEBAPP_ENVIRONMENT=staging
+        npm install
+        node_modules/.bin/bower install
+        node_modules/.bin/gulp
+        php composer.phar install
+        php artisan migrate
+        php artisan up
+    fi
+done
