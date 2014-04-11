@@ -4,6 +4,7 @@ php:
   - 5.4
 
 before_script:
+  - npm install -g gulp
   - mysql -e 'create database bible;'
   - php composer.phar install
 # migrate needs environment specification
