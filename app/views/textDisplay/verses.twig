@@ -4,7 +4,7 @@
     {% for verseContainer in verseContainers %}
         {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book } %}
         {% for verse in verseContainer.parsedVerses %}
-            <sup>{{ verse.numv }}</sup>{{ verse.text }}
+            <sup>{{ verse.numv }}</sup>{{ verse.text|raw }}
             {% if verse.xrefs is not empty %}
                 <sup>
                 ({%- for xref in verse.xrefs -%}
