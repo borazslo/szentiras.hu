@@ -16,7 +16,7 @@ do
         export SZENTIRAS_WEBAPP_ENVIRONMENT=staging
         npm install
         node_modules/.bin/bower install
-        node_modules/.bin/gulp
+        node_modules/.bin/gulp --require=coffee-script/register
         php composer.phar install
         php artisan migrate
         php artisan up

@@ -7,5 +7,9 @@
   "ignore": [
     "node_modules",
     "bower_components"
-  ]
+  ],
+  "devDependencies": {
+    "bootstrap": "~3.1.1",
+    "requirejs": "~2.1.11"
+  }
 }

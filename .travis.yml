@@ -4,10 +4,6 @@ php:
   - 5.4
 
 before_script:
-  - npm install bower
-  - npm install gulp
-  - node_modules/.bin/bower install bootstrap --config.interactive=false
-  - node_modules/.bin/gulp
   - mysql -e 'create database bible;'
   - php composer.phar install
 # migrate needs environment specification
