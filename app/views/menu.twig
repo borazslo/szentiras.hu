@@ -1,16 +1,11 @@
-<table border='0' cellpadding='0' cellspacing='0' width='750'>
+<ul class="nav nav-pills nav-stacked">
     {% for item in items %}
         {% if item == 'pause' %}
-            <tr><td style='height:15px'></tr>
+            <li class="nav-divider"></li>
         {% elseif item is not iterable %}
-            <tr><td class='menu' >{{ item|raw }}</td></tr>
+            <li>{{ item|raw }}</li>
         {% else %}
-            <tr><td style='height:3px'></tr>
-            <tr>
-                <td background='/img/vmenucolorbg.gif' width='140' align='left' class='menu'>
-                    <a href="{{ item[1] }}" class="menulink">{{ item[0] }}</a>
-                </td>
-            </tr>         
+            <li><a href="{{ item[1] }}">{{ item[0] }}</a></li>
         {% endif %}
     {% endfor %}
-</table>
+</ul>

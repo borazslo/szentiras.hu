@@ -5,8 +5,7 @@
 {% endset %}
 
 {% macro bookLink(translation, book) %}
-    <a href="/{{ translation.abbrev }}/{{ book.abbrev }}" class="link">{{ book.name }}</a>
-    <br>
+    <li><a href="/{{ translation.abbrev }}/{{ book.abbrev }}" class="link">{{ book.name }}</a></li>
 {% endmacro %}
 
 {% import _self as temp %}
@@ -14,14 +13,18 @@
 {% block content %}
     {% include 'textDisplay.breadcrumb' %}
     {% include 'bookAbbrevList' with { 'translation' : translation } %}
-    <p class='kiscim'>Ószövetség</p>
-    {% for book in books if book.old_testament %}
-        {{ temp.bookLink(translation, book) }}
-    {% endfor %}
+    <h4>Ószövetség</h4>
+    <ul class="list-unstyled">
+        {% for book in books if book.old_testament %}
+            {{ temp.bookLink(translation, book) }}
+        {% endfor %}
+    </ul>
 
-    <p class='kiscim'>Újszövetség</p>
-    {% for book in books if not book.old_testament %}
-        {{ temp.bookLink(translation, book) }}
-    {% endfor %}
+    <h4>Újszövetség</h4>
+    <ul class="list-unstyled">
+        {% for book in books if not book.old_testament %}
+            {{ temp.bookLink(translation, book) }}
+        {% endfor %}
+    </ul>
 
 {% endblock %}

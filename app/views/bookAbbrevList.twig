@@ -1,6 +1,6 @@
 {% if books|length > 0 %}
-<blockquote>
-    <p class='kicsi' align='center'>
+<div class="panel panel-default">
+    <div class="panel-body text-center">
         {% for b in books %}
             {% if (b == book) %}
                 <b>{{b.abbrev}}</b>
@@ -9,6 +9,6 @@
             {% endif %}
             {% if (not loop.last) %} - {% endif %}
         {% endfor %}
-    </p>
-</blockquote>
+    </div>
+</div>
 {% endif %}

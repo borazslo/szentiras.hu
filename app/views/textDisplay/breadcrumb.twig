@@ -1,13 +1,11 @@
-<h4>
+<ol class="breadcrumb">
     {% if translation is defined %}
-        <a href="/{{ translation.abbrev }}">{{ translation.name }}</a>
+        <li><a href="/{{ translation.abbrev }}">{{ translation.name }}</a></li>
         {% if book is defined %}
-            <img src='/img/arrowright.jpg' alt='->' />
-            <a href="/{{ translation.abbrev }}/{{ book.abbrev }}">{{ book.name }}</a>
+            <li><a href="/{{ translation.abbrev }}/{{ book.abbrev }}">{{ book.name }}</a></li>
             {% if chapter is defined %}
-                <img src='/img/arrowright.jpg' alt='->' />
-                <a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a>
+                <li><a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a></li>
             {% endif %}
         {% endif %}
     {% endif %}
-</h4>
+</ol>

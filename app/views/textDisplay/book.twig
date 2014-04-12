@@ -9,11 +9,10 @@
     {% include 'textDisplay.breadcrumb' %}
 
     {% for chapter, verses in groupedVerses %}
-        <a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a>
+        <h4><a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a></h4>
 
-        <br />
         {% for num in '1'..'2' %}
-            <sup>{{ verses[num].numv }}</sup>{{ verses[num].verse }}
+            <sup>{{ verses[num].numv }}</sup>{{ verses[num].verse|raw }}
         {% endfor %}
         <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter}}' class='link'>&gt;&gt;</a><br>
         <br />
