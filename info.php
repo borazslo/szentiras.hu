@@ -33,6 +33,7 @@ http://d7.aiee.eu/xxx/node/6
 $title = 'Fejlesztések';
 $pagetitle = 'Fejlesztések | Szentírás';
 $content .= '<br>
+  <span class="cim">2014. 03. 24. </span><span class="alcim">Fejlesztések a GitHubon </span><span class="alap"> a <a href="http://github.com/borazslo/szentiras.hu">github.com/borazslo/szentiras.hu</a> oldalon. <a href="https://github.com/borazslo/szentiras.hu/wiki/Fejleszt%C5%91i-tudnival%C3%B3k">Bárki csatlakozhat</a>!</span>
   <span class="cim">2013. 12. 24. </span><span class="alcim">Átfogó fejlesztések </span><span class="alap">történtek. Leginkább a keresőben, de a megjelenítsében is. Valamint további szövegjavítások is történtek.</span>
   <span class="cim">2013. 11. 12. </span><span class="alcim">Új szövegek </span><span class="alap"> mindegyik fordításban. Ehhez viszont adatbázis átalakítás is kellett, aminek eredményeként speciális keresésfunkciók ideiglenesen nem voltak elérhetőek.</span>
   <span class="cim">2013. 06. 05. </span><span class="alcim">Szöveg frissítés </span><span class="alap"> három fordításban (KNB, UF, KG)</span>
