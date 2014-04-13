@@ -40,19 +40,30 @@ $content .= "<form action='".BASE."index.php' method='get'>\n";
 		$content .= "</form>\n";
 
 /* hátha, már kerestük ezt vagy nem*/
+                
 $query = "
 		SELECT resultarray, resultcount
 		FROM ".DBPREF."stats_search
 		WHERE
-			searchtype = '".$searchby."'
-			AND rows = '".$rows."'
-			AND page = '".$page."'
-			AND reftrans = '".$transid."'
-			AND texttosearch = '".$texttosearch."'
-			AND resultupdated > '".date('Y-m-d H:i:s',strtotime("-".getvar('cache_mysql_lifetime')))."'
+			searchtype = :searchby
+			AND rows = :rows
+			AND page = :page
+			AND reftrans = :transid
+			AND texttosearch = :texttosearch
+			AND resultupdated > :lastcachehit
 		ORDER BY resultcount DESC
 		LIMIT 1";
-	$result = db_query($query);
+        $stmt = $db->prepare($query);
+        $stmt->execute(array(
+            ':searchby' => $searchby,
+            ':rows' => $rows,
+            ':page' => $page,
+            ':transid' => $transid,
+            ':texttosearch' => $texttosearch,
+            ':lastcachehit' => date('Y-m-d H:i:s',strtotime("-".getvar('cache_mysql_lifetime')))            
+        ));
+	$result = $stmt->fetchAll();
+        print_r($result);
 	if(isset($result[0]) AND getvar('cache_on') == 'on' AND $result[0]['searchcount']>1) {
 		$verses = unserialize($result[0]['resultarray']);
 		$count = $result[0]['resultcount'];

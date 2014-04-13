@@ -1,12 +1,12 @@
 <?php
-define('BASE','http://szentiras.hu/'); //base url of the site
-define('FILE','/var/www/szentiras.hu/'); //base url of the site
+
+define(FILE, getenv("DOCUMENT_ROOT")."/");
+define(BASE, "http://".getenv("HTTP_HOST")."/");
+$baseurl = BASE;
+$fileurl = $baseurl;
+
 define('DBPREF','kar_'); // prefixes of the tables in the database
 define('DROPBOXF','Bibliafordítások'); // A dropbox foldere a megosztottaknak
-
-//Redundancia miatt szükség van erre
-$fileurl = BASE;//"http://szentiras.hu/";
-$baseurl = BASE;//"http://szentiras.hu/";
 
 $sitetitle = 'Szentírás <sup>v3</sup>';
 $subsitetitle = 'Katolikus Biblia fordítások az interneten';
@@ -16,17 +16,16 @@ $share = '';
 $comments = '';
 $title = false;
 $tipps = array();	
-$mysqlhost = 'localhost';
-$mysqldb = 'bible';
-$mysqlpw = getenv('MYSQL_SZENTIRAS_PWD');
-$mysqluser = getenv('MYSQL_SZENTIRAS_USER');
-$database = array('mysql:host=localhost;dbname=bible',getenv('MYSQL_SZENTIRAS_USER'),getenv('MYSQL_SZENTIRAS_PWD'));
+$dbHost = 'localhost';
+$dbName = 'bible';
+$dbPassword = getenv('MYSQL_SZENTIRAS_PASSWORD');
+$dbUser = getenv('MYSQL_SZENTIRAS_USER');
 
 try { 
-	$db = new PDO($database[0], $database[1], $database[2],array('charset'=>'UTF-8',PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+        $db = new PDO("mysql:host=${dbhost};dbname=${dbName}", $dbUser, $dbPassword, array('charset'=>'UTF-8',PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
 } catch (PDOException $exception) { 
 	echo '<strong>Végzetes hiba törént!</strong>';
-	echo '<br/>Nem sikerült az adatbázishoz kapcsolódni!';
+        echo "<br/>Nem sikerült az adatbázishoz kapcsolódni! ${dbHost}:${dbName}";
 	echo '<br/>Részletek: '. $exception->getMessage(); 
    exit; 
 } 
