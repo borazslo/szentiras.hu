@@ -1,0 +1,12 @@
+{% extends 'layout' %}
+
+{% block content %}
+<h3>Bibliafordítások</h4>
+
+{% for translation in translations %}
+    <h4><a href='/{{ translation.abbrev }}'>{{ translation.name }} ({{ translation.denom }})</a></h4>
+    <p>{{ translation.copyright|raw }}</p>
+{% endfor %}
+
+{% include 'bookAbbrevList' %}
+{% endblock %}

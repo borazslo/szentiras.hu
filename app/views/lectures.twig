@@ -1,0 +1,29 @@
+{% if lectures is not empty %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a href="http://www.katolikus.hu/igenaptar/{{ "now"|date("Ym") }}.html" target="_blank">Napi olvasmányok</a>
+            </h3>
+        </div>
+        <div class="panel-body">
+            {% for lecture in lectures %}
+                <div class="row">
+                    <div class="col-md-2">
+                        <a href='{{ lecture.link }}'>{{ lecture.ref }}</a>
+                    </div>
+                    <div class="col-md-4 btn-group">
+                        {% for extLink in lecture.extLinks %}
+                            <a href="{{ extLink.url }}" title="{{ extLink.title }}"
+                               class="btn btn-default btn-xs">{{ extLink.label }}</a>
+                        {% endfor %}
+                        {% if loop.last %}
+                            <a href="http://evangelium.katolikus.hu/audio/NE{{ "now"|date('Ymd') }}.mp3"
+                               class="btn btn-default btn-xs" title="Evangélium és elmélkedés az evangelium365.hu honlapról."
+                               target="_blank">mp3</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

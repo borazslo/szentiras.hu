@@ -8,6 +8,7 @@ use SzentirasHu\Lib\Reference\ChapterRange;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Entities\Verse;
+use View;
 
 
 class VerseContainer
@@ -61,11 +62,19 @@ class VerseContainer
 class TextDisplayController extends \BaseController
 {
 
+    public function showTranslationList()
+    {
+        $translations = Translation::orderBy('denom')->get();
+        return View::make('textDisplay.translationList', [
+            'translations' => $translations
+        ]);
+    }
+
     public function showTranslation($translationAbbrev)
     {
         $translation = Translation::where('abbrev', $translationAbbrev)->first();
         $books = $translation->books()->orderBy('id')->get();
-        return \View::make('textDisplay.translation',
+        return View::make('textDisplay.translation',
             ['translation' => $translation,
                 'books' => $books]);
     }
@@ -96,7 +105,7 @@ class TextDisplayController extends \BaseController
             }
             $verseContainers[] = $verseContainer;
         }
-        return \View::make('textDisplay.verses')->with([
+        return View::make('textDisplay.verses')->with([
             'verseContainers' => $verseContainers,
             'translation' => $translation
         ]);
@@ -126,7 +135,7 @@ class TextDisplayController extends \BaseController
             }
         }
 
-        return \View::make('textDisplay.book', [
+        return View::make('textDisplay.book', [
             'translation' => $translation,
             'reference' => $translatedRef,
             'book' => $book,
