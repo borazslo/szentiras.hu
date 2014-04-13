@@ -1,29 +1,53 @@
 <?php
 
 use SzentirasHu\Controllers\Display\VerseParsers\KGVerseParser;
+use SzentirasHu\Controllers\Display\VerseParsers\KNBVerseParser;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Verse;
 
-class VerseParserTest extends TestCase {
+class VerseParserTest extends TestCase
+{
 
-    public function testKGVerseParser() {
-
-        $parser = new KGVerseParser();
+    public function testKNBVerseParser()
+    {
+        $parser = new KNBVerseParser();
         $book = new Book();
-        $book->abbrev="Mt";
+        $book->abbrev = "Mt";
 
         $v = new Verse();
         $chapter = 2;
         $v->chapter = $chapter;
         $numv = 3;
         $v->numv = $numv;
-        $v->verse = "abc ".KGVerseParser::$xrefSigns[0]." xyz";
+        $v->verse = "abc {Mk 12,34} xyz {Mt 23,45} zyx";
+        $v->tip = \Config::get('verseTypes.KNB.text.0');
+        $verseData = $parser->parse([$v], $book);
+
+        $this->assertEquals("abc xyz zyx", $verseData->text);
+        $this->assertCount(2, $verseData->xrefs);
+        $this->assertEquals("Mk 12,34", $verseData->xrefs[0]->text);
+
+    }
+
+    public function testKGVerseParser()
+    {
+
+        $parser = new KGVerseParser();
+        $book = new Book();
+        $book->abbrev = "Mt";
+
+        $v = new Verse();
+        $chapter = 2;
+        $v->chapter = $chapter;
+        $numv = 3;
+        $v->numv = $numv;
+        $v->verse = "abc " . KGVerseParser::$xrefSigns[0] . " xyz";
         $v->tip = \Config::get('verseTypes.KG.text.0');
 
         $xrefVerse = new Verse();
         $xrefVerse->chapter = $chapter;
         $xrefVerse->numv = $numv;
-        $xrefVerse->verse = KGVerseParser::$xrefSigns[0]." Mk. 12,34.";
+        $xrefVerse->verse = KGVerseParser::$xrefSigns[0] . " Mk. 12,34.";
         $xrefVerse->tip = \Config::get('verseTypes.KG.xref.0');;
 
         $verseData = $parser->parse([$v, $xrefVerse], $book);

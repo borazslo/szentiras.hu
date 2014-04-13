@@ -2,6 +2,8 @@
 
 namespace SzentirasHu\Lib;
 
+use ErrorException;
+
 class LectureDownloader {
 
     public $date;
@@ -17,7 +19,7 @@ class LectureDownloader {
             preg_match('/<!-- helyek:(.*)-->/', $text, $places);
             $referenceString = isset($places[1]) ? trim($places[1]) : '';
             return $referenceString;
-        } catch (Exception $e) {
+        } catch (ErrorException $e) {
             return null;
         }
     }

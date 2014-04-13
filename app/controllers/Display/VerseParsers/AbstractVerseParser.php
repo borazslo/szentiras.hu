@@ -60,11 +60,11 @@ abstract class AbstractVerseParser implements VerseParser {
     }
 
     /**
-     * @param $rawVerse
-     * @param $verse
+     * @param Verse $rawVerse
+     * @param VerseData $verseData
      * @return void
      */
-    abstract protected function parseTextVerse($rawVerse, $verse);
+    abstract protected function parseTextVerse($rawVerse, $verseData);
 
     /**
      * @param Book $book
