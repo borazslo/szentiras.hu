@@ -9,6 +9,10 @@ Route::resource("search", "SearchController");
 /** API */
 Route::controller("api", 'SzentirasHu\Controllers\Api\ApiController');
 
+Route::get('info', function() {
+   return View::make('info.info');
+});
+
 Route::get('API', function () {
     if (Input::get('feladat') === 'idezet') {
         return Redirect::action('SzentirasHu\Controllers\Api\ApiController@getIdezet', [Input::get('hivatkozas'), Input::get('forditas')], 301);
