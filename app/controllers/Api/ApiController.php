@@ -30,13 +30,21 @@ class ApiController extends BaseController {
         $verses = [];
         foreach ($verseContainers as $verseContainer) {
             foreach ($verseContainer->getParsedVerses() as $verse) {
-                $verses[] = $verse->text;
+                $jsonVerse["szoveg"]=$verse->text;
+                $jsonVerse["hely"]=[ "gepi" => $verse->gepi];
+                $jsonVerse["hely"]["szep"]=$verse->book->abbrev . " ". $verse->chapter . ','. $verse->numv;
+                $verses[] = $jsonVerse;
             }
         }
 
         return Response::json([
             "keres" => [ "feladat" => "idezet", "hivatkozas" => $canonicalRef->toString(), "forma" => "json"],
-            "valasz" => [ "versek" => $verses]
+            "valasz" => [
+                "versek" => $verses,
+                "forditas" => [
+                    "nev" => $translation->name,
+                    "rov" => $translation->abbrev
+                ]]
             ]
         );
     }

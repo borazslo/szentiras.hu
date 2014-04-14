@@ -13,6 +13,8 @@ class VerseData
      */
     public $xrefs = [];
     public $text;
+    public $gepi;
+    public $book;
 
     function __construct($chapter, $numv)
     {

@@ -48,7 +48,10 @@ class VerseContainer
     public function getParsedVerses() {
         $verseData = [];
         foreach ($this->rawVerses as $gepi => $rawVerses) {
-            $verseData[] = $this->verseParser->parse($rawVerses, $this->book);
+            $parsedVerseData = $this->verseParser->parse($rawVerses, $this->book);
+            $parsedVerseData->gepi=$gepi;
+            $parsedVerseData->book=$this->book;
+            $verseData[] = $parsedVerseData;
         }
         return $verseData;
     }
