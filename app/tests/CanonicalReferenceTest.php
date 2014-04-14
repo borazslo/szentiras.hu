@@ -229,5 +229,10 @@ class CanonicalReferenceTest extends TestCase
         $this->assertFalse($range->hasVerse(3, 5));
     }
 
+    public function testDashes() {
+        $this->assertEquals("Mt 2,1-2", CanonicalReference::fromString("Mt 2,1–2")->toString());
+        $this->assertEquals("Mt 2,1-2", CanonicalReference::fromString("Mt 2,1—2")->toString());
+    }
+
 }
  

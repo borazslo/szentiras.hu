@@ -2,8 +2,6 @@
 
 namespace SzentirasHu\lib\Reference;
 
-use SzentirasHu\Lib\Reference\AbstractLexer;
-
 class ReferenceLexer extends AbstractLexer {
 
     const T_CHAPTER_VERSE_SEPARATOR = 1;
@@ -27,7 +25,7 @@ class ReferenceLexer extends AbstractLexer {
         return [
             '\d+',
             '\p{L}+',
-            '[,:\-\.;\|]',
+            '[,:\-\.;\|–—]',
         ];
     }
 
@@ -57,6 +55,8 @@ class ReferenceLexer extends AbstractLexer {
                 case '.' :
                     return self::T_VERSE_RANGE_SEPARATOR;
                 case '-' :
+                case '–':
+                case '—':
                     return self::T_RANGE_OPERATOR;
                 case ';' :
                     return self::T_BOOK_SEPARATOR;
