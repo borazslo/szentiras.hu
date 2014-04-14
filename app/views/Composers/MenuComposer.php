@@ -2,7 +2,6 @@
 
 namespace SzentirasHu\Views\Composers;
 
-use SzentirasHu\Controllers\Search\SearchForm;
 use SzentirasHu\Models\Entities\Translation;
 
 /**
@@ -31,7 +30,7 @@ class MenuComposer
         $items[] = \View::make("searchForm")->render();
         $items[] = 'pause';
 
-        $items[] = ["FEJLESZTŐKNEK", "/API"];
+        $items[] = ["Fejlesztőknek", "/api"];
         $items[] = ["Újdonságaink", "/info"];
 
         $items[] = 'pause';
