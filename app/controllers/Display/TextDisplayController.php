@@ -91,20 +91,7 @@ class TextDisplayController extends \BaseController
             return $this->bookView($translationAbbrev, $canonicalRef);
         }
         $translation = Translation::byAbbrev($translationAbbrev);
-        $translatedRef = $canonicalRef->toTranslated($translation->id);
-        $verseContainers = [];
-        foreach ($translatedRef->bookRefs as $bookRef) {
-            $book = Book::where('abbrev', $bookRef->bookId)->where('translation_id', $translation->id)->first();
-            $verseContainer = new VerseContainer($book);
-            foreach ($bookRef->chapterRanges as $chapterRange) {
-                $searchedChapters = $this->collectChapterIds($chapterRange);
-                $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation);
-                foreach ($verses as $verse) {
-                    $verseContainer->addVerse($verse);
-                }
-            }
-            $verseContainers[] = $verseContainer;
-        }
+        $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation);
         return View::make('textDisplay.verses')->with([
             'verseContainers' => $verseContainers,
             'translation' => $translation
@@ -179,6 +166,30 @@ class TextDisplayController extends \BaseController
         orderBy('gepi')
             ->get();
         return $verses;
+    }
+
+    /**
+     * @param $canonicalRef
+     * @param $translation
+     * @return array
+     */
+    public function getTranslatedVerses($canonicalRef, $translation)
+    {
+        $translatedRef = $canonicalRef->toTranslated($translation->id);
+        $verseContainers = [];
+        foreach ($translatedRef->bookRefs as $bookRef) {
+            $book = Book::where('abbrev', $bookRef->bookId)->where('translation_id', $translation->id)->first();
+            $verseContainer = new VerseContainer($book);
+            foreach ($bookRef->chapterRanges as $chapterRange) {
+                $searchedChapters = $this->collectChapterIds($chapterRange);
+                $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation);
+                foreach ($verses as $verse) {
+                    $verseContainer->addVerse($verse);
+                }
+            }
+            $verseContainers[] = $verseContainer;
+        }
+        return $verseContainers;
     }
 
 }

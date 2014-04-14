@@ -20,6 +20,10 @@ class Translation extends Eloquent {
         return self::where('abbrev', $translationAbbrev)->first();
     }
 
+    public static function getDefaultTranslation() {
+        return self::find(\Config::get('settings.defaultTranslationId'));
+    }
+
     public function books() {
         return $this->hasMany('SzentirasHu\Models\Entities\Book');
     }
