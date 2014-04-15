@@ -6,6 +6,7 @@ use Eloquent;
 /**
  * Domain object representing a translation.
  *
+ * @property mixed id
  * @author berti
  */
 class Translation extends Eloquent {
@@ -20,6 +21,9 @@ class Translation extends Eloquent {
         return self::where('abbrev', $translationAbbrev)->first();
     }
 
+    /**
+     * @return Translation
+     */
     public static function getDefaultTranslation() {
         return self::find(\Config::get('settings.defaultTranslationId'));
     }

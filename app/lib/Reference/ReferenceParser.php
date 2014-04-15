@@ -57,11 +57,16 @@ class ReferenceParser
     {
         $bookRef = new BookRef($this->bookId());
         $bookRefs[] = $bookRef;
-        if ($this->lexer->moveNext()) {
-            $token = $this->lexer->lookahead;
-            if ($token['type'] == ReferenceLexer::T_NUMERIC) {
-                $bookRef->chapterRanges = $this->chapterRanges();
-            }
+        $nextToken = $this->lexer->glimpse();
+        if ($nextToken['type'] == ReferenceLexer::T_NUMERIC) {
+            $this->lexer->moveNext();
+            $bookRef->chapterRanges = $this->chapterRanges();
+        } else if (
+            $nextToken['type'] == ReferenceLexer::T_BOOK_SEPARATOR
+        ) {
+            $this->lexer->moveNext();
+        } else if ($nextToken) {
+            $this->parsingError();
         }
         return $bookRef;
     }
@@ -87,7 +92,8 @@ class ReferenceParser
         $chapterRanges = [];
         $chapterRanges[] = $this->chapterRange();
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR
-        || $this->lexer->glimpse()['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR) {
+            || $this->lexer->glimpse()['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR
+        ) {
             $this->lexer->moveNext();
             $this->lexer->moveNext();
             $chapterRanges = array_merge($chapterRanges, $this->chapterRanges());
@@ -103,8 +109,8 @@ class ReferenceParser
             $this->lexer->moveNext();
             $this->lexer->moveNext();
             $range->untilChapterRef = $this->chapterRef();
-            // a bit hard to understand, but this is used when the ranges are through chapters, 2,3-3,4
         } else {
+            // a bit hard to understand, but this is used when the ranges are through chapters, 2,3-3,4
             if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR) {
                 $range->untilChapterRef = $this->chapterRef();
             }
@@ -140,7 +146,8 @@ class ReferenceParser
         $verseRanges[] = $this->verseRange();
         $nextToken = $this->lexer->peek();
         if ($nextToken['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR
-        || $nextToken['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR) {
+            || $nextToken['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR
+        ) {
             if ($this->lexer->peek()['type'] == ReferenceLexer::T_NUMERIC
                 && $this->lexer->peek()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR
             ) {
@@ -154,6 +161,7 @@ class ReferenceParser
                 }
             }
         }
+        $this->lexer->resetPeek();
         return $verseRanges;
     }
 
@@ -188,6 +196,9 @@ class ReferenceParser
     public function verseId()
     {
         $token = $this->lexer->lookahead;
+        if ($token['type'] != ReferenceLexer::T_NUMERIC) {
+            $this->parsingError();
+        }
         $verseId = $token['value'];
         return $verseId;
     }
@@ -195,6 +206,11 @@ class ReferenceParser
     private function pushState($state)
     {
         array_push($this->stateStack, $state);
+    }
+
+    private function parsingError()
+    {
+        throw new ParsingException($this->lexer->lookahead['position']);
     }
 }
 

@@ -176,14 +176,18 @@ class CanonicalReferenceTest extends TestCase
 
     public function testIsValidBookRef()
     {
-//        $this->assertTrue(CanonicalReference::isValid("Jn 3,2-5"));
-//        $this->assertFalse(CanonicalReference::isValid("Jn 3,2,5"));
-//        $this->assertFalse(CanonicalReference::isValid("Jn 3,2-5,,"));
-//        $this->assertFalse(CanonicalReference::isValid("Jn 3,2-5.-6"));
-//
-//        $this->assertTrue(CanonicalReference::isValid("9Sira 10,2-5"));
-//        $this->assertFalse(CanonicalReference::isValid("Jn3"));
+        $this->assertTrue(CanonicalReference::isValid("Jn 3,2-5"));
+        $this->assertFalse(CanonicalReference::isValid("ne félj"));
+        $this->assertFalse(CanonicalReference::isValid("Jn 3,2-5,,"));
+        $this->assertTrue(CanonicalReference::isValid("9Sira 10,2-5"));
+    }
 
+    public
+    function testIsExistingBookRef()
+    {
+        $bookRef = CanonicalReference::fromString('1Móz 2,3.4-5')->getExistingBookRef();
+        $translatedBookRef = CanonicalReference::translateBookRef($bookRef, 1);
+        $this->assertEquals("Ter", $translatedBookRef->bookId);
     }
 
     public function testIsBookLevel()
@@ -194,14 +198,6 @@ class CanonicalReferenceTest extends TestCase
     }
 
 
-    public
-    function testIsExistingBookRef()
-    {
-        // $this->assertTrue(CanonicalReference::isExistingBookRef('Szám 2,3.4-5'));
-        //this->assertTrue(CanonicalReference::fromString('1Moz 2,3.4-5')->isExistingBookRef());
-        //this->assertFalse(CanonicalReference::fromString('999')->isExistingBookRef());
-        //this->assertFalse(CanonicalReference::fromString('ne félj')->isExistingBookRef());
-    }
 
     public
     function testChapterRange()

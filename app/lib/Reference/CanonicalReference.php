@@ -2,7 +2,9 @@
 
 namespace SzentirasHu\Lib\Reference;
 
+use Symfony\Component\Yaml\Exception\ParseException;
 use SzentirasHu\Models\Entities\BookAbbrev;
+use SzentirasHu\Models\Entities\Translation;
 
 /**
  * Class CanonicalReference to represent a unique reference to some Bible verses.
@@ -22,11 +24,15 @@ class CanonicalReference
         $this->bookRefs = $bookRefs;
     }
 
-    public static function isExistingBookRef($referenceString)
+    public function getExistingBookRef()
     {
-        $ref = self::fromString($referenceString);
-        $translationId = \Config::get("settings.defaultTranslationId");
-        return self::findStoredBookRef($ref->bookRefs[0], $translationId);
+        foreach (Translation::all() as $translation) {
+            $storedBookRef = self::findStoredBookRef($this->bookRefs[0], $translation->id);
+            if ($storedBookRef) {
+                return $storedBookRef;
+            }
+        }
+        return false;
     }
 
     public static function fromString($s)
@@ -40,7 +46,11 @@ class CanonicalReference
 
     public static function isValid($referenceString)
     {
-        $ref = self::fromString($referenceString);
+        try {
+            $ref = self::fromString($referenceString);
+        } catch (ParsingException $e) {
+            return false;
+        }
         return count($ref->bookRefs) > 0;
     }
 

@@ -3,15 +3,6 @@
 {% block content %}
     {% for verseContainer in verseContainers %}
         {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book } %}
-        {% for verse in verseContainer.parsedVerses %}
-            <sup>{{ verse.numv }}</sup>{{ verse.text|raw }}
-            {% if verse.xrefs is not empty %}
-                <sup>
-                ({%- for xref in verse.xrefs -%}
-                    <a href="/{{ translation.abbrev }}/{{ xref.text }}">{{ xref.text }}{% if not loop.last %};{% endif %}</a>
-                {%- endfor -%})
-                </sup>
-            {% endif %}
-        {% endfor %}
+        {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
     {% endfor %}
 {% endblock %}

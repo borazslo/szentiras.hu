@@ -11,5 +11,7 @@ class SearchForm {
     
     public $textToSearch;
     public $translation;
-    
+    public $book;
+    public $grouping;
+
 }

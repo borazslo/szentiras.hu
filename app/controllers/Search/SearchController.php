@@ -3,6 +3,9 @@
 namespace SzentirasHu\Controllers\Search;
 use BaseController;
 use Input;
+use SzentirasHu\Controllers\Display\TextDisplayController;
+use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Translation;
 use View;
 
@@ -14,24 +17,46 @@ use View;
 class SearchController extends BaseController {
 
     public function getIndex() {
-        return $this->getView(new SearchForm());
+        return $this->getView($this->prepareForm());
     }
 
     public function postSearch() {
+        $form = $this->prepareForm();
+        $view = $this->getView($form);
+        $storedBookRef = CanonicalReference::fromString($form->textToSearch)->getExistingBookRef();
+        $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $form->translation->id);
+        if ($storedBookRef) {
+            $textDisplayController = new TextDisplayController();
+            $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $form->translation);
+            $view = $view->with('bookRef', [
+                    'label' => $translatedRef->toString(),
+                    'link' => "/{$form->translation->abbrev}/{$translatedRef->toString()}",
+                    'verseContainers' => $verseContainers
+                ]);
+        }
+        return $view;
+    }
+
+    /**
+     * @return SearchForm
+     */
+    private function prepareForm() {
         $form = new SearchForm();
         $form->textToSearch = Input::get('textToSearch');
-        if (Input::has('translation')) {
-            $form->translation = Input::get('translation');
-        } else {
-            $form->translation = Translation::getDefaultTranslation()->id;
-        }
-        return $this->getView($form);
+        $form->grouping = Input::get('grouping');
+        $defaultTranslation = Translation::getDefaultTranslation();
+        $form->book = Input::has('book') ? Input::get('book') : 0;
+        $form->translation = Input::has('translation') ? Translation::find(Input::get('translation')) : $defaultTranslation;
+        return $form;
     }
 
     private function getView($form) {
-        return View::make("search", [
+        $translations = Translation::orderBy('name')->get();
+        $books = Book::where('translation_id', Translation::getDefaultTranslation()->id)->orderBy('id')->get();
+        return View::make("search.search", [
             'form' => $form,
-            'translations' => Translation::orderBy('name')->get()
+            'translations' => $translations,
+            'books' => $books
         ]);
     }
 

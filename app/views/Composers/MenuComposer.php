@@ -27,7 +27,7 @@ class MenuComposer
         $items[] = 'pause';
         $items[] = ["Keresés a Bibliában", '/kereses'];
 
-        $items[] = \View::make("searchForm")->render();
+        $items[] = \View::make("search.searchForm")->render();
         $items[] = 'pause';
 
         $items[] = ["Fejlesztőknek", "/api"];

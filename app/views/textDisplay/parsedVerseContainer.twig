@@ -1,0 +1,10 @@
+{% for verse in verseContainer.parsedVerses %}
+    <sup>{{ verse.numv }}</sup>{{ verse.text|raw }}
+    {% if verse.xrefs is not empty %}
+        <sup>
+            ({%- for xref in verse.xrefs -%}
+            <a href="/{{ translation.abbrev }}/{{ xref.text }}">{{ xref.text }}{% if not loop.last %};{% endif %}</a>
+            {%- endfor -%})
+        </sup>
+    {% endif %}
+{% endfor %}
