@@ -24,8 +24,8 @@ class SearchController extends BaseController {
         $form = $this->prepareForm();
         $view = $this->getView($form);
         $storedBookRef = CanonicalReference::fromString($form->textToSearch)->getExistingBookRef();
-        $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $form->translation->id);
         if ($storedBookRef) {
+            $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $form->translation->id);
             $textDisplayController = new TextDisplayController();
             $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $form->translation);
             $view = $view->with('bookRef', [
