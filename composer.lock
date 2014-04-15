@@ -3,8 +3,42 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "4921a7580a331da02220a92f5192364f",
+    "hash": "a4b2eef8012c7ad46646df709096c28b",
     "packages": [
+        {
+            "name": "barryvdh/laravel-cors",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/barryvdh/laravel-cors.git",
+                "reference": "644c63a742294d9b490ffb7bfa237913f4b0e776"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/barryvdh/laravel-cors/zipball/644c63a742294d9b490ffb7bfa237913f4b0e776",
+                "reference": "644c63a742294d9b490ffb7bfa237913f4b0e776",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "4.x",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Barryvdh\\Cors": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Barry vd. Heuvel",
+                    "email": "barryvdh@gmail.com"
+                }
+            ],
+            "description": "Adds CORS (Cross-Origin Resource Sharing) headers support in your Laravel application",
+            "time": "2014-03-06 20:42:59"
+        },
         {
             "name": "barryvdh/laravel-ide-helper",
             "version": "v1.9.1",
@@ -3081,7 +3115,8 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "barryvdh/laravel-twigbridge": 20
+        "barryvdh/laravel-twigbridge": 20,
+        "barryvdh/laravel-cors": 20
     },
     "platform": [
 
