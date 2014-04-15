@@ -3,6 +3,7 @@
 namespace SzentirasHu\Controllers\Api;
 
 use BaseController;
+use Input;
 use Response;
 use SzentirasHu\Controllers\Display\TextDisplayController;
 use SzentirasHu\Lib\Reference\CanonicalReference;
@@ -45,7 +46,7 @@ class ApiController extends BaseController {
                     "rov" => $translation->abbrev
                 ]]
             ]
-        );
+        )->setCallback(Input::get('callback'));
     }
 
     public function getForditasok($gepi) {
@@ -68,6 +69,6 @@ class ApiController extends BaseController {
             "valasz" => [
                 "versek" => $verseDataList
             ]
-        ]);
+        ])->setCallback(Input::get('callback'));
     }
 }
