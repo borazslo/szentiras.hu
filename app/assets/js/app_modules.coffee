@@ -1,1 +1,1 @@
-define ['news'], ->
+define [], ->
