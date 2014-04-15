@@ -1,6 +1,6 @@
 <?php
 
-namespace SzentirasHu\lib\Reference;
+namespace SzentirasHu\Lib\Reference;
 
 class ReferenceLexer extends AbstractLexer {
 
