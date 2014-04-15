@@ -4,7 +4,7 @@ require('views/Composers/viewComposers.php');
 
 Route::get('/', 'SzentirasHu\Controllers\Home\HomeController@index');
 
-Route::resource("search", "SearchController");
+Route::controller("kereses", 'SzentirasHu\Controllers\Search\SearchController');
 
 /** API */
 Route::controller("api", 'SzentirasHu\Controllers\Api\ApiController');

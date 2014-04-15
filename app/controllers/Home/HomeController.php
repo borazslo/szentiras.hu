@@ -2,6 +2,7 @@
 
 namespace SzentirasHu\Controllers\Home;
 
+use BaseController;
 use SzentirasHu\Models\Entities\Article;
 use SzentirasHu\Models\Entities\News;
 use SzentirasHu\Models\Entities\Translation;
@@ -11,7 +12,7 @@ use SzentirasHu\Models\Entities\Translation;
  * Controller for the home page.
  * Note that many parts on the home view are coming from view composers.
  */
-class HomeController extends \BaseController
+class HomeController extends BaseController
 {
 
     public function index()

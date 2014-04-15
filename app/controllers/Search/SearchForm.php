@@ -10,6 +10,6 @@ namespace SzentirasHu\Controllers\Search;
 class SearchForm {
     
     public $textToSearch;
-    public $refTrans;
+    public $translation;
     
 }

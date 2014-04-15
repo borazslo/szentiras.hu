@@ -1,27 +1,38 @@
-<?php namespace 
+<?php
 
-SzentirasHu\Controllers\Search;
+namespace SzentirasHu\Controllers\Search;
+use BaseController;
+use Input;
+use SzentirasHu\Models\Entities\Translation;
+use View;
 
 /**
  * Controller for searching. Based on REST conventions.
  *
  * @author berti
  */
-class SearchController extends \BaseController {
+class SearchController extends BaseController {
 
-    public function index() {
-        return \View::make("search", array("searchForm" => new SearchForm()));
+    public function getIndex() {
+        return $this->getView(new SearchForm());
     }
-        
-    public function show($textToSearch) {
+
+    public function postSearch() {
         $form = new SearchForm();
-        $form->textToSearch = $textToSearch;
-        return \View::make("search", array("searchForm" => $form, 
-            'pageTitle' => 'Szentírás | Keresés: '.$textToSearch));
+        $form->textToSearch = Input::get('textToSearch');
+        if (Input::has('translation')) {
+            $form->translation = Input::get('translation');
+        } else {
+            $form->translation = Translation::getDefaultTranslation()->id;
+        }
+        return $this->getView($form);
     }
-    
-    public function store() {
-        return $this->show(Input::get('textToSearch'));
+
+    private function getView($form) {
+        return View::make("search", [
+            'form' => $form,
+            'translations' => Translation::orderBy('name')->get()
+        ]);
     }
-    
+
 }
