@@ -14,11 +14,7 @@ do
         export MYSQL_SZENTIRAS_USER=szentiras
         export MYSQL_SZENTIRAS_PASSWORD=krumpli12
         export SZENTIRAS_WEBAPP_ENVIRONMENT=staging
-        npm install
-        node_modules/.bin/bower install
-        node_modules/.bin/grunt
-        php composer.phar install
-        php artisan migrate
+        sh install.sh
         php artisan up
     fi
 done

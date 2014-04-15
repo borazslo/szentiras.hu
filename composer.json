@@ -6,7 +6,8 @@
         "laravel/framework": "4.1.*",
         "barryvdh/laravel-twigbridge": "dev-master",
         "twig/extensions": "1.0.*",
-        "doctrine/dbal": "2.3.*"
+        "doctrine/dbal": "2.3.*",
+        "barryvdh/laravel-ide-helper": "1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
