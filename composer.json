@@ -8,7 +8,9 @@
         "twig/extensions": "1.0.*",
         "doctrine/dbal": "2.3.*",
         "barryvdh/laravel-ide-helper": "1.*",
-        "barryvdh/laravel-cors": "dev-master"
+        "barryvdh/laravel-cors": "dev-master",
+        "scalia/sphinxsearch": "dev-master",
+        "gigablah/sphinxphp": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

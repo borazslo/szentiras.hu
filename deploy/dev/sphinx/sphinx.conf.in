@@ -1,0 +1,76 @@
+#
+# Minimal Sphinx configuration sample (clean, simple, functional)
+#
+
+source verses_source
+{
+	type			= mysql
+	sql_host		= localhost
+	sql_user		= root
+	sql_pass		=
+	sql_db			= bible
+	sql_port		= 3306
+
+	sql_query		= \
+		SELECT id, gepi, trans, book, chapter, numv, tip, verse \
+		FROM kar_tdverse \
+		WHERE tip IN (60, 6, 901)
+
+	sql_attr_uint = trans
+	sql_attr_uint = book
+	sql_attr_uint = chapter
+	sql_attr_bigint = gepi
+	sql_attr_uint = tip
+
+	sql_query_info = SELECT * FROM kar_tdverse WHERE id=$id
+	sql_query_pre = SET NAMES utf8
+    sql_query_pre = SET SESSION query_cache_type=OFF
+}
+
+source verses_root_source : verses_source
+{
+    sql_query		= \
+    SELECT id, gepi, trans, book, chapter, numv, tip, verseroot \
+    FROM kar_tdverse \
+    WHERE tip IN (60, 6, 901)
+
+}
+
+index verse
+{
+	source			= verses_source
+	path = /tmp/sphinxsearch/verse
+	charset_type = utf-8
+	enable_star = *
+	min_infix_len = 3
+}
+
+index verse_root : verse
+{
+    source = verses_root_source
+    path = /tmp/sphinxsearch/verse_root
+}
+
+
+indexer
+{
+	mem_limit		= 32M
+}
+
+
+searchd
+{
+	listen			= 9312
+	listen			= 9306:mysql41
+	log			= /tmp/sphinxsearch/log/searchd.log
+	query_log		= /tmp/sphinxsearch/log/query.log
+	read_timeout		= 5
+	max_children		= 30
+	pid_file		= /tmp/sphinxsearch/log/searchd.pid
+	max_matches		= 1000
+	seamless_rotate		= 1
+	preopen_indexes		= 1
+	unlink_old		= 1
+	workers			= threads # for RT to work
+	binlog_path		= /tmp/sphinxsearch/data
+}

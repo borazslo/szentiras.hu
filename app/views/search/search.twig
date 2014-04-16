@@ -58,6 +58,13 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         {% endfor %}
     {% endif %}
 
+    {% if fullTextResults is defined %}
+        {% for verse in fullTextResults %}
+            {{ verse.chapter }},{{verse.numv}}: {{ verse.verse }}
+            <br>
+        {% endfor %}
+    {% endif %}
+
     {% if form.textToSearch is not defined %}
         {% include 'searchInfo' %}
     {% endif %}

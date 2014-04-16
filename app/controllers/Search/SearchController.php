@@ -34,6 +34,14 @@ class SearchController extends BaseController {
                     'verseContainers' => $verseContainers
                 ]);
         }
+        $fullTextResults = \SphinxSearch::
+            search($form->textToSearch)
+            ->limit(1000)
+            ->filter('trans', $form->translation->id)
+            ->get();
+        if ($fullTextResults) {
+            $view = $view->with('fullTextResults', $fullTextResults);
+        }
         return $view;
     }
 

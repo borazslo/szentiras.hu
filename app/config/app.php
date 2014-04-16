@@ -108,7 +108,8 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
         'Barryvdh\TwigBridge\ServiceProvider',
         'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
-        'Barryvdh\Cors\CorsServiceProvider'
+        'Barryvdh\Cors\CorsServiceProvider',
+        'Scalia\SphinxSearch\SphinxSearchServiceProvider',
 	),
 
 
@@ -175,7 +176,7 @@ return array(
 		'URL'             => 'Illuminate\Support\Facades\URL',
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
-
+        'SphinxSearch' => 'Scalia\SphinxSearch\SphinxSearchFacade',
 	),
 
 );
