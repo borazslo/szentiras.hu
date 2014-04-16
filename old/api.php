@@ -13,10 +13,12 @@ http://d7.aiee.eu/xxx/node/6
 //$content = $api;
 
 $content  .= <<<EOD
+<br><p class="alcim">Forráskód és bekapcsolódás</p>
+<p>A honlap forráskódja elérhető a <a href="https://github.com/borazslo/szentiras.hu">github.com/borazslo/szentiras.hu</a> honlapon. A bekapcsolódni vágyó fejlesztők itt találnak segítséget: <a href="https://github.com/borazslo/szentiras.hu/wiki/Fejlesztői-tudnivalók">github.com/borazslo/szentiras.hu/wiki/Fejlesztői-tudnivalók</a></p>
 <br><p class="alcim">Widgetek, pluginek, stb.</p>
-<p>Egyelőre semmilyen widget/plugin sem áll rendelkezésre. Ha bármilyen ötlete vagy igénye van szívesen segítünk a kifejlesztésében. 
+<p>Elkészült egy igemutató böngésző kiegészítő <a href="https://chrome.google.com/webstore/detail/szent%C3%ADr%C3%A1s/mooikajlieddnjlmlbodldompfifkoim">Google Chrome-hoz</a> és <a href=" https://addons.mozilla.org/hu/firefox/addon/szent%C3%ADr%C3%A1s/">Mozilla Firefoxhoz</a>. A forráskódja pedig nyilt: <a href="https://github.com/molnarm/igemutato">github.com/molnarm/igemutato</a></p>
+<p>Ha további widget/plugin ötlete vagy igénye van szívesen segítünk a kifejlesztésében. 
 Létező munkáját kérjük ossza meg velünk, hogy másoknak is hasznára lehessen.</p>
-<p>Kellő jelentkező/igénylő/használó esetén kifejleszthetünk egy <a href="http://reftagger.com/">reftagger.com</a> szerű eszközt is. Kérjük jelezze, ha használna ilyet.</p>
 
 <br><p class="cim">API</p>
 <p><strong>Kérünk minden API fejlesztőt/használót, hogy egy emailben jelentkezzen, hogy értesíteni tudjuk az esetlegese API fejlesztésekről!</strong></p>
