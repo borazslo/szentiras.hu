@@ -3,8 +3,10 @@
 namespace SzentirasHu\Controllers\Search;
 use BaseController;
 use Input;
+use SphinxSearch;
 use SzentirasHu\Controllers\Display\TextDisplayController;
 use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Translation;
 use View;
@@ -23,7 +25,12 @@ class SearchController extends BaseController {
     public function postSearch() {
         $form = $this->prepareForm();
         $view = $this->getView($form);
-        $storedBookRef = CanonicalReference::fromString($form->textToSearch)->getExistingBookRef();
+        $storedBookRef = false;
+        try {
+            $storedBookRef = CanonicalReference::fromString($form->textToSearch)->getExistingBookRef();
+        } catch (ParsingException $e) {
+
+        }
         if ($storedBookRef) {
             $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $form->translation->id);
             $textDisplayController = new TextDisplayController();
@@ -34,10 +41,12 @@ class SearchController extends BaseController {
                     'verseContainers' => $verseContainers
                 ]);
         }
-        $fullTextResults = \SphinxSearch::
+        $fullTextResults = SphinxSearch::
             search($form->textToSearch)
             ->limit(1000)
             ->filter('trans', $form->translation->id)
+            ->setMatchMode(\Sphinx\SphinxClient::SPH_MATCH_EXTENDED)
+            ->setSortMode(\Sphinx\SphinxClient::SPH_SORT_EXTENDED, "@weight DESC")
             ->get();
         if ($fullTextResults) {
             $view = $view->with('fullTextResults', $fullTextResults);
