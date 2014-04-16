@@ -42,7 +42,7 @@ class SearchController extends BaseController {
                 ]);
         }
         $fullTextResults = SphinxSearch::
-            search($form->textToSearch)
+            search($form->textToSearch, 'verse')
             ->limit(1000)
             ->filter('trans', $form->translation->id)
             ->setMatchMode(\Sphinx\SphinxClient::SPH_MATCH_EXTENDED)
