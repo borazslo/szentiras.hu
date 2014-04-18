@@ -108,6 +108,9 @@ class CanonicalReferenceTest extends TestCase
         $this->assertEquals("2", $bookRef->chapterRanges[0]->untilChapterRef->verseRanges[0]->verseRef->verseId);
         $this->assertEquals("b", $bookRef->chapterRanges[0]->untilChapterRef->verseRanges[0]->verseRef->versePart);
 
+        $canonicalRef = CanonicalReference::fromString("Kor 13,1a-14,2b;14,2");
+        $this->assertEquals("Kor 13,1a-14,2b|14,2", $canonicalRef->toString());
+
     }
 
     public function testCanonicalBookChapterVerseComplicated()

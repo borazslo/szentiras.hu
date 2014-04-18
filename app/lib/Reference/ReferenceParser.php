@@ -91,9 +91,21 @@ class ReferenceParser
     {
         $chapterRanges = [];
         $chapterRanges[] = $this->chapterRange();
-        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR
-            || $this->lexer->glimpse()['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR
-        ) {
+        $newRange = false;
+        if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_BOOK_SEPARATOR) {
+            $this->lexer->peek();
+            if ($this->lexer->peek()['type'] == ReferenceLexer::T_NUMERIC) {
+                if ($this->lexer->peek()['type'] != ReferenceLexer::T_TEXT)
+                $newRange = true;
+            }
+            $this->lexer->resetPeek();
+        }
+        if (!$newRange) {
+            $newRange = $this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR
+                || $this->lexer->glimpse()['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR;
+        }
+
+        if ($newRange) {
             $this->lexer->moveNext();
             $this->lexer->moveNext();
             $chapterRanges = array_merge($chapterRanges, $this->chapterRanges());
