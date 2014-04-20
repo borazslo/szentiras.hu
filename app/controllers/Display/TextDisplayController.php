@@ -145,27 +145,6 @@ class TextDisplayController extends \BaseController
 
     }
 
-    public function getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation)
-    {
-        $allChapterVerses = $this->getChapterVerses($book, $searchedChapters, $translation);
-        $chapterRangeVerses = [];
-        foreach ($allChapterVerses as $verse) {
-            if ($chapterRange->hasVerse($verse->chapter, $verse->numv)) {
-                $chapterRangeVerses[] = $verse;
-            }
-        }
-        return $chapterRangeVerses;
-    }
-
-    private function getChapterVerses($book, $searchedChapters, $translation)
-    {
-        $verses = Verse::where('book', $book->id)->
-        whereIn('chapter', $searchedChapters)->
-        where('trans', $translation->id)->
-        orderBy('gepi')
-            ->get();
-        return $verses;
-    }
 
     /**
      * @param $canonicalRef
@@ -189,6 +168,28 @@ class TextDisplayController extends \BaseController
             $verseContainers[] = $verseContainer;
         }
         return $verseContainers;
+    }
+
+    private function getChapterVerses($book, $searchedChapters, $translation)
+    {
+        $verses = Verse::where('book', $book->id)->
+        whereIn('chapter', $searchedChapters)->
+        where('trans', $translation->id)->
+        orderBy('gepi')
+            ->get();
+        return $verses;
+    }
+
+    public function getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation)
+    {
+        $allChapterVerses = $this->getChapterVerses($book, $searchedChapters, $translation);
+        $chapterRangeVerses = [];
+        foreach ($allChapterVerses as $verse) {
+            if ($chapterRange->hasVerse($verse->chapter, $verse->numv)) {
+                $chapterRangeVerses[] = $verse;
+            }
+        }
+        return $chapterRangeVerses;
     }
 
 }

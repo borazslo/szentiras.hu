@@ -25,5 +25,4 @@ class DisplayHelper {
         return $searchedChapters;
     }
 
-
 } 

@@ -1,6 +1,7 @@
 <?php
 
 namespace SzentirasHu\Controllers\Search;
+use App;
 use BaseController;
 use Input;
 use Sphinx\SphinxClient;
@@ -84,7 +85,7 @@ class SearchController extends BaseController {
             $storedBookRef = CanonicalReference::fromString($form->textToSearch)->getExistingBookRef();
             if ($storedBookRef) {
                 $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $form->translation->id);
-                $textDisplayController = new TextDisplayController();
+                $textDisplayController = App::make('SzentirasHu\Controllers\Display\TextDisplayController');
                 $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $form->translation);
                 $augmentedView = $view->with('bookRef', [
                     'label' => $translatedRef->toString(),

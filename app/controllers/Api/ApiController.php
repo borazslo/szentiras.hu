@@ -2,6 +2,7 @@
 
 namespace SzentirasHu\Controllers\Api;
 
+use App;
 use BaseController;
 use Input;
 use Response;
@@ -24,7 +25,7 @@ class ApiController extends BaseController {
         } else {
             $translation = Translation::getDefaultTranslation();
         }
-        $textDisplayController = new TextDisplayController();
+        $textDisplayController = App::make('SzentirasHu\Controllers\Display\TextDisplayController');
         $canonicalRef = CanonicalReference::fromString($refString);
         $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($refString), $translation);
         $verses = [];
