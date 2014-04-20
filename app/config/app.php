@@ -110,6 +110,7 @@ return array(
         'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
         'Barryvdh\Cors\CorsServiceProvider',
         'Scalia\SphinxSearch\SphinxSearchServiceProvider',
+        'SzentirasHu\Models\Repositories\RepositoriesProvider'
 	),
 
 

@@ -6,8 +6,8 @@ use SzentirasHu\Controllers\Display\VerseParsers\VerseParser;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ChapterRange;
 use SzentirasHu\Models\Entities\Book;
-use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Entities\Verse;
+use SzentirasHu\Models\Repositories\TranslationRepository;
 use View;
 
 
@@ -65,9 +65,20 @@ class VerseContainer
 class TextDisplayController extends \BaseController
 {
 
+
+    /**
+     * @var \SzentirasHu\Models\Repositories\TranslationRepository
+     */
+    private $translationRepository;
+
+    function __construct(TranslationRepository $translationRepository)
+    {
+        $this->translationRepository = $translationRepository;
+    }
+
     public function showTranslationList()
     {
-        $translations = Translation::orderBy('denom')->get();
+        $translations = $this->translationRepository->getAllOrderedByDenom();
         return View::make('textDisplay.translationList', [
             'translations' => $translations
         ]);
@@ -75,8 +86,8 @@ class TextDisplayController extends \BaseController
 
     public function showTranslation($translationAbbrev)
     {
-        $translation = Translation::where('abbrev', $translationAbbrev)->first();
-        $books = $translation->books()->orderBy('id')->get();
+        $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
+        $books = $this->translationRepository->getBooks($translation);
         return View::make('textDisplay.translation',
             ['translation' => $translation,
                 'books' => $books]);
@@ -93,7 +104,7 @@ class TextDisplayController extends \BaseController
         if ($canonicalRef->isBookLevel()) {
             return $this->bookView($translationAbbrev, $canonicalRef);
         }
-        $translation = Translation::byAbbrev($translationAbbrev);
+        $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
         $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation);
         return View::make('textDisplay.verses')->with([
             'verseContainers' => $verseContainers,
@@ -104,7 +115,7 @@ class TextDisplayController extends \BaseController
     private function bookView($translationAbbrev, $canonicalRef)
     {
         $bookRef = $canonicalRef->bookRefs[0];
-        $translation = Translation::byAbbrev($translationAbbrev);
+        $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
         $translatedRef = $canonicalRef->toTranslated($translation->id);
         $book = Book::
         where('abbrev', $translatedRef->bookRefs[0]->bookId)->
@@ -132,21 +143,6 @@ class TextDisplayController extends \BaseController
             'groupedVerses' => $groupedVerses
         ]);
 
-    }
-
-    /**
-     * @param ChapterRange $chapterRange
-     * @return array
-     */
-    public function collectChapterIds($chapterRange)
-    {
-        $searchedChapters = [];
-        $currentChapter = $chapterRange->chapterRef->chapterId;
-        do {
-            $searchedChapters[] = $currentChapter;
-            $currentChapter++;
-        } while ($chapterRange->untilChapterRef && $currentChapter <= $chapterRange->untilChapterRef->chapterId);
-        return $searchedChapters;
     }
 
     public function getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation)
@@ -184,7 +180,7 @@ class TextDisplayController extends \BaseController
             $book = Book::where('abbrev', $bookRef->bookId)->where('translation_id', $translation->id)->first();
             $verseContainer = new VerseContainer($book);
             foreach ($bookRef->chapterRanges as $chapterRange) {
-                $searchedChapters = $this->collectChapterIds($chapterRange);
+                $searchedChapters = DisplayHelper::collectChapterIds($chapterRange);
                 $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation);
                 foreach ($verses as $verse) {
                     $verseContainer->addVerse($verse);

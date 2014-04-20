@@ -6,6 +6,7 @@ use BaseController;
 use SzentirasHu\Models\Entities\Article;
 use SzentirasHu\Models\Entities\News;
 use SzentirasHu\Models\Entities\Translation;
+use SzentirasHu\Models\Repositories\TranslationRepository;
 
 /**
  *
@@ -15,14 +16,19 @@ use SzentirasHu\Models\Entities\Translation;
 class HomeController extends BaseController
 {
 
+    function __construct(TranslationRepository $translationRepository)
+    {
+        $this->translationRepository = $translationRepository;
+    }
+
     public function index()
     {
         return \View::make("home", [
             'news' => Article::where('frontpage', true)->orderBy('publish_date', 'desc')->get(),
             'pageTitle' => 'Fordítások | Szentírás',
             'title' => 'Katolikus bibliafordítások',
-            'cathBibles' => Translation::getByDenom('katolikus'),
-            'otherBibles' => Translation::getByDenom('protestáns'),
+            'cathBibles' => $this->translationRepository->getByDenom('katolikus'),
+            'otherBibles' => $this->translationRepository->getByDenom('protestáns'),
             'lectures' => (new LectureSelector())->getLectures()
         ]);
     }

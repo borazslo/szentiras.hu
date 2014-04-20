@@ -3,6 +3,7 @@
 namespace SzentirasHu\Views\Composers;
 
 use SzentirasHu\Models\Entities\Translation;
+use SzentirasHu\Models\Repositories\TranslationRepository;
 
 /**
  * View composer for the menu. This will lookup and provide data needed for the menu.
@@ -12,9 +13,20 @@ use SzentirasHu\Models\Entities\Translation;
 class MenuComposer
 {
 
+
+    /**
+     * @var \SzentirasHu\Models\Repositories\TranslationRepository
+     */
+    private $translationRepository;
+
+    function __construct(TranslationRepository $translationRepository)
+    {
+        $this->translationRepository = $translationRepository;
+    }
+
     public function compose($view)
     {
-        $translations = Translation::where('denom', 'katolikus')->orderBy('name')->get();
+        $translations = $this->translationRepository->getByDenom('katolikus');
         
         foreach ($translations as $translation) {
             $translationTitle = $translation['name']." (".$translation['abbrev'].")";
