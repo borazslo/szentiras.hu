@@ -81,7 +81,9 @@ class ReferenceParser
             $token = $this->lexer->lookahead;
         }
         $bookId = $bookId . $token['value'];
-        if ($this->lexer->glimpse()['value'] == '.') {
+        if ($this->lexer->glimpse()['value'] == '.' ||
+            $this->lexer->glimpse()['value'] == ','
+        ) {
             $this->lexer->moveNext();
         }
         return $bookId;

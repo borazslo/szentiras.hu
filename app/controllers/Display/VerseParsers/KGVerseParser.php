@@ -2,7 +2,9 @@
 
 namespace SzentirasHu\Controllers\Display\VerseParsers;
 
+use Log;
 use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Lib\Reference\ParsingException;
 
 class KGVerseParser extends AbstractVerseParser
 {
@@ -42,8 +44,13 @@ class KGVerseParser extends AbstractVerseParser
                 $this->createXrefHolder($verse, $xrefSign);
                 $refString = str_replace($xrefSign, '', $part[0]);
                 $refString = str_replace("rész", $book->abbrev, $refString);
-                \Log::debug("Adding refstring as xref: ", ['refstring' => $refString]);
-                $verse->xrefs[$xrefSign]->text = CanonicalReference::fromString($refString)->toString();
+                Log::debug("Adding refstring as xref: ", ['refstring' => $refString]);
+                try {
+                    $verse->xrefs[$xrefSign]->text = CanonicalReference::fromString($refString)->toString();
+                } catch (ParsingException $e) {
+                    $verse->xrefs[$xrefSign]->text = trim($refString);
+                    Log::debug('Error in ref text', [$verse->xrefs[$xrefSign]->text]);
+                }
             }
         }
     }

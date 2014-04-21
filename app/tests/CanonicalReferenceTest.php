@@ -163,6 +163,12 @@ class CanonicalReferenceTest extends TestCase
 
     }
 
+    public function testErrorHandling() {
+        $this->assertEquals('Mk 1,1', CanonicalReference::fromString('Mk. 1,1')->toString());
+        $this->assertEquals('Mk 1,1', CanonicalReference::fromString('Mk, 1,1')->toString());
+
+    }
+
     public function testTranslatedBookId()
     {
         $ref = CanonicalReference::fromString("2Moz");
