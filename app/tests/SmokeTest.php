@@ -19,4 +19,9 @@ class SmokeTest extends TestCase {
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
+    public function testBasicApi() {
+        $this->client->request('GET', '/api/idezet/Ter 2,3');
+        $this->assertTrue($this->client->getResponse()->isOk());
+    }
+
 }
