@@ -1,12 +1,8 @@
-{{ form_model(form) }}
-    {{ form_text(
-        'textToSearch', 
-        form_getValueAttribute(
-            "textToSearch"), 
-            {'onkeyup': 'suggest(this.value)', 'size' : 10, 'maxlength' : 80, 'class':'alap', 'style':'width:92%;margin-bottom:5px'}) }}
-    {{ form_hidden('reftrans') }}
-    {{ form_submit('Keresés') }}
-    <div id="suggestions" class="suggestionsBox2" style="display: none;">
-        <div id="suggestionsList" class="suggestionList"></div>
-    </div>    
-{{ form_close() }}
+<form role="form" method="post"
+      action="{{ action('SzentirasHu\\Controllers\\Search\\SearchController@postSearch') }}">
+    <div class="form-group">
+        <input type="text" name="textToSearch" id="textToSearch" value="{{ form.textToSearch }}" class="form-control"/>
+    </div>
+    <input type="submit" value="Keresés" class="btn btn-default"/>
+
+</form>
