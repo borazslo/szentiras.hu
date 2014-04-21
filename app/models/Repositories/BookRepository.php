@@ -7,4 +7,6 @@ interface BookRepository {
 
     public function getBooksByTranslation($translationId);
 
+    public function getByAbbrev($bookAbbrev);
+
 } 

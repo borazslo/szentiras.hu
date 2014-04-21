@@ -109,6 +109,7 @@ return array(
         'Barryvdh\TwigBridge\ServiceProvider',
         'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
         'Barryvdh\Cors\CorsServiceProvider',
+        'Barryvdh\Debugbar\ServiceProvider',
         'Scalia\SphinxSearch\SphinxSearchServiceProvider',
         'SzentirasHu\Models\Repositories\RepositoriesProvider'
 	),

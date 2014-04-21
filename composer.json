@@ -10,7 +10,8 @@
         "barryvdh/laravel-ide-helper": "1.*",
         "barryvdh/laravel-cors": "dev-master",
         "scalia/sphinxsearch": "dev-master",
-        "gigablah/sphinxphp": "dev-master"
+        "gigablah/sphinxphp": "dev-master",
+        "barryvdh/laravel-debugbar": "1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

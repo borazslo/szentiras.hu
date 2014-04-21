@@ -4,15 +4,21 @@ namespace SzentirasHu\Controllers\Home;
 
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Models\Entities\Verse;
+use SzentirasHu\Models\Repositories\BookRepository;
 
 class LectureSelector
 {
 
     private $date;
+    /**
+     * @var \SzentirasHu\Models\Repositories\BookRepository
+     */
+    private $bookRepository;
 
-    public function __construct($date = false)
+    public function __construct($date = false, BookRepository $bookRepository)
     {
         $this->date = $date ? $date : date("Ymd");
+        $this->bookRepository = $bookRepository;
     }
 
     public function getLectures()
@@ -42,9 +48,8 @@ class LectureSelector
 
             $extLinks = array();
 
-            $verse = Verse::where('trans', $translationId)->whereHas('books', function ($q) use ($lecture) {
-                $q->where('abbrev', $lecture->bookAbbrev);
-            })->first();
+            $book = $this->bookRepository->getByAbbrev($lecture->bookAbbrev);
+            $verse = Verse::where('trans', $translationId)->where('book', $book->id)->first();
             if ($verse) {
                 $availableTranslatedVerses = Verse::whereIn('tip', array(60, 6, 901))
                     ->where('gepi', $verse->gepi)->get();

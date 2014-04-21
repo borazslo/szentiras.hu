@@ -16,8 +16,18 @@ use SzentirasHu\Models\Repositories\TranslationRepository;
 class HomeController extends BaseController
 {
 
-    function __construct(TranslationRepository $translationRepository)
+    /**
+     * @var LectureSelector
+     */
+    private $lectureSelector;
+    /**
+     * @var \SzentirasHu\Models\Repositories\TranslationRepository
+     */
+    private $translationRepository;
+
+    function __construct(TranslationRepository $translationRepository, LectureSelector $lectureSelector)
     {
+        $this->lectureSelector = $lectureSelector;
         $this->translationRepository = $translationRepository;
     }
 
@@ -29,7 +39,7 @@ class HomeController extends BaseController
             'title' => 'Katolikus bibliafordítások',
             'cathBibles' => $this->translationRepository->getByDenom('katolikus'),
             'otherBibles' => $this->translationRepository->getByDenom('protestáns'),
-            'lectures' => (new LectureSelector())->getLectures()
+            'lectures' => $this->lectureSelector->getLectures()
         ]);
     }
 
