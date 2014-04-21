@@ -15,17 +15,16 @@ class LectureSelector
      */
     private $bookRepository;
 
-    public function __construct($date = false, BookRepository $bookRepository)
+    public function __construct(BookRepository $bookRepository)
     {
-        $this->date = $date ? $date : date("Ymd");
         $this->bookRepository = $bookRepository;
     }
 
-    public function getLectures()
+    public function getLectures($date = false)
     {
+        $date = $date ? $date : date("Ymd");
         $resultLectures = array();
-
-        $lectureDownloader = \App::make('SzentirasHu\Lib\LectureDownloader', [$this->date]);
+        $lectureDownloader = \App::make('SzentirasHu\Lib\LectureDownloader', [$date]);
         $referenceString = $lectureDownloader->getReferenceString();
         if (!$referenceString) {
             return $resultLectures;
