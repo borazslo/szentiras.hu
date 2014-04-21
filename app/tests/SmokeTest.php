@@ -2,7 +2,14 @@
 
 class SmokeTest extends TestCase {
 
-	/**
+    public function setUp() {
+        parent::setUp();
+        $downloader = Mockery::mock('SzentirasHu\Lib\LectureDownloader');
+        $this->app->instance('SzentirasHu\Lib\LectureDownloader', $downloader);
+        $downloader->shouldReceive('getReferenceString')->andReturn('Ter 4,5; Kiv 3,4');
+    }
+
+    /**
 	 * Basic home page test.
 	 *
 	 * @return void

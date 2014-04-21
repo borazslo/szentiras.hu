@@ -14,21 +14,21 @@ class LectureSelectorTest extends TestCase {
 
     public function testEmpty() {
         $this->downloader->shouldReceive('getReferenceString')->andReturn("");
-        $selector = new LectureSelector();
+        $selector = App::make('SzentirasHu\Controllers\Home\LectureSelector');
         $lectures = $selector->getLectures();
         $this->assertEmpty($lectures);
     }
 
     public function testSimple() {
-        $this->downloader->shouldReceive('getReferenceString')->andReturn('1Ter 4,5; 1Jn 2-3');
-        $selector = new LectureSelector();
+        $this->downloader->shouldReceive('getReferenceString')->andReturn('Ter 4,5; Kiv 3,4');
+        $selector = App::make('SzentirasHu\Controllers\Home\LectureSelector');
         $lectures = $selector->getLectures();
         $this->assertCount(2, $lectures);
     }
 
     public function testExtLink() {
         $this->downloader->shouldReceive('getReferenceString')->andReturn('1Moz 2,3; Kiv 3,4');
-        $selector = new LectureSelector();
+        $selector = App::make('SzentirasHu\Controllers\Home\LectureSelector');
         $lectures = $selector->getLectures();
         $this->assertCount(2, $lectures);
         $this->assertEquals("/TESTTRANS/Ter2,3", $lectures[0]->extLinks[0]->url);
