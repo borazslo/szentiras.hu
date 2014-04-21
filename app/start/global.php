@@ -66,7 +66,7 @@ App::error(function(Exception $exception, $code)
 
 App::down(function()
 {
-	return Response::make("Be right back!", 503);
+	return Response::make("Karbantartás", 503);
 });
 
 /*
@@ -91,5 +91,4 @@ App::instance("verseParsers", [
     2 => App::make('SzentirasHu\Controllers\Display\VerseParsers\DefaultVerseParser'),
     3 => App::make('SzentirasHu\Controllers\Display\VerseParsers\KNBVerseParser'),
     4 => App::make('SzentirasHu\Controllers\Display\VerseParsers\KGVerseParser'),
-
 ]);
