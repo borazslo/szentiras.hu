@@ -56,6 +56,8 @@ abstract class AbstractVerseParser implements VerseParser {
             $this->parseTextVerse($rawVerse, $verse);
         } else if ($rawVerse ->getType() == 'xref') {
             $this->parseXrefVerse($book, $rawVerse, $verse);
+        } else if (strpos($rawVerse->getType(), 'heading') === 0) {
+            $this->parseHeading($rawVerse, $verse);
         }
     }
 
@@ -73,5 +75,7 @@ abstract class AbstractVerseParser implements VerseParser {
      * @return void
      */
     abstract protected function parseXrefverse($book, $rawVerse, $verse);
+
+    abstract protected function parseHeading($rawVerse, $verse);
 
 }

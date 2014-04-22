@@ -6,7 +6,7 @@ use Log;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
 
-class KGVerseParser extends AbstractVerseParser
+class KGVerseParser extends DefaultVerseParser
 {
     public static $xrefSigns = ["•","†"];
 

@@ -6,6 +6,7 @@ namespace SzentirasHu\Controllers\Display\VerseParsers;
 
 class VerseData
 {
+    public $heading;
     public $chapter;
     public $numv;
     /**

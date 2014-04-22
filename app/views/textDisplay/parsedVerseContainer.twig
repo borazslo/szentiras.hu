@@ -1,4 +1,9 @@
 {% for verse in verseContainer.parsedVerses %}
+    {% if verse.heading.text is defined %}
+        {{('<h' ~ (verse.heading.level+1) ~ '>')|raw}}
+        <small>{{ verse.heading.text }}</small>
+        {{('</h' ~ (verse.heading.level+1) ~ '>')|raw}}
+    {% endif %}
     <sup>{{ verse.numv }}</sup>{{ verse.text|raw }}
     {% if verse.xrefs is not empty %}
         <sup>
