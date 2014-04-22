@@ -43,6 +43,9 @@ class SearchController extends BaseController {
     }
 
     public function postSearch() {
+        if (Input::get('textToSearch') == null) {
+            return $this->getIndex();
+        }
         $form = $this->prepareForm();
         $view = $this->getView($form);
         $view = $this->searchBookRef($form, $view);
