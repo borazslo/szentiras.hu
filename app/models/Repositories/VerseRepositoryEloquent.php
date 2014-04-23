@@ -31,4 +31,13 @@ class VerseRepositoryEloquent implements VerseRepository {
             ->remember(120)
             ->get();
     }
+
+    public function getVersesInOrder($verseIds)
+    {
+        $verses = Verse::whereIn('id', $verseIds)->get();
+        foreach ($verses as $verse) {
+            $idVerseMap[$verse->id] = $verse;
+        }
+        return array_replace(array_flip($verseIds), $idVerseMap);
+    }
 }

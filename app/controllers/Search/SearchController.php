@@ -13,6 +13,7 @@ use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
+use SzentirasHu\Models\Repositories\VerseRepository;
 use View;
 
 /**
@@ -31,11 +32,16 @@ class SearchController extends BaseController {
      * @var TranslationRepository
      */
     private $translationRepository;
+    /**
+     * @var \SzentirasHu\Models\Repositories\VerseRepository
+     */
+    private $verseRepository;
 
-    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository)
+    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository)
     {
         $this->bookRepository = $bookRepository;
         $this->translationRepository = $translationRepository;
+        $this->verseRepository = $verseRepository;
     }
 
     public function getIndex() {
@@ -109,14 +115,15 @@ class SearchController extends BaseController {
     private function searchFullText($form, $view)
     {
         $fullTextResults = SphinxSearch::
-        search($form->textToSearch, 'verse')
+        search($form->textToSearch)
             ->limit(1000)
             ->filter('trans', $form->translation->id)
             ->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED)
-            ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@weight DESC")
+            ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@relevance DESC, gepi ASC")
             ->get();
         if ($fullTextResults) {
-            $view = $view->with('fullTextResults', $fullTextResults);
+            $sortedVerses = $this->verseRepository->getVersesInOrder(array_keys($fullTextResults['matches']));
+            $view = $view->with('fullTextResults', $sortedVerses);
         }
         return $view;
     }

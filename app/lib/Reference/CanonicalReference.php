@@ -94,7 +94,10 @@ class CanonicalReference
         $result = false;
 
         $bookRepository = \App::make('SzentirasHu\Models\Repositories\BookRepository');
-        $book = $bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translationId);
+        $bookId = $bookRepository->getByAbbrev($bookRef->bookId)->id;
+        if ($bookId) {
+            $book = $bookRepository->getByIdForTranslation($bookId, $translationId);
+        }
         if ($book) {
             $result = new BookRef($book->abbrev);
             $result->chapterRanges = $bookRef->chapterRanges;

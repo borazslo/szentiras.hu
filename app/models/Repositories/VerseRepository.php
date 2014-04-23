@@ -9,4 +9,6 @@ interface VerseRepository {
 
     public function getLeadVerses($translationId, $bookId);
 
+    public function getVersesInOrder($array_keys);
+
 } 
