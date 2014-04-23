@@ -5,6 +5,7 @@ namespace SzentirasHu\Lib\Reference;
 use Symfony\Component\Yaml\Exception\ParseException;
 use SzentirasHu\Models\Entities\BookAbbrev;
 use SzentirasHu\Models\Entities\Translation;
+use SzentirasHu\Models\Repositories\BookRepository;
 
 /**
  * Class CanonicalReference to represent a unique reference to some Bible verses.
@@ -91,17 +92,14 @@ class CanonicalReference
     private static function findStoredBookRef($bookRef, $translationId)
     {
         $result = false;
-        $abbrev = BookAbbrev::where('abbrev', $bookRef->bookId)->first();
-        if (!$abbrev) {
-            \Log::debug("Book abbrev not found in database: {$abbrev}");
+
+        $bookRepository = \App::make('SzentirasHu\Models\Repositories\BookRepository');
+        $book = $bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translationId);
+        if ($book) {
+            $result = new BookRef($book->abbrev);
+            $result->chapterRanges = $bookRef->chapterRanges;
         } else {
-            $book = $abbrev->books()->where('translation_id', $translationId)->first();
-            if ($book) {
-                $result = new BookRef($book->abbrev);
-                $result->chapterRanges = $bookRef->chapterRanges;
-            } else {
-                \Log::debug("Book not found in database: abbrev: {$abbrev->abbrev}, book id: {$abbrev->books_id}");
-            }
+            \Log::debug("Book not found in database: {$bookRef->toString()}");
         }
         return $result;
     }

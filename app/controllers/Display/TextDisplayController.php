@@ -4,11 +4,11 @@ namespace SzentirasHu\Controllers\Display;
 
 use SzentirasHu\Controllers\Display\VerseParsers\VerseParser;
 use SzentirasHu\Lib\Reference\CanonicalReference;
-use SzentirasHu\Lib\Reference\ChapterRange;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Verse;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
+use SzentirasHu\Models\Repositories\VerseRepository;
 use View;
 
 
@@ -18,18 +18,15 @@ class VerseContainer
      * @var Book
      */
     public $book;
-
-
+    public $bookRef;
     /**
      * @var VerseParser
      */
     private $verseParser;
-
     /**
      * @var string[Verse][]
      */
     private $rawVerses;
-    public $bookRef;
 
     function __construct($book, $bookRef)
     {
@@ -45,15 +42,16 @@ class VerseContainer
         if (!array_key_exists($verseKey, $this->rawVerses)) {
             $this->rawVerses[$verseKey] = [];
         }
-        $this->rawVerses[$verseKey][]=$verse;
+        $this->rawVerses[$verseKey][] = $verse;
     }
 
-    public function getParsedVerses() {
+    public function getParsedVerses()
+    {
         $verseData = [];
         foreach ($this->rawVerses as $gepi => $rawVerses) {
             $parsedVerseData = $this->verseParser->parse($rawVerses, $this->book);
-            $parsedVerseData->gepi=$gepi;
-            $parsedVerseData->book=$this->book;
+            $parsedVerseData->gepi = $gepi;
+            $parsedVerseData->book = $this->book;
             $verseData[] = $parsedVerseData;
         }
         return $verseData;
@@ -77,11 +75,16 @@ class TextDisplayController extends \BaseController
      * @var \SzentirasHu\Models\Repositories\BookRepository
      */
     private $bookRepository;
+    /**
+     * @var \SzentirasHu\Models\Repositories\VerseRepository
+     */
+    private $verseRepository;
 
-    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository)
+    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository, VerseRepository $verseRepository)
     {
         $this->translationRepository = $translationRepository;
         $this->bookRepository = $bookRepository;
+        $this->verseRepository = $verseRepository;
     }
 
     public function showTranslationList()
@@ -120,36 +123,29 @@ class TextDisplayController extends \BaseController
         ]);
     }
 
-    private function bookView($translationAbbrev, $canonicalRef)
+    private function bookView($translationAbbrev, CanonicalReference $canonicalRef)
     {
         $bookRef = $canonicalRef->bookRefs[0];
         $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
         $translatedRef = $canonicalRef->toTranslated($translation->id);
-        $book = Book::
-        where('abbrev', $translatedRef->bookRefs[0]->bookId)->
-        where('translation_id', $translation->id)
-            ->first();
-        $firstVerses = $book
-            ->verses()
-            ->where('trans', $translation->id)
-            ->whereIn('numv', ['1', '2'])
-            ->orderBy('chapter')
-            ->orderBy('numv')
-            ->get();
-        $groupedVerses = [];
-        foreach ($firstVerses as $verse) {
-            $type = $verse->getType();
-            if ($type == 'text') {
-                $groupedVerses[$verse['chapter']][$verse['numv']] = $verse;
+        $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translation->id);
+        if ($book) {
+            $firstVerses = $this->verseRepository->getLeadVerses($translation->id, $book->id);
+            $groupedVerses = [];
+            foreach ($firstVerses as $verse) {
+                $type = $verse->getType();
+                if ($type == 'text') {
+                    $groupedVerses[$verse['chapter']][$verse['numv']] = $verse;
+                }
             }
-        }
+            return View::make('textDisplay.book', [
+                'translation' => $translation,
+                'reference' => $translatedRef,
+                'book' => $book,
+                'groupedVerses' => $groupedVerses
+            ]);
 
-        return View::make('textDisplay.book', [
-            'translation' => $translation,
-            'reference' => $translatedRef,
-            'book' => $book,
-            'groupedVerses' => $groupedVerses
-        ]);
+        }
 
     }
 
@@ -178,19 +174,9 @@ class TextDisplayController extends \BaseController
         return $verseContainers;
     }
 
-    private function getChapterVerses($book, $searchedChapters, $translation)
-    {
-        $verses = Verse::where('book', $book->id)->
-        whereIn('chapter', $searchedChapters)->
-        where('trans', $translation->id)->
-        orderBy('gepi')
-            ->get();
-        return $verses;
-    }
-
     public function getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation)
     {
-        $allChapterVerses = $this->getChapterVerses($book, $searchedChapters, $translation);
+        $allChapterVerses = $this->verseRepository->getTranslatedChapterVerses($translation->id, $book->id, $searchedChapters);
         $chapterRangeVerses = [];
         foreach ($allChapterVerses as $verse) {
             if ($chapterRange->hasVerse($verse->chapter, $verse->numv)) {
