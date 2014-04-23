@@ -14,7 +14,7 @@ source verses_source
 	sql_query		= \
 		SELECT id, gepi, trans, book, chapter, numv, tip, verse \
 		FROM kar_tdverse \
-		WHERE tip IN (60, 6, 901)
+        WHERE tip IN (60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704)
 
 	sql_attr_uint = trans
 	sql_attr_uint = book
@@ -33,8 +33,7 @@ source verses_root_source : verses_source
     sql_query		= \
     SELECT id, gepi, trans, book, chapter, numv, tip, verseroot \
     FROM kar_tdverse \
-    WHERE tip IN (60, 6, 901)
-
+    WHERE tip IN (60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704)
 }
 
 index verse
@@ -44,9 +43,14 @@ index verse
 	charset_type = utf-8
 	enable_star = *
 	min_infix_len = 3
-	charset_table = 0..9, a..z, A..Z->a..z,U+00C0..U+01FF
-
-
+	charset_table = \
+	    0..9, \
+	    a..z, \
+	    A..Z->a..z, \
+	    U+00E0..U+00FE, \
+	    U+00C0..U+00DE->U+00E0..U+00FE, \
+	    U+0150->U+0151, \
+	    U+0170->U+0171
 }
 
 index verse_root : verse
