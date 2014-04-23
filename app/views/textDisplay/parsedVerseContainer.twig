@@ -1,9 +1,12 @@
 {% for verse in verseContainer.parsedVerses %}
-    {% if verse.heading.text is defined %}
-        {{('<h' ~ (verse.heading.level+1) ~ '>')|raw}}
-        <small>{{ verse.heading.text }}</small>
-        {{('</h' ~ (verse.heading.level+1) ~ '>')|raw}}
+    {% for headingLevel in 0..4 %}
+    {% if verse.headings[headingLevel] is defined %}
+        {% set tag = 'h' ~ (headingLevel+1) %}
+        <{{ tag }}>
+        <small>{{ verse.headings[headingLevel] }}</small>
+        </{{ tag }}>
     {% endif %}
+    {% endfor %}
     <sup>{{ verse.numv }}</sup>{{ verse.text|raw }}
     {% if verse.xrefs is not empty %}
         <sup>

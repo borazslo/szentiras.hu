@@ -3,12 +3,12 @@
 
 A [szentiras.hu](http://szentiras.hu) teljes kódja.
 
-#Felépítés
+## Felépítés
 
-## Framework
+### Framework
 A Laravel keretrendszert használjuk.
 
-###Könyvtár struktúra
+#### Könyvtár struktúra
 - **app** - Maga a webalkalmazás.
 - **bootstrap** - Framework beizzítás
 - **deploy** - deployment konfigurációk és scriptek (apache, git hook stb.)
@@ -16,25 +16,28 @@ A Laravel keretrendszert használjuk.
 - **public** - a közvetlenül kiszolgált fájlok, az index.php, css, js és hasonlók
 - **tmp** - tesztadatbázis-példa
 
-#Alapvető funkciók
+## Alapvető funkciók
 
-###Főoldal:
-- fordítások listája, néhány információval kiegészítve
-- igenaptár adott napi megjelenítése a katolikus.hu/igenaptar-ból kihalászva minden alkalommal
-- mysql-ből hírek (szerkesztő felület nélkül)
-###Könyvnézegetés
-- Fordítás könyveinek listája
-- Egy-egy könyv fejezeteinek listája bevezetővel
+### Főoldal:
+- fordítások listája, néhány információval kiegészítve DONE
+- igenaptár adott napi megjelenítése a katolikus.hu/igenaptar-ból kihalászva minden alkalommal DONE
+- mysql-ből hírek (szerkesztő felület nélkül) DONE
+
+### Könyvnézegetés
+- Fordítás könyveinek listája DONE
+- Egy-egy könyv fejezeteinek listája bevezetővel DONE
 - Egy-egy fejezet megjelenítése
     - Lépés a következő/előző fejzetre. (Ez most val. nem működik.)
+
 ###Idézés
-- Url-be vagy keresőbe beírt szentírás hivatkozás észrevétele, elemzése és megjelenítése. pl. Mk3,4-7.9-12 vagy Mk3-6 vagy Mk 5,3-7,4.7 stb.
+- Url-be vagy keresőbe beírt szentírás hivatkozás észrevétele, elemzése és megjelenítése. pl. Mk3,4-7.9-12 vagy Mk3-6 vagy Mk 5,3-7,4.7 stb. DONE
 - Adott igehely/rész megjelenítése lábjegyzettel és magyarázattal
 - Link a többi fordítás azonos könyvére (sokszor már a rövidítés!)
-- Hibás fordítás/könyvrövidítés estén átvisz a helyes kombinációra
+- Hibás fordítás/könyvrövidítés estén átvisz a helyes kombinációra DONE
+
 ###Szövegmegjelenítés - Idézésnél és fejezet nézetnél is
-- Vannak címsorok, alcímsorok és a szöveg
-- A vers száma felső indexben nem mindig a tényleges sorszám (akár betű is lehet)
+- Vannak címsorok, alcímsorok és a szöveg DONE
+- A vers száma felső indexben nem mindig a tényleges sorszám (akár betű is lehet) DONE
 - Twitter és facebook megosztás (hozzávaló html tag-ek hogy szebb legyen a megosztott anyag)
 - Link a többi fordítás azonos könyvére (sokszor már a rövidítés!)
 - Lábjegyztekkel és magyrázatokkal. Ezek nem versekhez, hanem verstartományokhoz tartoznak.(Éppen nem működik, mert nincs az adatbázisban.)

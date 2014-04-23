@@ -23,7 +23,7 @@ class DefaultVerseParser extends AbstractVerseParser
 
     protected function parseHeading($rawVerse, $verse)
     {
-        $verse->heading['text'] = $rawVerse->verse;
-        $verse->heading['level'] = str_replace('heading','', $rawVerse->getType());
+        $level = str_replace('heading','', $rawVerse->getType());
+        $verse->headings[$level] = $rawVerse->verse;
     }
 }

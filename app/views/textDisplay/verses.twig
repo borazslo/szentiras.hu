@@ -2,7 +2,7 @@
 
 {% block content %}
     {% for verseContainer in verseContainers %}
-        {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book } %}
+        {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book, 'bookRef': verseContainer.bookRef } %}
         {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
     {% endfor %}
 {% endblock %}
