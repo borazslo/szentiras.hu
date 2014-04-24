@@ -342,7 +342,7 @@ class ChapterRef
     {
         $s = $this->chapterId;
         if ($this->chapterPart) {
-            $s .= $this->$chapterPart;
+            $s .= $this->chapterPart;
         }
         if (count($this->verseRanges) > 0) {
             $s .= ',';
