@@ -136,6 +136,8 @@ class SearchController extends BaseController {
                 $verseContainer->addVerse($verse);
             }
             $results=[];
+            $chapterCount = 0;
+            $verseCount = 0;
             foreach ($verseContainers as $bookAbbrev => $verseContainer) {
                 $result = [];
                 $result['book'] = $verseContainer->book;
@@ -154,10 +156,16 @@ class SearchController extends BaseController {
                     }
                     $result['chapters'][$verse->chapter][] = $verseData;
                     $result['verses'][] = $verseData;
+                    $verseCount++;
                 }
-                $results[] = $result;
+                $chapterCount += count($result['chapters']);
+                if (array_key_exists('verses', $result)) {
+                    $results[] = $result;
+                }
             }
-            $view = $view->with('fullTextResults', $results);
+            $view = $view->with('fullTextResults', [
+                'results' => $results,
+                'hitCount' => $form->grouping == 'chapter' ? $chapterCount : $verseCount]);
         }
         return $view;
     }

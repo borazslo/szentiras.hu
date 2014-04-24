@@ -59,8 +59,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
     {% endif %}
 
     {% if fullTextResults is defined %}
-        <h4>Találatok a szövegben</h4>
-        {% for result in fullTextResults %}
+        <h4>Találatok a szövegben <small>{{ fullTextResults.hitCount }} találat</small></h4>
+        {% for result in fullTextResults.results %}
             <h5><a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }}"><span
                             class="glyphicon glyphicon-book"></span> {{ result.book.name }}
                     ({{ result.translation.name }})</a></h5>
@@ -68,8 +68,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                 {% if form.grouping != 'chapter' %}
                     {% for verse in result.verses %}
                         <li>
-                            <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">{{ verse.chapter }}
-                                ,{{ verse.numv }}</a>
+                            <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">
+                                {{ verse.chapter }},{{ verse.numv }}</a>
                             {{ verse.text }}
                         </li>
                     {% endfor %}
