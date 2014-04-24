@@ -2,8 +2,6 @@
 
 namespace SzentirasHu\Lib\Reference;
 
-use Symfony\Component\Yaml\Exception\ParseException;
-use SzentirasHu\Models\Entities\BookAbbrev;
 use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Repositories\BookRepository;
 
@@ -25,15 +23,14 @@ class CanonicalReference
         $this->bookRefs = $bookRefs;
     }
 
-    public function getExistingBookRef()
+    public static function isValid($referenceString)
     {
-        foreach (Translation::all() as $translation) {
-            $storedBookRef = self::findStoredBookRef($this->bookRefs[0], $translation->id);
-            if ($storedBookRef) {
-                return $storedBookRef;
-            }
+        try {
+            $ref = self::fromString($referenceString);
+        } catch (ParsingException $e) {
+            return false;
         }
-        return false;
+        return count($ref->bookRefs) > 0;
     }
 
     public static function fromString($s)
@@ -45,14 +42,33 @@ class CanonicalReference
         return $ref;
     }
 
-    public static function isValid($referenceString)
+    public function getExistingBookRef()
     {
-        try {
-            $ref = self::fromString($referenceString);
-        } catch (ParsingException $e) {
-            return false;
+        $translationRepository = \App::make('SzentirasHu\Models\Repositories\TranslationRepository');
+        foreach ($translationRepository->getAll() as $translation) {
+            $storedBookRef = self::findStoredBookRef($this->bookRefs[0], $translation->id);
+            if ($storedBookRef) {
+                return $storedBookRef;
+            }
         }
-        return count($ref->bookRefs) > 0;
+        return false;
+    }
+
+    private static function findStoredBookRef($bookRef, $translationId)
+    {
+        $result = false;
+        $bookRepository = \App::make('SzentirasHu\Models\Repositories\BookRepository');
+        $abbreviatedBook = $bookRepository->getByAbbrev($bookRef->bookId);
+        if ($abbreviatedBook) {
+            $book = $bookRepository->getByIdForTranslation($abbreviatedBook->id, $translationId);
+            if ($book) {
+                $result = new BookRef($book->abbrev);
+                $result->chapterRanges = $bookRef->chapterRanges;
+            } else {
+                \Log::debug("Book not found in database: {$bookRef->toString()}");
+            }
+        }
+        return $result;
     }
 
     public function toString()
@@ -87,24 +103,6 @@ class CanonicalReference
     {
         $result = self::findStoredBookRef($bookRef, $translationId);
         return $result ? $result : $bookRef;
-    }
-
-    private static function findStoredBookRef($bookRef, $translationId)
-    {
-        $result = false;
-
-        $bookRepository = \App::make('SzentirasHu\Models\Repositories\BookRepository');
-        $bookId = $bookRepository->getByAbbrev($bookRef->bookId)->id;
-        if ($bookId) {
-            $book = $bookRepository->getByIdForTranslation($bookId, $translationId);
-        }
-        if ($book) {
-            $result = new BookRef($book->abbrev);
-            $result->chapterRanges = $bookRef->chapterRanges;
-        } else {
-            \Log::debug("Book not found in database: {$bookRef->toString()}");
-        }
-        return $result;
     }
 
     public function isBookLevel()

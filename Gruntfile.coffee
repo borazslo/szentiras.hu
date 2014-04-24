@@ -34,6 +34,12 @@ module.exports = (grunt) ->
           }
           {
             expand: true
+            cwd: 'app/assets/fonts'
+            src: ['**/*.*']
+            dest: 'public/fonts'
+          }
+          {
+            expand: true
             flatten: true
             src: ['bower_components/bootstrap/dist/css/bootstrap.min.css']
             dest: 'public/css'

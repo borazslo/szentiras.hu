@@ -19,7 +19,10 @@ class BookRepositoryEloquent implements BookRepository {
 
     public function getByAbbrev($bookAbbrev)
     {
-        return BookAbbrev::where('abbrev', $bookAbbrev)->first()->books()->first();
+        $abbrev = BookAbbrev::where('abbrev', $bookAbbrev)->remember(120)->first();
+        if ($abbrev) {
+            return $abbrev->books()->first();
+        }
     }
 
     /**

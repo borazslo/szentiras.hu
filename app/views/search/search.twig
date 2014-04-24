@@ -47,7 +47,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
     </div>
 
     {% if bookRef is defined %}
-        <h5>Igehely</h5>
+        <h4>Igehely</h4>
         {% for verseContainer in bookRef.verseContainers %}
             <blockquote>
                 <footer>
@@ -59,9 +59,31 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
     {% endif %}
 
     {% if fullTextResults is defined %}
-        {% for verse in fullTextResults %}
-            {{ verse.chapter }},{{verse.numv}}: {{ verse.verse }}
-            <br>
+        <h4>Találatok a szövegben</h4>
+        {% for result in fullTextResults %}
+            <h5><a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }}"><span
+                            class="glyphicon glyphicon-book"></span> {{ result.book.name }}
+                    ({{ result.translation.name }})</a></h5>
+            <ul class="list-unstyled">
+                {% if form.grouping != 'chapter' %}
+                    {% for verse in result.verses %}
+                        <li>
+                            <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">{{ verse.chapter }}
+                                ,{{ verse.numv }}</a>
+                            {{ verse.text }}
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    {% for chapter, verses in result.chapters %}
+                        <li>
+                            <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ chapter }}">{{ chapter }}</a>
+                            {% for verse in verses %}
+                                <sup>{{ verse.numv }}</sup>{{ verse.text }}
+                            {% endfor %}
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
         {% endfor %}
     {% endif %}
 

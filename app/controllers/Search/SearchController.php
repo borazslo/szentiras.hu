@@ -9,6 +9,7 @@ use SphinxSearch;
 use SzentirasHu\Controllers\Display\TextDisplayController;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
+use SzentirasHu\Lib\VerseContainer;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Repositories\BookRepository;
@@ -67,8 +68,8 @@ class SearchController extends BaseController {
         $form->textToSearch = Input::get('textToSearch');
         $form->grouping = Input::get('grouping');
         $defaultTranslation = Translation::getDefaultTranslation();
-        $form->book = Input::has('book') ? Input::get('book') : 0;
-        $form->translation = Input::has('translation') ? Translation::find(Input::get('translation')) : $defaultTranslation;
+        $form->book = Input::get('book');
+        $form->translation = Input::has('translation') ? $this->translationRepository->getById(Input::get('translation')) : $defaultTranslation;
         return $form;
     }
 
@@ -93,12 +94,13 @@ class SearchController extends BaseController {
         try {
             $storedBookRef = CanonicalReference::fromString($form->textToSearch)->getExistingBookRef();
             if ($storedBookRef) {
-                $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $form->translation->id);
+                $translation = $form->translation ? $form->translation : Translation::getDefaultTranslation();
+                $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $translation->id);
                 $textDisplayController = App::make('SzentirasHu\Controllers\Display\TextDisplayController');
-                $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $form->translation);
+                $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation);
                 $augmentedView = $view->with('bookRef', [
                     'label' => $translatedRef->toString(),
-                    'link' => "/{$form->translation->abbrev}/{$translatedRef->toString()}",
+                    'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
                     'verseContainers' => $verseContainers
                 ]);
             }
@@ -108,7 +110,7 @@ class SearchController extends BaseController {
     }
 
     /**
-     * @param $form
+     * @param SearchForm $form
      * @param $view
      * @return mixed
      */
@@ -116,14 +118,46 @@ class SearchController extends BaseController {
     {
         $fullTextResults = SphinxSearch::
         search($form->textToSearch)
-            ->limit(1000)
-            ->filter('trans', $form->translation->id)
             ->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED)
-            ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@relevance DESC, gepi ASC")
-            ->get();
+            ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@relevance DESC, gepi ASC");
+        if ($form->translation) {
+            $fullTextResults = $fullTextResults->filter('trans', $form->translation->id);
+        }
+        $fullTextResults = $fullTextResults->get();
         if ($fullTextResults) {
             $sortedVerses = $this->verseRepository->getVersesInOrder(array_keys($fullTextResults['matches']));
-            $view = $view->with('fullTextResults', $sortedVerses);
+            $verseContainers = [];
+            foreach ($sortedVerses as $verse) {
+                $book = $this->bookRepository->getByIdForTranslation($verse->book, $verse->trans);
+                if (!array_key_exists($book->abbrev, $verseContainers)) {
+                    $verseContainers[$book->abbrev] = new VerseContainer($book);
+                }
+                $verseContainer = $verseContainers[$book->abbrev];
+                $verseContainer->addVerse($verse);
+            }
+            $results=[];
+            foreach ($verseContainers as $bookAbbrev => $verseContainer) {
+                $result = [];
+                $result['book'] = $verseContainer->book;
+                $result['translation'] = $this->translationRepository->getById($verseContainer->book->translation_id);
+                $parsedVerses = $verseContainer->getParsedVerses();
+                $result['chapters'] = [];
+                foreach ($parsedVerses as $verse) {
+                    $verseData['chapter'] = $verse->chapter;
+                    $verseData['numv'] = $verse->numv;
+                    if ($verse->text) {
+                        $verseData['text'] = preg_replace('/<[^>]*>/',' ',$verse->text);
+                    } else {
+                        foreach ($verse->headings as $heading) {
+                            $verseData['text'] = $heading;
+                        }
+                    }
+                    $result['chapters'][$verse->chapter][] = $verseData;
+                    $result['verses'][] = $verseData;
+                }
+                $results[] = $result;
+            }
+            $view = $view->with('fullTextResults', $results);
         }
         return $view;
     }

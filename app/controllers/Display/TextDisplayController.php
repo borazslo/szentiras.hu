@@ -2,62 +2,12 @@
 
 namespace SzentirasHu\Controllers\Display;
 
-use SzentirasHu\Controllers\Display\VerseParsers\VerseParser;
 use SzentirasHu\Lib\Reference\CanonicalReference;
-use SzentirasHu\Models\Entities\Book;
-use SzentirasHu\Models\Entities\Verse;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 use SzentirasHu\Models\Repositories\VerseRepository;
 use View;
 
-
-class VerseContainer
-{
-    /**
-     * @var Book
-     */
-    public $book;
-    public $bookRef;
-    /**
-     * @var VerseParser
-     */
-    private $verseParser;
-    /**
-     * @var string[Verse][]
-     */
-    private $rawVerses;
-
-    function __construct($book, $bookRef)
-    {
-        $this->book = $book;
-        $this->rawVerses = [];
-        $this->verseParser = \App::make('verseParsers')[$book->translation_id];
-        $this->bookRef = $bookRef;
-    }
-
-    public function addVerse(Verse $verse)
-    {
-        $verseKey = $verse->gepi;
-        if (!array_key_exists($verseKey, $this->rawVerses)) {
-            $this->rawVerses[$verseKey] = [];
-        }
-        $this->rawVerses[$verseKey][] = $verse;
-    }
-
-    public function getParsedVerses()
-    {
-        $verseData = [];
-        foreach ($this->rawVerses as $gepi => $rawVerses) {
-            $parsedVerseData = $this->verseParser->parse($rawVerses, $this->book);
-            $parsedVerseData->gepi = $gepi;
-            $parsedVerseData->book = $this->book;
-            $verseData[] = $parsedVerseData;
-        }
-        return $verseData;
-    }
-
-}
 
 /**
  *
@@ -161,7 +111,7 @@ class TextDisplayController extends \BaseController
         $verseContainers = [];
         foreach ($translatedRef->bookRefs as $bookRef) {
             $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translation->id);
-            $verseContainer = new VerseContainer($book, $bookRef);
+            $verseContainer = new \SzentirasHu\Lib\VerseContainer($book, $bookRef);
             foreach ($bookRef->chapterRanges as $chapterRange) {
                 $searchedChapters = DisplayHelper::collectChapterIds($chapterRange);
                 $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation);

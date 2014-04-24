@@ -11,7 +11,7 @@ class TranslationRepositoryEloquent implements TranslationRepository {
 
     public function getAll()
     {
-        return Translation::orderBy('name')->remember(120)->get();
+        return Translation::remember(120)->orderBy('name')->get();
     }
 
     public function getByDenom($denom = false) {
@@ -37,6 +37,6 @@ class TranslationRepositoryEloquent implements TranslationRepository {
 
     public function getById($id)
     {
-        return Translation::find($id)->remember(120)->first();
+        return Translation::remember(120)->find($id);
     }
 }
