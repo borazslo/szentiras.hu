@@ -8,38 +8,46 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
     <h2>Keresés a Bibliában</h2>
     <div class="panel panel-default">
         <div class="panel-body">
-            <form role="form" method="post"
+            <form role="form" class="form-horizontal" method="post"
                   action="{{ action('SzentirasHu\\Controllers\\Search\\SearchController@postSearch') }}">
                 <div class="form-group">
-                    <label for="textToSearch">Keresendő</label>
-                    <input type="text" name="textToSearch" id="textToSearch" value="{{ form.textToSearch }}" class="form-control"/>
+                    <label for="textToSearch" class="col-sm-3 control-label">Keresendő</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="textToSearch" id="textToSearch" value="{{ form.textToSearch }}" class="form-control"/>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="translation">Fordítás</label>
-                    <select name="translation" class="form-control" id="translation">
-                        <option value="0" {{ form.translation is not defined ? 'selected' }}>mind</option>
-                        {% for translation in translations %}
-                            <option value="{{ translation.id }}" {{ translation.id == form.translation.id ? 'selected' }}>{{ translation.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="book" class="col-sm-3 control-label">Könyv</label>
+                    <div class="col-sm-9">
+                        <select name="book" class="form-control" id="book">
+                            <option value="all" {{ 'all' == form.book ? 'selected' }}>mind</option>
+                            <option value="old_testament" {{ 'old_testament' == form.book ? 'selected' }}>Ószövetség</option>
+                            <option value="new_testament" {{ 'new_testament' == form.book ? 'selected' }}>Újszövetség</option>
+                            {% for book in books %}
+                                <option value="{{ book.id }}" {{ book.id == form.book ? 'selected' }}>{{ book.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="book">Könyv</label>
-                    <select name="book" class="form-control" id="book">
-                        <option value="all" {{ 'all' == form.book ? 'selected' }}>mind</option>
-                        <option value="old_testament" {{ 'old_testament' == form.book ? 'selected' }}>Ószövetség</option>
-                        <option value="new_testament" {{ 'new_testament' == form.book ? 'selected' }}>Újszövetség</option>
-                        {% for book in books %}
-                            <option value="{{ book.id }}" {{ book.id == form.book ? 'selected' }}>{{ book.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="translation" class="col-sm-3 control-label">Fordítás</label>
+                    <div class="col-sm-9">
+                        <select name="translation" class="form-control" id="translation">
+                            <option value="0" {{ form.translation is not defined ? 'selected' }}>mind</option>
+                            {% for translation in translations %}
+                                <option value="{{ translation.id }}" {{ translation.id == form.translation.id ? 'selected' }}>{{ translation.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="grouping">Csoportosítás</label>
-                    <select name="grouping" class="form-control" id="grouping">
-                        <option value="chapter" {{ form.grouping == 'chapter' ? 'selected' }}>fejezetenként</option>
-                        <option value="verse" {{ form.grouping == 'verse' ? 'selected' }}>versenként</option>
-                    </select>
+                    <label for="grouping" class="col-sm-3 control-label">Csoportosítás</label>
+                    <div class="col-sm-9">
+                        <select name="grouping" class="form-control" id="grouping">
+                            <option value="chapter" {{ form.grouping == 'chapter' ? 'selected' }}>fejezetenként</option>
+                            <option value="verse" {{ form.grouping == 'verse' ? 'selected' }}>versenként</option>
+                        </select>
+                    </div>
                 </div>
                 <input type="submit" value="Keresés" class="btn btn-default"/>
             </form>

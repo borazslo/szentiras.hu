@@ -116,16 +116,16 @@ class SearchController extends BaseController {
      */
     private function searchFullText($form, $view)
     {
-        $fullTextResults = SphinxSearch::
+        $sphinxSearcher = SphinxSearch::
         search($form->textToSearch)
             ->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED)
             ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@relevance DESC, gepi ASC");
         if ($form->translation) {
-            $fullTextResults = $fullTextResults->filter('trans', $form->translation->id);
+            $sphinxSearcher = $sphinxSearcher->filter('trans', $form->translation->id);
         }
-        $fullTextResults = $fullTextResults->get();
-        if ($fullTextResults) {
-            $sortedVerses = $this->verseRepository->getVersesInOrder(array_keys($fullTextResults['matches']));
+        $sphinxResults = $sphinxSearcher->get();
+        if ($sphinxResults) {
+            $sortedVerses = $this->verseRepository->getVersesInOrder(array_keys($sphinxResults['matches']));
             $verseContainers = [];
             foreach ($sortedVerses as $verse) {
                 $book = $this->bookRepository->getByIdForTranslation($verse->book, $verse->trans);
@@ -147,12 +147,12 @@ class SearchController extends BaseController {
                 foreach ($parsedVerses as $verse) {
                     $verseData['chapter'] = $verse->chapter;
                     $verseData['numv'] = $verse->numv;
+                    $verseData['text'] = '';
+                    if ($verse->headings) {foreach ($verse->headings as $heading) {
+                        $verseData['text'] .= $heading . ' ';
+                    }}
                     if ($verse->text) {
-                        $verseData['text'] = preg_replace('/<[^>]*>/',' ',$verse->text);
-                    } else {
-                        foreach ($verse->headings as $heading) {
-                            $verseData['text'] = $heading;
-                        }
+                        $verseData['text'] .= preg_replace('/<[^>]*>/',' ',$verse->text);
                     }
                     $result['chapters'][$verse->chapter][] = $verseData;
                     $result['verses'][] = $verseData;
@@ -165,7 +165,8 @@ class SearchController extends BaseController {
             }
             $view = $view->with('fullTextResults', [
                 'results' => $results,
-                'hitCount' => $form->grouping == 'chapter' ? $chapterCount : $verseCount]);
+                'hitCount' => $form->grouping == 'chapter' ? $chapterCount : $verseCount
+            ]);
         }
         return $view;
     }

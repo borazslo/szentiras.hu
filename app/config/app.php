@@ -110,7 +110,7 @@ return array(
         'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
         'Barryvdh\Cors\CorsServiceProvider',
         'Barryvdh\Debugbar\ServiceProvider',
-        'Scalia\SphinxSearch\SphinxSearchServiceProvider',
+        'SzentirasHu\Lib\Sphinx\SphinxSearchServiceProvider',
         'SzentirasHu\Models\Repositories\RepositoriesProvider'
 	),
 
@@ -178,7 +178,7 @@ return array(
 		'URL'             => 'Illuminate\Support\Facades\URL',
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
-        'SphinxSearch' => 'Scalia\SphinxSearch\SphinxSearchFacade',
+        'SphinxSearch' => 'SzentirasHu\Lib\Sphinx\SphinxSearchFacade',
 	),
 
 );

@@ -15,7 +15,6 @@ class VerseRepositoryEloquent implements VerseRepository {
         whereIn('chapter', $chapters)->
         where('trans', $translationId)->
         orderBy('gepi')
-            ->remember(120)
             ->get();
         return $verses;
 

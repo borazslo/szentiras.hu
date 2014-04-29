@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "08eff2421a7d474d36dd9aad1b63ef32",
+    "hash": "767ba047081c59ee37b1b69e177d7e8f",
     "packages": [
         {
             "name": "barryvdh/laravel-cors",
@@ -851,16 +851,16 @@
         },
         {
             "name": "gigablah/sphinxphp",
-            "version": "dev-master",
+            "version": "2.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gigablah/sphinxphp.git",
-                "reference": "5b4a819617c91867c83bf4e88315b07881720188"
+                "reference": "6d5e97fdd33c1129ca372203d1330827c1cbc46c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gigablah/sphinxphp/zipball/5b4a819617c91867c83bf4e88315b07881720188",
-                "reference": "5b4a819617c91867c83bf4e88315b07881720188",
+                "url": "https://api.github.com/repos/gigablah/sphinxphp/zipball/6d5e97fdd33c1129ca372203d1330827c1cbc46c",
+                "reference": "6d5e97fdd33c1129ca372203d1330827c1cbc46c",
                 "shasum": ""
             },
             "require": {
@@ -891,14 +891,14 @@
                     "homepage": "http://sphinxsearch.com/"
                 }
             ],
-            "description": "Sphinx Search PHP 5.3+ API with PSR compliance",
+            "description": "Sphinx Search PHP API",
             "homepage": "http://sphinxsearch.com/",
             "keywords": [
                 "api",
                 "search",
                 "sphinx"
             ],
-            "time": "2013-08-26 03:20:14"
+            "time": "2013-08-22 08:05:44"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -1156,16 +1156,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.9.0",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "1afc39690e7414412face1f8cbf67b73db34485c"
+                "reference": "65026b610f8c19e61d7242f600530677b0466aac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/1afc39690e7414412face1f8cbf67b73db34485c",
-                "reference": "1afc39690e7414412face1f8cbf67b73db34485c",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/65026b610f8c19e61d7242f600530677b0466aac",
+                "reference": "65026b610f8c19e61d7242f600530677b0466aac",
                 "shasum": ""
             },
             "require": {
@@ -1220,7 +1220,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-04-20 16:41:26"
+            "time": "2014-04-24 13:29:03"
         },
         {
             "name": "nesbot/carbon",
@@ -1634,51 +1634,6 @@
                 "php"
             ],
             "time": "2013-08-12 22:46:16"
-        },
-        {
-            "name": "scalia/sphinxsearch",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/scalia/sphinxsearch.git",
-                "reference": "f1453e9dfe6954d38ac26f611e520764888e4f75"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/scalia/sphinxsearch/zipball/f1453e9dfe6954d38ac26f611e520764888e4f75",
-                "reference": "f1453e9dfe6954d38ac26f611e520764888e4f75",
-                "shasum": ""
-            },
-            "require": {
-                "gigablah/sphinxphp": "dev-master",
-                "illuminate/support": "~4.0",
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Scalia\\SphinxSearch": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Scalia",
-                    "email": "contacto@scalia.es"
-                }
-            ],
-            "description": "Laravel package to query Sphinxsearch",
-            "homepage": "http://github.com/scalia/sphinxsearch",
-            "keywords": [
-                "Laravel 4",
-                "laravel",
-                "sphinx",
-                "sphinxsearch"
-            ],
-            "time": "2014-03-08 09:44:44"
         },
         {
             "name": "stack/builder",
@@ -3311,9 +3266,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "barryvdh/laravel-twigbridge": 20,
-        "barryvdh/laravel-cors": 20,
-        "scalia/sphinxsearch": 20,
-        "gigablah/sphinxphp": 20
+        "barryvdh/laravel-cors": 20
     },
     "platform": [
 

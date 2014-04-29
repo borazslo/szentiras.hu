@@ -9,7 +9,8 @@ require.config(
     app_modules: 'app_bundle'
 
   shim:
-    bootstrap:
-      deps: ['jquery']
+    bootstrap: ['jquery'],
+    typeahead: ['jquery']
+
   deps: ['app_modules', 'jquery', 'bootstrap']
 )

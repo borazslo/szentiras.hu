@@ -26,7 +26,7 @@ class VerseContainer
     /**
      * @var string[Verse][]
      */
-    private $rawVerses;
+    public $rawVerses;
 
     function __construct($book, $bookRef=false)
     {
