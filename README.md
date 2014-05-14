@@ -32,7 +32,7 @@ A Laravel keretrendszert használjuk.
 ###Idézés
 - Url-be vagy keresőbe beírt szentírás hivatkozás észrevétele, elemzése és megjelenítése. pl. Mk3,4-7.9-12 vagy Mk3-6 vagy Mk 5,3-7,4.7 stb. DONE
 - Adott igehely/rész megjelenítése lábjegyzettel és magyarázattal - PARTLY DONE Egyelőre a lábjegyzet és magyarázat nem támogatott
-- Link a többi fordítás azonos könyvére (sokszor már a rövidítés!)
+- Link a többi fordítás azonos könyvére (sokszor már a rövidítés!) DONE
 - Hibás fordítás/könyvrövidítés estén átvisz a helyes kombinációra DONE
 
 ###Szövegmegjelenítés - Idézésnél és fejezet nézetnél is

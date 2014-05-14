@@ -2,17 +2,25 @@
 
 {% block content %}
     {% for verseContainer in verseContainers %}
-        {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book, 'bookRef': verseContainer.bookRef } %}
-        <p>
-            {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
-        </p>
-        <p>
-            {% for otherTranslation in translations %}
-                {% if otherTranslation.id != translation.id %}
-                    <a class="btn btn-default btn-xs" href="/{{ otherTranslation.abbrev }}/{{ verseContainer.bookRef.toString() }}">{{ otherTranslation.abbrev }}</a>
-                {% endif %}
-            {% endfor %}
-        </p>
+        <div class="pull-right panel panel-default">
+            <div class="panel-body">
+                {% include 'textDisplay.share' with { 'bookRef' : verseContainer.bookRef } %}</div>
+            </div>
+        <div>
+            {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book, 'bookRef': verseContainer.bookRef } %}
+        </div>
+        <div>
+            <p>
+                {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
+            </p>
+            <p>
+                {% for otherTranslation in translations %}
+                    {% if otherTranslation.id != translation.id %}
+                        <a class="btn btn-default btn-xs" href="/{{ otherTranslation.abbrev }}/{{ verseContainer.bookRef.toString() }}">{{ otherTranslation.abbrev }}</a>
+                    {% endif %}
+                {% endfor %}
+            </p>
+        </div>
         <hr>
     {% endfor %}
 {% endblock %}
