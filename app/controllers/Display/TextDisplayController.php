@@ -2,7 +2,9 @@
 
 namespace SzentirasHu\Controllers\Display;
 
+use Illuminate\Support\Facades\Redirect;
 use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 use SzentirasHu\Models\Repositories\VerseRepository;
@@ -61,16 +63,21 @@ class TextDisplayController extends \BaseController
 
     public function showTranslatedReferenceText($translationAbbrev, $reference)
     {
-        $canonicalRef = CanonicalReference::fromString($reference);
-        if ($canonicalRef->isBookLevel()) {
-            return $this->bookView($translationAbbrev, $canonicalRef);
+        try {
+            $canonicalRef = CanonicalReference::fromString($reference);
+            if ($canonicalRef->isBookLevel()) {
+                return $this->bookView($translationAbbrev, $canonicalRef);
+            }
+            $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
+            $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation);
+            return View::make('textDisplay.verses')->with([
+                'verseContainers' => $verseContainers,
+                'translation' => $translation
+            ]);
+        } catch (ParsingException $e) {
+            // as this doesn't look like a valid reference, interpret as full text search
+            return Redirect::to("/kereses/search?textToSearch={$reference}");
         }
-        $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
-        $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation);
-        return View::make('textDisplay.verses')->with([
-            'verseContainers' => $verseContainers,
-            'translation' => $translation
-        ]);
     }
 
     private function bookView($translationAbbrev, CanonicalReference $canonicalRef)
