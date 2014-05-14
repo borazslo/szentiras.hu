@@ -118,6 +118,7 @@ class SearchController extends BaseController {
     {
         $sphinxSearcher = SphinxSearch::
         search($form->textToSearch)
+            ->limit(1000)
             ->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED)
             ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@relevance DESC, gepi ASC");
         if ($form->translation) {
