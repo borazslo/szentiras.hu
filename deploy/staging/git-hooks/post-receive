@@ -5,14 +5,12 @@ do
     echo Received ref $refname as $branch
     if [ "mvc" == "$branch" ]; then
         echo Updating deployment
-        DIR=/home/szentiras_hu_git/github/borazslo/staging.szentiras.hu
-        cd $DIR
-        echo $PWD
+        cd /home/szentiras_hu_git/github/borazslo/staging.szentiras.hu
         unset GIT_DIR
         git checkout mvc
         git pull
         export MYSQL_SZENTIRAS_USER=szentiras
-        export MYSQL_SZENTIRAS_PASSWORD=krumpli12
+        export MYSQL_SZENTIRAS_PASSWORD=
         export SZENTIRAS_WEBAPP_ENVIRONMENT=staging
         sh install.sh
         php artisan up
