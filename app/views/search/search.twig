@@ -74,7 +74,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
     {% endfor %}
 
     {% if fullTextResults is defined %}
-        <h4>Találatok a szövegben <small>{{ fullTextResults.hitCount }} találat</small></h4>
+        <h4>Találatok a szövegben <span class="badge">{{ fullTextResults.hitCount }} találat</span></h4>
         {% for result in fullTextResults.results %}
             <h5><a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }}"><span
                             class="glyphicon glyphicon-book"></span> {{ result.book.name }}

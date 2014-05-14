@@ -72,7 +72,8 @@ class TextDisplayController extends \BaseController
             $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation);
             return View::make('textDisplay.verses')->with([
                 'verseContainers' => $verseContainers,
-                'translation' => $translation
+                'translation' => $translation,
+                'translations' => $this->translationRepository->getAllOrderedByDenom()
             ]);
         } catch (ParsingException $e) {
             // as this doesn't look like a valid reference, interpret as full text search
@@ -99,7 +100,8 @@ class TextDisplayController extends \BaseController
                 'translation' => $translation,
                 'reference' => $translatedRef,
                 'book' => $book,
-                'groupedVerses' => $groupedVerses
+                'groupedVerses' => $groupedVerses,
+                'translations' => $this->translationRepository->getAllOrderedByDenom()
             ]);
 
         }
