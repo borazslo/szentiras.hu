@@ -9,6 +9,7 @@ use SphinxSearch;
 use SzentirasHu\Controllers\Display\TextDisplayController;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
+use SzentirasHu\Lib\Search\SphinxSearcher;
 use SzentirasHu\Lib\VerseContainer;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Translation;
@@ -49,7 +50,7 @@ class SearchController extends BaseController {
         return $this->getView($this->prepareForm());
     }
 
-    public function postSearch() {
+    public function anySearch() {
         if (Input::get('textToSearch') == null) {
             return $this->getIndex();
         }
@@ -116,17 +117,19 @@ class SearchController extends BaseController {
      */
     private function searchFullText($form, $view)
     {
-        $sphinxSearcher = SphinxSearch::
-        search($form->textToSearch)
-            ->limit(1000)
-            ->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED)
-            ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@relevance DESC, gepi ASC");
-        if ($form->translation) {
-            $sphinxSearcher = $sphinxSearcher->filter('trans', $form->translation->id);
+        $translationHits = [];
+        foreach ($this->translationRepository->getAll() as $translation) {
+            $searcher = new SphinxSearcher($form->textToSearch, $translation);
+            $searchHits = $searcher->get();
+            if ($searchHits) {
+                $translationHits[] = [ 'translation' => $translation, 'hitCount' => $searchHits->hitCount ];
+            }
         }
+        $view = $view->with('translationHits', $translationHits);
+        $sphinxSearcher = new SphinxSearcher($form->textToSearch, $form->translation);
         $sphinxResults = $sphinxSearcher->get();
         if ($sphinxResults) {
-            $sortedVerses = $this->verseRepository->getVersesInOrder(array_keys($sphinxResults['matches']));
+            $sortedVerses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
             $verseContainers = [];
             foreach ($sortedVerses as $verse) {
                 $book = $this->bookRepository->getByIdForTranslation($verse->book, $verse->trans);
@@ -166,7 +169,7 @@ class SearchController extends BaseController {
             }
             $view = $view->with('fullTextResults', [
                 'results' => $results,
-                'hitCount' => $form->grouping == 'chapter' ? $chapterCount : $verseCount
+                'hitCount' => $form->grouping == 'chapter' ? $chapterCount : $verseCount,
             ]);
         }
         return $view;

@@ -9,7 +9,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
     <div class="panel panel-default">
         <div class="panel-body">
             <form role="form" class="form-horizontal" method="post"
-                  action="{{ action('SzentirasHu\\Controllers\\Search\\SearchController@postSearch') }}">
+                  action="{{ action('SzentirasHu\\Controllers\\Search\\SearchController@anySearch') }}">
                 <div class="form-group">
                     <label for="textToSearch" class="col-sm-3 control-label">Keresendő</label>
                     <div class="col-sm-9">
@@ -65,6 +65,13 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
             </blockquote>
         {% endfor %}
     {% endif %}
+
+
+    {% for translationHit in translationHits %}
+        <a href="/kereses/search?textToSearch={{ form.textToSearch }}&translation={{ translationHit.translation.id }}"
+           class="btn btn-default btn-xs">{{ translationHit.translation.abbrev }} <sup>{{ translationHit.hitCount }}</sup>
+        </a>
+    {% endfor %}
 
     {% if fullTextResults is defined %}
         <h4>Találatok a szövegben <small>{{ fullTextResults.hitCount }} találat</small></h4>
