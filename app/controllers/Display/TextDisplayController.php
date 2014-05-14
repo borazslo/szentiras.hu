@@ -76,7 +76,7 @@ class TextDisplayController extends \BaseController
             ]);
         } catch (ParsingException $e) {
             // as this doesn't look like a valid reference, interpret as full text search
-            return Redirect::to("/kereses/search?textToSearch={$reference}");
+            return Redirect::action("SzentirasHu\Controllers\Search\SearchController@anySearch", [ 'textToSearch'=> $reference ]);
         }
     }
 
