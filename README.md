@@ -39,31 +39,30 @@ A Laravel keretrendszert használjuk.
 - Vannak címsorok, alcímsorok és a szöveg DONE
 - A vers száma felső indexben nem mindig a tényleges sorszám (akár betű is lehet) DONE
 - Twitter és facebook megosztás (hozzávaló html tag-ek hogy szebb legyen a megosztott anyag) DONE
-- Link a többi fordítás azonos könyvére (sokszor már a rövidítés!)
+- Link a többi fordítás azonos könyvére (sokszor már a rövidítés!) DONE
 - Lábjegyztekkel és magyrázatokkal. Ezek nem versekhez, hanem verstartományokhoz tartoznak.(Éppen nem működik, mert nincs az adatbázisban.)
 
 ###Keresés
 - Url-be vagy keresőbe beírt kifejezés keresése DONE
 - szűri lehetőség: bármely könyvre ill. Újszöv/Ószöv; fordítás
-- találatok csoportosítása: versenként vagy fejezetenként
-- A találatokat súlyozza és a legsúlyosabbal kezdi (tehát nem előfordulási könyvbeli sorrendben jelennek meg)
+- találatok csoportosítása: versenként vagy fejezetenként DONE
+- A találatokat súlyozza és a legsúlyosabbal kezdi (tehát nem előfordulási könyvbeli sorrendben jelennek meg) DONE
 - Amit figyel
-    - pontos és regexp találat.
-    - szavakra bontva és idézőjelben is (idézőjeles keresési lehetőség)
-    - szótóben keres (megkeresi a hunspell a keresőszó szótöveit, a szentírás minden versét szótöves változatban is tároljuk)
+    - Sphinx extended search nyelvtan szerint DONE
+    - szótóben keres (megkeresi a hunspell a keresőszó szótöveit, a szentírás minden versét szótöves változatban is tároljuk) PARTLY DONE (a keresőszót nem tövezzük) 
 - Extrák
-    - megnézni, hogy az alternatív fordításokban ugyan erre mennyi a találat (hogy ne legyen túl lassú a logban/cacheben lévők között néz csak körül)
-    - tippeket ad hasonló kifejezésekre ill. azonos szótövű szavakra, ha valaki keresett már rá és 10-100 talált van
+    - megnézni, hogy az alternatív fordításokban ugyan erre mennyi a találat DONE - csak a Sphinx indexben nézi, ezért villámgyors
+    - tippeket ad hasonló kifejezésekre ill. azonos szótövű szavakra
     - tippeket ad kézzel készülő szinoníma szótár alapján: létra/lajtorja, Nebukodonozor/Nebukadanazzár, stb.
     - ugyan ezen szótár szerint elgépelt nevekre is tippeket ad
 ###API/Fejlesztőknek
-- csupán json/xml válaszokat ad megfelelő kérésekre (tehát nincs cross browsing, felhasznál kezelé, oauth, stb.) (ez magasabb szinten is kell majd)
-- főként a keresésekre válaszol és elvileg mindent tudnia kéne, amit a keresőnek, csak más formátumban válaszol
-- könyvek automatikus /epub kimenetele ill. abból generált /mobi (havont egyszer gyárt, onnantól mindig azt hviatkozza)
+- JSON válaszokat ad megfelelő kérésekre DONE (JSON)
+- főként a keresésekre válaszol és elvileg mindent tudnia kéne, amit a keresőnek, csak más formátumban válaszol DONE (legalábbis az kész, ami volt)
+- könyvek automatikus /epub kimenetele ill. abból generált /mobi (havont egyszer gyárt, onnantól mindig azt hviatkozza) (ez nem megy az élesen sem)
 ###Egyéb
 - pár statikusabb oldal kéne ill van (címlap, infó, impresszum, stb.) (nem kell szerkesztő felület)
-- agresszív cache: a php script a végén html-ben lementi az oldalt, legközelebb azt hozza be
-- mysql cache: a kereséseket logolja és cacheli, hogy az alternítvákat jól mutassa és lássam mi megy az életben
-- rövid urlek (és régi-régi linkek hosszú url-jeit is értelmezi)
-- GoogleAnalytics egyelőre igénytelenül (pl. kereséseket nem követ)
-- cron napi/heti/havi: adatbázis karbantartás, felesleges fájlok törlése
+- agresszív cache: a php script a végén html-ben lementi az oldalt, legközelebb azt hozza be - ez már nincs, de van egy csomó cache-elés, főleg db
+- mysql cache: a kereséseket logolja és cacheli, hogy az alternítvákat jól mutassa és lássam mi megy az életben DONE
+- rövid urlek (és régi-régi linkek hosszú url-jeit is értelmezi) DONE
+- GoogleAnalytics egyelőre igénytelenül (pl. kereséseket nem követ) DONE
+- cron napi/heti/havi: adatbázis karbantartás, felesleges fájlok törlése TO BE DELETED
