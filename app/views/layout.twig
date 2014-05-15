@@ -7,16 +7,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ pageTitle }}</title>
 
-	<meta property="fb:admins" content="1819502454" />
-	<meta name="description" content="A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban">
-	<meta name="keywords" content="biblia, katolikus, protestáns, szentírás, keresztény, keresztyén, református, hivatalos">
-	<meta name="author" content="szentiras.hu">
-	<meta http-equiv="cleartype" content="on">
+        <meta property="fb:admins" content="1819502454" />
+        <meta name="description" content="A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban">
+        <meta name="keywords" content="biblia, katolikus, protestáns, szentírás, keresztény, keresztyén, református, hivatalos">
+        <meta name="author" content="szentiras.hu">
+        <meta http-equiv="cleartype" content="on">
 
-	<meta property="og:image" content="/img/biblia.jpg">
-        {{ meta }}
-	
-
+        <meta property="og:image" content="/img/biblia.jpg">
+        {% block meta %}{% endblock %}
         <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/img/favicon.ico">
         <link href="/css/bootstrap.min.css" rel="stylesheet">
         <link href="/css/style.css" rel="stylesheet">

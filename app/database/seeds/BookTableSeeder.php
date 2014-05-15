@@ -7,38 +7,33 @@ class BookTableSeeder extends Seeder
 {
     public function run()
     {
-        $translation = new \SzentirasHu\Models\Entities\Translation();
-        $translation->id = 1;
-        $translation->name='Translation Name';
-        $translation->abbrev='TESTTRANS';
-        $translation->save();
+        $translation = $this->addTranslation(1, 'Translation Name 1', 'TESTTRANS');
+        $this->addBook(101, "Ter", $translation);
+        $this->addBook(102, "Kiv", $translation);
 
-        $book = new \SzentirasHu\Models\Entities\Book();
-        $book->abbrev = "Ter";
-        $book->id = 101;
-        $book->translation()->associate($translation);
-        $book->save();
-
-        $book = new \SzentirasHu\Models\Entities\Book();
-        $book->abbrev = "Kiv";
-        $book->id = 102;
-        $book->translation()->associate($translation);
-        $book->save();
-
-        $translation = new \SzentirasHu\Models\Entities\Translation();
-        $translation->id = 2;
-        $translation->name='Translation Name 2';
-        $translation->abbrev='TESTTRANS2';
-        $translation->save();
-
-        $book = new \SzentirasHu\Models\Entities\Book();
-        $book->abbrev = "1Móz";
-        $book->id = 101;
-        $book->translation()->associate($translation);
-        $book->save();
-
-
+        $translation = $this->addTranslation(2, 'Translation Name 2', 'TESTTRANS2');
+        $this->addBook(101, "1Móz", $translation);
+        $this->addBook(102, "2Móz", $translation);
     }
 
+    private function addBook($id, $abbrev, $translation)
+    {
+        $book = new \SzentirasHu\Models\Entities\Book();
+        $book->id = $id;
+        $book->abbrev = $abbrev;
+        $book->translation()->associate($translation);
+        $book->save();
+        return $book;
+    }
+
+    private function addTranslation($id, $name, $abbrev)
+    {
+        $translation = new \SzentirasHu\Models\Entities\Translation();
+        $translation->id = $id;
+        $translation->name = $name;
+        $translation->abbrev = $abbrev;
+        $translation->save();
+        return $translation;
+    }
 
 } 

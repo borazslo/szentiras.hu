@@ -1,5 +1,9 @@
 {% extends 'layout' %}
 
+{% block meta %}
+    <meta property="og:url" content="{{ canonicalUrl }}">
+{% endblock %}
+
 {% block content %}
     {% for verseContainer in verseContainers %}
         <div class="pull-right panel panel-default">

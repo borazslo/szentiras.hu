@@ -115,4 +115,11 @@ class CanonicalReference
         return true;
     }
 
+    public function getCanonicalUrl($translation)
+    {
+        $translatedRef = $this->toTranslated($translation->id);
+        $url = preg_replace('/[ ]+/', '', "{$translation->abbrev}/{$translatedRef->toString()}");
+        return $url;
+    }
+
 }

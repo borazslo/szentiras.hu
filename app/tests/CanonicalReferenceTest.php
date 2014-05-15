@@ -163,7 +163,8 @@ class CanonicalReferenceTest extends TestCase
 
     }
 
-    public function testErrorHandling() {
+    public function testErrorHandling()
+    {
         $this->assertEquals('Mk 1,1', CanonicalReference::fromString('Mk. 1,1')->toString());
         $this->assertEquals('Mk 1,1', CanonicalReference::fromString('Mk, 1,1')->toString());
 
@@ -207,7 +208,6 @@ class CanonicalReferenceTest extends TestCase
     }
 
 
-
     public
     function testChapterRange()
     {
@@ -234,9 +234,18 @@ class CanonicalReferenceTest extends TestCase
         $this->assertFalse($range->hasVerse(3, 5));
     }
 
-    public function testDashes() {
+    public function testDashes()
+    {
         $this->assertEquals("Mt 2,1-2", CanonicalReference::fromString("Mt 2,1–2")->toString());
         $this->assertEquals("Mt 2,1-2", CanonicalReference::fromString("Mt 2,1—2")->toString());
+    }
+
+    public function testCanonicalUrl()
+    {
+        $translationRepository = App::make('SzentirasHu\Models\Repositories\TranslationRepository');
+        $translation = $translationRepository->getById(1);
+        $ref = "Kiv 1,9-10; 1Móz 22";
+        $this->assertEquals("TESTTRANS/Kiv1,9-10;Ter22", CanonicalReference::fromString($ref)->getCanonicalUrl($translation));
     }
 
 }

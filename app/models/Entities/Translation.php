@@ -7,6 +7,8 @@ use Eloquent;
  * Domain object representing a translation.
  *
  * @property mixed id
+ * @property string name
+ * @property string abbrev
  * @author berti
  */
 class Translation extends Eloquent {

@@ -73,7 +73,8 @@ class TextDisplayController extends \BaseController
             return View::make('textDisplay.verses')->with([
                 'verseContainers' => $verseContainers,
                 'translation' => $translation,
-                'translations' => $this->translationRepository->getAllOrderedByDenom()
+                'translations' => $this->translationRepository->getAllOrderedByDenom(),
+                'canonicalUrl' => $canonicalRef->getCanonicalUrl($translation)
             ]);
         } catch (ParsingException $e) {
             // as this doesn't look like a valid reference, interpret as full text search
