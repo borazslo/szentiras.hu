@@ -1,21 +1,24 @@
 {% extends 'layout' %}
 
 {% block meta %}
-    <meta property="og:url" content="{{ canonicalUrl }}">
+    <meta property="og:url" content="{{ url('/' ~ canonicalUrl ) }}">
+    <meta property="og:title" content="{{ metaTitle }}">
+    <meta property="og:description" content="{{ teaser }}">
 {% endblock %}
 
 {% block content %}
+    <div class="pull-right panel panel-default">
+        <div class="panel-body">
+            {% include 'textDisplay.share' with { 'canonicalUrl' : canonicalUrl } %}
+        </div>
+    </div>
     {% for verseContainer in verseContainers %}
-        <div class="pull-right panel panel-default">
-            <div class="panel-body">
-                {% include 'textDisplay.share' with { 'bookRef' : verseContainer.bookRef } %}</div>
-            </div>
         <div>
             {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book, 'bookRef': verseContainer.bookRef } %}
         </div>
         <div>
             <p>
-                {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
+             {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
             </p>
             <p>
                 {% for otherTranslation in translations %}

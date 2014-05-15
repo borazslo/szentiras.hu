@@ -5,6 +5,7 @@ namespace SzentirasHu\Controllers\Display;
 use Illuminate\Support\Facades\Redirect;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
+use SzentirasHu\Lib\VerseContainer;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 use SzentirasHu\Models\Repositories\VerseRepository;
@@ -74,11 +75,13 @@ class TextDisplayController extends \BaseController
                 'verseContainers' => $verseContainers,
                 'translation' => $translation,
                 'translations' => $this->translationRepository->getAllOrderedByDenom(),
-                'canonicalUrl' => $canonicalRef->getCanonicalUrl($translation)
+                'canonicalUrl' => $canonicalRef->getCanonicalUrl($translation),
+                'metaTitle' => $this->getTitle($verseContainers, $translation),
+                'teaser' => $this->getTeaser($verseContainers)
             ]);
         } catch (ParsingException $e) {
             // as this doesn't look like a valid reference, interpret as full text search
-            return Redirect::action("SzentirasHu\Controllers\Search\SearchController@anySearch", [ 'textToSearch'=> $reference ]);
+            return Redirect::action("SzentirasHu\Controllers\Search\SearchController@anySearch", ['textToSearch' => $reference]);
         }
     }
 
@@ -109,7 +112,6 @@ class TextDisplayController extends \BaseController
 
     }
 
-
     /**
      * @param $canonicalRef
      * @param $translation
@@ -121,7 +123,7 @@ class TextDisplayController extends \BaseController
         $verseContainers = [];
         foreach ($translatedRef->bookRefs as $bookRef) {
             $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translation->id);
-            $verseContainer = new \SzentirasHu\Lib\VerseContainer($book, $bookRef);
+            $verseContainer = new VerseContainer($book, $bookRef);
             foreach ($bookRef->chapterRanges as $chapterRange) {
                 $searchedChapters = DisplayHelper::collectChapterIds($chapterRange);
                 $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation);
@@ -144,6 +146,34 @@ class TextDisplayController extends \BaseController
             }
         }
         return $chapterRangeVerses;
+    }
+
+    private function getTitle($verseContainers, $translation)
+    {
+        $title = "";
+        $title .= "{$translation->name}";
+        foreach ($verseContainers as $verseContainer) {
+            if (isset($verseContainer->book)) {
+                $title .= " - {$verseContainer->book->name}";
+            }
+            if (isset($verseContainer->bookRef)) {
+                $title .= " - {$verseContainer->bookRef->toString()}";
+            }
+        }
+        return $title;
+    }
+
+    /**
+     * @param VerseContainer[] $verseContainers
+     * @return string
+     */
+    private function getTeaser($verseContainers)
+    {
+        $teaser = "";
+        foreach ($verseContainers as $verseContainer) {
+            $teaser .= $verseContainer->getParsedVerses()[0]->text . '... ';
+        }
+        return $teaser;
     }
 
 }
