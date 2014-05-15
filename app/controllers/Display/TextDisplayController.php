@@ -171,7 +171,7 @@ class TextDisplayController extends \BaseController
     {
         $teaser = "";
         foreach ($verseContainers as $verseContainer) {
-            $teaser .= $verseContainer->getParsedVerses()[0]->text . '... ';
+            $teaser .= preg_replace('/<[^>]+>/', ' ', $verseContainer->getParsedVerses()[0]->text) . ' ... ';
         }
         return $teaser;
     }
