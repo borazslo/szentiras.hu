@@ -1,1 +1,7 @@
-<div class="fb-share-button" data-href="{{ url('/' ~ canonicalUrl) }}" data-type="button"></div>
+<ul class="list-unstyled">
+    <li>
+        <div class="fb-share-button" data-href="{{ url('/' ~ canonicalUrl) }}" data-type="button"></div>
+    </li>
+    <li><a href="https://twitter.com/share" class="twitter-share-button" {{ url('/' ~ canonicalUrl) }} data-text="{{ teaser }}" data-lang="hu">Tweet</a>
+    </li>
+</ul>

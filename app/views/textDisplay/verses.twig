@@ -11,7 +11,7 @@
 {% block content %}
     <div class="pull-right panel panel-default">
         <div class="panel-body">
-            {% include 'textDisplay.share' with { 'canonicalUrl' : canonicalUrl } %}
+            {% include 'textDisplay.share' with { 'canonicalUrl' : canonicalUrl, 'teaser' : teaser } %}
         </div>
     </div>
     {% for verseContainer in verseContainers %}
