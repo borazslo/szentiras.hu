@@ -90,7 +90,7 @@ class TextDisplayController extends \BaseController
         $bookRef = $canonicalRef->bookRefs[0];
         $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
         $translatedRef = $canonicalRef->toTranslated($translation->id);
-        $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translation->id);
+        $book = $this->bookRepository->getByAbbrevForTranslation($translatedRef->bookRefs[0]->bookId, $translation->id);
         if ($book) {
             $firstVerses = $this->verseRepository->getLeadVerses($translation->id, $book->id);
             $groupedVerses = [];

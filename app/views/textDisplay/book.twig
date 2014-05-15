@@ -8,6 +8,15 @@
 
     {% include 'textDisplay.breadcrumb' %}
 
+    <p>
+        {% for otherTranslation in translations %}
+            {% if otherTranslation.id != translation.id %}
+                <a class="btn btn-default btn-xs" href="/{{ otherTranslation.abbrev }}/{{ book.abbrev }}">{{ otherTranslation.abbrev }}</a>
+            {% endif %}
+        {% endfor %}
+    </p>
+
+
     {% for chapter, verses in groupedVerses %}
         <h4><a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a></h4>
 

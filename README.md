@@ -38,11 +38,12 @@ A Laravel keretrendszert használjuk.
 ###Szövegmegjelenítés - Idézésnél és fejezet nézetnél is
 - Vannak címsorok, alcímsorok és a szöveg DONE
 - A vers száma felső indexben nem mindig a tényleges sorszám (akár betű is lehet) DONE
-- Twitter és facebook megosztás (hozzávaló html tag-ek hogy szebb legyen a megosztott anyag)
+- Twitter és facebook megosztás (hozzávaló html tag-ek hogy szebb legyen a megosztott anyag) DONE
 - Link a többi fordítás azonos könyvére (sokszor már a rövidítés!)
 - Lábjegyztekkel és magyrázatokkal. Ezek nem versekhez, hanem verstartományokhoz tartoznak.(Éppen nem működik, mert nincs az adatbázisban.)
+
 ###Keresés
-- Url-be vagy keresőbe beírt kifejezés keresése
+- Url-be vagy keresőbe beírt kifejezés keresése DONE
 - szűri lehetőség: bármely könyvre ill. Újszöv/Ószöv; fordítás
 - találatok csoportosítása: versenként vagy fejezetenként
 - A találatokat súlyozza és a legsúlyosabbal kezdi (tehát nem előfordulási könyvbeli sorrendben jelennek meg)
