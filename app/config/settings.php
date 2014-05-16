@@ -6,4 +6,5 @@ return [
     'translationAbbrevRegex' => 'KNB|SZIT|UF|KG|knb|szit|uf|kg',
     'audioDirectory' => 'hang',
     'facebookAppId' => '679257202109581',
+    'searchLimit' => 1000
 ];

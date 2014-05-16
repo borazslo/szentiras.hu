@@ -6,6 +6,7 @@
 namespace SzentirasHu\Lib\Search;
 
 
+use Config;
 use Sphinx\SphinxClient;
 use SphinxSearch;
 
@@ -16,27 +17,32 @@ class SphinxSearcher
      */
     private $sphinxClient;
 
-    public function __construct($textToSearch, $translation = false)
+    public function __construct(FullTextSearchParams $params)
     {
         $this->sphinxClient = SphinxSearch::
-        search($textToSearch)
-            ->limit(1000)
+        search($params->text)
+            ->limit((int)Config::get('settings.searchLimit') + 1)
             ->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED)
             ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@relevance DESC, gepi ASC");
-        if ($translation) {
-            $this->sphinxClient = $this->sphinxClient->filter('trans', $translation->id);
+        if ($params->translationId) {
+            $this->sphinxClient = $this->sphinxClient->filter('trans', $params->translationId);
+        }
+        if (count($params->bookIds) > 0) {
+            $this->sphinxClient = $this->sphinxClient->filter('book', $params->bookIds);
         }
     }
 
     /**
      * @return FullTextSearchResult|false
      */
-    public function get() {
+    public function get()
+    {
         $sphinxResult = $this->sphinxClient->get();
         if ($sphinxResult) {
             $fullTextSearchResult = new FullTextSearchResult();
-            $fullTextSearchResult->hitCount = $sphinxResult['total_found'];
             $fullTextSearchResult->verseIds = array_keys($sphinxResult['matches']);
+            $fullTextSearchResult->hitCount = count($sphinxResult['matches']);
+
             return $fullTextSearchResult;
         }
     }

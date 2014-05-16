@@ -66,10 +66,9 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         {% endfor %}
     {% endif %}
 
-
     {% for translationHit in translationHits %}
-        <a href="/kereses/search?textToSearch={{ form.textToSearch }}&translation={{ translationHit.translation.id }}"
-           class="btn btn-default btn-xs">{{ translationHit.translation.abbrev }} <sup>{{ translationHit.hitCount }}</sup>
+        <a href="/kereses/search?textToSearch={{ form.textToSearch }}&translation={{ translationHit.translation.id }}&book={{ form.book }}&grouping={{ form.grouping }}"
+           class="btn btn-default btn-xs">{{ translationHit.translation.abbrev }} <sup>{% if translationHit.hitCount > 999 %}&gt;{% endif %}{{ translationHit.hitCount }}</sup>
         </a>
     {% endfor %}
 
