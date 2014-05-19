@@ -6,11 +6,12 @@ require.config(
       "lib/jquery.min"
     ]
     bootstrap: 'lib/bootstrap.min'
+    typeahead: 'lib/typeahead.jquery.min'
     app_modules: 'app_bundle'
 
   shim:
     bootstrap: ['jquery'],
     typeahead: ['jquery']
 
-  deps: ['app_modules', 'jquery', 'bootstrap']
+  deps: ['app_modules', 'jquery', 'bootstrap', 'typeahead']
 )

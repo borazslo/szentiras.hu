@@ -83,6 +83,7 @@
             <p>Kérdések, ötletek, problémák: <a href='mailto:eleklaszlosj@gmail.com'>Elek László SJ</a> (<a
                         href="http://jezsuita.hu">JTMR</a>)</p>
         </div>
+        {% if app.environment=='dev' %}{{ html_script('/js/lib/jquery.min.js') }}{% endif %}
         <script data-main="/js/requirejs_config" src="/js/lib/require.js"></script>
     </body>
 </html>

@@ -51,6 +51,7 @@ module.exports = (grunt) ->
               'bower_components/bootstrap/dist/js/bootstrap.min.js'
               'bower_components/requirejs/require.js'
               'bower_components/jquery/dist/jquery.min.js'
+              'bower_components/typeahead.js/dist/typeahead.jquery.min.js'
             ]
             dest: 'public/js/lib'
           }
