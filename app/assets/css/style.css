@@ -13,11 +13,11 @@
     z-index: 1000;
     display: none;
     float: left;
-    min-width: 160px;
+    width: 300px;
     padding: 5px 0;
     margin: 2px 0 0;
     list-style: none;
-    font-size: 14px;
+    font-size: 12px;
     background-color: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 4px;
@@ -29,7 +29,6 @@
     display: block;
     padding: 3px 20px;
     clear: both;
-    font-weight: normal;
     line-height: 1.428571429;
     color: #333333;
     white-space: nowrap;
@@ -38,7 +37,6 @@
 .tt-suggestion > p:focus,
 .tt-suggestion.tt-cursor p {
     color: #ffffff;
-    text-decoration: none;
     outline: 0;
     background-color: #428bca;
 }

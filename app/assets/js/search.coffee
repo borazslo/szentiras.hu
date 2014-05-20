@@ -14,4 +14,7 @@ define ['jquery', 'typeahead', 'bloodhound'], ->
     highlight: true
     minLength: 3
     source: suggester.ttAdapter()
+    templates:
+      header: (context) ->
+        return '<p class="text-center"><a href="/kereses/search?textToSearch='+context.query+'">Részletes keresés &gt;</a></p><hr>'
   });

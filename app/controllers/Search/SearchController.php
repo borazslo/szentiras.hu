@@ -90,7 +90,11 @@ class SearchController extends BaseController
         $form->grouping = Input::get('grouping');
         $defaultTranslation = Translation::getDefaultTranslation();
         $form->book = Input::get('book');
-        $form->translation = Input::has('translation') && Input::get('translation') != 0 ? $this->translationRepository->getById(Input::get('translation')) : $defaultTranslation;
+        if (!Input::has('translation')) {
+            $form->translation = $defaultTranslation;
+        } else if (Input::get('translation') != 0) {
+            $form->translation = $this->translationRepository->getById(Input::get('translation'));
+        }
         return $form;
     }
 
@@ -260,7 +264,9 @@ class SearchController extends BaseController
     {
         $searchParams = new FullTextSearchParams;
         $searchParams->text = $form->textToSearch;
-        $searchParams->translationId = $form->translation->id;
+        if ($form->translation) {
+            $searchParams->translationId = $form->translation->id;
+        }
         $searchParams->bookIds = $this->extractBookIds($form);
         return $searchParams;
     }
