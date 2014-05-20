@@ -51,19 +51,27 @@ class SearchController extends BaseController
         return $this->getView($this->prepareForm());
     }
 
-    public function anySuggest() {
-        $searchParams = new FullTextSearchParams;
-        $searchParams->text = Input::get('textToSearch');
-        $searchParams->limit = 10;
-        $sphinxSearcher = new SphinxSearcher($searchParams);
-        $sphinxResults = $sphinxSearcher->get();
-        if ($sphinxResults) {
-            $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
-            $result = [];
-            foreach ($verses as $verse) {
-                $result[] = [ 'value' => $verse->verse ];
+    public function anySuggest()
+    {
+        if (Input::get('refToSearch')) {
+            $ref = $this->findTranslatedRef(Input::get('refToSearch'));
+            if ($ref) {
+                return \Response::json([['value' => $ref->toString()]]);
             }
-            return \Response::json($result);
+        } else if (Input::get('textToSearch')) {
+            $searchParams = new FullTextSearchParams;
+            $searchParams->text = Input::get('textToSearch');
+            $searchParams->limit = 10;
+            $sphinxSearcher = new SphinxSearcher($searchParams);
+            $sphinxResults = $sphinxSearcher->get();
+            if ($sphinxResults) {
+                $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
+                $result = [];
+                foreach ($verses as $verse) {
+                    $result[] = ['value' => $verse->verse];
+                }
+                return \Response::json($result);
+            }
         }
         return \Response::json([]);
     }
@@ -117,20 +125,18 @@ class SearchController extends BaseController
     private function searchBookRef($form, $view)
     {
         $augmentedView = $view;
-        try {
-            $storedBookRef = CanonicalReference::fromString($form->textToSearch)->getExistingBookRef();
-            if ($storedBookRef) {
-                $translation = $form->translation ? $form->translation : Translation::getDefaultTranslation();
-                $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $translation->id);
-                $textDisplayController = App::make('SzentirasHu\Controllers\Display\TextDisplayController');
-                $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation);
-                $augmentedView = $view->with('bookRef', [
-                    'label' => $translatedRef->toString(),
-                    'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
-                    'verseContainers' => $verseContainers
-                ]);
-            }
-        } catch (ParsingException $e) {
+        $translatedRef = $this->findTranslatedRef($form->textToSearch, $form->translation);
+        $storedBookRef = CanonicalReference::fromString($form->textToSearch)->getExistingBookRef();
+        if ($translatedRef) {
+            $translation = $form->translation ? $form->translation : Translation::getDefaultTranslation();
+            $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $translation->id);
+            $textDisplayController = App::make('SzentirasHu\Controllers\Display\TextDisplayController');
+            $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation);
+            $augmentedView = $view->with('bookRef', [
+                'label' => $translatedRef->toString(),
+                'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
+                'verseContainers' => $verseContainers
+            ]);
         }
         return $augmentedView;
     }
@@ -205,9 +211,9 @@ class SearchController extends BaseController
         $bookIds = [];
         if ($form->book) {
             if ($form->book == 'old_testament') {
-                $bookIds = range(101,146);
+                $bookIds = range(101, 146);
             } else if ($form->book == 'new_testament') {
-                $bookIds = range(201,227);
+                $bookIds = range(201, 227);
             } else if ($form->book == 'all') {
                 $bookIds = [];
             } else {
@@ -269,6 +275,22 @@ class SearchController extends BaseController
         }
         $searchParams->bookIds = $this->extractBookIds($form);
         return $searchParams;
+    }
+
+    /**
+     * @param $refToSearch
+     * @param $translation
+     */
+    private function findTranslatedRef($refToSearch, $translation = false)
+    {
+        try {
+            $storedBookRef = CanonicalReference::fromString($refToSearch)->getExistingBookRef();
+            if ($storedBookRef) {
+                $translation = $translation ? $translation : Translation::getDefaultTranslation();
+                return CanonicalReference::translateBookRef($storedBookRef, $translation->id);
+            }
+        } catch (ParsingException $e) {
+        }
     }
 
 }
