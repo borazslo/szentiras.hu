@@ -12,5 +12,6 @@ define ['jquery', 'typeahead', 'bloodhound'], ->
     name: 'suggester'
     displayKey: 'value'
     highlight: true
+    minLength: 3
     source: suggester.ttAdapter()
   });

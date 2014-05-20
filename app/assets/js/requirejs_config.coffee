@@ -13,6 +13,7 @@ require.config(
   shim:
     bootstrap: ['jquery']
     typeahead: ['jquery']
+    bloodhound: ['jquery', 'typeahead']
 
   deps: ['app_modules', 'jquery', 'bootstrap', 'typeahead']
 )
