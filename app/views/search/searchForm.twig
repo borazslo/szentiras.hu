@@ -1,7 +1,7 @@
 <form role="form" method="post"
       action="{{ action('SzentirasHu\\Controllers\\Search\\SearchController@anySearch') }}">
-    <div class="form-group">
-        <input type="text" name="textToSearch" id="textToSearch" value="{{ form.textToSearch }}" class="form-control"/>
+    <div class="form-group" id="quickSearch">
+        <input type="text" class="typeahead form-control" name="textToSearch" value="{{ form.textToSearch }}"/>
     </div>
     <input type="submit" value="Keresés" class="btn btn-default"/>
 

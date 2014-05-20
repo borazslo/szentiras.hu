@@ -21,9 +21,14 @@ class SphinxSearcher
     {
         $this->sphinxClient = SphinxSearch::
         search($params->text)
-            ->limit((int)Config::get('settings.searchLimit') + 1)
             ->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED)
             ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@relevance DESC, gepi ASC");
+        if ($params->limit) {
+            $limit = $params->limit;
+        } else {
+            $limit = (int)Config::get('settings.searchLimit') + 1;
+        }
+        $this->sphinxClient = $this->sphinxClient->limit($limit);
         if ($params->translationId) {
             $this->sphinxClient = $this->sphinxClient->filter('trans', $params->translationId);
         }

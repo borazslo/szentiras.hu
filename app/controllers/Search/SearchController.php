@@ -51,6 +51,23 @@ class SearchController extends BaseController
         return $this->getView($this->prepareForm());
     }
 
+    public function anySuggest() {
+        $searchParams = new FullTextSearchParams;
+        $searchParams->text = Input::get('textToSearch');
+        $searchParams->limit = 10;
+        $sphinxSearcher = new SphinxSearcher($searchParams);
+        $sphinxResults = $sphinxSearcher->get();
+        if ($sphinxResults) {
+            $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
+            $result = [];
+            foreach ($verses as $verse) {
+                $result[] = [ 'value' => $verse->verse ];
+            }
+            return \Response::json($result);
+        }
+        return \Response::json([]);
+    }
+
     public function anySearch()
     {
         if (Input::get('textToSearch') == null) {
@@ -121,23 +138,8 @@ class SearchController extends BaseController
      */
     private function searchFullText($form, $view)
     {
-        $translationHits = [];
-        $searchParams = new FullTextSearchParams;
-        $searchParams->text = $form->textToSearch;
-        $searchParams->translationId = $form->translation->id;
-        $searchParams->bookIds = $this->extractBookIds($form);
-
-        foreach ($this->translationRepository->getAll() as $translation) {
-            $params = clone $searchParams;
-            $params->translationId = $translation->id;
-            $searcher = new SphinxSearcher($params);
-            $searchHits = $searcher->get();
-            if ($searchHits) {
-                $translationHits[] = ['translation' => $translation, 'hitCount' => $searchHits->hitCount];
-            }
-        }
-        $view = $view->with('translationHits', $translationHits);
-
+        $searchParams = $this->createFullTextSearchParams($form);
+        $view = $this->addTranslationHits($view, $searchParams);
         $sphinxSearcher = new SphinxSearcher($searchParams);
         $sphinxResults = $sphinxSearcher->get();
         if ($sphinxResults) {
@@ -155,15 +157,7 @@ class SearchController extends BaseController
     private function handleFullTextResults($form, $view, $sphinxResults)
     {
         $sortedVerses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
-        $verseContainers = [];
-        foreach ($sortedVerses as $verse) {
-            $book = $this->bookRepository->getByIdForTranslation($verse->book, $verse->trans);
-            if (!array_key_exists($book->abbrev, $verseContainers)) {
-                $verseContainers[$book->abbrev] = new VerseContainer($book);
-            }
-            $verseContainer = $verseContainers[$book->abbrev];
-            $verseContainer->addVerse($verse);
-        }
+        $verseContainers = $this->groupVersesByBook($sortedVerses);
         $results = [];
         $chapterCount = 0;
         $verseCount = 0;
@@ -217,6 +211,58 @@ class SearchController extends BaseController
             }
         }
         return $bookIds;
+    }
+
+    /**
+     * @param $sortedVerses
+     * @return VerseContainer[]
+     */
+    private function groupVersesByBook($sortedVerses)
+    {
+        $verseContainers = [];
+        foreach ($sortedVerses as $verse) {
+            $book = $this->bookRepository->getByIdForTranslation($verse->book, $verse->trans);
+            if (!array_key_exists($book->abbrev, $verseContainers)) {
+                $verseContainers[$book->abbrev] = new VerseContainer($book);
+            }
+            $verseContainer = $verseContainers[$book->abbrev];
+            $verseContainer->addVerse($verse);
+        }
+        return $verseContainers;
+    }
+
+    /**
+     * @param $view
+     * @param $searchParams
+     * @return mixed
+     */
+    private function addTranslationHits($view, $searchParams)
+    {
+        $translationHits = [];
+        foreach ($this->translationRepository->getAll() as $translation) {
+            $params = clone $searchParams;
+            $params->translationId = $translation->id;
+            $searcher = new SphinxSearcher($params);
+            $searchHits = $searcher->get();
+            if ($searchHits) {
+                $translationHits[] = ['translation' => $translation, 'hitCount' => $searchHits->hitCount];
+            }
+        }
+        $view = $view->with('translationHits', $translationHits);
+        return $view;
+    }
+
+    /**
+     * @param $form
+     * @return FullTextSearchParams
+     */
+    private function createFullTextSearchParams($form)
+    {
+        $searchParams = new FullTextSearchParams;
+        $searchParams->text = $form->textToSearch;
+        $searchParams->translationId = $form->translation->id;
+        $searchParams->bookIds = $this->extractBookIds($form);
+        return $searchParams;
     }
 
 }

@@ -14,6 +14,9 @@ module.exports = (grunt) ->
           out: 'public/js/app_bundle.js'
           paths: {
             jquery: "empty:"
+            bootstrap: "empty:"
+            bloodhound: "empty:"
+            typeahead: "empty:"
           }
     clean: ["public/js", "public/img", "public/css"]
     coffee:
@@ -24,6 +27,13 @@ module.exports = (grunt) ->
         dest: 'public/js'
         ext: '.js'
     copy:
+      dev:
+        files: [
+          {
+            src: ['public/js/app_modules.js']
+            dest: 'public/js/app_bundle.js'
+          }
+        ]
       main:
         files: [
           {
@@ -52,6 +62,7 @@ module.exports = (grunt) ->
               'bower_components/requirejs/require.js'
               'bower_components/jquery/dist/jquery.min.js'
               'bower_components/typeahead.js/dist/typeahead.jquery.min.js'
+              'bower_components/typeahead.js/dist/bloodhound.min.js'
             ]
             dest: 'public/js/lib'
           }
@@ -72,3 +83,4 @@ module.exports = (grunt) ->
   ]
 
   grunt.registerTask 'default', ['clean', 'copy', 'coffee', 'requirejs']
+  grunt.registerTask 'dev', ['clean', 'coffee', 'copy:main', 'copy:dev']
