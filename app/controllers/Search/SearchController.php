@@ -5,6 +5,7 @@ namespace SzentirasHu\Controllers\Search;
 use App;
 use BaseController;
 use Input;
+use Response;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Search\FullTextSearchParams;
@@ -53,27 +54,24 @@ class SearchController extends BaseController
 
     public function anySuggest()
     {
-        if (Input::get('refToSearch')) {
-            $ref = $this->findTranslatedRef(Input::get('refToSearch'));
-            if ($ref) {
-                return \Response::json([['value' => $ref->toString()]]);
-            }
-        } else if (Input::get('textToSearch')) {
-            $searchParams = new FullTextSearchParams;
-            $searchParams->text = Input::get('textToSearch');
-            $searchParams->limit = 10;
-            $sphinxSearcher = new SphinxSearcher($searchParams);
-            $sphinxResults = $sphinxSearcher->get();
-            if ($sphinxResults) {
-                $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
-                $result = [];
-                foreach ($verses as $verse) {
-                    $result[] = ['value' => $verse->verse];
-                }
-                return \Response::json($result);
+        $result = [];
+        $term = Input::get('term');
+        $ref = $this->findTranslatedRef($term);
+        if ($ref) {
+            $result[] = ['cat'=>'ref', 'label'=>$ref->toString()];
+        }
+        $searchParams = new FullTextSearchParams;
+        $searchParams->text = $term;
+        $searchParams->limit = 10;
+        $sphinxSearcher = new SphinxSearcher($searchParams);
+        $sphinxResults = $sphinxSearcher->get();
+        if ($sphinxResults) {
+            $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
+            foreach ($verses as $verse) {
+                $result[] = ['cat'=>'verse', 'label' => $verse->verse];
             }
         }
-        return \Response::json([]);
+        return Response::json($result);
     }
 
     public function anySearch()
@@ -126,15 +124,12 @@ class SearchController extends BaseController
     {
         $augmentedView = $view;
         $translatedRef = $this->findTranslatedRef($form->textToSearch, $form->translation);
-        $storedBookRef = CanonicalReference::fromString($form->textToSearch)->getExistingBookRef();
         if ($translatedRef) {
-            $translation = $form->translation ? $form->translation : Translation::getDefaultTranslation();
-            $translatedRef = CanonicalReference::translateBookRef($storedBookRef, $translation->id);
             $textDisplayController = App::make('SzentirasHu\Controllers\Display\TextDisplayController');
-            $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation);
+            $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $form->translation);
             $augmentedView = $view->with('bookRef', [
                 'label' => $translatedRef->toString(),
-                'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
+                'link' => "/{$form->translation->abbrev}/{$translatedRef->toString()}",
                 'verseContainers' => $verseContainers
             ]);
         }

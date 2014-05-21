@@ -13,6 +13,7 @@
     "requirejs": "~2.1.11"
   },
   "dependencies": {
-    "typeahead.js": "~0.10.2"
+    "jquery": "1.11.1",
+    "jquery-ui": "1.11.4"
   }
 }

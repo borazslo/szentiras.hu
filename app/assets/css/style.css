@@ -6,37 +6,60 @@
     border-top: 1px solid #e5e5e5;
 }
 
-.tt-dropdown-menu {
+.ui-autocomplete-loading {
+    background: white url('/img/waiting.gif') right center no-repeat;
+}
+
+.ui-autocomplete {
+    font-size:12px;
     position: absolute;
     top: 100%;
     left: 0;
     z-index: 1000;
-    display: none;
     float: left;
-    width: 300px;
-    padding: 5px 0;
-    margin: 2px 0 0;
+    display: none;
+    min-width: 160px;
+    _width: 160px;
+    padding: 4px 0;
+    margin: 2px 0 0 0;
     list-style: none;
-    font-size: 12px;
     background-color: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    border-color: #ccc;
+    border-color: rgba(0, 0, 0, 0.2);
+    border-style: solid;
+    border-width: 1px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
     background-clip: padding-box;
+    *border-right-width: 2px;
+    *border-bottom-width: 2px;
 }
-.tt-suggestion > p {
+
+.ui-autocomplete.ui-menu {
+    width:300px
+}
+
+.ui-menu-item > a.ui-corner-all {
     display: block;
-    padding: 3px 20px;
+    padding: 3px 15px;
     clear: both;
-    line-height: 1.428571429;
-    color: #333333;
-    white-space: nowrap;
+    font-weight: normal;
+    line-height: 18px;
+    color: #555555;
 }
-.tt-suggestion > p:hover,
-.tt-suggestion > p:focus,
-.tt-suggestion.tt-cursor p {
+
+.ui-state-active {
     color: #ffffff;
-    outline: 0;
-    background-color: #428bca;
+    text-decoration: none;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    background: #0088cc none;
 }
+

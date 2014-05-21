@@ -15,8 +15,7 @@ module.exports = (grunt) ->
           paths: {
             jquery: "empty:"
             bootstrap: "empty:"
-            bloodhound: "empty:"
-            typeahead: "empty:"
+            autocomplete: "empty:"
           }
     clean: ["public/js", "public/img", "public/css"]
     coffee:
@@ -62,8 +61,11 @@ module.exports = (grunt) ->
               'bower_components/requirejs/require.js'
               'bower_components/jquery/dist/jquery.min.js'
               'bower_components/jquery/dist/jquery.min.map'
-              'bower_components/typeahead.js/dist/typeahead.jquery.min.js'
-              'bower_components/typeahead.js/dist/bloodhound.min.js'
+              'bower_components/jquery-ui/ui/minified/jquery.ui.autocomplete.min.js'
+              'bower_components/jquery-ui/ui/minified/jquery.ui.core.min.js'
+              'bower_components/jquery-ui/ui/minified/jquery.ui.widget.min.js'
+              'bower_components/jquery-ui/ui/minified/jquery.ui.position.min.js'
+              'bower_components/jquery-ui/ui/minified/jquery.ui.menu.min.js'
             ]
             dest: 'public/js/lib'
           }
