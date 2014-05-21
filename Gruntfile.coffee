@@ -15,7 +15,7 @@ module.exports = (grunt) ->
           paths: {
             jquery: "empty:"
             bootstrap: "empty:"
-            autocomplete: "empty:"
+            'jquery.ui.autocomplete': "empty:"
           }
     clean: ["public/js", "public/img", "public/css"]
     coffee:
