@@ -276,4 +276,9 @@ class SphinxSearch {
         $this->_connection->setGroupBy($attr, $func, $groupsort);
         return $this;
     }
+
+    public function buildExcerpts($verses, $index, $words, $opts = []) {
+        $excerpts = $this->_connection->buildExcerpts($verses, $index, $words, $opts);
+        return $excerpts;
+    }
 }

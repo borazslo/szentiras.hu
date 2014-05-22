@@ -42,7 +42,7 @@ index verse
 	source	= verses_source
 	path = /home/szentiras_hu_git/github/borazslo/staging.szentiras.hu/app/storage/sphinx/verse_index
 	charset_type = utf-8
-	enable_star = *
+	enable_star = 1
 	min_infix_len = 3
 	charset_table = \
 	    0..9, \
@@ -50,6 +50,7 @@ index verse
 	    A..Z->a..z, \
 	    U+00E0..U+00FE, \
 	    U+00C0..U+00DE->U+00E0..U+00FE, \
+	    U+0151, U+0171, \
 	    U+0150->U+0151, \
 	    U+0170->U+0171
 }

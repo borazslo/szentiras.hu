@@ -67,8 +67,13 @@ class SearchController extends BaseController
         $sphinxResults = $sphinxSearcher->get();
         if ($sphinxResults) {
             $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
+            $texts = [];
             foreach ($verses as $verse) {
-                $result[] = ['cat'=>'verse', 'label' => $verse->verse];
+                $texts[] = $verse->verse;
+            }
+            $excerpts = $sphinxSearcher->getExcerpts($texts);
+            foreach ($excerpts as $excerpt) {
+                $result[] = ['cat'=>'verse', 'label' => $excerpt];
             }
         }
         return Response::json($result);

@@ -16,11 +16,20 @@ class SphinxSearcher
      * @var SphinxSearch
      */
     private $sphinxClient;
+    /**
+     * @var FullTextSearchParams
+     */
+    private $params;
+
+    private function addStars($text)
+    {
+        return preg_replace('/(\w+)/u', '($1 | *$1* )', $text);
+    }
 
     public function __construct(FullTextSearchParams $params)
     {
         $this->sphinxClient = SphinxSearch::
-        search($params->text)
+        search($this->addStars($params->text))
             ->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED)
             ->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@relevance DESC, gepi ASC");
         if ($params->limit) {
@@ -35,6 +44,12 @@ class SphinxSearcher
         if (count($params->bookIds) > 0) {
             $this->sphinxClient = $this->sphinxClient->filter('book', $params->bookIds);
         }
+        $this->params = $params;
+    }
+
+    public function getExcerpts($verses)
+    {
+        return $this->sphinxClient->buildExcerpts($verses, "verse", $this->addStars($this->params->text), ['query_mode' => 1]);
     }
 
     /**
