@@ -11,3 +11,6 @@ define ['jquery.ui.autocomplete'], ->
       return $("<li>").append("<a><b>Igehely: </b>"+item.label+"</a>").appendTo(ul)
     else
       return $("<li>").append("<a>"+item.label+"</a>").appendTo(ul)
+
+  $('#quickSearchButton').click ->
+    $('#quickSearchForm').submit();

@@ -1,1 +1,1 @@
-define ['search'], ->
+define ['quickSearch'], ->

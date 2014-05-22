@@ -6,6 +6,9 @@ paths =
 
 module.exports = (grunt) ->
   grunt.initConfig
+    watch:
+      files: 'app/assets/js/**/*.coffee'
+      tasks: ['coffee']
     requirejs:
       compile:
         options:
@@ -83,6 +86,7 @@ module.exports = (grunt) ->
     'grunt-contrib-clean'
     'grunt-contrib-coffee'
     'grunt-contrib-copy'
+    'grunt-contrib-watch'
   ]
 
   grunt.registerTask 'default', ['clean', 'copy', 'coffee', 'requirejs']
