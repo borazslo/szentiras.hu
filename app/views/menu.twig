@@ -5,7 +5,11 @@
         {% elseif item is not iterable %}
             <li>{{ item|raw }}</li>
         {% else %}
-            <li><a href="{{ item[1] }}">{{ item[0] }}</a></li>
+            {% if item[1] %}
+                <li><a href="{{ item[1] }}">{{ item[0] }}</a></li>
+            {% else %}
+                <li><p class="navbar-text">{{ item[0] }}</p></li>
+            {% endif %}
         {% endif %}
     {% endfor %}
 </ul>

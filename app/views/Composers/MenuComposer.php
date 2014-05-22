@@ -37,7 +37,7 @@ class MenuComposer
         $items[] = ["Újszövetség: hangfájlok", "/hang"];
         $items[] = ["További fordítások", "/forditasok"];
         $items[] = 'pause';
-        $items[] = ["Keresés a Bibliában", '/kereses'];
+        $items[] = ["Keresés a Bibliában"];
 
         $items[] = \View::make("search.searchForm")->render();
         $items[] = 'pause';
@@ -54,7 +54,5 @@ class MenuComposer
         $view
             ->with('items', $items);
     }
-    
-    
 
 }
