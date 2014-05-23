@@ -12,7 +12,7 @@ class VerseRepositoryTest extends TestCase {
         $verse = array_pop($verses);
         $this->assertEquals(1, $verse->id);
         $this->assertEquals('TESTTRANS', $verse->translation->abbrev);
-        $this->assertEquals('Ter', $verse->book()->first()->abbrev);
+        $this->assertEquals('Ter', $verse->book->abbrev);
     }
 
 } 

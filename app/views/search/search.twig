@@ -8,7 +8,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
     <h2>Keresés a Bibliában</h2>
     <div class="panel panel-default">
         <div class="panel-body">
-            <form role="form" class="form-horizontal" method="post"
+            <form role="form" class="form-horizontal" method="get"
                   action="{{ action('SzentirasHu\\Controllers\\Search\\SearchController@anySearch') }}">
                 <div class="form-group">
                     <label for="textToSearch" class="col-sm-3 control-label">Keresendő</label>

@@ -57,7 +57,7 @@ class ApiController extends BaseController {
             $translation = $verse->translation()->first();
             if (in_array($verse->tip, \Config::get("verseTypes.{$translation->abbrev}.text"))) {
                 $verseData['hely']['gepi'] = $verse->gepi;
-                $book = $verse->books()->where('translation_id', $translation->id)->first();
+                $book = $verse->book;
                 $verseData['hely']['szep'] = "{$book->abbrev} {$verse->chapter},{$verse->numv}";
                 $verseData['szoveg'] = $verse->verse;
                 $verseDataList[] = $verseData;

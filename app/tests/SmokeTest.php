@@ -31,4 +31,9 @@ class SmokeTest extends TestCase {
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
+    public function testBasicApiTranslation() {
+        $this->client->request('GET', '/api/forditasok/10100100200');
+        $this->assertTrue($this->client->getResponse()->isOk());
+    }
+
 }

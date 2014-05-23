@@ -12,5 +12,6 @@ class FullTextSearchParams {
     public $translationId;
     public $bookIds;
     public $limit;
+    public $groupByVerse;
 
 } 

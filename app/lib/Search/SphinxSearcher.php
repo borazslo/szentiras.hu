@@ -37,12 +37,15 @@ class SphinxSearcher
         } else {
             $limit = (int)Config::get('settings.searchLimit') + 1;
         }
-        $this->sphinxClient = $this->sphinxClient->limit($limit);
+        $this->sphinxClient->limit($limit);
+        if ($params->groupByVerse) {
+            $this->sphinxClient->setGroupBy('gepi', SphinxClient::SPH_GROUPBY_ATTR, '@relevance desc');
+        }
         if ($params->translationId) {
-            $this->sphinxClient = $this->sphinxClient->filter('trans', $params->translationId);
+            $this->sphinxClient->filter('trans', $params->translationId);
         }
         if (count($params->bookIds) > 0) {
-            $this->sphinxClient = $this->sphinxClient->filter('book', $params->bookIds);
+             $this->sphinxClient->filter('book', $params->bookIds);
         }
         $this->params = $params;
     }

@@ -64,6 +64,7 @@ class SearchController extends BaseController
         $searchParams = new FullTextSearchParams;
         $searchParams->text = $term;
         $searchParams->limit = 10;
+        $searchParams->groupByVerse = true;
         $sphinxSearcher = new SphinxSearcher($searchParams);
         $sphinxResults = $sphinxSearcher->get();
         if ($sphinxResults) {
@@ -136,11 +137,12 @@ class SearchController extends BaseController
         $augmentedView = $view;
         $translatedRef = $this->findTranslatedRef($form->textToSearch, $form->translation);
         if ($translatedRef) {
+            $translation = $form->translation ? $form->translation : Translation::getDefaultTranslation();
             $textDisplayController = App::make('SzentirasHu\Controllers\Display\TextDisplayController');
-            $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $form->translation);
+            $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation);
             $augmentedView = $view->with('bookRef', [
                 'label' => $translatedRef->toString(),
-                'link' => "/{$form->translation->abbrev}/{$translatedRef->toString()}",
+                'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
                 'verseContainers' => $verseContainers
             ]);
         }
@@ -237,7 +239,7 @@ class SearchController extends BaseController
     {
         $verseContainers = [];
         foreach ($sortedVerses as $verse) {
-            $book = $this->bookRepository->getByNumberForTranslation($verse->book, $verse->trans);
+            $book = $verse->book;
             if (!array_key_exists($book->abbrev, $verseContainers)) {
                 $verseContainers[$book->abbrev] = new VerseContainer($book);
             }
