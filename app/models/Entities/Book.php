@@ -8,16 +8,17 @@ use Eloquent;
  *
  * @property string abbrev
  * @property int id
+ * @property  int number
  * @author berti
  */
 class Book extends Eloquent {
 
     public function abbrevs() {
-        return $this->hasMany('SzentirasHu\Models\Entities\BookAbbrev', 'id');
+        return $this->hasMany('SzentirasHu\Models\Entities\BookAbbrev', 'number');
     }
 
     public function verses() {
-        return $this->hasMany('SzentirasHu\Models\Entities\Verse', 'book');
+        return $this->hasMany('SzentirasHu\Models\Entities\Verse', 'book_id');
     }
 
     public function translation() {

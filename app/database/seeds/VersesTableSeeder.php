@@ -11,7 +11,8 @@ class VersesTableSeeder extends Seeder
         $v->did = 1;
         $v->trans = 1;
         $v->gepi = 10100200300;
-        $v->book = 101;
+        $v->book_number = 101;
+        $v->book_id = 1;
         $v->chapter = 2;
         $v->numv = '3';
         $v->hiv = "Ter 2,3";
@@ -27,7 +28,8 @@ class VersesTableSeeder extends Seeder
         $v->did = 1;
         $v->trans = 2;
         $v->gepi = 10100200300;
-        $v->book = 101;
+        $v->book_number = 101;
+        $v->book_id = 3;
         $v->chapter = 2;
         $v->numv = '3';
         $v->hiv = "1Móz 2,3";
@@ -43,7 +45,8 @@ class VersesTableSeeder extends Seeder
         $v->did = 1;
         $v->trans = 1;
         $v->gepi = 10200300400;
-        $v->book = 102;
+        $v->book_number = 102;
+        $v->book_id = 2;
         $v->chapter = 3;
         $v->numv = '4';
         $v->hiv = "Kiv 3,4";

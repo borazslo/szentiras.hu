@@ -13,6 +13,7 @@ use SzentirasHu\Lib\Search\FullTextSearchResult;
 use SzentirasHu\Lib\Search\SphinxSearcher;
 use SzentirasHu\Lib\VerseContainer;
 use SzentirasHu\Models\Entities\Translation;
+use SzentirasHu\Models\Entities\Verse;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 use SzentirasHu\Models\Repositories\VerseRepository;
@@ -69,7 +70,7 @@ class SearchController extends BaseController
             $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
             $texts = [];
             foreach ($verses as $verse) {
-                $texts[] = $verse->verse;
+                $texts[] = $this->getParsedVerse($verse);
             }
             $excerpts = $sphinxSearcher->getExcerpts($texts);
             foreach ($excerpts as $excerpt) {
@@ -77,6 +78,11 @@ class SearchController extends BaseController
             }
         }
         return Response::json($result);
+    }
+
+    private function getParsedVerse(Verse $verse)
+    {
+        return "{$verse->book->abbrev} {$verse->chapter},{$verse->numv} " . $verse->verse;
     }
 
     public function anySearch()
@@ -231,7 +237,7 @@ class SearchController extends BaseController
     {
         $verseContainers = [];
         foreach ($sortedVerses as $verse) {
-            $book = $this->bookRepository->getByIdForTranslation($verse->book, $verse->trans);
+            $book = $this->bookRepository->getByNumberForTranslation($verse->book, $verse->trans);
             if (!array_key_exists($book->abbrev, $verseContainers)) {
                 $verseContainers[$book->abbrev] = new VerseContainer($book);
             }

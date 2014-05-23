@@ -48,7 +48,7 @@ class LectureSelector
             $extLinks = array();
 
             $book = $this->bookRepository->getByAbbrev($lecture->bookAbbrev);
-            $verse = Verse::where('trans', $translationId)->where('book', $book->id)->first();
+            $verse = Verse::where('book_id', $book->id)->first();
             if ($verse) {
                 $availableTranslatedVerses = Verse::whereIn('tip', array(60, 6, 901))
                     ->where('gepi', $verse->gepi)->get();

@@ -35,8 +35,8 @@ class BookRepositoryEloquent implements BookRepository {
         return Book::where('translation_id', $translationId)->where('abbrev', $abbrev)->remember(120)->first();
     }
 
-    public function getByIdForTranslation($bookId, $translationId)
+    public function getByNumberForTranslation($number, $translationId)
     {
-        return Book::where('id', $bookId)->where('translation_id', $translationId)->remember(120)->first();
+        return Book::where('number', $number)->where('translation_id', $translationId)->remember(120)->first();
     }
 }

@@ -11,7 +11,7 @@ class VerseRepositoryEloquent implements VerseRepository {
 
     public function getTranslatedChapterVerses($translationId, $bookId, $chapters)
     {
-        $verses = Verse::where('book', $bookId)->
+        $verses = Verse::where('book_number', $bookId)->
         whereIn('chapter', $chapters)->
         where('trans', $translationId)->
         orderBy('gepi')
@@ -22,7 +22,7 @@ class VerseRepositoryEloquent implements VerseRepository {
 
     public function getLeadVerses($translationId, $bookId)
     {
-        return Verse::where('book', $bookId)
+        return Verse::where('book_number', $bookId)
             ->where('trans', $translationId)
             ->whereIn('numv', ['1', '2'])
             ->orderBy('chapter')
@@ -33,7 +33,9 @@ class VerseRepositoryEloquent implements VerseRepository {
 
     public function getVersesInOrder($verseIds)
     {
-        $verses = Verse::whereIn('id', $verseIds)->get();
+        $verses = Verse::whereIn('id', $verseIds)->with([
+            'translation',
+            'book'])->get();
         foreach ($verses as $verse) {
             $idVerseMap[$verse->id] = $verse;
         }

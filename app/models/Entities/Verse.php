@@ -19,10 +19,14 @@ class Verse extends Eloquent {
 
     private static $typeMap;
 
-    public function books() {
-        return $this->belongsTo('SzentirasHu\Models\Entities\Book', 'book');
+    public function book() {
+        return $this->belongsTo('SzentirasHu\Models\Entities\Book');
     }
-    
+
+    public function books() {
+        return $this->belongsTo('SzentirasHu\Models\Entities\Book', 'book_number');
+    }
+
     public function translation() {
         return $this->belongsTo('SzentirasHu\Models\Entities\Translation','trans');
     }

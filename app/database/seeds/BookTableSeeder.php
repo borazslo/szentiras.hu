@@ -16,10 +16,10 @@ class BookTableSeeder extends Seeder
         $this->addBook(102, "2Móz", $translation);
     }
 
-    private function addBook($id, $abbrev, $translation)
+    private function addBook($number, $abbrev, $translation)
     {
         $book = new \SzentirasHu\Models\Entities\Book();
-        $book->id = $id;
+        $book->number = $number;
         $book->abbrev = $abbrev;
         $book->translation()->associate($translation);
         $book->save();

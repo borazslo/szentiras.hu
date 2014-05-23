@@ -16,7 +16,7 @@ class BookAbbrev extends Eloquent {
     public $timestamps=false;
 
     public function books() {
-        return $this->belongsTo('SzentirasHu\\Models\\Entities\\Book');
+        return $this->belongsTo('SzentirasHu\\Models\\Entities\\Book', 'books_id', 'number');
     }
     
 }
