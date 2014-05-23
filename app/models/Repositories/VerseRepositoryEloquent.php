@@ -9,21 +9,19 @@ use SzentirasHu\Models\Entities\Verse;
 
 class VerseRepositoryEloquent implements VerseRepository {
 
-    public function getTranslatedChapterVerses($translationId, $bookId, $chapters)
+    public function getTranslatedChapterVerses($bookId, $chapters)
     {
-        $verses = Verse::where('book_number', $bookId)->
+        $verses = Verse::where('book_id', $bookId)->
         whereIn('chapter', $chapters)->
-        where('trans', $translationId)->
         orderBy('gepi')
             ->get();
         return $verses;
 
     }
 
-    public function getLeadVerses($translationId, $bookId)
+    public function getLeadVerses($bookId)
     {
-        return Verse::where('book_number', $bookId)
-            ->where('trans', $translationId)
+        return Verse::where('book_id', $bookId)
             ->whereIn('numv', ['1', '2'])
             ->orderBy('chapter')
             ->orderBy('numv')

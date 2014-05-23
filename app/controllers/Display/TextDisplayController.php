@@ -87,12 +87,11 @@ class TextDisplayController extends \BaseController
 
     private function bookView($translationAbbrev, CanonicalReference $canonicalRef)
     {
-        $bookRef = $canonicalRef->bookRefs[0];
         $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
         $translatedRef = $canonicalRef->toTranslated($translation->id);
         $book = $this->bookRepository->getByAbbrevForTranslation($translatedRef->bookRefs[0]->bookId, $translation->id);
         if ($book) {
-            $firstVerses = $this->verseRepository->getLeadVerses($translation->id, $book->id);
+            $firstVerses = $this->verseRepository->getLeadVerses($book->id);
             $groupedVerses = [];
             foreach ($firstVerses as $verse) {
                 $type = $verse->getType();
@@ -138,7 +137,7 @@ class TextDisplayController extends \BaseController
 
     public function getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation)
     {
-        $allChapterVerses = $this->verseRepository->getTranslatedChapterVerses($translation->id, $book->id, $searchedChapters);
+        $allChapterVerses = $this->verseRepository->getTranslatedChapterVerses($book->id, $searchedChapters);
         $chapterRangeVerses = [];
         foreach ($allChapterVerses as $verse) {
             if ($chapterRange->hasVerse($verse->chapter, $verse->numv)) {

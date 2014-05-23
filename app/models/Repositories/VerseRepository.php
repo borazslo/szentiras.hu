@@ -7,9 +7,9 @@ use SzentirasHu\Models\Entities\Verse;
 
 interface VerseRepository {
 
-    public function getTranslatedChapterVerses($translationId, $bookId, $chapters);
+    public function getTranslatedChapterVerses($bookId, $chapters);
 
-    public function getLeadVerses($translationId, $bookId);
+    public function getLeadVerses($bookId);
 
     /**
      * @param int[] $verseIds
