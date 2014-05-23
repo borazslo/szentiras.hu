@@ -23,7 +23,7 @@ class SphinxSearcher
 
     private function addStars($text)
     {
-        return preg_replace('/(\w+)/u', '($1 | *$1* )', $text);
+        return preg_replace('/(\w+)/u', '("$1" | $1  | *$1* )', $text);
     }
 
     public function __construct(FullTextSearchParams $params)
