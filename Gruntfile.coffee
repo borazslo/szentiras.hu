@@ -53,7 +53,10 @@ module.exports = (grunt) ->
           {
             expand: true
             flatten: true
-            src: ['bower_components/bootstrap/dist/css/bootstrap.min.css']
+            src: [
+              'bower_components/bootstrap/dist/css/bootstrap.min.css'
+              'bower_components/jquery-ui/themes/base/minified/jquery-ui.min.css'
+            ]
             dest: 'public/css'
           }
           {

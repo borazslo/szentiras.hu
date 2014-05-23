@@ -70,12 +70,23 @@ class SearchController extends BaseController
         if ($sphinxResults) {
             $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
             $texts = [];
-            foreach ($verses as $verse) {
-                $texts[] = $this->getParsedVerse($verse);
+            foreach ($verses as $key=>$verse) {
+                $parsedVerse = $this->getParsedVerse($verse);
+                if ($parsedVerse) {
+                    $texts[$key] = $parsedVerse;
+                }
             }
             $excerpts = $sphinxSearcher->getExcerpts($texts);
-            foreach ($excerpts as $excerpt) {
-                $result[] = ['cat'=>'verse', 'label' => $excerpt];
+            $textKeys = array_keys($texts);
+            foreach ($excerpts as $i => $excerpt) {
+                $verse = $verses[$textKeys[$i]];
+                $linkLabel = "{$verse->book->abbrev} {$verse->chapter},{$verse->numv}";
+                $result[] = [
+                    'cat' => 'verse',
+                    'label' => $excerpt,
+                    'link' => "/{$verse->translation->abbrev}/{$linkLabel}",
+                    'linkLabel' => $linkLabel
+                ];
             }
         }
         return Response::json($result);
@@ -83,7 +94,10 @@ class SearchController extends BaseController
 
     private function getParsedVerse(Verse $verse)
     {
-        return "{$verse->book->abbrev} {$verse->chapter},{$verse->numv} " . $verse->verse;
+        $verseContainer = new VerseContainer($verse->book);
+        $verseContainer->addVerse($verse);
+        $parsedVerses = $verseContainer->getParsedVerses();
+        return $parsedVerses[0]->text;
     }
 
     public function anySearch()

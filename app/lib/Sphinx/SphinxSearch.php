@@ -277,6 +277,13 @@ class SphinxSearch {
         return $this;
     }
 
+    /**
+     * @param $verses
+     * @param $index
+     * @param $words
+     * @param array $opts
+     * @return array|false
+     */
     public function buildExcerpts($verses, $index, $words, $opts = []) {
         $excerpts = $this->_connection->buildExcerpts($verses, $index, $words, $opts);
         return $excerpts;
