@@ -17,7 +17,7 @@
         <h4><a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a></h4>
 
         {% for num in '1'..'2' %}
-            <sup>{{ verses[num].numv }}</sup>{{ verses[num].verse|raw }}
+            <sup>{{ verses[num].numv }}</sup>{{ verses[num]|raw }}
         {% endfor %}
         <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter}}' class='link'>&gt;&gt;</a><br>
         <br />

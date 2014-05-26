@@ -105,7 +105,9 @@ class TextDisplayController extends \BaseController
             foreach ($firstVerses as $verse) {
                 $type = $verse->getType();
                 if ($type == 'text') {
-                    $groupedVerses[$verse['chapter']][$verse['numv']] = $verse;
+                    $verseContainer = new VerseContainer($book);
+                    $verseContainer->addVerse($verse);
+                    $groupedVerses[$verse['chapter']][$verse['numv']] = $this->getTeaser([$verseContainer]);
                 }
             }
             return View::make('textDisplay.book', [
@@ -179,7 +181,11 @@ class TextDisplayController extends \BaseController
     {
         $teaser = "";
         foreach ($verseContainers as $verseContainer) {
-            $teaser .= preg_replace('/<[^>]+>/', ' ', $verseContainer->getParsedVerses()[0]->text) . ' ... ';
+            $teaser .= preg_replace('/<\/?[^>]+>/', ' ', $verseContainer->getParsedVerses()[0]->text);
+            if ($verseContainer != last($verseContainers)) {
+                $teaser .= ' ... ';
+
+            }
         }
         return $teaser;
     }
