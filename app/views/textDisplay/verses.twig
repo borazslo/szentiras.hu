@@ -23,13 +23,7 @@
              {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
             </p>
             <p>
-                {% for otherTranslation in translations %}
-                    {% if otherTranslation.id != translation.id %}
-                        <a class="btn btn-xs btn-default" href="/{{ otherTranslation.abbrev }}/{{ verseContainer.bookRef.toString() }}">{{ otherTranslation.abbrev }}</a>
-                    {% else %}
-                        <a class="btn btn-xs btn-primary disabled">{{ otherTranslation.abbrev }}</a>
-                    {% endif %}
-                {% endfor %}
+                {% include 'textDisplay.translationButtons' with { 'translations' :  translations, 'translation': translation, 'link': verseContainer.bookRef.toString() } %}
             </p>
             <p>
                 {% if chapterLinks.prevLink %}
