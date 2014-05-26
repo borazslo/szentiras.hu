@@ -2,9 +2,6 @@
 
 namespace SzentirasHu\Lib\Reference;
 
-use SzentirasHu\Models\Entities\Translation;
-use SzentirasHu\Models\Repositories\BookRepository;
-
 /**
  * Class CanonicalReference to represent a unique reference to some Bible verses.
  * This reference is agnostic of translations, uses the primary
@@ -113,6 +110,15 @@ class CanonicalReference
             }
         }
         return true;
+    }
+
+    public function isOneChapter()
+    {
+        $result = count($this->bookRefs) == 1 &&
+            count($this->bookRefs[0]->chapterRanges) == 1 &&
+                !$this->bookRefs[0]->chapterRanges[0]->untilChapterRef &&
+                count($this->bookRefs[0]->chapterRanges[0]->chapterRef->verseRanges)==0;
+        return $result;
     }
 
     public function getCanonicalUrl($translation)

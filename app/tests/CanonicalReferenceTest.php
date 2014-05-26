@@ -248,5 +248,13 @@ class CanonicalReferenceTest extends TestCase
         $this->assertEquals("TESTTRANS/Kiv1,9-10;Ter22", CanonicalReference::fromString($ref)->getCanonicalUrl($translation));
     }
 
+    public function testIsOneChapter() {
+        $this->assertTrue(CanonicalReference::fromString('ApCsel 1')->isOneChapter());
+        $this->assertFalse(CanonicalReference::fromString('ApCsel 1,2')->isOneChapter());
+        $this->assertFalse(CanonicalReference::fromString('ApCsel 1,2-5')->isOneChapter());
+        $this->assertFalse(CanonicalReference::fromString('ApCsel 3-4')->isOneChapter());
+        $this->assertFalse(CanonicalReference::fromString('ApCsel')->isOneChapter());
+    }
+
 }
  

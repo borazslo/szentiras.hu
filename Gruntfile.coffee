@@ -68,6 +68,7 @@ module.exports = (grunt) ->
             flatten: true
             src: [
               'bower_components/jquery-ui/themes/base/images/*'
+              'app/assets/css/images/*'
             ]
             dest: 'public/css/images'
           }

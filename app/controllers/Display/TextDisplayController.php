@@ -69,6 +69,9 @@ class TextDisplayController extends \BaseController
             if ($canonicalRef->isBookLevel()) {
                 return $this->bookView($translationAbbrev, $canonicalRef);
             }
+            if ($canonicalRef->isOneChapter()) {
+                $chapterLinks = $this->createChapterLinks();
+            }
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
             $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation);
             return View::make('textDisplay.verses')->with([
@@ -81,7 +84,7 @@ class TextDisplayController extends \BaseController
             ]);
         } catch (ParsingException $e) {
             // as this doesn't look like a valid reference, interpret as full text search
-            return Redirect::action("SzentirasHu\Controllers\Search\SearchController@anySearch", ['textToSearch' => $reference]);
+            return Redirect::action('SzentirasHu\Controllers\Search\SearchController@anySearch', ['textToSearch' => $reference]);
         }
     }
 
@@ -173,6 +176,11 @@ class TextDisplayController extends \BaseController
             $teaser .= preg_replace('/<[^>]+>/', ' ', $verseContainer->getParsedVerses()[0]->text) . ' ... ';
         }
         return $teaser;
+    }
+
+    private function createChapterLinks()
+    {
+
     }
 
 }
