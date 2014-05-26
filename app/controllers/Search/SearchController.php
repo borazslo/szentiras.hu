@@ -65,7 +65,11 @@ class SearchController extends BaseController
         $term = Input::get('term');
         $ref = $this->findTranslatedRef($term);
         if ($ref) {
-            $result[] = ['cat'=>'ref', 'label'=>$ref->toString()];
+            $result[] = [
+                'cat'=>'ref',
+                'label'=>$ref->toString(),
+                'link'=>"/{$ref->toString()}"
+            ];
         }
         $searchParams = new FullTextSearchParams;
         $searchParams->text = $term;
@@ -84,15 +88,17 @@ class SearchController extends BaseController
             }
             $excerpts = $sphinxSearcher->getExcerpts($texts);
             $textKeys = array_keys($texts);
-            foreach ($excerpts as $i => $excerpt) {
-                $verse = $verses[$textKeys[$i]];
-                $linkLabel = "{$verse->book->abbrev} {$verse->chapter},{$verse->numv}";
-                $result[] = [
-                    'cat' => 'verse',
-                    'label' => $excerpt,
-                    'link' => "/{$verse->translation->abbrev}/{$linkLabel}",
-                    'linkLabel' => $linkLabel
-                ];
+            if ($excerpts) {
+                foreach ($excerpts as $i => $excerpt) {
+                    $verse = $verses[$textKeys[$i]];
+                    $linkLabel = "{$verse->book->abbrev} {$verse->chapter},{$verse->numv}";
+                    $result[] = [
+                        'cat' => 'verse',
+                        'label' => $excerpt,
+                        'link' => "/{$verse->translation->abbrev}/{$linkLabel}",
+                        'linkLabel' => $linkLabel
+                    ];
+                }
             }
         }
         return Response::json($result);
