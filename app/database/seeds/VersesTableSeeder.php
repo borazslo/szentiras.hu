@@ -12,6 +12,7 @@ class VersesTableSeeder extends Seeder
         $this->addVerse(1, 101, 'Ter', 50, 9);
         $this->addVerse(2, 102, 'Kiv', 1, 1);
         $this->addVerse(2, 102, 'Kiv', 2, 3);
+        $this->addVerse(2, 102, 'Kiv', 3, 3);
         $this->addVerse(5, 101, '1Móz', 2, 3);
     }
 

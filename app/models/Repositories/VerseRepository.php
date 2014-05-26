@@ -17,5 +17,6 @@ interface VerseRepository {
      */
     public function getVersesInOrder($verseIds);
 
+    public function getVerses($bookId);
 
 } 

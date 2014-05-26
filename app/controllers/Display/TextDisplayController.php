@@ -7,6 +7,7 @@ use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Lib\VerseContainer;
+use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 use SzentirasHu\Models\Repositories\VerseRepository;
@@ -73,10 +74,10 @@ class TextDisplayController extends \BaseController
             if ($canonicalRef->isBookLevel()) {
                 return $this->bookView($translationAbbrev, $canonicalRef);
             }
-            if ($canonicalRef->isOneChapter()) {
-                $chapterLinks = $this->createChapterLinks();
-            }
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
+            $chapterLinks = $canonicalRef->isOneChapter() ?
+                $this->createChapterLinks($canonicalRef, $translation)
+                : false;
             $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation);
             return View::make('textDisplay.verses')->with([
                 'verseContainers' => $verseContainers,
@@ -84,7 +85,8 @@ class TextDisplayController extends \BaseController
                 'translations' => $this->translationRepository->getAllOrderedByDenom(),
                 'canonicalUrl' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
                 'metaTitle' => $this->getTitle($verseContainers, $translation),
-                'teaser' => $this->getTeaser($verseContainers)
+                'teaser' => $this->getTeaser($verseContainers),
+                'chapterLinks' => $chapterLinks
             ]);
         } catch (ParsingException $e) {
             // as this doesn't look like a valid reference, interpret as full text search
@@ -182,9 +184,16 @@ class TextDisplayController extends \BaseController
         return $teaser;
     }
 
-    private function createChapterLinks()
+    private function createChapterLinks(CanonicalReference $canonicalReference, Translation $translation)
     {
+        list($prevRef, $nextRef) = $this->referenceService->getPrevNextChapter($canonicalReference, $translation->id);
+        $prevLink = $prevRef ?
+            $this->referenceService->getCanonicalUrl($prevRef, $translation->id) :
+            false;
 
+        $nextLink = $nextRef ?
+            $this->referenceService->getCanonicalUrl($nextRef, $translation->id) :
+            false;
+        return ['prevLink' => $prevLink, 'nextLink' => $nextLink];
     }
-
 }

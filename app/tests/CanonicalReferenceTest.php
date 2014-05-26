@@ -260,5 +260,26 @@ class CanonicalReferenceTest extends TestCase
         $this->assertFalse(CanonicalReference::fromString('ApCsel')->isOneChapter());
     }
 
+    public function testPrevNextChapter() {
+        /** @var $referenceService SzentirasHu\Lib\Reference\ReferenceService */
+        $referenceService = App::make('SzentirasHu\Lib\Reference\ReferenceService');
+        $ref = CanonicalReference::fromString('Ter 50');
+        list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1);
+        $this->assertEquals('Ter 49', $prevRef->toString());
+        $this->assertEquals(false, $nextRef);
+
+        $ref = CanonicalReference::fromString('Kiv 1');
+        list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1);
+        $this->assertEquals('Kiv 2', $nextRef->toString());
+        $this->assertEquals(false, $prevRef);
+
+        $ref = CanonicalReference::fromString('Kiv 2');
+        list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1);
+        $this->assertEquals('Kiv 3', $nextRef->toString());
+        $this->assertEquals('Kiv 1', $prevRef->toString());
+
+
+    }
+
 }
  

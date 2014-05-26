@@ -5,9 +5,16 @@
 
 namespace SzentirasHu\Models\Repositories;
 
+use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Verse;
 
 class VerseRepositoryEloquent implements VerseRepository {
+
+    public function getVerses($bookId)
+    {
+        $verses = Book::find($bookId)->verses()->orderBy('gepi')->get();
+        return $verses;
+    }
 
     public function getTranslatedChapterVerses($bookId, $chapters)
     {
