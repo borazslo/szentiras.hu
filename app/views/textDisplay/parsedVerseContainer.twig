@@ -7,7 +7,7 @@
         </{{ tag }}>
     {% endif %}
     {% endfor %}
-    <sup>{{ verse.numv }}</sup>{{ verse.text|raw }}
+    <span class="text-muted"><sup>{{ verse.numv }}</sup></span>{{ verse.text|raw }}
     {% if verse.xrefs is not empty %}
         <sup>
             ({%- for xref in verse.xrefs -%}
@@ -15,4 +15,5 @@
             {%- endfor -%})
         </sup>
     {% endif %}
+    {% if verseContainer.book.number == 121 %}<br>{% endif %}
 {% endfor %}
