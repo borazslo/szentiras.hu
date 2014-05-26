@@ -26,10 +26,13 @@ require.config(
 
   shim:
     bootstrap: ['jquery']
+    'jquery.ui.core': ['jquery']
+    'jquery.ui.widget': ['jquery.ui.core']
+    'jquery.ui.position': ['jquery.ui.core']
     'jquery.ui.menu': ['jquery.ui.core', 'jquery.ui.widget', 'jquery.ui.position']
     'jquery.ui.autocomplete':
       deps: ['jquery', 'jquery.ui.core', 'jquery.ui.widget', 'jquery.ui.position', 'jquery.ui.menu']
       exports: 'autocomplete'
 
-  deps: ['app_modules', 'jquery']
+  deps: ['app_modules', 'jquery', 'bootstrap']
 )

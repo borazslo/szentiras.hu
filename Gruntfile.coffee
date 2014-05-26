@@ -28,6 +28,10 @@ module.exports = (grunt) ->
         src: ['**/*.coffee']
         dest: 'public/js'
         ext: '.js'
+    less:
+      main:
+        files:
+          'public/css/autocomplete.css': 'app/assets/css/autocomplete.less'
     copy:
       dev:
         files: [
@@ -63,6 +67,14 @@ module.exports = (grunt) ->
             expand: true
             flatten: true
             src: [
+              'bower_components/jquery-ui/themes/base/images/*'
+            ]
+            dest: 'public/css/images'
+          }
+          {
+            expand: true
+            flatten: true
+            src: [
               'bower_components/bootstrap/dist/js/bootstrap.min.js'
               'bower_components/requirejs/require.js'
               'bower_components/jquery/dist/jquery.min.js'
@@ -90,7 +102,8 @@ module.exports = (grunt) ->
     'grunt-contrib-coffee'
     'grunt-contrib-copy'
     'grunt-contrib-watch'
+    'grunt-contrib-less'
   ]
 
-  grunt.registerTask 'default', ['clean', 'copy', 'coffee', 'requirejs']
-  grunt.registerTask 'dev', ['clean', 'coffee', 'copy:main', 'copy:dev']
+  grunt.registerTask 'default', ['clean', 'copy', 'coffee', 'less', 'grequirejs']
+  grunt.registerTask 'dev', ['clean', 'coffee', 'less', 'copy:main', 'copy:dev']
