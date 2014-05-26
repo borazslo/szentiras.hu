@@ -53,7 +53,7 @@ class LectureSelector
                 $availableTranslatedVerses = Verse::whereIn('tip', array(60, 6, 901))
                     ->where('gepi', $verse->gepi)->get();
                 foreach ($availableTranslatedVerses as $verse) {
-                    $translation = $verse->translation;
+                    $translation = $verse->book->translation;
                     $extLink = new ExtLink();
                     $extLink->label = $translation->abbrev;
                     $extLink->title = $extLink->label;
