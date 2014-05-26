@@ -27,7 +27,7 @@ A Laravel keretrendszert használjuk.
 - Fordítás könyveinek listája DONE
 - Egy-egy könyv fejezeteinek listája bevezetővel DONE
 - Egy-egy fejezet megjelenítése DONE
-    - Lépés a következő/előző fejezetre. (Ez most val. nem működik.)
+    - Lépés a következő/előző fejezetre. DONE
 
 ###Idézés
 - Url-be vagy keresőbe beírt szentírás hivatkozás észrevétele, elemzése és megjelenítése. pl. Mk3,4-7.9-12 vagy Mk3-6 vagy Mk 5,3-7,4.7 stb. DONE
