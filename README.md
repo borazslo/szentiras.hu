@@ -55,10 +55,12 @@ A Laravel keretrendszert használjuk.
     - tippeket ad hasonló kifejezésekre ill. azonos szótövű szavakra
     - tippeket ad kézzel készülő szinoníma szótár alapján: létra/lajtorja, Nebukodonozor/Nebukadanazzár, stb.
     - ugyan ezen szótár szerint elgépelt nevekre is tippeket ad
+
 ###API/Fejlesztőknek
 - JSON válaszokat ad megfelelő kérésekre DONE (JSON)
 - főként a keresésekre válaszol és elvileg mindent tudnia kéne, amit a keresőnek, csak más formátumban válaszol DONE (legalábbis az kész, ami volt)
 - könyvek automatikus /epub kimenetele ill. abból generált /mobi (havont egyszer gyárt, onnantól mindig azt hviatkozza) (ez nem megy az élesen sem)
+
 ###Egyéb
 - pár statikusabb oldal kéne ill van (címlap, infó, impresszum, stb.) (nem kell szerkesztő felület)
 - agresszív cache: a php script a végén html-ben lementi az oldalt, legközelebb azt hozza be - ez már nincs, de van egy csomó cache-elés, főleg db
