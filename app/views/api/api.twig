@@ -69,7 +69,9 @@
         <em>hivatkozas</em> (kötelező): pl. <i>10100100200</i> (Jelenleg csak az úgynevezett <i>gépi kód</i>dal lehet
         verset keresni.
         Ez 11 számjegyből áll: 1. Ószöv/Újszöv, 2-3. könyv, 4-6. fejezet, 7-9. vers, 10-11. alvers.)<br>
-        Példa: {{ url('api/forditasok/10100100100') }}</p>
+        Példa:
+        {% set exampleUrl = 'api/forditasok/10100100100' %}
+        <a href="{{ exampleUrl }}">{{ url(exampleUrl) }}</a></p>
 
     <h4>API: PHP példa</h4>
     <pre>
