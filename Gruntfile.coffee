@@ -1,9 +1,3 @@
-paths =
-    scripts: ['app/assets/js/**/*.js']
-    coffee: ['app/assets/js/**/*.coffee']
-    styleSheets: ['app/assets/css/**/*.css']
-    images: 'app/assets/img/*'
-
 module.exports = (grunt) ->
   grunt.initConfig
     watch:
@@ -34,12 +28,8 @@ module.exports = (grunt) ->
           'public/css/autocomplete.css': 'app/assets/css/autocomplete.less'
     copy:
       dev:
-        files: [
-          {
-            src: ['public/js/app_modules.js']
-            dest: 'public/js/app_bundle.js'
-          }
-        ]
+        files:
+          'public/js/app_bundle.js': 'public/js/app_modules.js'
       main:
         files: [
           {
@@ -106,5 +96,5 @@ module.exports = (grunt) ->
     'grunt-contrib-less'
   ]
 
-  grunt.registerTask 'default', ['clean', 'copy', 'coffee', 'less', 'requirejs']
+  grunt.registerTask 'default', ['clean', 'copy:main', 'coffee', 'less', 'requirejs']
   grunt.registerTask 'dev', ['clean', 'coffee', 'less', 'copy:main', 'copy:dev']
