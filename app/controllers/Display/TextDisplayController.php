@@ -5,6 +5,7 @@ namespace SzentirasHu\Controllers\Display;
 use Illuminate\Support\Facades\Redirect;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
+use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Lib\VerseContainer;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
@@ -33,11 +34,14 @@ class TextDisplayController extends \BaseController
      */
     private $verseRepository;
 
-    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository, VerseRepository $verseRepository)
+    private $referenceService;
+
+    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository, VerseRepository $verseRepository, ReferenceService $referenceService)
     {
         $this->translationRepository = $translationRepository;
         $this->bookRepository = $bookRepository;
         $this->verseRepository = $verseRepository;
+        $this->referenceService = $referenceService;
     }
 
     public function showTranslationList()
@@ -78,7 +82,7 @@ class TextDisplayController extends \BaseController
                 'verseContainers' => $verseContainers,
                 'translation' => $translation,
                 'translations' => $this->translationRepository->getAllOrderedByDenom(),
-                'canonicalUrl' => $canonicalRef->getCanonicalUrl($translation),
+                'canonicalUrl' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
                 'metaTitle' => $this->getTitle($verseContainers, $translation),
                 'teaser' => $this->getTeaser($verseContainers)
             ]);
@@ -91,7 +95,7 @@ class TextDisplayController extends \BaseController
     private function bookView($translationAbbrev, CanonicalReference $canonicalRef)
     {
         $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
-        $translatedRef = $canonicalRef->toTranslated($translation->id);
+        $translatedRef = $this->referenceService->translateReference($canonicalRef, $translation->id);
         $book = $this->bookRepository->getByAbbrevForTranslation($translatedRef->bookRefs[0]->bookId, $translation->id);
         if ($book) {
             $firstVerses = $this->verseRepository->getLeadVerses($book->id);
@@ -121,7 +125,7 @@ class TextDisplayController extends \BaseController
      */
     public function getTranslatedVerses($canonicalRef, $translation)
     {
-        $translatedRef = $canonicalRef->toTranslated($translation->id);
+        $translatedRef = $this->referenceService->translateReference($canonicalRef, $translation->id);
         $verseContainers = [];
         foreach ($translatedRef->bookRefs as $bookRef) {
             $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translation->id);

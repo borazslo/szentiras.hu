@@ -67,6 +67,8 @@ class SphinxSearcher
             $fullTextSearchResult->hitCount = count($sphinxResult['matches']);
 
             return $fullTextSearchResult;
+        } else {
+            return false;
         }
     }
 

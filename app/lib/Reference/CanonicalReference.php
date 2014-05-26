@@ -39,35 +39,6 @@ class CanonicalReference
         return $ref;
     }
 
-    public function getExistingBookRef()
-    {
-        $translationRepository = \App::make('SzentirasHu\Models\Repositories\TranslationRepository');
-        foreach ($translationRepository->getAll() as $translation) {
-            $storedBookRef = self::findStoredBookRef($this->bookRefs[0], $translation->id);
-            if ($storedBookRef) {
-                return $storedBookRef;
-            }
-        }
-        return false;
-    }
-
-    private static function findStoredBookRef($bookRef, $translationId)
-    {
-        $result = false;
-        $bookRepository = \App::make('SzentirasHu\Models\Repositories\BookRepository');
-        $abbreviatedBook = $bookRepository->getByAbbrev($bookRef->bookId);
-        if ($abbreviatedBook) {
-            $book = $bookRepository->getByNumberForTranslation($abbreviatedBook->number, $translationId);
-            if ($book) {
-                $result = new BookRef($book->abbrev);
-                $result->chapterRanges = $bookRef->chapterRanges;
-            } else {
-                \Log::debug("Book not found in database: {$bookRef->toString()}");
-            }
-        }
-        return $result;
-    }
-
     public function toString()
     {
         $s = '';
@@ -79,27 +50,6 @@ class CanonicalReference
             }
         }
         return $s;
-    }
-
-    public function toTranslated($translationId)
-    {
-        $bookRefs = array_map(function ($bookRef) use ($translationId) {
-            return self::translateBookRef($bookRef, $translationId);
-        }, $this->bookRefs);
-        return new CanonicalReference($bookRefs);
-    }
-
-    /**
-     *
-     * Takes a bookref and get an other bookref according
-     * to the given translation.
-     *
-     * @return BookRef
-     */
-    public static function translateBookRef(BookRef $bookRef, $translationId)
-    {
-        $result = self::findStoredBookRef($bookRef, $translationId);
-        return $result ? $result : $bookRef;
     }
 
     public function isBookLevel()
@@ -119,13 +69,6 @@ class CanonicalReference
                 !$this->bookRefs[0]->chapterRanges[0]->untilChapterRef &&
                 count($this->bookRefs[0]->chapterRanges[0]->chapterRef->verseRanges)==0;
         return $result;
-    }
-
-    public function getCanonicalUrl($translation)
-    {
-        $translatedRef = $this->toTranslated($translation->id);
-        $url = preg_replace('/[ ]+/', '', "{$translation->abbrev}/{$translatedRef->toString()}");
-        return $url;
     }
 
 }

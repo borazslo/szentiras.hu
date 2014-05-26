@@ -22,6 +22,8 @@ class BookRepositoryEloquent implements BookRepository {
         $abbrev = BookAbbrev::where('abbrev', $bookAbbrev)->remember(120)->first();
         if ($abbrev) {
             return $abbrev->books()->first();
+        } else {
+            return false;
         }
     }
 

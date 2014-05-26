@@ -8,6 +8,7 @@ use Input;
 use Response;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
+use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Lib\Search\FullTextSearchParams;
 use SzentirasHu\Lib\Search\FullTextSearchResult;
 use SzentirasHu\Lib\Search\SphinxSearcher;
@@ -40,12 +41,17 @@ class SearchController extends BaseController
      * @var \SzentirasHu\Models\Repositories\VerseRepository
      */
     private $verseRepository;
+    /**
+     * @var \SzentirasHu\Lib\Reference\ReferenceService
+     */
+    private $referenceService;
 
-    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository)
+    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, ReferenceService $referenceService)
     {
         $this->bookRepository = $bookRepository;
         $this->translationRepository = $translationRepository;
         $this->verseRepository = $verseRepository;
+        $this->referenceService = $referenceService;
     }
 
     public function getIndex()
@@ -306,10 +312,11 @@ class SearchController extends BaseController
     private function findTranslatedRef($refToSearch, $translation = false)
     {
         try {
-            $storedBookRef = CanonicalReference::fromString($refToSearch)->getExistingBookRef();
+            $ref = CanonicalReference::fromString($refToSearch);
+            $storedBookRef = $this->referenceService->getExistingBookRef($ref);
             if ($storedBookRef) {
                 $translation = $translation ? $translation : Translation::getDefaultTranslation();
-                return CanonicalReference::translateBookRef($storedBookRef, $translation->id);
+                return $this->referenceService->translateBookRef($storedBookRef, $translation->id);
             }
         } catch (ParsingException $e) {
         }

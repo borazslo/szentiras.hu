@@ -3,6 +3,7 @@
 namespace SzentirasHu\Controllers\Home;
 
 use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Models\Entities\Verse;
 use SzentirasHu\Models\Repositories\BookRepository;
 
@@ -14,10 +15,15 @@ class LectureSelector
      * @var \SzentirasHu\Models\Repositories\BookRepository
      */
     private $bookRepository;
+    /**
+     * @var \SzentirasHu\Lib\Reference\ReferenceService
+     */
+    private $referenceService;
 
-    public function __construct(BookRepository $bookRepository)
+    public function __construct(BookRepository $bookRepository, ReferenceService $referenceService)
     {
         $this->bookRepository = $bookRepository;
+        $this->referenceService = $referenceService;
     }
 
     public function getLectures($date = false)
@@ -31,7 +37,8 @@ class LectureSelector
         }
 
         $translationId = \Config::get('settings.defaultTranslationId');
-        $bookRefs = CanonicalReference::fromString($referenceString)->toTranslated($translationId)->bookRefs;
+        $ref = CanonicalReference::fromString($referenceString);
+        $bookRefs = $this->referenceService->translateReference($ref, $translationId)->bookRefs;
 
         foreach ($bookRefs as $bookRef) {
             // extract and convert Psalm numbering

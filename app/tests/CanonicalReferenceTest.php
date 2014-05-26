@@ -172,12 +172,14 @@ class CanonicalReferenceTest extends TestCase
 
     public function testTranslatedBookId()
     {
+        /** @var $referenceService SzentirasHu\Lib\Reference\ReferenceService */
+        $referenceService = App::make('SzentirasHu\Lib\Reference\ReferenceService');
         $ref = CanonicalReference::fromString("2Moz");
-        $translatedRef = $ref->toTranslated(1);
+        $translatedRef = $referenceService->translateReference($ref, 1);
         $this->assertEquals("Kiv", $translatedRef->bookRefs[0]->bookId);
 
         $ref = CanonicalReference::fromString("Kivonulas 2:3.4-5; 1Moz 4,5-6,12");
-        $translatedRef = $ref->toTranslated(1);
+        $translatedRef = $referenceService->translateReference($ref, 1);
         $this->assertEquals("Kiv", $translatedRef->bookRefs[0]->bookId);
         $this->assertEquals("Ter", $translatedRef->bookRefs[1]->bookId);
 
@@ -195,8 +197,10 @@ class CanonicalReferenceTest extends TestCase
     public
     function testIsExistingBookRef()
     {
-        $bookRef = CanonicalReference::fromString('1Móz 2,3.4-5')->getExistingBookRef();
-        $translatedBookRef = CanonicalReference::translateBookRef($bookRef, 1);
+        /** @var $referenceService SzentirasHu\Lib\Reference\ReferenceService */
+        $referenceService = App::make('SzentirasHu\Lib\Reference\ReferenceService');
+        $bookRef = $referenceService->getExistingBookRef(CanonicalReference::fromString('1Móz 2,3.4-5'));
+        $translatedBookRef = $referenceService->translateBookRef($bookRef, 1);
         $this->assertEquals("Ter", $translatedBookRef->bookId);
     }
 
@@ -242,10 +246,10 @@ class CanonicalReferenceTest extends TestCase
 
     public function testCanonicalUrl()
     {
-        $translationRepository = App::make('SzentirasHu\Models\Repositories\TranslationRepository');
-        $translation = $translationRepository->getById(1);
+        $referenceService = App::make('SzentirasHu\Lib\Reference\ReferenceService');
         $ref = "Kiv 1,9-10; 1Móz 22";
-        $this->assertEquals("TESTTRANS/Kiv1,9-10;Ter22", CanonicalReference::fromString($ref)->getCanonicalUrl($translation));
+        $this->assertEquals("TESTTRANS/Kiv1,9-10;Ter22",
+            $referenceService->getCanonicalUrl(CanonicalReference::fromString($ref), 1));
     }
 
     public function testIsOneChapter() {
