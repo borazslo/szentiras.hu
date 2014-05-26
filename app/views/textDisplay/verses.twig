@@ -25,8 +25,12 @@
             <p>
                 {% for otherTranslation in translations %}
                     {% if otherTranslation.id != translation.id %}
-                        <a class="btn btn-default btn-xs" href="/{{ otherTranslation.abbrev }}/{{ verseContainer.bookRef.toString() }}">{{ otherTranslation.abbrev }}</a>
+                        <a class="btn btn-xs btn-default" href="/{{ otherTranslation.abbrev }}/{{ verseContainer.bookRef.toString() }}">{{ otherTranslation.abbrev }}</a>
+                    {% else %}
+                        <a class="btn btn-xs btn-primary disabled">{{ otherTranslation.abbrev }}</a>
                     {% endif %}
+
+
                 {% endfor %}
             </p>
         </div>
