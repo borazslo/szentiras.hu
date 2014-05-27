@@ -75,6 +75,7 @@ class SearchController extends BaseController
         $searchParams->text = $term;
         $searchParams->limit = 10;
         $searchParams->groupByVerse = true;
+        $searchParams->synonyms = true;
         $sphinxSearcher = new SphinxSearcher($searchParams);
         $sphinxResults = $sphinxSearcher->get();
         if ($sphinxResults) {

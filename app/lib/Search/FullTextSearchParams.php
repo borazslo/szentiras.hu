@@ -13,5 +13,6 @@ class FullTextSearchParams {
     public $bookIds;
     public $limit;
     public $groupByVerse;
+    public $synonyms;
 
 } 
