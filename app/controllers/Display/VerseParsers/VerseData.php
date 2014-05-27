@@ -23,4 +23,19 @@ class VerseData
         $this->numv = $numv;
     }
 
+    public function getHeadingText()
+    {
+        if (count($this->headings) > 0) {
+            $headingText = '';
+            foreach (range(0, 4) as $headingLevel) {
+                if (array_key_exists($headingLevel, $this->headings)) {
+                    $headingText .= $this->headings[$headingLevel];
+                }
+            }
+            return $headingText;
+        } else {
+            return false;
+        }
+    }
+
 }

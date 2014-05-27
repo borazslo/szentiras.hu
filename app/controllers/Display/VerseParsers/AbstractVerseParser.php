@@ -76,6 +76,6 @@ abstract class AbstractVerseParser implements VerseParser {
      */
     abstract protected function parseXrefverse($book, $rawVerse, $verse);
 
-    abstract protected function parseHeading($rawVerse, $verse);
+    abstract protected function parseHeading($rawVerse, VerseData $verse);
 
 }

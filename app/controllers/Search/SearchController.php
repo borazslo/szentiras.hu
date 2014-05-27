@@ -110,7 +110,11 @@ class SearchController extends BaseController
         $verseContainer = new VerseContainer($verse->book);
         $verseContainer->addVerse($verse);
         $parsedVerses = $verseContainer->getParsedVerses();
-        return $parsedVerses[0]->text;
+        if ($parsedVerses[0]->getHeadingText()) {
+            return $parsedVerses[0]->getHeadingText();
+        } else {
+            return $parsedVerses[0]->text;
+        }
     }
 
     public function anySearch()

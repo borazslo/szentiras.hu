@@ -4,6 +4,7 @@
  */
 namespace SzentirasHu\Lib;
 
+use SzentirasHu\Controllers\Display\VerseParsers\VerseData;
 use SzentirasHu\Controllers\Display\VerseParsers\VerseParser;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Verse;
@@ -45,6 +46,9 @@ class VerseContainer
         $this->rawVerses[$verseKey][] = $verse;
     }
 
+    /**
+     * @return VerseData[]
+     */
     public function getParsedVerses()
     {
         $verseData = [];

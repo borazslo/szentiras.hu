@@ -21,7 +21,7 @@ class DefaultVerseParser extends AbstractVerseParser
         $verse->xrefs[]= $xref;
     }
 
-    protected function parseHeading($rawVerse, $verse)
+    protected function parseHeading($rawVerse, VerseData $verse)
     {
         $level = str_replace('heading','', $rawVerse->getType());
         $verse->headings[$level] = $rawVerse->verse;
