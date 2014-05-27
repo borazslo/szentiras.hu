@@ -54,7 +54,7 @@ class SphinxSearcher
     {
         $term = $this->addAlternatives($params);
         $this->sphinxClient = SphinxSearch::search($term);
-        \Log::debug('searching', ['term' => $term]);
+        \Log::debug('searching', ['params' => $params, 'term' => $term]);
         $this->sphinxClient->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED);
         $this->sphinxClient->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@weight DESC, gepi ASC");
         if ($params->limit) {
