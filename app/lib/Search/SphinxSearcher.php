@@ -68,8 +68,8 @@ class SphinxSearcher
         if ($params->translationId) {
             $this->sphinxClient->filter('trans', $params->translationId);
         }
-        if (count($params->bookIds) > 0) {
-            $this->sphinxClient->filter('book', $params->bookIds);
+        if (count($params->bookNumbers) > 0) {
+            $this->sphinxClient->filter('book_number', $params->bookNumbers);
         }
         $this->params = $params;
     }

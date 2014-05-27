@@ -66,9 +66,9 @@ class SearchController extends BaseController
         $ref = $this->findTranslatedRef($term);
         if ($ref) {
             $result[] = [
-                'cat'=>'ref',
-                'label'=>$ref->toString(),
-                'link'=>"/{$ref->toString()}"
+                'cat' => 'ref',
+                'label' => $ref->toString(),
+                'link' => "/{$ref->toString()}"
             ];
         }
         $searchParams = new FullTextSearchParams;
@@ -81,7 +81,7 @@ class SearchController extends BaseController
         if ($sphinxResults) {
             $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
             $texts = [];
-            foreach ($verses as $key=>$verse) {
+            foreach ($verses as $key => $verse) {
                 $parsedVerse = $this->getParsedVerse($verse);
                 if ($parsedVerse) {
                     $texts[$key] = $parsedVerse;
@@ -133,11 +133,8 @@ class SearchController extends BaseController
         $form = new SearchForm();
         $form->textToSearch = Input::get('textToSearch');
         $form->grouping = Input::get('grouping');
-        $defaultTranslation = Translation::getDefaultTranslation();
         $form->book = Input::get('book');
-        if (!Input::has('translation')) {
-            $form->translation = $defaultTranslation;
-        } else if (Input::get('translation') != 0) {
+        if (Input::get('translation') > 0) {
             $form->translation = $this->translationRepository->getById(Input::get('translation'));
         }
         return $form;
@@ -202,11 +199,11 @@ class SearchController extends BaseController
     private function handleFullTextResults($form, $view, $sphinxResults)
     {
         $sortedVerses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
-        $verseContainers = $this->groupVersesByBook($sortedVerses);
+        $verseContainers = $this->groupVersesByBook($sortedVerses, $form->translation);
         $results = [];
         $chapterCount = 0;
         $verseCount = 0;
-        foreach ($verseContainers as $bookAbbrev => $verseContainer) {
+        foreach ($verseContainers as $verseContainer) {
             $result = [];
             $result['book'] = $verseContainer->book;
             $result['translation'] = $this->translationRepository->getById($verseContainer->book->translation_id);
@@ -241,7 +238,7 @@ class SearchController extends BaseController
         return $view;
     }
 
-    private function extractBookIds($form)
+    private function extractBookNumbers($form)
     {
         $bookIds = [];
         if ($form->book) {
@@ -262,15 +259,18 @@ class SearchController extends BaseController
      * @param $sortedVerses
      * @return VerseContainer[]
      */
-    private function groupVersesByBook($sortedVerses)
+    private function groupVersesByBook($sortedVerses, $translation)
     {
         $verseContainers = [];
         foreach ($sortedVerses as $verse) {
             $book = $verse->book;
-            if (!array_key_exists($book->abbrev, $verseContainers)) {
-                $verseContainers[$book->abbrev] = new VerseContainer($book);
+            $key = !$translation ?
+                $book->translation_id . '/' . $book->abbrev :
+                $book->abbrev;
+            if (!array_key_exists($key, $verseContainers)) {
+                $verseContainers[$key] = new VerseContainer($book);
             }
-            $verseContainer = $verseContainers[$book->abbrev];
+            $verseContainer = $verseContainers[$key];
             $verseContainer->addVerse($verse);
         }
         return $verseContainers;
@@ -308,7 +308,8 @@ class SearchController extends BaseController
         if ($form->translation) {
             $searchParams->translationId = $form->translation->id;
         }
-        $searchParams->bookIds = $this->extractBookIds($form);
+        $searchParams->bookNumbers = $this->extractBookNumbers($form);
+        $searchParams->synonyms = true;
         return $searchParams;
     }
 
