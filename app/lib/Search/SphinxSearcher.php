@@ -24,11 +24,11 @@ class SphinxSearcher
     private function addAlternatives($params)
     {
         $text = trim($params->text);
-        $searchedTerm = "\"{$text}\" | {$text} | *{$text}*";
+        $searchedTerm = "(\"{$text}\" | {$text} | *{$text}*)";
         $originalWords = preg_split('/\W+/u', $text);
         $synonyms = [];
         $synonymRepository = \App::make('SzentirasHu\Models\Repositories\SynonymRepository');
-        $searchedTerm .= ' | ';
+        $searchedTerm .= ' | ( ';
         foreach ($originalWords as $word) {
             $searchedTerm .= "(";
             $searchedTerm .= "\"{$word}\" | {$word} | *{$word}*";
@@ -43,9 +43,10 @@ class SphinxSearcher
             }
             $searchedTerm .= ")";
             if ($word != end($originalWords)) {
-                $searchedTerm .= " | ";
+                $searchedTerm .= "   ";
             }
         }
+        $searchedTerm .= ' )';
         return $searchedTerm;
     }
 
