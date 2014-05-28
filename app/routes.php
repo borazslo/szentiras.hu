@@ -42,8 +42,3 @@ Route::get('/{TRANSLATION_ABBREV}/{REFERENCE}', 'SzentirasHu\\Controllers\\Displ
 
 Route::get('/{REFERENCE}', 'SzentirasHu\\Controllers\\Display\\TextDisplayController@showReferenceText')
     ->where('REFERENCE', '[^/]+');
-
-/** UPDATE tdverse from XLS */
-
-Route::get('/update/{TRANSLATION_ABBREV}','SzentirasHu\\Controllers\\UpdateController@run')
-	->where('TRANSLATION_ABBREV', Config::get('settings.translationAbbrevRegex'));
