@@ -4,14 +4,14 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class UpdateText extends Command {
+class updateText extends Command {
 
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'UpdateText';
+    protected $name = 'szentiras:updateText';
 
     /**
      * The console command description.
@@ -56,7 +56,7 @@ class UpdateText extends Command {
             $content = File::get($path);
             $filetype = PHPExcel_IOFactory::identify($path);
             $objReader = PHPExcel_IOFactory::createReader($filetype);
-            $objReader->setReadDataOnly(true);  // set this if you don't need to write
+            $objReader->setReadDataOnly(true);
             $objReader->setLoadSheetsOnly($abbrev);             
             $objPHPExcel = $objReader->load($path);
             $objWorksheet = $objPHPExcel->getActiveSheet();
@@ -97,9 +97,9 @@ class UpdateText extends Command {
         /* sorról sorra */
         $this->info("Beolvasás sorról sorra...");
         
-        //$max = 10; 
         $max = $objWorksheet->getHighestRow();
         $insert = array();
+        echo "\n";
         for($i = 3;$i<$max;$i++) {
             $row = $i;
 
@@ -113,25 +113,32 @@ class UpdateText extends Command {
             $values['verseroot'] = '??';
             $values['ido'] = gmdate ( 'Y-m-d H:i:s', PHPExcel_Shared_Date::ExcelToPHP( $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($cols['ido'], $i)->getValue()));
             if(isset($books_number2id[(int) substr($gepi,0,3)])) $values['book_id'] = $books_number2id[(int) substr($gepi,0,3)]; 
-                else App::abort(500,'Valami gond van a tdbook id/number párossal!');
+                else {
+                    $this->error("A ".(int) substr($gepi,0,3)."-hez nincs `book_id`");
+                    App::abort(500,'Valami gond van a tdbook id/number párossal!');
+               }
                     
-            //if((isset($_REQUEST['gepi']) AND preg_match('/'.$_REQUEST['gepi'].'/i',$gepi)) OR !isset($_REQUEST['gepi'])) {}         
-            
-            echo $abbrev." ".$values['gepi'].": ".substr($values['verse'],0,140)."\n";
+            //if((isset($_REQUEST['gepi']) AND preg_match('/'.$_REQUEST['gepi'].'/i',$gepi)) OR !isset($_REQUEST['gepi'])) {}                     
+            echo "\e[1A".$abbrev." ".$values['gepi']."\n"; //": ".substr($values['verse'],0,140)."\n";
             $inserts[$i] = $values;
         }
+         echo "\e[1A";
     
-    
-            /**        
-            * mySQL
-            *
-            echo "Mysql adatbázis lementése...\n";
-            exec('mysqldump -u '.getenv('MYSQL_SZENTIRAS_USER').' --password='.getenv('MYSQL_SZENTIRAS_PWD').' bible '.DBPREF.'tdverse > tmp/bible_'.DBPREF.'tdverse_'.$trans.'_'.date('YmdHis').'.sql');
-  
-            setvar('update_'.$trans.'_hossz','mysql_'.(int) ((time()-$starttime)/60));
-            setvar('frissitunk_'.$trans,'true');
-            echo "Mysql tábla ürítése: ";
-            $query = "DELETE FROM ".DBPREF."tdverse WHERE  trans = ".$transsk[$trans];
+         $this->info("Mysql adatbázis lementése...");
+         //TODO: larevelesíteni (http://bundles.laravel.com/bundle/mysqldump-php ?)
+         $connections = Config::get('database.connections');
+         $conn = $connections[Config::get('database.default')];
+         exec('mysqldump -u '.$conn['username'].' --password='.$conn['password'].' '.$conn['database'].' '.$conn['prefix'].'tdverse > '.Config::get('settings.sourceDirectory').'/'.$conn['database'].'_'.$conn['prefix'].'tdverse_'.$abbrev.'_'.date('YmdHis').'.sql');
+
+         $this->info("Mysql tábla ürítése...");         
+         DB::table('tdverse')->where('trans', '=', $translation->id)->delete();
+         
+         $this->info("Mysql tábla feltöltése...");         
+         DB::table('tdverse')->insert($inserts[4]);
+                           
+         
+/*
+         $query = "DELETE FROM ".DBPREF."tdverse WHERE  trans = ".$transsk[$trans];
             if(isset($_REQUEST['gepi'])) $query .= " AND gepi REGEXP '".$_REQUEST['gepi']."'";
             $query .= "\n";
             db_query($query);
