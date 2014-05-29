@@ -9,6 +9,7 @@ do
         unset GIT_DIR
         git checkout mvc
         git pull
+        echo "<?php return [ 'hash' => '`git rev-parse HEAD`' ];" > app/config/staging/version.php
         export MYSQL_SZENTIRAS_USER=szentiras
         export MYSQL_SZENTIRAS_PASSWORD=
         export SZENTIRAS_WEBAPP_ENVIRONMENT=staging

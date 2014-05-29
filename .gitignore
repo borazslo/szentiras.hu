@@ -13,3 +13,4 @@ nbproject
 app/storage
 node_modules
 bower_components
+version.php
