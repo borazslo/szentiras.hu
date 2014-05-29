@@ -1,6 +1,6 @@
-{% for otherTranslation in translations %}
+{% for otherTranslation in translationLinks %}
     {% if otherTranslation.id != translation.id %}
-        <a class="btn btn-xs btn-default" href="/{{ otherTranslation.abbrev }}/{{ link }}">{{ otherTranslation.abbrev }}</a>
+        <a class="btn btn-xs btn-default" href="/{{ otherTranslation.link }}">{{ otherTranslation.abbrev }}</a>
     {% else %}
         <a class="btn btn-xs btn-primary disabled">{{ otherTranslation.abbrev }}</a>
     {% endif %}

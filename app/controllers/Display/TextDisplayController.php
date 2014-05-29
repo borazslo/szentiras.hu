@@ -79,14 +79,23 @@ class TextDisplayController extends \BaseController
                 $this->createChapterLinks($canonicalRef, $translation)
                 : false;
             $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation);
+            $translations = $this->translationRepository->getAllOrderedByDenom();
             return View::make('textDisplay.verses')->with([
                 'verseContainers' => $verseContainers,
                 'translation' => $translation,
-                'translations' => $this->translationRepository->getAllOrderedByDenom(),
+                'translations' => $translations,
                 'canonicalUrl' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
                 'metaTitle' => $this->getTitle($verseContainers, $translation),
                 'teaser' => $this->getTeaser($verseContainers),
-                'chapterLinks' => $chapterLinks
+                'chapterLinks' => $chapterLinks,
+                'translationLinks' => $translations->map(
+                        function ($translation) use ($canonicalRef) {
+                            return [
+                                'id' => $translation->id,
+                                'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
+                                'abbrev' => $translation->abbrev];
+                        }
+                    )
             ]);
         } catch (ParsingException $e) {
             // as this doesn't look like a valid reference, interpret as full text search
@@ -110,12 +119,22 @@ class TextDisplayController extends \BaseController
                     $groupedVerses[$verse['chapter']][$verse['numv']] = $this->getTeaser([$verseContainer]);
                 }
             }
+            $translations = $this->translationRepository->getAllOrderedByDenom();
             return View::make('textDisplay.book', [
                 'translation' => $translation,
                 'reference' => $translatedRef,
                 'book' => $book,
                 'groupedVerses' => $groupedVerses,
-                'translations' => $this->translationRepository->getAllOrderedByDenom()
+                'translations' => $translations,
+                'translationLinks' => $translations->map(
+                        function ($translation) use ($canonicalRef) {
+                            return [
+                                'id' => $translation->id,
+                                'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
+                                'abbrev' => $translation->abbrev];
+                        }
+                    )
+
             ]);
 
         }
