@@ -3,6 +3,7 @@
 namespace SzentirasHu\Controllers\Api;
 
 use BaseController;
+use Illuminate\Support\Facades\Config;
 use Input;
 use Response;
 use SzentirasHu\Lib\Reference\CanonicalReference;
@@ -56,7 +57,7 @@ class ApiController extends BaseController {
                     "rov" => $translation->abbrev
                 ]]
             ]
-        )->setCallback(Input::get('callback'));
+        , 200, [], Config::get('app.debug') ? JSON_PRETTY_PRINT : 0)->setCallback(Input::get('callback'));
     }
 
     public function getForditasok($gepi) {
