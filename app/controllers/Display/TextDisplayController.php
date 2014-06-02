@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Redirect;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Reference\ReferenceService;
+use SzentirasHu\Lib\Text\TextService;
 use SzentirasHu\Lib\VerseContainer;
 use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Repositories\BookRepository;
@@ -36,13 +37,18 @@ class TextDisplayController extends \BaseController
     private $verseRepository;
 
     private $referenceService;
+    /**
+     * @var \SzentirasHu\Lib\Text\TextService
+     */
+    private $textService;
 
-    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository, VerseRepository $verseRepository, ReferenceService $referenceService)
+    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository, VerseRepository $verseRepository, ReferenceService $referenceService, TextService $textService)
     {
         $this->translationRepository = $translationRepository;
         $this->bookRepository = $bookRepository;
         $this->verseRepository = $verseRepository;
         $this->referenceService = $referenceService;
+        $this->textService = $textService;
     }
 
     public function showTranslationList()
@@ -78,7 +84,7 @@ class TextDisplayController extends \BaseController
             $chapterLinks = $canonicalRef->isOneChapter() ?
                 $this->createChapterLinks($canonicalRef, $translation)
                 : false;
-            $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation);
+            $verseContainers = $this->textService->getTranslatedVerses($canonicalRef, $translation);
             $translations = $this->translationRepository->getAllOrderedByDenom();
             return View::make('textDisplay.verses')->with([
                 'verseContainers' => $verseContainers,
@@ -139,42 +145,6 @@ class TextDisplayController extends \BaseController
 
         }
 
-    }
-
-    /**
-     * @param $canonicalRef
-     * @param $translation
-     * @return array
-     */
-    public function getTranslatedVerses($canonicalRef, $translation)
-    {
-        $translatedRef = $this->referenceService->translateReference($canonicalRef, $translation->id);
-        $verseContainers = [];
-        foreach ($translatedRef->bookRefs as $bookRef) {
-            $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translation->id);
-            $verseContainer = new VerseContainer($book, $bookRef);
-            foreach ($bookRef->chapterRanges as $chapterRange) {
-                $searchedChapters = DisplayHelper::collectChapterIds($chapterRange);
-                $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation);
-                foreach ($verses as $verse) {
-                    $verseContainer->addVerse($verse);
-                }
-            }
-            $verseContainers[] = $verseContainer;
-        }
-        return $verseContainers;
-    }
-
-    public function getChapterRangeVerses($chapterRange, $book, $searchedChapters, $translation)
-    {
-        $allChapterVerses = $this->verseRepository->getTranslatedChapterVerses($book->id, $searchedChapters);
-        $chapterRangeVerses = [];
-        foreach ($allChapterVerses as $verse) {
-            if ($chapterRange->hasVerse($verse->chapter, $verse->numv)) {
-                $chapterRangeVerses[] = $verse;
-            }
-        }
-        return $chapterRangeVerses;
     }
 
     private function getTitle($verseContainers, $translation)

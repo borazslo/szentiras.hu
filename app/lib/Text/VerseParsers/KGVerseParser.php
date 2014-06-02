@@ -1,8 +1,9 @@
 <?php
 
-namespace SzentirasHu\Controllers\Display\VerseParsers;
+namespace SzentirasHu\Lib\Text\VerseParsers;
 
 use Log;
+use SzentirasHu\Controllers\Display\VerseParsers\Xref;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
 

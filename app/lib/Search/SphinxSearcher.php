@@ -12,6 +12,7 @@ use SphinxSearch;
 
 class SphinxSearcher
 {
+
     /**
      * @var SphinxSearch
      */

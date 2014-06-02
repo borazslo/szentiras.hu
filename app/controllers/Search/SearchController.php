@@ -12,6 +12,7 @@ use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Lib\Search\FullTextSearchParams;
 use SzentirasHu\Lib\Search\FullTextSearchResult;
 use SzentirasHu\Lib\Search\SphinxSearcher;
+use SzentirasHu\Lib\Text\TextService;
 use SzentirasHu\Lib\VerseContainer;
 use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Entities\Verse;
@@ -45,13 +46,18 @@ class SearchController extends BaseController
      * @var \SzentirasHu\Lib\Reference\ReferenceService
      */
     private $referenceService;
+    /**
+     * @var \SzentirasHu\Lib\Text\TextService
+     */
+    private $textService;
 
-    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, ReferenceService $referenceService)
+    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, ReferenceService $referenceService, TextService $textService)
     {
         $this->bookRepository = $bookRepository;
         $this->translationRepository = $translationRepository;
         $this->verseRepository = $verseRepository;
         $this->referenceService = $referenceService;
+        $this->textService = $textService;
     }
 
     public function getIndex()
@@ -166,8 +172,7 @@ class SearchController extends BaseController
         $translatedRef = $this->findTranslatedRef($form->textToSearch, $form->translation);
         if ($translatedRef) {
             $translation = $form->translation ? $form->translation : Translation::getDefaultTranslation();
-            $textDisplayController = App::make('SzentirasHu\Controllers\Display\TextDisplayController');
-            $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation);
+            $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation);
             $augmentedView = $view->with('bookRef', [
                 'label' => $translatedRef->toString(),
                 'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",

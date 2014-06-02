@@ -1,6 +1,8 @@
 <?php
 
 use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Lib\Reference\ChapterRange;
+use SzentirasHu\Lib\Reference\ChapterRef;
 
 class CanonicalReferenceTest extends TestCase
 {
@@ -277,9 +279,20 @@ class CanonicalReferenceTest extends TestCase
         list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1);
         $this->assertEquals('Kiv 3', $nextRef->toString());
         $this->assertEquals('Kiv 1', $prevRef->toString());
-
-
     }
+
+    public function testCollectChapterIds() {
+        $range = new ChapterRange();
+        $range->chapterRef = new ChapterRef(2);
+        $range->untilChapterRef = new ChapterRef(4);
+        $ids = CanonicalReference::collectChapterIds($range);
+        $this->assertContains(2, $ids);
+        $this->assertContains(3, $ids);
+        $this->assertContains(4, $ids);
+        $this->assertNotContains(1, $ids);
+        $this->assertNotContains(5, $ids);
+    }
+
 
 }
  

@@ -1,8 +1,9 @@
 <?php
 
-namespace SzentirasHu\Controllers\Display\VerseParsers;
+namespace SzentirasHu\Lib\Text\VerseParsers;
 
-use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Controllers\Display\VerseParsers\VerseData;
+use SzentirasHu\Controllers\Display\VerseParsers\Xref;
 
 class KNBVerseParser extends DefaultVerseParser
 {

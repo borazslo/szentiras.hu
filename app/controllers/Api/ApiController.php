@@ -2,19 +2,29 @@
 
 namespace SzentirasHu\Controllers\Api;
 
-use App;
 use BaseController;
 use Input;
 use Response;
-use SzentirasHu\Controllers\Display\TextDisplayController;
 use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Lib\Text\TextService;
 use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Entities\Verse;
 use View;
 
 class ApiController extends BaseController {
 
-	public function getIndex()
+
+    /**
+     * @var \SzentirasHu\Lib\Text\TextService
+     */
+    private $textService;
+
+    function __construct(TextService $textService)
+    {
+        $this->textService = $textService;
+    }
+
+    public function getIndex()
 	{
         return View::make("api.api");
 	}
@@ -25,9 +35,8 @@ class ApiController extends BaseController {
         } else {
             $translation = Translation::getDefaultTranslation();
         }
-        $textDisplayController = App::make('SzentirasHu\Controllers\Display\TextDisplayController');
         $canonicalRef = CanonicalReference::fromString($refString);
-        $verseContainers = $textDisplayController->getTranslatedVerses(CanonicalReference::fromString($refString), $translation);
+        $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($refString), $translation);
         $verses = [];
         foreach ($verseContainers as $verseContainer) {
             foreach ($verseContainer->getParsedVerses() as $verse) {
