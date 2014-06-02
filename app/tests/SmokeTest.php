@@ -10,6 +10,9 @@ class SmokeTest extends TestCase
         $this->app->instance('SzentirasHu\Lib\LectureDownloader', $downloader);
         $downloader->shouldReceive('getReferenceString')->andReturn('Ter 4,5; Kiv 3,4');
 
+        $searcherFactory = Mockery::mock('SzentirasHu\Lib\Search\SearcherFactory');
+        $this->app->instance('SzentirasHu\Lib\Search\SearcherFactory', $searcherFactory);
+        $searcherFactory->shouldReceive('createSearcherFor')->andReturn(new SearcherStub());
     }
 
     /**

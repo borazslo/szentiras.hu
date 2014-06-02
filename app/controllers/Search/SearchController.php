@@ -11,6 +11,7 @@ use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Lib\Search\FullTextSearchParams;
 use SzentirasHu\Lib\Search\FullTextSearchResult;
+use SzentirasHu\Lib\Search\SearcherFactory;
 use SzentirasHu\Lib\Search\SphinxSearcher;
 use SzentirasHu\Lib\Text\TextService;
 use SzentirasHu\Lib\VerseContainer;
@@ -50,14 +51,19 @@ class SearchController extends BaseController
      * @var \SzentirasHu\Lib\Text\TextService
      */
     private $textService;
+    /**
+     * @var \SzentirasHu\Lib\Search\SearcherFactory
+     */
+    private $searcherFactory;
 
-    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, ReferenceService $referenceService, TextService $textService)
+    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, ReferenceService $referenceService, TextService $textService, SearcherFactory $searcherFactory)
     {
         $this->bookRepository = $bookRepository;
         $this->translationRepository = $translationRepository;
         $this->verseRepository = $verseRepository;
         $this->referenceService = $referenceService;
         $this->textService = $textService;
+        $this->searcherFactory = $searcherFactory;
     }
 
     public function getIndex()
@@ -82,7 +88,7 @@ class SearchController extends BaseController
         $searchParams->limit = 10;
         $searchParams->groupByVerse = true;
         $searchParams->synonyms = true;
-        $sphinxSearcher = new SphinxSearcher($searchParams);
+        $sphinxSearcher = $this->searcherFactory->createSearcherFor($searchParams);
         $sphinxResults = $sphinxSearcher->get();
         if ($sphinxResults) {
             $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
@@ -191,7 +197,7 @@ class SearchController extends BaseController
     {
         $searchParams = $this->createFullTextSearchParams($form);
         $view = $this->addTranslationHits($view, $searchParams);
-        $sphinxSearcher = new SphinxSearcher($searchParams);
+        $sphinxSearcher = $this->searcherFactory->createSearcherFor($searchParams);
         $sphinxResults = $sphinxSearcher->get();
         if ($sphinxResults) {
             $view = $this->handleFullTextResults($form, $view, $sphinxResults);
@@ -296,7 +302,7 @@ class SearchController extends BaseController
         foreach ($this->translationRepository->getAll() as $translation) {
             $params = clone $searchParams;
             $params->translationId = $translation->id;
-            $searcher = new SphinxSearcher($params);
+            $searcher = $this->searcherFactory->createSearcherFor($params);
             $searchHits = $searcher->get();
             if ($searchHits) {
                 $translationHits[] = ['translation' => $translation, 'hitCount' => $searchHits->hitCount];
