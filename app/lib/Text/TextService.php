@@ -39,12 +39,12 @@ class TextService {
      * @param $translation
      * @return VerseContainer[]
      */
-    public function getTranslatedVerses($canonicalRef, $translation)
+    public function getTranslatedVerses($canonicalRef, $translationId)
     {
-        $translatedRef = $this->referenceService->translateReference($canonicalRef, $translation->id);
+        $translatedRef = $this->referenceService->translateReference($canonicalRef, $translationId);
         $verseContainers = [];
         foreach ($translatedRef->bookRefs as $bookRef) {
-            $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translation->id);
+            $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translationId);
             $verseContainer = new VerseContainer($book, $bookRef);
             foreach ($bookRef->chapterRanges as $chapterRange) {
                 $searchedChapters = CanonicalReference::collectChapterIds($chapterRange);
@@ -68,6 +68,29 @@ class TextService {
             }
         }
         return $chapterRangeVerses;
+    }
+
+    /**
+     * @param $canonicalRef CanonicalReference | string
+     * @param $translationId int
+     * @return string
+     */
+    public function getPureText($canonicalRef, $translationId)
+    {
+        if (is_string($canonicalRef)) {
+            $canonicalRef = CanonicalReference::fromString($canonicalRef);
+        }
+        $verseContainers = $this->getTranslatedVerses($canonicalRef, $translationId);
+        $text = '';
+        foreach ($verseContainers as $verseContainer) {
+            $verses = $verseContainer->getParsedVerses();
+            foreach ($verses as $verse) {
+                $verseText = $verse -> text;
+                $verseText = preg_replace('/<[^>]*>/', ' ', $verseText);
+                $text .= $verseText.' ';
+            }
+        }
+        return $text;
     }
 
 } 

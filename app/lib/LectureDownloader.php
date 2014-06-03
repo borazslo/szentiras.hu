@@ -3,24 +3,21 @@
 namespace SzentirasHu\Lib;
 
 use Cache;
+use Carbon\Carbon;
 use ErrorException;
 
 class LectureDownloader {
 
     const LECTURE_CACHE_KEY = 'szentiras.lecture';
-    public $date;
 
-    public function __construct($date) {
-        $this->date = $date;
-    }
-
-    public function getReferenceString() {
-        $fn2 = "http://katolikus.hu/igenaptar/{$this->date}.html";
+    public function getReferenceString($date=false) {
+        $date = $date ? $date : date("Ymd");
+        $fn2 = "http://katolikus.hu/igenaptar/{$date}.html";
         try {
             $text = Cache::get(self::LECTURE_CACHE_KEY);
             if (!$text) {
                 $text = file_get_contents($fn2);
-                $tomorrow = \Carbon\Carbon::tomorrow();
+                $tomorrow = Carbon::tomorrow();
                 $tomorrow->setTime(0, 0, 0);
                 Cache::put(self::LECTURE_CACHE_KEY, $text, $tomorrow);
             }

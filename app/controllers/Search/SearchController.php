@@ -178,7 +178,7 @@ class SearchController extends BaseController
         $translatedRef = $this->findTranslatedRef($form->textToSearch, $form->translation);
         if ($translatedRef) {
             $translation = $form->translation ? $form->translation : Translation::getDefaultTranslation();
-            $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation);
+            $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation->id);
             $augmentedView = $view->with('bookRef', [
                 'label' => $translatedRef->toString(),
                 'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
