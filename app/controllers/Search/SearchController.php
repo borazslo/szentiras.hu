@@ -159,7 +159,7 @@ class SearchController extends BaseController
     private function getView($form)
     {
         $translations = $this->translationRepository->getAll();
-        $books = $this->bookRepository->getBooksByTranslation(Translation::getDefaultTranslation()->id);
+        $books = $this->bookRepository->getBooksByTranslation($this->translationRepository->getDefault()->id);
         return View::make("search.search", [
             'form' => $form,
             'translations' => $translations,
@@ -177,7 +177,7 @@ class SearchController extends BaseController
         $augmentedView = $view;
         $translatedRef = $this->findTranslatedRef($form->textToSearch, $form->translation);
         if ($translatedRef) {
-            $translation = $form->translation ? $form->translation : Translation::getDefaultTranslation();
+            $translation = $form->translation ? $form->translation : $this->translationRepository->getDefault();
             $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation->id);
             $augmentedView = $view->with('bookRef', [
                 'label' => $translatedRef->toString(),
@@ -338,7 +338,7 @@ class SearchController extends BaseController
             $ref = CanonicalReference::fromString($refToSearch);
             $storedBookRef = $this->referenceService->getExistingBookRef($ref);
             if ($storedBookRef) {
-                $translation = $translation ? $translation : Translation::getDefaultTranslation();
+                $translation = $translation ? $translation : $this->translationRepository->getDefault();
                 return $this->referenceService->translateBookRef($storedBookRef, $translation->id);
             }
         } catch (ParsingException $e) {

@@ -16,9 +16,9 @@ class LectureDownloader {
         try {
             $text = Cache::get(self::LECTURE_CACHE_KEY);
             if (!$text) {
-                $text = file_get_contents($fn2);
                 $tomorrow = Carbon::tomorrow();
                 $tomorrow->setTime(0, 0, 0);
+                $text = file_get_contents($fn2);
                 Cache::put(self::LECTURE_CACHE_KEY, $text, $tomorrow);
             }
 

@@ -4,13 +4,17 @@ namespace SzentirasHu\Controllers\Api;
 
 use BaseController;
 use Illuminate\Support\Facades\Config;
+use URL;
 use Input;
 use Response;
 use SzentirasHu\Controllers\Home\LectureSelector;
 use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Lib\Text\TextService;
 use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Entities\Verse;
+use SzentirasHu\Models\Repositories\BookRepository;
+use SzentirasHu\Models\Repositories\TranslationRepository;
 use View;
 
 class ApiController extends BaseController
@@ -25,11 +29,31 @@ class ApiController extends BaseController
      * @var \SzentirasHu\Controllers\Home\LectureSelector
      */
     private $lectureSelector;
+    /**
+     * @var \SzentirasHu\Models\Repositories\TranslationRepository
+     */
+    private $translationRepository;
+    /**
+     * @var \SzentirasHu\Models\Repositories\BookRepository
+     */
+    private $bookRepository;
+    /**
+     * @var \SzentirasHu\Lib\Reference\ReferenceService
+     */
+    private $referenceService;
 
-    function __construct(TextService $textService, LectureSelector $lectureSelector)
+    function __construct(
+        TextService $textService,
+        LectureSelector $lectureSelector,
+        TranslationRepository $translationRepository,
+        BookRepository $bookRepository,
+        ReferenceService $referenceService)
     {
         $this->textService = $textService;
         $this->lectureSelector = $lectureSelector;
+        $this->translationRepository = $translationRepository;
+        $this->bookRepository = $bookRepository;
+        $this->referenceService = $referenceService;
     }
 
     public function getIndex()
@@ -40,9 +64,9 @@ class ApiController extends BaseController
     public function getIdezet($refString, $translationAbbrev = false)
     {
         if ($translationAbbrev) {
-            $translation = Translation::byAbbrev($translationAbbrev);
+            $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
         } else {
-            $translation = Translation::getDefaultTranslation();
+            $translation = $this->translationRepository->getDefault();
         }
         $canonicalRef = CanonicalReference::fromString($refString);
         $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($refString), $translation->id);
@@ -103,11 +127,53 @@ class ApiController extends BaseController
         return $this->formatJsonResponse(['lectures' => $formattedLectures]);
     }
 
+    public function getBooks($translationAbbrev = false) {
+        $translation = $this->findTranslation($translationAbbrev);
+        foreach ($this->bookRepository->getBooksByTranslation($translation->id) as $book) {
+            $bookData[] = [
+                'abbrev' => $book->abbrev,
+                'name' => $book->name,
+                'number' => $book->number
+            ];
+        }
+        $data = [
+            'translation' => ['abbrev' => $translation->abbrev, 'id'=>$translation->id],
+            'books' => $bookData
+        ];
+        return $this->formatJsonResponse($data);
+    }
+
+    public function getRef($ref, $translationAbbrev = false)
+    {
+        $translation = $this->findTranslation($translationAbbrev);
+        $canonicalRef = $this->referenceService->translateReference(CanonicalReference::fromString($ref), $translation->id);
+        return $this->formatJsonResponse([
+            'canonicalRef' => $canonicalRef->toString(),
+            'canonicalUrl' => URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id)),
+            'text' => $this->textService->getPureText($canonicalRef, $translation->id)
+        ]);
+    }
+
     private function formatJsonResponse($data)
     {
         $flags = Config::get('app.debug') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE : 0;
         return Response::json($data, 200, [
             'Content-Type' => 'application/json; charset=UTF-8'
         ], $flags)->setCallback(Input::get('callback'));
+    }
+
+    /**
+     * @param $translationAbbrev
+     * @return mixed
+     */
+    private function findTranslation($translationAbbrev = false)
+    {
+        if ($translationAbbrev) {
+            $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
+            return $translation;
+        } else {
+            $translation = $this->translationRepository->getDefault();
+            return $translation;
+        }
     }
 }
