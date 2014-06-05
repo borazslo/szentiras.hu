@@ -91,7 +91,7 @@ class SphinxSearcher implements Searcher
 
             return $fullTextSearchResult;
         } else {
-            return false;
+            return null;
         }
     }
 

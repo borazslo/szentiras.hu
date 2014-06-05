@@ -11,12 +11,9 @@ use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Lib\Search\FullTextSearchParams;
 use SzentirasHu\Lib\Search\FullTextSearchResult;
-use SzentirasHu\Lib\Search\SearcherFactory;
-use SzentirasHu\Lib\Search\SphinxSearcher;
+use SzentirasHu\Lib\Search\SearchService;
 use SzentirasHu\Lib\Text\TextService;
 use SzentirasHu\Lib\VerseContainer;
-use SzentirasHu\Models\Entities\Translation;
-use SzentirasHu\Models\Entities\Verse;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 use SzentirasHu\Models\Repositories\VerseRepository;
@@ -52,18 +49,18 @@ class SearchController extends BaseController
      */
     private $textService;
     /**
-     * @var \SzentirasHu\Lib\Search\SearcherFactory
+     * @var \SzentirasHu\Lib\Search\SearchService
      */
-    private $searcherFactory;
+    private $searchService;
 
-    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, ReferenceService $referenceService, TextService $textService, SearcherFactory $searcherFactory)
+    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, ReferenceService $referenceService, TextService $textService, SearchService $searchService)
     {
         $this->bookRepository = $bookRepository;
         $this->translationRepository = $translationRepository;
         $this->verseRepository = $verseRepository;
         $this->referenceService = $referenceService;
         $this->textService = $textService;
-        $this->searcherFactory = $searcherFactory;
+        $this->searchService = $searchService;
     }
 
     public function getIndex()
@@ -83,50 +80,9 @@ class SearchController extends BaseController
                 'link' => "/{$ref->toString()}"
             ];
         }
-        $searchParams = new FullTextSearchParams;
-        $searchParams->text = $term;
-        $searchParams->limit = 10;
-        $searchParams->groupByVerse = true;
-        $searchParams->synonyms = true;
-        $sphinxSearcher = $this->searcherFactory->createSearcherFor($searchParams);
-        $sphinxResults = $sphinxSearcher->get();
-        if ($sphinxResults) {
-            $verses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
-            $texts = [];
-            foreach ($verses as $key => $verse) {
-                $parsedVerse = $this->getParsedVerse($verse);
-                if ($parsedVerse) {
-                    $texts[$key] = $parsedVerse;
-                }
-            }
-            $excerpts = $sphinxSearcher->getExcerpts($texts);
-            $textKeys = array_keys($texts);
-            if ($excerpts) {
-                foreach ($excerpts as $i => $excerpt) {
-                    $verse = $verses[$textKeys[$i]];
-                    $linkLabel = "{$verse->book->abbrev} {$verse->chapter},{$verse->numv}";
-                    $result[] = [
-                        'cat' => 'verse',
-                        'label' => $excerpt,
-                        'link' => "/{$verse->translation->abbrev}/{$linkLabel}",
-                        'linkLabel' => $linkLabel
-                    ];
-                }
-            }
-        }
+        $suggestions = $this->searchService->getSuggestionsFor($term);
+        $result = array_merge($result, $suggestions);
         return Response::json($result);
-    }
-
-    private function getParsedVerse(Verse $verse)
-    {
-        $verseContainer = new VerseContainer($verse->book);
-        $verseContainer->addVerse($verse);
-        $parsedVerses = $verseContainer->getParsedVerses();
-        if ($parsedVerses[0]->getHeadingText()) {
-            return $parsedVerses[0]->getHeadingText();
-        } else {
-            return $parsedVerses[0]->text;
-        }
     }
 
     public function anySearch()
@@ -197,59 +153,10 @@ class SearchController extends BaseController
     {
         $searchParams = $this->createFullTextSearchParams($form);
         $view = $this->addTranslationHits($view, $searchParams);
-        $sphinxSearcher = $this->searcherFactory->createSearcherFor($searchParams);
-        $sphinxResults = $sphinxSearcher->get();
-        if ($sphinxResults) {
-            $view = $this->handleFullTextResults($form, $view, $sphinxResults);
+        $results = $this->searchService->getDetailedResults($searchParams);
+        if ($results) {
+            $view = $view->with('fullTextResults', $results);
         }
-        return $view;
-    }
-
-    /**
-     * @param SearchForm $form
-     * @param $view
-     * @param FullTextSearchResult $sphinxResults
-     * @return mixed
-     */
-    private function handleFullTextResults($form, $view, $sphinxResults)
-    {
-        $sortedVerses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
-        $verseContainers = $this->groupVersesByBook($sortedVerses, $form->translation);
-        $results = [];
-        $chapterCount = 0;
-        $verseCount = 0;
-        foreach ($verseContainers as $verseContainer) {
-            $result = [];
-            $result['book'] = $verseContainer->book;
-            $result['translation'] = $this->translationRepository->getById($verseContainer->book->translation_id);
-            $parsedVerses = $verseContainer->getParsedVerses();
-            $result['chapters'] = [];
-            foreach ($parsedVerses as $verse) {
-                $verseData = [];
-                $verseData['chapter'] = $verse->chapter;
-                $verseData['numv'] = $verse->numv;
-                $verseData['text'] = '';
-                if ($verse->headings) {
-                    foreach ($verse->headings as $heading) {
-                        $verseData['text'] .= $heading . ' ';
-                    }
-                }
-                if ($verse->text) {
-                    $verseData['text'] .= preg_replace('/<[^>]*>/', ' ', $verse->text);
-                }
-                $result['chapters'][$verse->chapter][] = $verseData;
-                $result['verses'][] = $verseData;
-                $verseCount++;
-            }
-            $chapterCount += count($result['chapters']);
-            if (array_key_exists('verses', $result)) {
-                $results[] = $result;
-            }
-        }
-        $view = $view->with('fullTextResults', [
-            'results' => $results,
-            'hitCount' => $form->grouping == 'chapter' ? $chapterCount : $verseCount,
-        ]);
         return $view;
     }
 
@@ -271,27 +178,6 @@ class SearchController extends BaseController
     }
 
     /**
-     * @param $sortedVerses
-     * @return VerseContainer[]
-     */
-    private function groupVersesByBook($sortedVerses, $translation)
-    {
-        $verseContainers = [];
-        foreach ($sortedVerses as $verse) {
-            $book = $verse->book;
-            $key = !$translation ?
-                $book->translation_id . '/' . $book->abbrev :
-                $book->abbrev;
-            if (!array_key_exists($key, $verseContainers)) {
-                $verseContainers[$key] = new VerseContainer($book);
-            }
-            $verseContainer = $verseContainers[$key];
-            $verseContainer->addVerse($verse);
-        }
-        return $verseContainers;
-    }
-
-    /**
      * @param $view
      * @param $searchParams
      * @return mixed
@@ -302,8 +188,7 @@ class SearchController extends BaseController
         foreach ($this->translationRepository->getAll() as $translation) {
             $params = clone $searchParams;
             $params->translationId = $translation->id;
-            $searcher = $this->searcherFactory->createSearcherFor($params);
-            $searchHits = $searcher->get();
+            $searchHits = $this->searchService->getSimpleResults($params);
             if ($searchHits) {
                 $translationHits[] = ['translation' => $translation, 'hitCount' => $searchHits->hitCount];
             }

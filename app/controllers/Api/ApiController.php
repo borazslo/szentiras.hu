@@ -4,6 +4,9 @@ namespace SzentirasHu\Controllers\Api;
 
 use BaseController;
 use Illuminate\Support\Facades\Config;
+use SzentirasHu\Lib\Search\FullTextSearchParams;
+use SzentirasHu\Lib\Search\SearcherFactory;
+use SzentirasHu\Lib\Search\SearchService;
 use URL;
 use Input;
 use Response;
@@ -41,19 +44,29 @@ class ApiController extends BaseController
      * @var \SzentirasHu\Lib\Reference\ReferenceService
      */
     private $referenceService;
+    /**
+     * @var \SzentirasHu\Lib\Search\SearcherFactory
+     */
+    private $searcherFactory;
+    /**
+     * @var SearchService
+     */
+    private $searchService;
 
     function __construct(
         TextService $textService,
         LectureSelector $lectureSelector,
         TranslationRepository $translationRepository,
         BookRepository $bookRepository,
-        ReferenceService $referenceService)
+        ReferenceService $referenceService,
+        SearchService $searchService)
     {
         $this->textService = $textService;
         $this->lectureSelector = $lectureSelector;
         $this->translationRepository = $translationRepository;
         $this->bookRepository = $bookRepository;
         $this->referenceService = $referenceService;
+        $this->searchService = $searchService;
     }
 
     public function getIndex()
@@ -152,6 +165,15 @@ class ApiController extends BaseController
             'canonicalUrl' => URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id)),
             'text' => $this->textService->getPureText($canonicalRef, $translation->id)
         ]);
+    }
+
+    public function getSearch($text)
+    {
+        $params = new FullTextSearchParams();
+        $params->text = $text;
+        $results = $this->searchService->getDetailedResults($params);
+        return $this->formatJsonResponse($results);
+
     }
 
     private function formatJsonResponse($data)
