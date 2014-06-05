@@ -112,6 +112,10 @@ class CanonicalReferenceTest extends TestCase
 
         $canonicalRef = CanonicalReference::fromString("Kor 13,1a-14,2b;14,2");
         $this->assertEquals("Kor 13,1a-14,2b|14,2", $canonicalRef->toString());
+        $canonicalRef = CanonicalReference::fromString("Kor 13,1|14");
+        $this->assertEquals("Kor 13,1|14", $canonicalRef->toString());
+        $canonicalRef = CanonicalReference::fromString("Kor 13,1-14,5");
+        $this->assertEquals("Kor 13,1-14,5", $canonicalRef->toString());
 
     }
 

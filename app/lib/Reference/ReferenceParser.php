@@ -160,7 +160,6 @@ class ReferenceParser
         $verseRanges[] = $this->verseRange();
         $nextToken = $this->lexer->peek();
         if ($nextToken['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR
-            || $nextToken['type'] == ReferenceLexer::T_CHAPTER_RANGE_SEPARATOR
         ) {
             if ($this->lexer->peek()['type'] == ReferenceLexer::T_NUMERIC
                 && $this->lexer->peek()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR
