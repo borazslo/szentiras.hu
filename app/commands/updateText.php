@@ -180,7 +180,7 @@ class UpdateText extends Command {
          DB::table('tdverse')->where('trans', '=', $translation->id)->delete();
          
          $this->info("Mysql tábla feltöltése...");         
-         DB::table('tdverse')->insert($inserts[4]);
+         DB::table('tdverse')->insert($inserts);
 
 }
 

@@ -28,7 +28,7 @@ class TestingCreateTdverse extends Migration {
                 $table->longText('versesimple');
                 $table->longText('verseroot');
                 $table->string('ido', 50);
-                $table->index(['did', 'trans']);
+                $table->index(['did', 'trans'],'`Index 1`');
             });
         }
 	}
