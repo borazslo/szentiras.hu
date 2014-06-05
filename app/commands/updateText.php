@@ -4,7 +4,7 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class updateText extends Command {
+class UpdateText extends Command {
 
     /**
      * The console command name.
@@ -45,13 +45,59 @@ class updateText extends Command {
         
         $bookRepository = \App::make('SzentirasHu\Models\Repositories\BookRepository');        
         $books = $bookRepository->getBooksByTranslation($translation->id);
-        foreach($books as $book)  
-            $books_number2id[$book->number] = $book->id;;
-
+        foreach($books as $book) {  
+            $books_number2id[$book->number] = $book->id;
+            $books_abbrev2id[$book->abbrev] = $book->id;
+        }
+        
         $dir = Config::get('settings.sourceDirectory');
         $file = $abbrev.".xls";
         $path = "{$dir}/{$file}";
         $this->info("A ".$path." betöltése...");
+        
+        /* Betöltjük a "Könyvek" lapot */
+        try {
+            $content = File::get($path);
+            $filetype = PHPExcel_IOFactory::identify($path);
+            $objReader = PHPExcel_IOFactory::createReader($filetype);
+            $objReader->setReadDataOnly(true);        
+            $objReader->setLoadSheetsOnly('Könyvek');             
+            $objPHPExcel = $objReader->load($path);
+            $objWorksheet = $objPHPExcel->getActiveSheet();
+        } catch (Exception $e) {
+            $this->error('nincs');
+            App::abort(500,'Nem sikerült a fájlt betölteni!');
+        }
+
+        $this->info("A 'Könyvek' beolvasása...");
+        $konyvoszlopok = array(
+            'SZIT'=>array(0,5),
+            'KNB'=>array(0,4),
+            'UF'=>array(),
+            'KG'=>array(0,4)
+        );
+        if(!isset($konyvoszlopok[$abbrev])) {
+            App::abort(500,'Ennél a szövegforrásnál ('.$abbrev.') nem tudjuk, hogy hol vannak a könyvek rövidítéseit feloldó oszlopok.');
+        }
+        
+        $max = $objWorksheet->getHighestRow();
+        $insert = array();
+        
+        for($i = 2;$i<$max;$i++) {
+            $row = $i;
+            $gepi = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($konyvoszlopok[$abbrev][0], $i)->getValue();
+            $rov = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($konyvoszlopok[$abbrev][1], $i)->getValue();
+            if(!isset($books_abbrev2id[$rov])) $hibasrov[] = $rov;
+            else $books_gepi2id[$gepi] = $books_abbrev2id[$rov];                                
+        }
+        
+        if(isset($hibasrov)) {
+            App::abort(500,"A következő rövidítések csak a szövegforrásban találhatóak meg, az adatbázisban nem!\n".implode(', ',$hibasrov));
+        }
+        
+        
+        /* Betöltjük a "$abbrev" lapot */
+        $this->info("Az '".$abbrev."' lap betöltése...");
         try {
             $content = File::get($path);
             $filetype = PHPExcel_IOFactory::identify($path);
@@ -64,7 +110,6 @@ class updateText extends Command {
             $this->error('nincs');
             App::abort(500,'Nem sikerült a fájlt betölteni!');
         }
-                
         /* fejlécek megszerzése */
         $this->info("A fejlécek megszerzése...");
         foreach ($objWorksheet->getRowIterator() as $row) {
@@ -75,7 +120,7 @@ class updateText extends Command {
             }
             break;
         }
-        
+
         /* oszlopok ellenőrzése */
         $fields = array('did'=>'*Ssz','gepi'=>'DCB_hiv','hiv'=>'szephiv','old'=>'DCB_old','tip'=>'jelstatusz','verse'=>'jel','ido'=>'ido');
         $errors = array(); 
@@ -112,14 +157,15 @@ class updateText extends Command {
             $values['verse'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($cols['jel'], $i)->getCalculatedValue();
             $values['verseroot'] = '??';
             $values['ido'] = gmdate ( 'Y-m-d H:i:s', PHPExcel_Shared_Date::ExcelToPHP( $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($cols['ido'], $i)->getValue()));
-            if(isset($books_number2id[(int) substr($gepi,0,3)])) $values['book_id'] = $books_number2id[(int) substr($gepi,0,3)]; 
-                else {
+            if(isset($books_gepi2id[(int) substr($gepi,0,3)])) $values['book_id'] = $books_gepi2id[(int) substr($gepi,0,3)]; 
+            else {
                     $this->error("A ".(int) substr($gepi,0,3)."-hez nincs `book_id`");
-                    App::abort(500,'Valami gond van a tdbook id/number párossal!');
+                    App::abort(500,'Valami gond van a books id/gepi párossal!');
                }
                     
             //if((isset($_REQUEST['gepi']) AND preg_match('/'.$_REQUEST['gepi'].'/i',$gepi)) OR !isset($_REQUEST['gepi'])) {}                     
-            echo "\e[1A".$abbrev." ".$values['gepi']."\n"; //": ".substr($values['verse'],0,140)."\n";
+            echo "\e[1A"; 
+            echo $abbrev." ".$values['gepi']."\n"; //": ".substr($values['verse'],0,140)."\n";
             $inserts[$i] = $values;
         }
          echo "\e[1A";
@@ -135,30 +181,7 @@ class updateText extends Command {
          
          $this->info("Mysql tábla feltöltése...");         
          DB::table('tdverse')->insert($inserts[4]);
-                           
-         
-/*
-         $query = "DELETE FROM ".DBPREF."tdverse WHERE  trans = ".$transsk[$trans];
-            if(isset($_REQUEST['gepi'])) $query .= " AND gepi REGEXP '".$_REQUEST['gepi']."'";
-            $query .= "\n";
-            db_query($query);
-            if($cli) echo $query;
-            $content .= "<pre>". $query."<br>"; 
-            echo "Mysql INSERT sorok elküldése...\n";
-            foreach ($insert as $ins) {
-                set_time_limit(60);
-                $fields = array(); $values = array();
-                foreach($ins as $k=>$v) {
-                    $fields[] = $k;
-                    $values[] = $v;
-                }
-                $query = "INSERT INTO ".DBPREF."tdverse (".implode(',',$fields).") VALUES ('".implode("','",$values)."');";
-                db_query($query);
-                $content .= $query."<br>";
-                if($cli) echo "mysql ".(time() - $starttime)." ".$trans." ".$ins['gepi'].": ".substr($query,99,130)."\n";
-                }
-            exit;
-            /**/
+
 }
 
     /**
