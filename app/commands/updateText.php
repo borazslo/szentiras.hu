@@ -36,22 +36,25 @@ class UpdateText extends Command {
      * @return mixed
      */
     public function fire()
-    {
+    {    
         $abbrev = $this->argument('abbrev');
         if(!preg_match("/^(".Config::get('settings.translationAbbrevRegex').")$/",$abbrev))  App::abort(500,'Hibás fordítás rövidítés!');
 
         $translationRepository = \App::make('SzentirasHu\Models\Repositories\TranslationRepository');        
-        $translation = $translationRepository->getByAbbrev($abbrev);
-        
+        $translation = $translationRepository->getByAbbrev($abbrev);    
+     
+        if($this->option('file')) $file = $this->option('file');
+        else $file = $abbrev.".xls";       
+     
         $bookRepository = \App::make('SzentirasHu\Models\Repositories\BookRepository');        
         $books = $bookRepository->getBooksByTranslation($translation->id);
         foreach($books as $book) {  
             $books_number2id[$book->number] = $book->id;
-            $books_abbrev2id[$book->abbrev] = $book->id;
+            $books_abbrev2id[$book->abbrev] = $book->id;           
         }
         
         $dir = Config::get('settings.sourceDirectory');
-        $file = $abbrev.".xls";
+       
         $path = "{$dir}/{$file}";
         $this->info("A ".$path." betöltése...");
         
@@ -73,7 +76,7 @@ class UpdateText extends Command {
         $konyvoszlopok = array(
             'SZIT'=>array(0,5),
             'KNB'=>array(0,4),
-            'UF'=>array(),
+            'UF'=>array(0,4),
             'KG'=>array(0,4)
         );
         if(!isset($konyvoszlopok[$abbrev])) {
@@ -83,18 +86,17 @@ class UpdateText extends Command {
         $max = $objWorksheet->getHighestRow();
         $insert = array();
         
-        for($i = 2;$i<$max;$i++) {
+        for($i = 2;$i<=$max;$i++) {
             $row = $i;
             $gepi = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($konyvoszlopok[$abbrev][0], $i)->getValue();
             $rov = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($konyvoszlopok[$abbrev][1], $i)->getValue();
-            if(!isset($books_abbrev2id[$rov])) $hibasrov[] = $rov;
-            else $books_gepi2id[$gepi] = $books_abbrev2id[$rov];                                
+            if(!isset($books_abbrev2id[$rov]) AND  $rov != '-') $hibasrov[] = $rov;
+            elseif($rov != '-') $books_gepi2id[$gepi] = $books_abbrev2id[$rov];                                
         }
         
         if(isset($hibasrov)) {
             App::abort(500,"A következő rövidítések csak a szövegforrásban találhatóak meg, az adatbázisban nem!\n".implode(', ',$hibasrov));
         }
-        
         
         /* Betöltjük a "$abbrev" lapot */
         $this->info("Az '".$abbrev."' lap betöltése...");
@@ -204,7 +206,7 @@ class UpdateText extends Command {
     protected function getOptions()
     {
         return array(
-            //array('example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null),
+            array('file', null, InputOption::VALUE_OPTIONAL, 'File to use for the import', null),
         );
     }
 
