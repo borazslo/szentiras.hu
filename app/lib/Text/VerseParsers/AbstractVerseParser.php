@@ -3,9 +3,10 @@
 
  */
 
-namespace SzentirasHu\Controllers\Display\VerseParsers;
+namespace SzentirasHu\Lib\Text\VerseParsers;
 
 
+use SzentirasHu\Controllers\Display\VerseParsers\VerseData;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Verse;
 

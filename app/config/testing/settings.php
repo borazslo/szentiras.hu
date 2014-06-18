@@ -3,5 +3,5 @@
 return [
     'defaultTranslationId' => 1,
     'defaultTranslationAbbrev' => 'TESTTRANS',
-    'translationAbbrevRegex' => 'TESTTRANS.*',
+    'translationAbbrevRegex' => 'TESTTRANS\d*',
 ];

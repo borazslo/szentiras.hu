@@ -2,6 +2,7 @@
 
 namespace SzentirasHu\Controllers\Home;
 
+use SzentirasHu\Lib\LectureDownloader;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Models\Entities\Verse;
@@ -19,19 +20,22 @@ class LectureSelector
      * @var \SzentirasHu\Lib\Reference\ReferenceService
      */
     private $referenceService;
+    /**
+     * @var \SzentirasHu\Lib\LectureDownloader
+     */
+    private $lectureDownloader;
 
-    public function __construct(BookRepository $bookRepository, ReferenceService $referenceService)
+    public function __construct(BookRepository $bookRepository, ReferenceService $referenceService, LectureDownloader $lectureDownloader)
     {
         $this->bookRepository = $bookRepository;
         $this->referenceService = $referenceService;
+        $this->lectureDownloader = $lectureDownloader;
     }
 
-    public function getLectures($date = false)
+    public function getLectures()
     {
-        $date = $date ? $date : date("Ymd");
         $resultLectures = array();
-        $lectureDownloader = \App::make('SzentirasHu\Lib\LectureDownloader', [$date]);
-        $referenceString = $lectureDownloader->getReferenceString();
+        $referenceString = $this->lectureDownloader->getReferenceString();
         if (!$referenceString) {
             return $resultLectures;
         }

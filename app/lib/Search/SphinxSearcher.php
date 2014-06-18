@@ -10,8 +10,9 @@ use Config;
 use Sphinx\SphinxClient;
 use SphinxSearch;
 
-class SphinxSearcher
+class SphinxSearcher implements Searcher
 {
+
     /**
      * @var SphinxSearch
      */
@@ -80,9 +81,6 @@ class SphinxSearcher
         return $this->sphinxClient->buildExcerpts($verses, "verse", $this->addAlternatives($this->params), ['query_mode' => 1]);
     }
 
-    /**
-     * @return FullTextSearchResult|false
-     */
     public function get()
     {
         $sphinxResult = $this->sphinxClient->get();
@@ -93,7 +91,7 @@ class SphinxSearcher
 
             return $fullTextSearchResult;
         } else {
-            return false;
+            return null;
         }
     }
 

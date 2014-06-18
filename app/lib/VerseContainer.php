@@ -5,7 +5,7 @@
 namespace SzentirasHu\Lib;
 
 use SzentirasHu\Controllers\Display\VerseParsers\VerseData;
-use SzentirasHu\Controllers\Display\VerseParsers\VerseParser;
+use SzentirasHu\Lib\Text\VerseParsers\VerseParser;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Verse;
 
@@ -21,7 +21,7 @@ class VerseContainer
     public $book;
     public $bookRef;
     /**
-     * @var VerseParser
+     * @var \SzentirasHu\Lib\Text\VerseParsers\VerseParser
      */
     private $verseParser;
     /**
@@ -29,7 +29,7 @@ class VerseContainer
      */
     public $rawVerses;
 
-    function __construct($book, $bookRef=false)
+    function __construct($book, $bookRef=null)
     {
         $this->book = $book;
         $this->rawVerses = [];

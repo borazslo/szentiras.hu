@@ -39,4 +39,9 @@ class TranslationRepositoryEloquent implements TranslationRepository {
     {
         return Translation::remember(120)->find($id);
     }
+
+    public function getDefault()
+    {
+        return Translation::remember(120)->find(\Config::get('settings.defaultTranslationId'));
+    }
 }

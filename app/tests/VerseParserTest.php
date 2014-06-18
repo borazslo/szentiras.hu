@@ -1,7 +1,7 @@
 <?php
 
-use SzentirasHu\Controllers\Display\VerseParsers\KGVerseParser;
-use SzentirasHu\Controllers\Display\VerseParsers\KNBVerseParser;
+use SzentirasHu\Lib\Text\VerseParsers\KGVerseParser;
+use SzentirasHu\Lib\Text\VerseParsers\KNBVerseParser;
 use SzentirasHu\Models\Entities\Book;
 use SzentirasHu\Models\Entities\Verse;
 

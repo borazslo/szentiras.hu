@@ -17,5 +17,7 @@ interface TranslationRepository {
 
     public function getById($id);
 
+    public function getDefault();
+
 
 } 

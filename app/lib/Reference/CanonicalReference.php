@@ -71,4 +71,19 @@ class CanonicalReference
         return $result;
     }
 
+    /**
+     * @param ChapterRange $chapterRange
+     * @return array
+     */
+    public static function collectChapterIds($chapterRange)
+    {
+        $searchedChapters = [];
+        $currentChapter = $chapterRange->chapterRef->chapterId;
+        do {
+            $searchedChapters[] = $currentChapter;
+            $currentChapter++;
+        } while ($chapterRange->untilChapterRef && $currentChapter <= $chapterRange->untilChapterRef->chapterId);
+        return $searchedChapters;
+    }
+
 }

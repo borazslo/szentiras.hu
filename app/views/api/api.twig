@@ -9,92 +9,56 @@
                 href="https://github.com/borazslo/szentiras.hu/wiki/Fejlesztői-tudnivalók">github.com/borazslo/szentiras.hu/wiki/Fejlesztői-tudnivalók</a>
     </p>
     <h4>Widgetek, pluginek, stb.</h4>
-    <p>Elkészült egy igemutató böngésző kiegészítő <a
+    <p>Elkészült egy <a href="http://molnarm.github.io/igemutato/">igemutató kiegészítő</a> ami a bibliai hivatkozásokat automatikusan átalakítja, hogy felugró ablkaban lehessen olvasni a teljes szöveget.</p>
+    <p> A script beilleszthető bármilyen honlapba vagy telepíthető <a
                 href="https://chrome.google.com/webstore/detail/szent%C3%ADr%C3%A1s/mooikajlieddnjlmlbodldompfifkoim">Google
-            Chrome-hoz</a> és <a href=" https://addons.mozilla.org/hu/firefox/addon/szent%C3%ADr%C3%A1s/">Mozilla
-            Firefoxhoz</a>. A forráskódja pedig nyilt: <a href="https://github.com/molnarm/igemutato">github.com/molnarm/igemutato</a>
+            Chrome</a> és <a href=" https://addons.mozilla.org/hu/firefox/addon/szent%C3%ADr%C3%A1s/">Mozilla
+            Firefox</a> böngészőkben. További információ: <a href="http://molnarm.github.io/igemutato/">molnarm.github.io/igemutato</a>
     </p>
     <p>Ha további widget/plugin ötlete vagy igénye van szívesen segítünk a kifejlesztésében.
         Létező munkáját kérjük ossza meg velünk, hogy másoknak is hasznára lehessen.</p>
 
     <h3>API</h3>
     <p><strong>Kérünk minden API fejlesztőt/használót, hogy egy emailben jelentkezzen, hogy értesíteni tudjuk az
-            esetlegese API fejlesztésekről!</strong></p>
-    <p>Az egyes szentírási szakaszokat távolról is el lehet érni
-        <a href="http://hu.wikipedia.org/wiki/JSON">JSON</a> formátumban.
-        {% set exampleUrl = url('api/idezet/1Kor13,10-13') %}
-        Például: <a href="{{ exampleUrl }}">{{ exampleUrl }}</a> hivatkozás bekérésével.
-        További részletek, lehetőségek, és PHP-ben alkalmazásra példa lejjebb az API dokumentációban.</p>
-    <p>Kérésre elérhetővé tesszük XML vagy bármely más közismert formátumban is.</p>
+            esetleges API fejlesztésekről!</strong></p>
+    <p>Minden API hívás JSON formátumú válasszal tér vissza.</p>
+    <h4>idezet</h4>
+    Megadott szentírási hely(ek) megjelenítése alapértelmezett vagy megadott fordításban.
+    {% set exampleUrl = url('api/idezet/1Kor13,10-13') %}
+    <p>Példa: <a href="{{ exampleUrl }}">{{ exampleUrl }}</a></p>
+    <h5>Paraméterek:</h5>
+    <dl>
+        <dt>Hivatkozás*</dt>
+        <dd>A szentírási hely hivatkozása, lényegében bármilyen elfogadott formátumban, bármely fordítás szerint, pl. <code>1Kor13,10-13</code></dd>
+        <dt>Fordítás</dt>
+        <dd>A fordítás rövidítése. Ha nincs megadva, az alapértelmezett fordítás alapján ad vissza találatot.</dd>
+    </dl>
+    <h4>forditasok</h4>
+    Egyetlen szentírási vers megjelenítése az összes elérhető fordításban<br>
+    Példa:
+    {% set exampleUrl = 'api/forditasok/10100100100' %}
+    <a href="{{ exampleUrl }}">{{ url(exampleUrl) }}</a></p>
 
-    <h4>API: általános leírás</h4>
-    <p>A kéréseket a {{ url('/api') }}/<i>feladat</i>/<i>beállítás</i> hivatkozás meghívásával kell elindítani.
-        Ez a lekérés egyelőre mindig egy JSON objektummal tér vissza.
-    <ul>A visszatérő objektumban szerepel egy
-        <li>'keres': ami tartalmazza a lekérdezés adatait</li>
-        <li>'valasz': ami az eredményeket tartalmazza, hiba esetén üres</li>
-        <li>'hiba': abban az esetben, ha valami hiba törént.</li>
+    <em>hivatkozas</em> (kötelező): pl. <i>10100100200</i> (Jelenleg csak az úgynevezett <i>gépi kód</i>dal lehet
+    verset keresni.
+    Ez 11 számjegyből áll: 1. Ószöv/Újszöv, 2-3. könyv, 4-6. fejezet, 7-9. vers, 10-11. alvers.)<br>
+
+    <h4>books</h4>
+    Adott fordítás könyveinek listája.
+    Példák: <ul>
+        <li><a href='/api/books'>{{ url('/api/books')}}</a></li>
+        <li><a href='/api/books/KG'>{{ url('/api/books/KG')}}</a></li></li>
     </ul>
-    Például:
-    <pre>
-{
-    "keres": {
-        "feladat": "idezet",
-        "hivatkozas": "1Kor13,10",
-        "forma": "json"
-    },
-    "valasz": {
-        "versek": [
-            {
-                "hely": {
-                    "gepi": "20701301000",
-                    "szep": "1Kor 13,10"
-                },
-                "szoveg": "amikor pedig eljön majd a tökéletes, a töredékes véget fog érni."
-            }
-        ],
-        "forditas": {
-            "nev": "Káldi-Neovulgáta",
-            "rov": "KNB"
-        }
-    }
-}
-</pre>
-    <h4>API: lehetséges beállítások</h4>
-    <p><strong>api/idezet/hivatkozas/forditas</strong><br>Adott szentírási szakasz megjelenítése.<br>
-        <em>hivatkozas</em> (kötelező): pl. api/idezet/<i>1Kor13,10</i><br>
-        <em>forditas</em>: pl. <i>KNB</i> vagy <i>UF</i><br>
-        Példa: {{ url('api/idezet/1Kor13,10-13/UF') }}</p>
-    <p><strong>api/forditasok</strong><br>Egyetlen szentírási vers megjelenítése az összes elérhető fordításban<br>
-        <em>hivatkozas</em> (kötelező): pl. <i>10100100200</i> (Jelenleg csak az úgynevezett <i>gépi kód</i>dal lehet
-        verset keresni.
-        Ez 11 számjegyből áll: 1. Ószöv/Újszöv, 2-3. könyv, 4-6. fejezet, 7-9. vers, 10-11. alvers.)<br>
-        Példa:
-        {% set exampleUrl = 'api/forditasok/10100100100' %}
-        <a href="{{ exampleUrl }}">{{ url(exampleUrl) }}</a></p>
 
-    <h4>API: PHP példa</h4>
-    <pre>
-&lt;?php
-$json = file_get_contents('{{ url('api/forditasok/10100100100') }}');
-$data = json_decode($json, TRUE);
-    echo "&lt;pre&gt;".print_r($data,1)."&lt;/pre&gt;";
-?&gt;
-</pre>
-    <pre>
-&lt;php
-$json = file_get_contents('{{ url('api/idezet/1Kor2,10-14') }}');
-$data = json_decode($json, TRUE);
+    <h4>ref</h4>
+    Megadott hivatkozás teljes szövege.
+    Példák:
+    {% set example = '1Kor 2,2-3.4;Jn 1,1-2' %}
+    <ul>
+    <li><a href='/api/ref/{{ example }}'>{{ url('/api/ref/' ~ example )}}</a></li>
+    <li><a href='/api/ref/{{ example }}/KG'>{{ url('/api/ref/' ~ example ~ '/KG')}}</a></li></li>
+</ul>
 
-if($data['valasz'] == '') echo '&lt;strong&gt;Hiba történt:&lt;strong&gt; '.$data['hiba'];
-else {
-    echo "&lt;strong&gt;1Kor2,10-14:&lt;/strong&gt;&lt;br&gt;\n";
-    foreach($data['valasz']['versek'] as $vers) {
-        echo $vers['szoveg']." ";
-    }
-}
-?&gt;
-
-</pre>
+    <h4>search</h4>
 
 {% endblock %}

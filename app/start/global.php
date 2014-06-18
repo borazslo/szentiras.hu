@@ -11,8 +11,6 @@
 |
 */
 
-use SzentirasHu\Controllers\Display\VerseParsers\KGVerseParser;
-
 ClassLoader::addDirectories(array(
 
 	app_path().'/commands',
@@ -87,9 +85,9 @@ Event::listen("illuminate.query", function($query, $bindings, $time, $name){
 });
 
 App::instance("verseParsers", [
-    1 => App::make('SzentirasHu\Controllers\Display\VerseParsers\DefaultVerseParser'),
-    2 => App::make('SzentirasHu\Controllers\Display\VerseParsers\DefaultVerseParser'),
-    3 => App::make('SzentirasHu\Controllers\Display\VerseParsers\KNBVerseParser'),
-    4 => App::make('SzentirasHu\Controllers\Display\VerseParsers\KGVerseParser'),
+    1 => App::make('SzentirasHu\Lib\Text\VerseParsers\DefaultVerseParser'),
+    2 => App::make('SzentirasHu\Lib\Text\VerseParsers\DefaultVerseParser'),
+    3 => App::make('SzentirasHu\Lib\Text\VerseParsers\KNBVerseParser'),
+    4 => App::make('SzentirasHu\Lib\Text\VerseParsers\KGVerseParser'),
 
 ]);
