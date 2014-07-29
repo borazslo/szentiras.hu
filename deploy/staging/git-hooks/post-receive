@@ -11,7 +11,7 @@ do
     echo "<?php return [ 'hash' => '`git rev-parse HEAD`' ];" > app/config/$branch/version.php
     export MYSQL_SZENTIRAS_USER=szentiras
     export MYSQL_SZENTIRAS_PASSWORD=
-    export SZENTIRAS_WEBAPP_ENVIRONMENT=staging
+    export SZENTIRAS_WEBAPP_ENVIRONMENT=$branch
     sh install.sh
     php artisan up
 done
