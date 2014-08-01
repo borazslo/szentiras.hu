@@ -16,5 +16,7 @@ do
     echo "<?php return [ 'hash' => '`git rev-parse HEAD`' ];" > app/config/$appEnv/version.php
     export SZENTIRAS_WEBAPP_ENVIRONMENT=$appEnv
     sh install.sh
+    php artisan cache:clear
+    php artisan twig:clear
     php artisan up
 done
