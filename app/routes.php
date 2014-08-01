@@ -4,16 +4,16 @@ require('views/Composers/viewComposers.php');
 
 Route::get('/', 'SzentirasHu\Controllers\Home\HomeController@index');
 
-Route::controller("kereses", 'SzentirasHu\Controllers\Search\SearchController');
+Route::controller("/kereses", 'SzentirasHu\Controllers\Search\SearchController');
 
 /** API */
-Route::controller("api", 'SzentirasHu\Controllers\Api\ApiController');
+Route::controller("/api", 'SzentirasHu\Controllers\Api\ApiController');
 
-Route::get('info', function() {
+Route::get('/info', function() {
    return View::make('info.info');
 });
 
-Route::get('API', function () {
+Route::get('/API', function () {
     if (Input::get('feladat') === 'idezet') {
         return Redirect::action('SzentirasHu\Controllers\Api\ApiController@getIdezet', [Input::get('hivatkozas'), Input::get('forditas')], 301);
     } else if (Input::get('feladat') === '') {

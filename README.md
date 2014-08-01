@@ -59,12 +59,11 @@ A Laravel keretrendszert használjuk.
 ###API/Fejlesztőknek
 - JSON válaszokat ad megfelelő kérésekre DONE (JSON)
 - főként a keresésekre válaszol és elvileg mindent tudnia kéne, amit a keresőnek, csak más formátumban válaszol DONE (legalábbis az kész, ami volt)
-- könyvek automatikus /epub kimenetele ill. abból generált /mobi (havont egyszer gyárt, onnantól mindig azt hviatkozza) (ez nem megy az élesen sem)
+- TODO: könyvek automatikus /epub kimenetele ill. abból generált /mobi (havont egyszer gyárt, onnantól mindig azt hviatkozza)
 
 ###Egyéb
-- pár statikusabb oldal kéne ill van (címlap, infó, impresszum, stb.) (nem kell szerkesztő felület)
-- agresszív cache: a php script a végén html-ben lementi az oldalt, legközelebb azt hozza be - ez már nincs, de van egy csomó cache-elés, főleg db
+- pár statikusabb oldal van (címlap, infó, impresszum, stb.) (nem kell szerkesztő felület)
+- cache: van egy csomó cache-elés, főleg db
 - mysql cache: a kereséseket logolja és cacheli, hogy az alternítvákat jól mutassa és lássam mi megy az életben DONE
 - rövid urlek (és régi-régi linkek hosszú url-jeit is értelmezi) DONE
-- GoogleAnalytics egyelőre igénytelenül (pl. kereséseket nem követ) DONE
-- cron napi/heti/havi: adatbázis karbantartás, felesleges fájlok törlése TO BE DELETED
+- GoogleAnalytics DONE
