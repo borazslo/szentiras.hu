@@ -4,12 +4,17 @@ do
     branch=$(git rev-parse --symbolic --abbrev-ref $refname)
     echo Received ref $refname meaning branch $branch
     echo Branch $branch push received
-    echo Shutting down the app
     cd /home/szentiras_hu_git/github/borazslo/
-    if [ ! -d "$branch.szentiras.hu" ]; then
-      git clone szentiras.hu.git $branch.szentiras.hu
+    if [ "$branch" == "master" ]; then
+      appEnv=staging
+    else
+      appEnv=$branch
     fi
-    cd $branch.szentiras.hu
+    if [ ! -d "$appEnv.szentiras.hu" ]; then
+      git clone szentiras.hu.git $appEnv.szentiras.hu
+    fi
+    echo Shutting down the app
+    cd $appEnv.szentiras.hu
     if [ -f composer.lock ]; then
        php artisan down
     fi
