@@ -67,6 +67,12 @@ App::down(function()
 	return Response::make("Karbantartás", 503);
 });
 
+
+App::missing(function($exception) {
+    Log::warning("404 for request: ". Request::url());
+    return Response::make('A kért oldal nem található. <a href="/">Vissza a címlapra</a>', 404);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Require The Filters File
