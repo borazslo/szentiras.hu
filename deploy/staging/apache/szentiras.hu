@@ -3,8 +3,6 @@
         ServerName staging.szentiras.hu
         ServerAlias staging.szentiras.hu
 
-        SetEnv MYSQL_SZENTIRAS_USER usernameGoesHere
-        SetEnv MYSQL_SZENTIRAS_PASSWORD passwordGoesHere
         SetEnv SZENTIRAS_WEBAPP_ENVIRONMENT staging
 
         DocumentRoot /home/szentiras_hu_git/github/borazslo/szentiras.hu/public

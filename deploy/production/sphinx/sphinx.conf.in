@@ -13,7 +13,7 @@ source verses_source
 
 	sql_query		= \
 		SELECT id, gepi, trans, book_number, chapter, numv, tip, verse \
-		FROM staging_tdverse \
+		FROM kar_tdverse \
     WHERE tip IN (60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704)
 
 	sql_attr_uint = trans
@@ -22,7 +22,7 @@ source verses_source
 	sql_attr_bigint = gepi
 	sql_attr_uint = tip
 
-	sql_query_info = SELECT * FROM staging_tdverse WHERE id=$id
+	sql_query_info = SELECT * FROM kar_tdverse WHERE id=$id
 	sql_query_pre = SET NAMES utf8
     sql_query_pre = SET SESSION query_cache_type=OFF
     sql_query_pre = SET CHARACTER_SET_RESULTS=utf8
@@ -32,7 +32,7 @@ source verses_root_source : verses_source
 {
     sql_query		= \
     SELECT id, gepi, trans, book_number, chapter, numv, tip, verseroot \
-    FROM staging_tdverse \
+    FROM kar_tdverse \
     WHERE tip IN (60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704)
 
 }
@@ -40,7 +40,7 @@ source verses_root_source : verses_source
 index verse
 {
 	source	= verses_source
-	path = /home/szentiras_hu_git/github/borazslo/staging.szentiras.hu/app/storage/sphinx/verse_index
+	path = /home/szentiras_hu_git/github/borazslo/production.szentiras.hu/app/storage/sphinx/verse_index
 	charset_type = utf-8
 	enable_star = 1
 	min_infix_len = 3
@@ -58,7 +58,7 @@ index verse
 index verse_root : verse
 {
     source = verses_root_source
-    path = /home/szentiras_hu_git/github/borazslo/staging.szentiras.hu/app/storage/sphinx/verse_root_index
+    path = /home/szentiras_hu_git/github/borazslo/production.szentiras.hu/app/storage/sphinx/verse_root_index
 }
 
 
@@ -70,12 +70,12 @@ indexer
 
 searchd
 {
-	listen			= 19312
-	log			= /home/szentiras_hu_git/github/borazslo/staging.szentiras.hu/app/storage/logs/sphinx/sphinx_searchd.log
-	query_log		= /home/szentiras_hu_git/github/borazslo/staging.szentiras.hu/app/storage/logs/sphinx/sphinx_query.log
+	listen			= 9312
+	log			= /home/szentiras_hu_git/github/borazslo/production.szentiras.hu/app/storage/logs/sphinx/sphinx_searchd.log
+	query_log		= /home/szentiras_hu_git/github/borazslo/production.szentiras.hu/app/storage/logs/sphinx/sphinx_query.log
 	read_timeout		= 5
 	max_children		= 30
-	pid_file		= /home/szentiras_hu_git/github/borazslo/staging.szentiras.hu/app/storage/logs/sphinx/sphinx_searchd.pid
+	pid_file		= /home/szentiras_hu_git/github/borazslo/production.szentiras.hu/app/storage/logs/sphinx/sphinx_searchd.pid
 	max_matches		= 1000
 	seamless_rotate		= 1
 	preopen_indexes		= 1
