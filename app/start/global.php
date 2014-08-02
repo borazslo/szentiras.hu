@@ -48,7 +48,8 @@ Log::useDailyFiles(storage_path().'/logs/laravel.log', 0, Config::get('settings.
 
 App::error(function(Exception $exception, $code)
 {
-	Log::error($exception);
+	Log::error("Exception on request: " . Request::url() . " referer: " . Request::header('Referer') . ". " . $exception);
+
 });
 
 /*
