@@ -125,19 +125,22 @@ class TextDisplayController extends \BaseController
                     $groupedVerses[$verse['chapter']][$verse['numv']] = $this->getTeaser([$verseContainer]);
                 }
             }
-            $translations = $this->translationRepository->getAllOrderedByDenom();
+            $allTranslations = $this->translationRepository->getAllOrderedByDenom();
+            $bookTranslations = $this->getAllBookTranslations($book);
             return View::make('textDisplay.book', [
                 'translation' => $translation,
                 'reference' => $translatedRef,
                 'book' => $book,
                 'groupedVerses' => $groupedVerses,
-                'translations' => $translations,
-                'translationLinks' => $translations->map(
-                        function ($translation) use ($canonicalRef) {
+                'translations' => $allTranslations,
+                'translationLinks' => $allTranslations->map(
+                        function ($translation) use ($canonicalRef, $bookTranslations) {
+                            $bookExistsInTranslation = $bookTranslations->contains($translation->id);
                             return [
                                 'id' => $translation->id,
                                 'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
-                                'abbrev' => $translation->abbrev];
+                                'abbrev' => $translation->abbrev,
+                                'enabled' => $bookExistsInTranslation];
                         }
                     )
 
@@ -190,5 +193,18 @@ class TextDisplayController extends \BaseController
             $this->referenceService->getCanonicalUrl($nextRef, $translation->id) :
             false;
         return ['prevLink' => $prevLink, 'nextLink' => $nextLink];
+    }
+
+    /**
+     * @param $book
+     * @return mixed
+     */
+    private function getAllBookTranslations($book)
+    {
+        $translations = $this->translationRepository->getAllOrderedByDenom()->filter(function ($translation) use ($book) {
+                return $this->bookRepository->getByAbbrevForTranslation($book->abbrev, $translation->id);
+            }
+        );
+        return $translations;
     }
 }
