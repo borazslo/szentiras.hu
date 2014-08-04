@@ -33,9 +33,14 @@ class ReferenceService
         $this->verseRepository = $verseRepository;
     }
 
-    public function getExistingBookRef(CanonicalReference $ref)
+    public function getExistingBookRef(CanonicalReference $ref, $translationId = false)
     {
-        foreach ($this->translationRepository->getAll() as $translation) {
+        if ($translationId) {
+            $translations = [ $this->translationRepository->getById($translationId) ];
+        } else {
+            $translations = $this->translationRepository->getAll();
+        }
+        foreach ($translations as $translation) {
             $storedBookRef = $this->findStoredBookRef($ref->bookRefs[0], $translation->id);
             if ($storedBookRef) {
                 return $storedBookRef;
@@ -130,4 +135,4 @@ class ReferenceService
         return [$prevRef, $nextRef];
     }
 
-} 
+}

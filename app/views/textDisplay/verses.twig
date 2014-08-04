@@ -23,7 +23,7 @@
              {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
             </p>
             <p>
-                {% include 'textDisplay.translationButtons' with { 'translations' :  translations, 'translation': translation, 'translationLinks' : translationLinks } %}
+                {% include 'textDisplay.translationButtons' with { 'translations' : translations, 'translation': translation, 'translationLinks' : translationLinks } %}
             </p>
             <p>
                 {% if chapterLinks.prevLink %}
@@ -36,4 +36,8 @@
         </div>
         <hr>
     {% endfor %}
+    <div>
+            <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleNumv">Versszámozás</a>
+            <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleXrefs">Hivatkozások</a>
+    </div>
 {% endblock %}

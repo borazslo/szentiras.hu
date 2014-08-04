@@ -1,1 +1,4 @@
-define ['quickSearch'], ->
+define [
+  'quickSearch',
+  'textDisplay'
+], ->
