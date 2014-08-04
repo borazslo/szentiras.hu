@@ -135,7 +135,7 @@ class TextDisplayController extends \BaseController
                 }
             }
             $allTranslations = $this->translationRepository->getAllOrderedByDenom();
-            $bookTranslations = $this->getAllBookTranslations($book);
+            $bookTranslations = $this->getAllBookTranslations($book->abbrev);
             return View::make('textDisplay.book', [
                 'translation' => $translation,
                 'reference' => $translatedRef,
