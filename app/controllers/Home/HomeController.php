@@ -4,8 +4,6 @@ namespace SzentirasHu\Controllers\Home;
 
 use BaseController;
 use SzentirasHu\Models\Entities\Article;
-use SzentirasHu\Models\Entities\News;
-use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 
 /**

@@ -96,10 +96,19 @@ class TextDisplayController extends \BaseController
                 'chapterLinks' => $chapterLinks,
                 'translationLinks' => $translations->map(
                         function ($translation) use ($canonicalRef) {
+                            $allBooksExistInTranslation = true;
+                            foreach ($canonicalRef->bookRefs as $bookRef) {
+                                if (!$this->getAllBookTranslations($bookRef->bookId)->contains($translation->id)) {
+                                    $allBooksExistInTranslation = false;
+                                    break;
+                                }
+                            }
                             return [
                                 'id' => $translation->id,
                                 'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
-                                'abbrev' => $translation->abbrev];
+                                'abbrev' => $translation->abbrev,
+                                'enabled' => $allBooksExistInTranslation
+                            ];
                         }
                     )
             ]);
@@ -199,10 +208,10 @@ class TextDisplayController extends \BaseController
      * @param $book
      * @return mixed
      */
-    private function getAllBookTranslations($book)
+    private function getAllBookTranslations($bookAbbrev)
     {
-        $translations = $this->translationRepository->getAllOrderedByDenom()->filter(function ($translation) use ($book) {
-                return $this->bookRepository->getByAbbrevForTranslation($book->abbrev, $translation->id);
+        $translations = $this->translationRepository->getAllOrderedByDenom()->filter(function ($translation) use ($bookAbbrev) {
+                return $this->bookRepository->getByAbbrevForTranslation($bookAbbrev, $translation->id);
             }
         );
         return $translations;
