@@ -4,14 +4,15 @@
     "license": "MIT",
     "require": {
         "laravel/framework": "4.1.*",
-        "barryvdh/laravel-twigbridge": "dev-master",
+        "barryvdh/laravel-twigbridge": "0.3.3",
         "twig/extensions": "1.0.*",
         "doctrine/dbal": "2.3.*",
         "barryvdh/laravel-ide-helper": "1.*",
-        "barryvdh/laravel-cors": "dev-master",
+        "barryvdh/laravel-cors": "0.2.2",
         "gigablah/sphinxphp": "2.0.*",
         "barryvdh/laravel-debugbar": "1.*",
-		"phpoffice/phpexcel": "1.*"
+		"phpoffice/phpexcel": "1.*",
+        "endroid/qrcode": "1.2.4"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
