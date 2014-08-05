@@ -4,15 +4,17 @@ define ['jquery'], ->
     delay = 400;
     $('#toggleNumv').click ->
       if ($('#toggleNumv').hasClass('active'))
-        $('.numv').hide(delay)
+        $('.numv').fadeOut(delay)
         $('#toggleNumv').removeClass('active')
       else
-        $('.numv').show(delay)
+        $('.numv').fadeIn(delay)
         $('#toggleNumv').addClass('active')
     $('#toggleXrefs').click ->
       if ($('#toggleXrefs').hasClass('active'))
-        $('.xref').hide(delay)
+        $('.xref').fadeOut(delay)
         $('#toggleXrefs').removeClass('active')
       else
-        $('.xref').show(delay)
+        $('.xref').fadeIn(delay)
         $('#toggleXrefs').addClass('active')
+
+  initToggler()

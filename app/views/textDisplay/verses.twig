@@ -25,7 +25,7 @@
         <div>
             {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book, 'bookRef': verseContainer.bookRef } %}
         </div>
-        <div>
+        <div class="parsedVerses">
             <p>
              {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
             </p>
