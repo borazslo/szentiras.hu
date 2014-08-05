@@ -81,7 +81,9 @@ class SearchController extends BaseController
             ];
         }
         $suggestions = $this->searchService->getSuggestionsFor($term);
-        $result = array_merge($result, $suggestions);
+        if (is_array($suggestions)) {
+            $result = array_merge($result, $suggestions);
+        }
         return Response::json($result);
     }
 
