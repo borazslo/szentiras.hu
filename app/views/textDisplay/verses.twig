@@ -9,6 +9,13 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Modal -->
+    <div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
     <div class="pull-right panel panel-default">
         <div class="panel-body" class="share">
             {% include 'textDisplay.share' with { 'canonicalUrl' : canonicalUrl, 'teaser' : teaser } %}
