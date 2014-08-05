@@ -135,11 +135,13 @@ class SearchController extends BaseController
         if ($translatedRef) {
             $translation = $form->translation ? $form->translation : $this->translationRepository->getDefault();
             $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation->id);
-            $augmentedView = $view->with('bookRef', [
-                'label' => $translatedRef->toString(),
-                'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
-                'verseContainers' => $verseContainers
-            ]);
+            if ($verseContainers) {
+                $augmentedView = $view->with('bookRef', [
+                    'label' => $translatedRef->toString(),
+                    'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
+                    'verseContainers' => $verseContainers
+                ]);
+            }
         }
         return $augmentedView;
     }
