@@ -31,6 +31,10 @@ Route::get('/hang/{id}', 'SzentirasHu\Controllers\Display\AudioBookController@sh
 
 /** TEXT DISPLAY */
 
+/** QR code */
+Route::get('/qr/dialog/{url}', 'SzentirasHu\Controllers\Display\QrCodeController@dialog')->where('url', '.+');
+Route::get('/qr/img/{url}', 'SzentirasHu\Controllers\Display\QrCodeController@index')->where('url', '.+');
+
 Route::get('/forditasok', 'SzentirasHu\Controllers\Display\TextDisplayController@showTranslationList');
 
 Route::get('/{TRANSLATION_ABBREV}', 'SzentirasHu\\Controllers\\Display\\TextDisplayController@showTranslation')
@@ -42,3 +46,4 @@ Route::get('/{TRANSLATION_ABBREV}/{REFERENCE}', 'SzentirasHu\\Controllers\\Displ
 
 Route::get('/{REFERENCE}', 'SzentirasHu\\Controllers\\Display\\TextDisplayController@showReferenceText')
     ->where('REFERENCE', '[^/]+');
+

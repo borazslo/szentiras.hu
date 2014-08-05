@@ -49,8 +49,9 @@ Log::useDailyFiles(storage_path().'/logs/laravel.log', 0, Config::get('settings.
 App::error(function(Exception $exception, $code)
 {
 	Log::error("Exception on request: " . Request::url() . " referer: " . Request::header('Referer') . ". " . $exception);
-    return Response::make('Hiba történt. <a href="/">Vissza a címlapra</a>', 500);
-
+    if (!Config::get('app.debug')) {
+        return Response::make('Hiba történt. <a href="/">Vissza a címlapra</a>', 500);
+    }
 });
 
 /*

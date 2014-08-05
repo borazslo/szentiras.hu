@@ -33,7 +33,6 @@ abstract class AbstractVerseParser implements VerseParser {
      */
     public function parse($rawVerses, $book)
     {
-        \Log::debug("Parsing verse data", [$rawVerses]);
         $verse = $this->initVerseData($rawVerses);
         foreach ($rawVerses as $rawVerse) {
             $this->parseRawVerses($book, $rawVerse, $verse);

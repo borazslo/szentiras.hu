@@ -174,6 +174,9 @@ class CanonicalReferenceTest extends TestCase
         $this->assertEquals('Mk 1,1', CanonicalReference::fromString('Mk. 1,1')->toString());
         $this->assertEquals('Mk 1,1', CanonicalReference::fromString('Mk, 1,1')->toString());
 
+        $this->setExpectedException('\SzentirasHu\Lib\Reference\ParsingException');
+        CanonicalReference::fromString("1,2");
+
     }
 
     public function testTranslatedBookId()

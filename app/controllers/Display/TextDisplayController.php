@@ -2,7 +2,9 @@
 
 namespace SzentirasHu\Controllers\Display;
 
+use Config;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\URL;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Reference\ReferenceService;
@@ -70,17 +72,17 @@ class TextDisplayController extends \BaseController
 
     public function showReferenceText($reference)
     {
-        return $this->showTranslatedReferenceText(\Config::get('settings.defaultTranslationAbbrev'), $reference);
+        return $this->showTranslatedReferenceText(null, $reference);
     }
 
     public function showTranslatedReferenceText($translationAbbrev, $reference)
     {
         try {
+            $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
             $canonicalRef = CanonicalReference::fromString($reference);
             if ($canonicalRef->isBookLevel()) {
                 return $this->bookView($translationAbbrev, $canonicalRef);
             }
-            $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
             $chapterLinks = $canonicalRef->isOneChapter() ?
                 $this->createChapterLinks($canonicalRef, $translation)
                 : false;
@@ -114,13 +116,13 @@ class TextDisplayController extends \BaseController
             ]);
         } catch (ParsingException $e) {
             // as this doesn't look like a valid reference, interpret as full text search
-            return Redirect::action('SzentirasHu\Controllers\Search\SearchController@anySearch', ['textToSearch' => $reference]);
+            return $this->fallbackSearch($translationAbbrev ? $translation : null, $reference);
         }
     }
 
     private function bookView($translationAbbrev, CanonicalReference $canonicalRef)
     {
-        $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
+        $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
         $translatedRef = $this->referenceService->translateReference($canonicalRef, $translation->id);
         $book = $this->bookRepository->getByAbbrevForTranslation($translatedRef->bookRefs[0]->bookId, $translation->id);
         if ($book) {
@@ -155,8 +157,19 @@ class TextDisplayController extends \BaseController
 
             ]);
 
+        } else {
+            return $this->fallbackSearch($translationAbbrev ? $translation : null, $canonicalRef->toString());
         }
 
+    }
+
+    private function fallbackSearch($translation, $reference)
+    {
+        $location = "/kereses/search?textToSearch={$reference}";
+        if ($translation) {
+            $location .= "&translation={$translation->id}";
+        }
+        return Redirect::to($location);
     }
 
     private function getTitle($verseContainers, $translation)

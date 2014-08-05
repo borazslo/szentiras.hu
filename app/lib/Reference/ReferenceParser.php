@@ -79,6 +79,9 @@ class ReferenceParser
             $bookId = $bookId . $token['value'];
             $this->lexer->moveNext();
             $token = $this->lexer->lookahead;
+            if ($token['type'] !== ReferenceLexer::T_TEXT) {
+                $this->parsingError();
+            }
         }
         $bookId = $bookId . $token['value'];
         if ($this->lexer->glimpse()['value'] == '.' ||

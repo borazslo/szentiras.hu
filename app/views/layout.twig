@@ -5,12 +5,12 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ pageTitle }}</title>
+        <title>{{ pageTitle ? pageTitle : metaTitle }}</title>
 
         <meta property="fb:admins" content="1819502454" />
         <meta property="fb:appId" content="{{ config_get('settings.facebookAppId') }}" />
 
-        <meta name="description" content="A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban">
+        <meta name="description" content="{{ teaser ? teaser : 'A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban' }}">
         <meta name="keywords" content="biblia, katolikus, protestáns, szentírás, keresztény, keresztyén, református, hivatalos">
         <meta name="author" content="szentiras.hu">
         <meta http-equiv="cleartype" content="on">

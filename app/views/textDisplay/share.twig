@@ -1,7 +1,9 @@
+{% set fullCanonicalUrl = url('/' ~ canonicalUrl) %}
 <ul class="list-unstyled">
     <li>
-        <div class="fb-share-button" data-href="{{ url('/' ~ canonicalUrl) }}" data-type="button"></div>
+        <div class="fb-share-button" data-href="{{ fullCanonicalUrl }}" data-type="button"></div>
     </li>
-    <li><a href="https://twitter.com/share" class="twitter-share-button" {{ url('/' ~ canonicalUrl) }} data-text="{{ teaser }}" data-lang="hu">Tweet</a>
+    <li><a href="https://twitter.com/share" class="twitter-share-button" {{ fullCanonicalUrl }} data-text="{{ teaser }}" data-lang="hu">Tweet</a>
     </li>
+    <li><a href="/qr/dialog/{{ fullCanonicalUrl }}" data-target="#qrModal" data-toggle="modal"><img src="/img/qr.png" />QR-kód</a></li>
 </ul>

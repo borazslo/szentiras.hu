@@ -7,6 +7,15 @@
 }
 
 .share {
-    width:150px;
-    height:100px;
+    width: 120px;
+    height: 100px;
+    margin: 5px;
+}
+
+.fb-share-button {
+    padding-bottom: 5px;
+}
+
+.parsedVerses {
+    text-align: justify;
 }
