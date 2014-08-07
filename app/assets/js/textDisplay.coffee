@@ -20,7 +20,6 @@ define ['jquery'], ->
   initQr = ->
     $('#qrLink').click ->
       ga('send', 'event', 'link', 'click', 'qrCode')
-      alert('hello')
 
   initToggler()
   initQr()
