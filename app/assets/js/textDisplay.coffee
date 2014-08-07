@@ -17,4 +17,9 @@ define ['jquery'], ->
         $('.xref').fadeIn(delay)
         $('#toggleXrefs').addClass('active')
 
+  initQr = ->
+    $('#qrLink').click ->
+      ga('send', 'event', 'link', 'click', 'qrCode')
+
   initToggler()
+  initQr()
