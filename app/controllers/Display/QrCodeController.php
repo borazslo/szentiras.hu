@@ -9,7 +9,6 @@ namespace SzentirasHu\Controllers\Display;
 use Endroid\QrCode\QrCode;
 use Imagine;
 use Imagine\Gd\Font;
-use Imagine\Image\Box;
 use Imagine\Image\Color;
 use Imagine\Image\Point;
 use Request;

@@ -43,7 +43,7 @@ class ImagineServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('sphinxsearch');
+		return array('imagine');
 	}
 
 }
