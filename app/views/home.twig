@@ -1,5 +1,11 @@
 {% extends "layout" %}
 
+{% block pageHeader %}
+    <div class="page-header">
+        <h1>Szentírás.hu <small>Katolikus bibliafordítások az interneten</small></h1>
+    </div>
+{%  endblock %}
+
 {% block news %}
   <h4>Hírek</h4>
   {% for n in news %}

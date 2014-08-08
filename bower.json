@@ -9,8 +9,8 @@
     "bower_components"
   ],
   "devDependencies": {
-    "bootstrap": "~3.1.1",
-    "requirejs": "~2.1.11"
+    "bootstrap": "3.2.x",
+    "requirejs": "2.1.11"
   },
   "dependencies": {
     "jquery": "1.11.1",

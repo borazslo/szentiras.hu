@@ -4,5 +4,5 @@
  * 
  */
 
-View::composer('menu', '\SzentirasHu\Views\Composers\MenuComposer');
+View::composer('layout', '\SzentirasHu\Views\Composers\MenuComposer');
 View::composer('bookAbbrevList', '\SzentirasHu\Views\Composers\BookAbbrevListComposer');

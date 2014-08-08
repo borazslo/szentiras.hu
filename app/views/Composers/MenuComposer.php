@@ -31,28 +31,29 @@ class MenuComposer
         foreach ($translations as $translation) {
             $translationTitle = $translation['name']." (".$translation['abbrev'].")";
             $translationUrl = "/${translation['abbrev']}";
-            $items[]  = [$translationTitle,$translationUrl];
+            $navItems[]  = [$translationTitle,$translationUrl];
         }
 
-        $items[] = ["Újszövetség: hangfájlok", "/hang"];
-        $items[] = ["További fordítások", "/forditasok"];
-        $items[] = 'pause';
-        $items[] = ["Keresés a Bibliában"];
+        $navItems[] = ["További fordítások", "/forditasok"];
+        $navItems[] = ["Újszövetség: hangfájlok", "/hang"];
+        $menuItems[] = 'pause';
+        $menuItems[] = ["Keresés a Bibliában"];
+        $menuItems[] = \View::make("search.searchForm")->render();
+        $menuItems[] = 'pause';
 
-        $items[] = \View::make("search.searchForm")->render();
-        $items[] = 'pause';
+        $menuItems[] = ["Fejlesztőknek", "/api"];
+        $menuItems[] = ["Újdonságaink", "/info"];
 
-        $items[] = ["Fejlesztőknek", "/api"];
-        $items[] = ["Újdonságaink", "/info"];
-
-        $items[] = 'pause';
-        $items[] = ["Görög újszövetségi honlap","http://www.ujszov.hu/"];
-        $items[] = ["Katolikus igenaptár","http://www.katolikus.hu/igenaptar/"];
-        $items[] = ["Zsolozsma","http://zsolozsma.katolikus.hu/"];
+        $menuItems[] = 'pause';
+        $menuItems[] = ["Görög újszövetségi honlap","http://www.ujszov.hu/"];
+        $menuItems[] = ["Katolikus igenaptár","http://www.katolikus.hu/igenaptar/"];
+        $menuItems[] = ["Zsolozsma","http://zsolozsma.katolikus.hu/"];
 
         
         $view
-            ->with('items', $items);
+            ->with('menuItems', $menuItems)
+            ->with('navItems', $navItems)
+        ;
     }
 
 }
