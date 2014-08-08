@@ -252,7 +252,7 @@ class BookRef
             foreach ($this->chapterRanges as $chapterRange) {
                 $s .= $chapterRange->toString();
                 if ($last !== $chapterRange) {
-                    $s .= "|";
+                    $s .= ";";
                 }
             }
         }
