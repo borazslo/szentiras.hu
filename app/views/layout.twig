@@ -53,21 +53,14 @@
             }(document, 'script', 'facebook-jssdk'));</script>
         <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
         <div class="container">
-            <div class="row">
-                <div class="page-header">
-                    <h1><a href="/">Szentírás.hu</a>
-                        <small>Katolikus bibliafordítások az interneten</small></h1>
-                </div>
-            </div>
+            {% include 'navbar' %}
             <div class="row">
                 <div class="col-md-3 col-sm-3">
-                    {% block menu %}
-                        {% include 'menu' %}
-                    {% endblock %}
+                     {% include 'menu' %}
                 </div>
                 <div class="col-md-9 col-sm-9">
+                    {% block pageHeader %}{% endblock %}
                     <div>
-                        {% block news %}{% endblock %}
                         {% if title is defined %}<h3>{{ title }}</h3>{% endif %}
                         {% block content %}{% endblock %}
                         <br />

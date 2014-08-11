@@ -111,9 +111,9 @@ class CanonicalReferenceTest extends TestCase
         $this->assertEquals("b", $bookRef->chapterRanges[0]->untilChapterRef->verseRanges[0]->verseRef->versePart);
 
         $canonicalRef = CanonicalReference::fromString("Kor 13,1a-14,2b;14,2");
-        $this->assertEquals("Kor 13,1a-14,2b|14,2", $canonicalRef->toString());
+        $this->assertEquals("Kor 13,1a-14,2b;14,2", $canonicalRef->toString());
         $canonicalRef = CanonicalReference::fromString("Kor 13,1|14");
-        $this->assertEquals("Kor 13,1|14", $canonicalRef->toString());
+        $this->assertEquals("Kor 13,1;14", $canonicalRef->toString());
         $canonicalRef = CanonicalReference::fromString("Kor 13,1-14,5");
         $this->assertEquals("Kor 13,1-14,5", $canonicalRef->toString());
 
@@ -153,18 +153,19 @@ class CanonicalReferenceTest extends TestCase
     {
         $this->assertEquals("2Sám", CanonicalReference::fromString("2Sám")->toString());
         $this->assertEquals("2Sám; 2Kor", $s = CanonicalReference::fromString("  2 Sám. ; 2Kor ;")->toString());
-        $this->assertEquals("2Sám 3; 1Kor 2-5; 2Kor 5|6", CanonicalReference::fromString("2Sám 3; 1Kor2-5;2Kor5|6")->toString());
+        $this->assertEquals("2Sám 3; 1Kor 2-5; 2Kor 5;6", CanonicalReference::fromString("2Sám 3; 1Kor2-5;2Kor5|6")->toString());
+        $this->assertEquals("2Sám 3; 1Kor 2-5; 2Kor 5;6", CanonicalReference::fromString("2Sám 3; 1Kor2-5;2Kor5;6")->toString());
         $this->assertEquals("2Kor 3,1", CanonicalReference::fromString("2Kor 3, 1")->toString());
         $this->assertEquals("2Kor 3,1", CanonicalReference::fromString("2Kor 3, 1.")->toString());
         $this->assertEquals("Zs 88,2-29", CanonicalReference::fromString("Zs 88:2-29")->toString());
         $this->assertEquals("Bölcs 2,1a.12-22", CanonicalReference::fromString("Bölcs 2,1a.12-22")->toString());
 
-        $this->assertEquals("1Kor 3,12|13,36", CanonicalReference::fromString("1Kor 3,12.13,36")->toString());
-        $complicatedString = ("Kor4:13-5:6|2,3.4-5,6.7-12");
-        $this->assertEquals("Kor 4,13-5,6|2,3.4-5,6.7-12", CanonicalReference::fromString($complicatedString)->toString());
+        $this->assertEquals("1Kor 3,12;13,36", CanonicalReference::fromString("1Kor 3,12.13,36")->toString());
+        $complicatedString = ("Kor4:13-5:6;2,3.4-5,6.7-12");
+        $this->assertEquals("Kor 4,13-5,6;2,3.4-5,6.7-12", CanonicalReference::fromString($complicatedString)->toString());
 
-        $complicatedString = ("2Sám7:4-5a.12-14a.16;Zs88,2-29;2Kor4:13a.14b-5:1b.6-8.7|2,3.4-5,6.7-12");
-        $this->assertEquals("2Sám 7,4-5a.12-14a.16; Zs 88,2-29; 2Kor 4,13a.14b-5,1b.6-8.7|2,3.4-5,6.7-12", CanonicalReference::fromString($complicatedString)->toString());
+        $complicatedString = ("2Sám7:4-5a.12-14a.16;Zs88,2-29;2Kor4:13a.14b-5:1b.6-8.7;2,3.4-5,6.7-12");
+        $this->assertEquals("2Sám 7,4-5a.12-14a.16; Zs 88,2-29; 2Kor 4,13a.14b-5,1b.6-8.7;2,3.4-5,6.7-12", CanonicalReference::fromString($complicatedString)->toString());
         $this->assertEquals("1Kor 2,3-4", CanonicalReference::fromString("1Kor 2,3-4.")->toString());
 
     }

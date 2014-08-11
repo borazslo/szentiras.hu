@@ -5,6 +5,7 @@ namespace SzentirasHu\Lib;
 use Cache;
 use Carbon\Carbon;
 use ErrorException;
+use Illuminate\Support\Facades\Log;
 
 class LectureDownloader {
 
@@ -20,7 +21,7 @@ class LectureDownloader {
         try {
             if (!$date) {
                 // today's lecture is cached
-                $text = Cache::remember(self::LECTURE_CACHE_KEY, $downloadedDate->tomorrow(), function() use ($dailyLecture)
+                $text = Cache::remember(self::LECTURE_CACHE_KEY, $downloadedDate->tomorrow()->addMinute(), function() use ($dailyLecture)
                 {
                     return file_get_contents($dailyLecture);
                 });
@@ -31,6 +32,7 @@ class LectureDownloader {
             $referenceString = isset($places[1]) ? trim($places[1]) : '';
             return $referenceString;
         } catch (ErrorException $e) {
+            \Log::error($e);
             return null;
         }
     }

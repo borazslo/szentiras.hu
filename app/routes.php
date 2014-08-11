@@ -9,9 +9,7 @@ Route::controller("/kereses", 'SzentirasHu\Controllers\Search\SearchController')
 /** API */
 Route::controller("/api", 'SzentirasHu\Controllers\Api\ApiController');
 
-Route::get('/info', function() {
-   return View::make('info.info');
-});
+Route::controller('/info', 'SzentirasHu\Controllers\Home\InfoController');
 
 Route::get('/API', function () {
     if (Input::get('feladat') === 'idezet') {
