@@ -26,12 +26,11 @@ class MenuComposer
 
     public function compose($view)
     {
-        $translations = $this->translationRepository->getByDenom('katolikus');
-        
+        $translations = $this->translationRepository->getAllOrderedByDenom();
         foreach ($translations as $translation) {
             $translationTitle = $translation['name']." (".$translation['abbrev'].")";
             $translationUrl = "/${translation['abbrev']}";
-            $navItems[]  = [$translationTitle,$translationUrl];
+            $navTranslations[]  = [$translationTitle,$translationUrl];
         }
 
         $navItems[] = ["További fordítások", "/forditasok"];
@@ -46,13 +45,11 @@ class MenuComposer
 
         $menuItems[] = 'pause';
         $menuItems[] = ["Görög újszövetségi honlap","http://www.ujszov.hu/"];
-        $menuItems[] = ["Katolikus igenaptár","http://www.katolikus.hu/igenaptar/"];
-        $menuItems[] = ["Zsolozsma","http://zsolozsma.katolikus.hu/"];
 
         
         $view
             ->with('menuItems', $menuItems)
-            ->with('navItems', $navItems)
+            ->with('navTranslations', $navTranslations)
         ;
     }
 

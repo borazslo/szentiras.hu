@@ -6,24 +6,6 @@
     </div>
 {%  endblock %}
 
-{% block news %}
-  <h4>Hírek</h4>
-  {% for n in news %}
-    <div class="panel-group" id="newsAccordion">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#newsAccordion" href="#news{{ loop.index }}">{{ n.title }}</a>
-                </h4>
-            </div>
-            <div id="news{{ loop.index }}" class="panel-collapse collapse">
-                <div class="panel-body">{{ n.text|raw }}</div>
-            </div>
-        </div>
-    </div>
-  {% endfor %}
-{% endblock %}
-
 {% block content %}
     {% for row in cathBibles %}
         <h4><a href='/{{ row.abbrev }}'>{{ row.name }} ({{ row.denom }})</a></h4>

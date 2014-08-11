@@ -32,7 +32,6 @@ class HomeController extends BaseController
     public function index()
     {
         return \View::make("home", [
-            'news' => Article::where('frontpage', true)->orderBy('publish_date', 'desc')->get(),
             'pageTitle' => 'Fordítások | Szentírás',
             'title' => 'Katolikus bibliafordítások',
             'cathBibles' => $this->translationRepository->getByDenom('katolikus'),

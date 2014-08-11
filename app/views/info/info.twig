@@ -1,15 +1,33 @@
 {% extends 'layout' %}
 {% set pageTitle='Újdonságok | Szentírás' %}
+
 {% block content %}
-<h3>Fejlesztések</h3>
+    <h4>Hírek</h4>
+    {% for n in news %}
+        <div class="panel-group" id="newsAccordion">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#newsAccordion" href="#news{{ loop.index }}">{{ n.title }}</a>
+                    </h4>
+                </div>
+                <div id="news{{ loop.index }}" class="panel-collapse collapse">
+                    <div class="panel-body">{{ n.text|raw }}</div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <h4>Fejlesztések</h4>
     <dl>
-        <dt>2014. 08. 01. <small>Élesítve az új keresőmotor, új megjelenés, új fejlesztési módszertan</small></dt>
+        <dt>2014. 08. 01. Élesítve az új keresőmotor, új megjelenés, új fejlesztési módszertan</dt>
         <dd>Új keresőmotort és új keretrendszert helyeztünk az egész szentiras.hu alá. Így nagyságrendekkel gyorsabbá (és biztonságosabbá) vált az oldal,
             a gyorskeresés sokkal intelligensebb és gyorsabb, valamint a fejlesztés is egyszerűbbé vált.</dd>
-<dt>2014. 03. 24. <small>Fejlesztések a GitHubon</small></dt>
+<dt>2014. 03. 24. Fejlesztések a GitHubon</dt>
 <dd>A <a href="http://github.com/borazslo/szentiras.hu">github.com/borazslo/szentiras.hu</a> oldalon. <a href="https://github.com/borazslo/szentiras.hu/wiki/Fejleszt%C5%91i-tudnival%C3%B3k">Bárki csatlakozhat</a>!</dd>
-<dt>2013. 12. 24. Átfogó fejlesztések történtek.</dt> Leginkább a keresőben, de a megjelenítsében is. Valamint további szövegjavítások is történtek.
-    <dt>2013. 11. 12. Új szövegek  mindegyik fordításban.</dt> Ehhez viszont adatbázis átalakítás is kellett, aminek eredményeként speciális keresésfunkciók ideiglenesen nem voltak elérhetőek.
+<dt>2013. 12. 24. Átfogó fejlesztések történtek.</dt>
+        <dd>Leginkább a keresőben, de a megjelenítsében is. Valamint további szövegjavítások is történtek.</dd>
+    <dt>2013. 11. 12. Új szövegek  mindegyik fordításban.</dt> <dd>Ehhez viszont adatbázis átalakítás is kellett, aminek eredményeként speciális keresésfunkciók ideiglenesen nem voltak elérhetőek.</dd>
     <dt>2013. 06. 05. Szöveg frissítés  három fordításban (KNB, UF, KG)</dt>
     <dt>2013. 05. 18. ebook .epub és .mobi változatban könyvenként elolvasható a Szentírás: /epub</dt>
     <dt>2013. 04. 23. Költözés új virtuális szervert kaptunk a legfrissebb programokkal</dt>
