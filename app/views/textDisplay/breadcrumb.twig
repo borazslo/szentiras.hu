@@ -9,7 +9,7 @@
                 {% set chapter = bookRef.chapterRanges[0].chapterRef.chapterId %}
                 <li><a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a></li>
             {% else %}
-                <li><a href="/{{ translation.abbrev }}/{{ bookRef.toString() }}">{{ bookRef.toString() }}</a></li>
+                <li class="active">{{ bookRef.toString() }}</a></li>
             {% endif %}
         {% endif %}
     {% endif %}
