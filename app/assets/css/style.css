@@ -19,3 +19,15 @@
 .parsedVerses {
     text-align: justify;
 }
+
+span.toggle.active {
+    display: none;
+}
+
+.active span.toggle.inactive {
+    display:none;
+}
+
+.active span.toggle.active {
+    display: inline;
+}

@@ -43,8 +43,18 @@
         </div>
         <hr>
     {% endfor %}
-    <div>
-            <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleNumv">Versszámozás</a>
-            <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleXrefs">Hivatkozások</a>
+    <div class="panel panel-default">
+        <div class="panel-body">
+        <div class="btn-group">
+            <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleNumv">
+                <span class="toggle glyphicon glyphicon-check active"></span>
+                <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
+                Versszámozás</a>
+            <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleXrefs">
+                <span class="toggle glyphicon glyphicon-check active"></span>
+                <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
+                Hivatkozások</a>
+        </div>
     </div>
+        </div>
 {% endblock %}
