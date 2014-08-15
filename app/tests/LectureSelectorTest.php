@@ -31,9 +31,9 @@ class LectureSelectorTest extends TestCase {
         $selector = App::make('SzentirasHu\Controllers\Home\LectureSelector');
         $lectures = $selector->getLectures();
         $this->assertCount(2, $lectures);
-        $this->assertEquals("/TESTTRANS/Ter2,3", $lectures[0]->extLinks[0]->url);
+        $this->assertEquals("/TESTTRANS/Ter2,3", $lectures[0]->extLinks[1]->url);
         $this->assertEquals("/TESTTRANS/Kiv3,4", $lectures[1]->extLinks[0]->url);
-        $this->assertEquals("/TESTTRANS2/Ter2,3", $lectures[0]->extLinks[1]->url);
+        $this->assertEquals("/TESTTRANS2/Ter2,3", $lectures[0]->extLinks[0]->url);
     }
 
 } 
