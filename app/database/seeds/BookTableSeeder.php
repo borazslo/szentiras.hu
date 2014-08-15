@@ -7,13 +7,13 @@ class BookTableSeeder extends Seeder
 {
     public function run()
     {
-        $translation = $this->addTranslation(2, 'Translation Name 1', 'TESTTRANS');
+        $translation = $this->addTranslation(1, 'Translation Name 1', 'TESTTRANS');
         $this->addBook(101, "Ter", $translation);
         $this->addBook(102, "Kiv", $translation);
         $this->addBook(103, "Lev", $translation);
         $this->addBook(104, "Szám", $translation);
 
-        $translation = $this->addTranslation(1, 'Translation Name 2', 'TESTTRANS2');
+        $translation = $this->addTranslation(2, 'Translation Name 2', 'TESTTRANS2');
         $this->addBook(101, "1Móz", $translation);
         $this->addBook(102, "2Móz", $translation);
     }
