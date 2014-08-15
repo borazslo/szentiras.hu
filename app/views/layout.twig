@@ -55,10 +55,10 @@
         <div class="container">
             {% include 'navbar' %}
             <div class="row">
-                <div class="col-md-3 col-sm-3">
+                <div class="col-md-3 col-sm-4">
                      {% include 'menu' %}
                 </div>
-                <div class="col-md-9 col-sm-9">
+                <div class="col-md-9 col-sm-8">
                     {% block pageHeader %}{% endblock %}
                     <div>
                         {% block content %}{% endblock %}
@@ -78,6 +78,7 @@
                 {% if config_get('version.hash') %}- <small>verzió:
                     <a href="https://github.com/borazslo/szentiras.hu/commit/{{ config_get('version.hash') }}">
                     {{ config_get('version.hash') }}</a></small>{% endif %}</p>
+            <p>Programozók: <a href="https://github.com/briff">Fodor Bertalan</a>, <a href="https://github.com/borazslo">Elek László SJ</a>, <a href="https://github.com/molnarm">Molnár Márton</a></p>
         </div>
         {% if config_get('app.debug') %}
             {{ html_script('/js/lib/jquery.min.js') }}

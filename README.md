@@ -2,6 +2,8 @@
 ========
 
 A [szentiras.hu](http://szentiras.hu) teljes kódja.
+[![Build Status](https://travis-ci.org/borazslo/szentiras.hu.png)](https://travis-ci.org/borazslo/szentiras.hu)
+
 
 ## Felépítés
 
