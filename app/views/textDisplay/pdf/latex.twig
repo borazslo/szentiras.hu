@@ -1,0 +1,22 @@
+\documentclass[11pt]{article}
+\usepackage{fontspec}
+\usepackage[magyar]{babel}
+\setmainfont[Ligatures=TeX]{Times New Roman}
+
+\begin{document}
+\thispagestyle{empty}
+
+%\begin{figure}
+{% for verseContainer in verses %}
+    {%- for verse in verseContainer.parsedVerses %}
+        {%- for headingLevel in 0..4 %}
+            {%- if verse.headings[headingLevel] is defined %}
+{{ '\\subsubsection*{' ~ verse.headings[headingLevel] ~ '}' }}
+            {%- endif %}
+        {%- endfor %}
+{{ verse.text|raw|replace({'<br>':' \\\\ '}) }} {% if verseContainer.book.number == 121 %} \\ {% endif %}
+    {%- endfor %}
+{%- endfor %}
+
+%\end{figure}
+\end{document}
