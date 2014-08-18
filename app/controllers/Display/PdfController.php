@@ -40,7 +40,7 @@ class PdfController extends \BaseController {
         $builder->getProcess()->run(function ($type, $buffer) {
         });
         fclose($tmpFile);
-        $response = Response::download(preg_replace('/\.tmp$/', '.pdf', $tmpFileName));
+        $response = Response::download(preg_replace('/\.tmp$/', '', $tmpFileName) . '.pdf');
         $response->headers->set('Content-Type', 'application/pdf');
         return $response;
     }
