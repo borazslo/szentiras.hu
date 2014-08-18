@@ -1,6 +1,6 @@
 {% macro toggleButton(id, label, active) %}
 <label class="btn btn-default {{ active ? 'active' }}" style="text-align: left;">
-    <input type="checkbox" name="id" {{ active ? 'checked' }}><span class="glyphicon glyphicon-check"></span><span class="glyphicon glyphicon-unchecked"></span> {{ label }}
+    <input type="checkbox" id="{{ id }}" {{ active ? 'checked' }}><span class="glyphicon glyphicon-check"></span><span class="glyphicon glyphicon-unchecked"></span> {{ label }}
 </label>
 {% endmacro %}
 {% import _self as macros %}
@@ -12,14 +12,20 @@
 <div class="modal-body">
     <div class="row">
         <div class="col-md-7">
-            <h4>Előnézet</h4>
-            Ide töltjük ajax-szal a preview-t a {{ refString }}-hez
+            <div id="previewContainer" data-ref="{{ refString }}" data-translation="{{ translationId }}"><i class="fa fa-circle-o-notch fa-spin"></i></div>
         </div>
         <div class="col-md-5">
-            <div class="btn-group-vertical" data-toggle="buttons">
-                {{ macros.toggleButton('headings', 'Címsorok', true) }}
-                {{ macros.toggleButton('refs', 'Hivatkozások', false) }}
-                {{ macros.toggleButton('nums', 'Versszámozás', false) }}
+            <div class="row">
+                <div class="btn-group-vertical" data-toggle="buttons" id="pdfToggles">
+                    {{ macros.toggleButton('pdfHeadings', 'Címsorok', true) }}
+                    {# {{ macros.toggleButton('pdfRefs', 'Hivatkozások', false) }} #}
+                    {{ macros.toggleButton('pdfNums', 'Versszámozás', false) }}
+                </div>
+            </div>
+            <div class="row">
+                <hr width="100px" />
+                <p></p>
+                <p><a href="javascript:void(0)" id="pdfDownload"><span class="glyphicon glyphicon-download"></span> Letöltés</a></p>
             </div>
         </div>
     </div>

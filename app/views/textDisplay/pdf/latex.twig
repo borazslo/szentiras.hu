@@ -10,12 +10,14 @@
 
     {{ '\\subsection*{' ~ verseContainer.bookRef.toString() ~ '}' }}
     {%- for verse in verseContainer.parsedVerses %}
-        {%- for headingLevel in 0..4 %}
-            {%- if verse.headings[headingLevel] is defined %}
-{{ '\\subsubsection*{' ~ verse.headings[headingLevel] ~ '}' }}
-            {%- endif %}
-        {%- endfor %}
-{{ verse.text|raw|replace({'<br>':' \\\\ '}) }} {% if verseContainer.book.number == 121 %} \\ {% endif %}
+        {% if options.headings %}
+            {%- for headingLevel in 0..4 %}
+                {%- if verse.headings[headingLevel] is defined %}
+    {{ '\\subsubsection*{' ~ verse.headings[headingLevel] ~ '}' }}
+                {%- endif %}
+            {%- endfor %}
+        {% endif %}
+        {{ (options.nums ? '\\textsuperscript{' ~ verse.numv ~ '}' : '' ) ~ verse.text|raw|replace({'<br>':' \\\\ '}) }} {% if verseContainer.book.number == 121 %} \\ {% endif %}
     {%- endfor %}
 
 {%- endfor %}

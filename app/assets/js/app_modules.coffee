@@ -1,4 +1,5 @@
 define [
   'quickSearch',
-  'textDisplay'
+  'textDisplay',
+  'pdfDialog'
 ], ->

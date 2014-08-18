@@ -1,5 +1,6 @@
 <?php
 
 return [
-    'audioDirectory' => '../../hang'
+    'audioDirectory' => '../../hang',
+    'imageMagickCommand' => 'convert'
 ];
