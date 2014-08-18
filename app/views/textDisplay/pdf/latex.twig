@@ -6,8 +6,9 @@
 \begin{document}
 \thispagestyle{empty}
 
-%\begin{figure}
 {% for verseContainer in verses %}
+
+    {{ '\\subsection*{' ~ verseContainer.bookRef.toString() ~ '}' }}
     {%- for verse in verseContainer.parsedVerses %}
         {%- for headingLevel in 0..4 %}
             {%- if verse.headings[headingLevel] is defined %}
@@ -16,7 +17,10 @@
         {%- endfor %}
 {{ verse.text|raw|replace({'<br>':' \\\\ '}) }} {% if verseContainer.book.number == 121 %} \\ {% endif %}
     {%- endfor %}
+
 {%- endfor %}
 
-%\end{figure}
+
+\noindent\makebox[\linewidth]{\rule{8cm}{0.4pt}}
+
 \end{document}

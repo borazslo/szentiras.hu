@@ -31,3 +31,19 @@ span.toggle.active {
 .active span.toggle.active {
     display: inline;
 }
+
+input ~ span.glyphicon-unchecked {
+    display: inline;
+}
+
+input ~ span.glyphicon-check {
+    display: none;
+}
+
+input:checked ~ span.glyphicon-unchecked {
+    display: none;
+}
+
+input:checked ~ span.glyphicon-check {
+    display: inline;
+}

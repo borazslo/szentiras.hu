@@ -26,7 +26,11 @@ class PdfController extends \BaseController {
         $this->textService = $textService;
     }
 
-    public function anyRef($refString)
+    public function getDialog($translationAbbrev, $refString) {
+        return View::make('textDisplay.pdf.pdfDialog')->with([ 'refString' => $refString]);
+    }
+
+    public function postRef($refString)
     {
         $ref = CanonicalReference::fromString($refString);
         $verses = $this->textService->getTranslatedVerses($ref, 3);
@@ -40,8 +44,10 @@ class PdfController extends \BaseController {
         $builder->getProcess()->run(function ($type, $buffer) {
         });
         fclose($tmpFile);
-        $response = Response::download(preg_replace('/\.tmp$/', '', $tmpFileName) . '.pdf');
-        $response->headers->set('Content-Type', 'application/pdf');
+        $response = Response::download(
+            preg_replace('/\.tmp$/', '', $tmpFileName) . '.pdf',
+            "szentiras.hu-{$refString}.pdf",
+            ['Content-Type' => 'application/pdf']);
         return $response;
     }
 

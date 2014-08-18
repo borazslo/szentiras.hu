@@ -9,17 +9,11 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Modal -->
-    <div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-            </div>
-        </div>
+    <div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
+        <div class="modal-dialog"><div class="modal-content"></div></div>
     </div>
-    <div class="pull-right panel panel-default share">
-        <div class="panel-body">
-            {% include 'textDisplay.share' with { 'canonicalUrl' : canonicalUrl, 'teaser' : teaser } %}
-        </div>
+    <div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel" aria-hidden="true">
+        <div class="modal-dialog"><div class="modal-content"></div></div>
     </div>
     {% for verseContainer in verseContainers %}
         <div>
@@ -39,22 +33,23 @@
                 {% if chapterLinks.nextLink %}
                     <a href="/{{ chapterLinks.nextLink }}" class="btn btn-default">Következő fejezet <span class="glyphicon glyphicon-chevron-right"></span></a>
                 {% endif %}
-
         </div>
         <hr>
     {% endfor %}
     <div class="panel panel-default">
         <div class="panel-body">
-        <div class="btn-group">
-            <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleNumv">
-                <span class="toggle glyphicon glyphicon-check active"></span>
-                <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
-                Versszámozás</a>
-            <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleXrefs">
-                <span class="toggle glyphicon glyphicon-check active"></span>
-                <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
-                Hivatkozások</a>
+            <div class="btn-group">
+                <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleNumv">
+                    <span class="toggle glyphicon glyphicon-check active"></span>
+                    <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
+                    Versszámozás</a>
+                <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleXrefs">
+                    <span class="toggle glyphicon glyphicon-check active"></span>
+                    <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
+                    Hivatkozások</a>
+            </div>
         </div>
     </div>
-        </div>
+    {% include 'textDisplay.share' with { 'canonicalUrl' : canonicalUrl, 'teaser' : teaser } %}
+
 {% endblock %}

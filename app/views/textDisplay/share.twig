@@ -1,9 +1,14 @@
 {% set fullCanonicalUrl = url('/' ~ canonicalUrl) %}
-<ul class="list-unstyled">
-    <li>
-        <div class="fb-share-button" data-href="{{ fullCanonicalUrl }}" data-type="button"></div>
-    </li>
-    <li><a href="https://twitter.com/share" class="twitter-share-button" {{ fullCanonicalUrl }} data-text="{{ teaser }}" data-lang="hu">Tweet</a>
-    </li>
-    <li><a href="/qr/dialog/{{ fullCanonicalUrl }}" rel="nofollow" data-target="#qrModal" data-toggle="modal" id="qrLink"><img src="/img/qr.png" />QR-kód</a></li>
-</ul>
+
+{% macro social(link, icon, color, label) %}
+    <a href="{{ link }}" class="btn btn-default" onclick="javascript:window.open(this.href,
+  '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><i class="fa {{ icon }} fa-lg" style="color: {{ color }}"></i> {{ label }}</a>
+{% endmacro %}
+{% import _self as macros %}
+<div>
+    {{ macros.social('http://www.facebook.com/share.php?title=' ~ teaser ~ '&u=' ~ fullCanonicalUrl, 'fa-facebook', '#3b5999', 'Facebook') }}
+    {{ macros.social('https://twitter.com/share?lang=hu&text=' ~ teaser ~ '&url=' ~ fullCanonicalUrl, 'fa-twitter', '#55acee', 'Twitter') }}
+    {{ macros.social('https://plus.google.com/share?url=' ~ fullCanonicalUrl, 'fa-google-plus', '#dd4b39', 'Google+') }}
+    <a href="/qr/dialog/{{ fullCanonicalUrl }}" rel="nofollow" data-target="#qrModal" data-toggle="modal" id="qrLink" class="btn btn-default"><i class="fa fa-qrcode fa-lg"></i> QR-kód</a></li>
+    <a href="/pdf/dialog/{{ canonicalUrl }}" rel="nofollow" data-target="#pdfModal" data-toggle="modal" id="pdfLink" class="btn btn-default"><i class="fa fa-print fa-lg"></i> PDF</a>
+</div>
