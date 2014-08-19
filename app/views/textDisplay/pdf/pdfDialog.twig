@@ -20,6 +20,12 @@
                     {{ macros.toggleButton('pdfHeadings', 'Címsorok', true) }}
                     {# {{ macros.toggleButton('pdfRefs', 'Hivatkozások', false) }} #}
                     {{ macros.toggleButton('pdfNums', 'Versszámozás', false) }}
+                         <div class="form-control">Példányszám
+                        <select id="pdfQuantity">
+                            {% for i in 1..30 %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
+                        </select>
+                             </div>
+                    </p>
                 </div>
             </div>
             <div class="row">
