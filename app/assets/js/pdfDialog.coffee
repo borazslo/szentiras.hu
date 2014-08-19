@@ -10,7 +10,7 @@ define ['jquery'], ->
   $('#pdfModal').on 'loaded.bs.modal', (event) =>
     ref = $('#previewContainer').data 'ref'
     translationId = $('#previewContainer').data 'translation'
-    img = $("<img />").attr('src', '/pdf/preview/'+translationId+'/'+ref+'?'+options())
+    img = $("<img />").attr('src', '/pdf/preview/'+translationId+'/'+ref+'?'+options());
     img.load( ->
       $('#previewContainer .fa-spin').hide()
       $("#previewContainer").append(img)

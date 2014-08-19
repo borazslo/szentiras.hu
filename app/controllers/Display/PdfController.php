@@ -64,7 +64,7 @@ class PdfController extends \BaseController {
         } else {
             $processBuilder->add($imageMagickCommand);
         }
-        foreach (['-trim', $pdfFile, $pngFile ] as $arg) {
+        foreach (['-density','300', '-resize','25%', '-trim', $pdfFile, $pngFile ] as $arg) {
             $processBuilder->add($arg);
         }
         $processBuilder->getProcess()->run();
