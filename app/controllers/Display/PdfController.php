@@ -21,11 +21,13 @@ class PdfOptions {
     public $headings = true;
     public $refs = false;
     public $nums = false;
+    public $quantity = 1;
 
     public function __construct(Request $request) {
         $this->headings = $request->input('headings', 'true') == 'true';
         $this->nums = $request->input('nums', 'false') == 'true';
         $this->refs = $request->input('refs', 'false') == 'true';
+        $this->quantity = $request->input('quantity', 1);
     }
 
 }
