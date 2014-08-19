@@ -1,5 +1,5 @@
 {% macro toggleButton(id, label, active) %}
-<label class="btn btn-default {{ active ? 'active' }}" style="text-align: left;">
+<label class="btn btn-default" style="text-align: left;">
     <input type="checkbox" id="{{ id }}" {{ active ? 'checked' }}> {{ label }}
 </label>
 {% endmacro %}
@@ -16,7 +16,7 @@
         </div>
         <div class="col-md-4">
             <div class="row">
-                <div class="btn-group-vertical" data-toggle="buttons" id="pdfToggles">
+                <div class="btn-group-vertical" id="pdfToggles">
                     {{ macros.toggleButton('pdfHeadings', 'Címsorok', true) }}
                     {# {{ macros.toggleButton('pdfRefs', 'Hivatkozások', false) }} #}
                     {{ macros.toggleButton('pdfNums', 'Versszámozás', false) }}
