@@ -8,20 +8,26 @@ namespace SzentirasHu\Controllers\Display;
 
 use App;
 use Config;
+use Illuminate\Http\Request;
 use Input;
 use Response;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 use \View;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Text\TextService;
-use SzentirasHu\Models\Entities\Translation;
 
 class PdfOptions {
     public $headings = true;
     public $refs = false;
     public $nums = false;
+
+    public function __construct(Request $request) {
+        $this->headings = $request->input('headings', 'true') == 'true';
+        $this->nums = $request->input('nums', 'false') == 'true';
+        $this->refs = $request->input('refs', 'false') == 'true';
+    }
+
 }
 
 class PdfController extends \BaseController {
@@ -47,7 +53,7 @@ class PdfController extends \BaseController {
 
     public function getPreview($translationId, $refString)
     {
-        $pdfFile = $this->generatePdf($translationId, $refString, Input::all());
+        $pdfFile = $this->generatePdf($translationId, $refString, Input::instance());
         $pngFile = "{$pdfFile}.png";
         $processBuilder = new ProcessBuilder([ Config::get('settings.imageMagickCommand'), '-trim', $pdfFile, $pngFile ]);
         $processBuilder->getProcess()->run();
@@ -67,7 +73,7 @@ class PdfController extends \BaseController {
     public function getRef($translationId, $refString)
     {
         $response = Response::download(
-            $this->generatePdf($translationId, $refString, Input::all()),
+            $this->generatePdf($translationId, $refString, Input::instance()),
             "szentiras.hu-{$refString}.pdf",
             ['Content-Type' => 'application/pdf']);
         return $response;
@@ -75,10 +81,7 @@ class PdfController extends \BaseController {
 
     private function generatePdf($translationId, $refString, $input)
     {
-        $options = new PdfOptions();
-        $options->headings = $input['headings'] == 'true';
-        $options->nums = $input['nums']  == 'true';
-        $options->refs = $input['refs']  == 'true';
+        $options = new PdfOptions($input);
         $ref = CanonicalReference::fromString($refString);
         $verses = $this->textService->getTranslatedVerses($ref, $translationId);
         $content = View::make('textDisplay.pdf.latex')->with(
