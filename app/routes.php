@@ -11,6 +11,8 @@ Route::controller("/api", 'SzentirasHu\Controllers\Api\ApiController');
 
 Route::controller('/info', 'SzentirasHu\Controllers\Home\InfoController');
 
+Route::controller('/pdf', 'SzentirasHu\Controllers\Display\PdfController');
+
 Route::get('/API', function () {
     if (Input::get('feladat') === 'idezet') {
         return Redirect::action('SzentirasHu\Controllers\Api\ApiController@getIdezet', [Input::get('hivatkozas'), Input::get('forditas')], 301);

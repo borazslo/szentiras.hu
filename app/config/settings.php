@@ -8,5 +8,7 @@ return [
     'sourceDirectory' => 'tmp',
     'facebookAppId' => '679257202109581',
     'searchLimit' => 1000,
-    'logLevel' => 'debug'
+    'logLevel' => 'debug',
+    'imageMagickCommand' => [ 'gm', 'convert' ]
+
 ];
