@@ -1,6 +1,6 @@
 {% macro toggleButton(id, label, active) %}
 <label class="btn btn-default {{ active ? 'active' }}" style="text-align: left;">
-    <input type="checkbox" id="{{ id }}" {{ active ? 'checked' }}><span class="glyphicon glyphicon-check"></span><span class="glyphicon glyphicon-unchecked"></span> {{ label }}
+    <input type="checkbox" id="{{ id }}" {{ active ? 'checked' }}> {{ label }}
 </label>
 {% endmacro %}
 {% import _self as macros %}
@@ -11,10 +11,10 @@
 </div>
 <div class="modal-body">
     <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-8">
             <div id="previewContainer" data-ref="{{ refString }}" data-translation="{{ translationId }}" style="overflow:hidden"><i class="fa fa-circle-o-notch fa-spin"></i></div>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-4">
             <div class="row">
                 <div class="btn-group-vertical" data-toggle="buttons" id="pdfToggles">
                     {{ macros.toggleButton('pdfHeadings', 'Címsorok', true) }}

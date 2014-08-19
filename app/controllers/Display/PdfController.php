@@ -55,7 +55,18 @@ class PdfController extends \BaseController {
     {
         $pdfFile = $this->generatePdf($translationId, $refString, Input::instance());
         $pngFile = "{$pdfFile}.png";
-        $processBuilder = new ProcessBuilder([ Config::get('settings.imageMagickCommand'), '-trim', $pdfFile, $pngFile ]);
+        $processBuilder = new ProcessBuilder();
+        $imageMagickCommand = Config::get('settings.imageMagickCommand');
+        if (is_array($imageMagickCommand)) {
+            foreach ($imageMagickCommand as $arg) {
+                $processBuilder->add($arg);
+            }
+        } else {
+            $processBuilder->add($imageMagickCommand);
+        }
+        foreach (['-trim', $pdfFile, $pngFile ] as $arg) {
+            $processBuilder->add($arg);
+        }
         $processBuilder->getProcess()->run();
         if (!file_exists($pngFile)) {
             $pngFile = "$pdfFile-0.png";
