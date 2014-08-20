@@ -49,10 +49,10 @@ class ReferenceService
         return false;
     }
 
-    private function findStoredBookRef($bookRef, $translationId)
+    private function findStoredBookRef($bookRef, $translationId, $refTranslationId = null)
     {
         $result = false;
-        $abbreviatedBook = $this->bookRepository->getByAbbrev($bookRef->bookId, $translationId);
+        $abbreviatedBook = $this->bookRepository->getByAbbrev($bookRef->bookId, $refTranslationId);
         if ($abbreviatedBook) {
             $book = $this->bookRepository->getByNumberForTranslation($abbreviatedBook->number, $translationId);
             if ($book) {
@@ -70,18 +70,19 @@ class ReferenceService
      * Takes a bookref and get an other bookref according
      * to the given translation.
      *
+     * @param refTranslationId The id of the translation the bookref is interpreted according to.
      * @return BookRef
      */
-    public function translateBookRef(BookRef $bookRef, $translationId)
+    public function translateBookRef(BookRef $bookRef, $translationId, $refTranslationId = null)
     {
-        $result = $this->findStoredBookRef($bookRef, $translationId);
+        $result = $this->findStoredBookRef($bookRef, $translationId, $refTranslationId);
         return $result ? $result : $bookRef;
     }
 
     public function translateReference(CanonicalReference $ref, $translationId)
     {
-        $bookRefs = array_map(function ($bookRef) use ($translationId) {
-            return $this->translateBookRef($bookRef, $translationId);
+        $bookRefs = array_map(function ($bookRef) use ($translationId, $ref) {
+            return $this->translateBookRef($bookRef, $translationId, $ref->translationId);
         }, $ref->bookRefs);
         return new CanonicalReference($bookRefs);
     }

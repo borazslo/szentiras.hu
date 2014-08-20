@@ -221,7 +221,7 @@ class SearchController extends BaseController
      * @param $refToSearch
      * @param $translation
      */
-    private function findTranslatedRef($refToSearch, $translation = false)
+    private function findTranslatedRef($refToSearch, $translation = null)
     {
         try {
             $ref = CanonicalReference::fromString($refToSearch);

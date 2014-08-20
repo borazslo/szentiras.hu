@@ -78,7 +78,7 @@ class TextDisplayController extends \BaseController
     {
         try {
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
-            $canonicalRef = CanonicalReference::fromString($reference);
+            $canonicalRef = CanonicalReference::fromString($reference, $translation->id);
             if ($canonicalRef->isBookLevel()) {
                 return $this->bookView($translationAbbrev, $canonicalRef);
             }
@@ -96,18 +96,19 @@ class TextDisplayController extends \BaseController
                 'teaser' => $this->getTeaser($verseContainers),
                 'chapterLinks' => $chapterLinks,
                 'translationLinks' => $translations->map(
-                        function ($translation) use ($canonicalRef) {
+                        function ($otherTranslation) use ($canonicalRef, $translation) {
                             $allBooksExistInTranslation = true;
                             foreach ($canonicalRef->bookRefs as $bookRef) {
-                                if (!$this->getAllBookTranslations($bookRef->bookId)->contains($translation->id)) {
+                                $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translation->id);
+                                if (!$this->getAllBookTranslations($book->number)->contains($otherTranslation->id)) {
                                     $allBooksExistInTranslation = false;
                                     break;
                                 }
                             }
                             return [
-                                'id' => $translation->id,
-                                'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
-                                'abbrev' => $translation->abbrev,
+                                'id' => $otherTranslation->id,
+                                'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $otherTranslation->id, $translation->id),
+                                'abbrev' => $otherTranslation->abbrev,
                                 'enabled' => $allBooksExistInTranslation
                             ];
                         }
@@ -136,7 +137,7 @@ class TextDisplayController extends \BaseController
                 }
             }
             $allTranslations = $this->translationRepository->getAllOrderedByDenom();
-            $bookTranslations = $this->getAllBookTranslations($book->abbrev);
+            $bookTranslations = $this->getAllBookTranslations($book->number);
             return View::make('textDisplay.book', [
                 'translation' => $translation,
                 'reference' => $translatedRef,
@@ -220,10 +221,10 @@ class TextDisplayController extends \BaseController
      * @param $book
      * @return mixed
      */
-    private function getAllBookTranslations($bookAbbrev)
+    private function getAllBookTranslations($bookNumber)
     {
-        $translations = $this->translationRepository->getAllOrderedByDenom()->filter(function ($translation) use ($bookAbbrev) {
-                return $this->bookRepository->getByAbbrevForTranslation($bookAbbrev, $translation->id);
+        $translations = $this->translationRepository->getAllOrderedByDenom()->filter(function ($translation) use ($bookNumber) {
+                return $this->bookRepository->getByNumberForTranslation($bookNumber, $translation->id);
             }
         );
         return $translations;

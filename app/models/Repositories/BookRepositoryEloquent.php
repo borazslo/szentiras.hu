@@ -29,8 +29,10 @@ class BookRepositoryEloquent implements BookRepository {
             $query = $query->where(function ($query) use ($translationId) {
                 $query->where('translation_id', $translationId)->orWhere('translation_id', null);
             });
+            $query = $query ->orderBy('translation_id', 'desc');
+        } else {
+            $query = $query ->orderBy('translation_id', 'asc');
         }
-        $query = $query ->orderBy('translation_id', 'desc');
         $abbrev = $query->remember(120)->first();
         if ($abbrev) {
             return $abbrev->books()->first();
