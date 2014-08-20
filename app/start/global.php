@@ -31,7 +31,7 @@ ClassLoader::addDirectories(array(
 |
 */
 
-Log::useFiles(storage_path().'/logs/laravel.log');
+Log::useDailyFiles(storage_path().'/logs/laravel.log', 0, Config::get('settings.logLevel'));
 
 /*
 |--------------------------------------------------------------------------
@@ -48,7 +48,10 @@ Log::useFiles(storage_path().'/logs/laravel.log');
 
 App::error(function(Exception $exception, $code)
 {
-	Log::error($exception);
+	Log::error("Exception on request: " . Request::url() . " referer: " . Request::header('Referer') . ". " . $exception);
+    if (!Config::get('app.debug')) {
+        return Response::make('Hiba történt. <a href="/">Vissza a címlapra</a>', 500);
+    }
 });
 
 /*
@@ -65,6 +68,12 @@ App::error(function(Exception $exception, $code)
 App::down(function()
 {
 	return Response::make("Karbantartás", 503);
+});
+
+
+App::missing(function($exception) {
+    Log::warning("404 for request: ". Request::url());
+    return Response::make('A kért oldal nem található. <a href="/">Vissza a címlapra</a>', 404);
 });
 
 /*

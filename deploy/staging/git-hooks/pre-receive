@@ -3,16 +3,19 @@ while read oldrev newrev refname
 do
     branch=$(git rev-parse --symbolic --abbrev-ref $refname)
     echo Received ref $refname meaning branch $branch
-    if [ "mvc" == "$branch" ]; then
-        echo Branch $branch push received
-        echo Shutting down the app
-        cd /home/szentiras_hu_git/github/borazslo/
-        if [ ! -d staging.szentiras.hu ]; then
-          git clone szentiras.hu.git staging.szentiras.hu
-        fi
-        cd staging.szentiras.hu
-        if [ -f composer.lock ]; then
-            php artisan down
-        fi
+    echo Branch $branch push received
+    cd /home/szentiras_hu_git/github/borazslo/
+    if [ "$branch" == "master" ]; then
+      appEnv=staging
+    else
+      appEnv=$branch
+    fi
+    if [ ! -d "$appEnv.szentiras.hu" ]; then
+      git clone szentiras.hu.git $appEnv.szentiras.hu
+    fi
+    echo Shutting down the app
+    cd $appEnv.szentiras.hu
+    if [ -f composer.lock ]; then
+       php artisan down
     fi
 done

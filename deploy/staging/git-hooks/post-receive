@@ -3,17 +3,20 @@ while read oldrev newrev refname
 do
     branch=$(git rev-parse --symbolic --abbrev-ref $refname)
     echo Received ref $refname as $branch
-    if [ "mvc" == "$branch" ]; then
-        echo Updating deployment
-        cd /home/szentiras_hu_git/github/borazslo/staging.szentiras.hu
-        unset GIT_DIR
-        git checkout mvc
-        git pull
-        echo "<?php return [ 'hash' => '`git rev-parse HEAD`' ];" > app/config/staging/version.php
-        export MYSQL_SZENTIRAS_USER=szentiras
-        export MYSQL_SZENTIRAS_PASSWORD=
-        export SZENTIRAS_WEBAPP_ENVIRONMENT=staging
-        sh install.sh
-        php artisan up
+    echo Updating deployment
+    if [ "$branch" == "master" ]; then
+      appEnv=staging
+    else
+      appEnv=$branch
     fi
+    cd /home/szentiras_hu_git/github/borazslo/$appEnv.szentiras.hu
+    unset GIT_DIR
+    git checkout $branch
+    git pull
+    echo "<?php return [ 'hash' => '`git rev-parse HEAD`' ];" > app/config/$appEnv/version.php
+    export SZENTIRAS_WEBAPP_ENVIRONMENT=$appEnv
+    sh install.sh
+    php artisan cache:clear
+    php artisan twig:clear
+    php artisan up
 done

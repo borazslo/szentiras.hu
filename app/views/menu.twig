@@ -1,15 +1,1 @@
-<ul class="nav nav-pills nav-stacked">
-    {% for item in items %}
-        {% if item == 'pause' %}
-            <li class="nav-divider"></li>
-        {% elseif item is not iterable %}
-            <li>{{ item|raw }}</li>
-        {% else %}
-            {% if item[1] %}
-                <li><a href="{{ item[1] }}">{{ item[0] }}</a></li>
-            {% else %}
-                <li><p class="navbar-text">{{ item[0] }}</p></li>
-            {% endif %}
-        {% endif %}
-    {% endfor %}
-</ul>
+{% include 'search.quickSearchForm' %}

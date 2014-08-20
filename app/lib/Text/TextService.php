@@ -45,15 +45,17 @@ class TextService {
         $verseContainers = [];
         foreach ($translatedRef->bookRefs as $bookRef) {
             $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translationId);
-            $verseContainer = new VerseContainer($book, $bookRef);
-            foreach ($bookRef->chapterRanges as $chapterRange) {
-                $searchedChapters = CanonicalReference::collectChapterIds($chapterRange);
-                $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters);
-                foreach ($verses as $verse) {
-                    $verseContainer->addVerse($verse);
+            if ($book) {
+                $verseContainer = new VerseContainer($book, $bookRef);
+                foreach ($bookRef->chapterRanges as $chapterRange) {
+                    $searchedChapters = CanonicalReference::collectChapterIds($chapterRange);
+                    $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters);
+                    foreach ($verses as $verse) {
+                        $verseContainer->addVerse($verse);
+                    }
                 }
+                $verseContainers[] = $verseContainer;
             }
-            $verseContainers[] = $verseContainer;
         }
         return $verseContainers;
     }

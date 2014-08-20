@@ -4,8 +4,6 @@ namespace SzentirasHu\Controllers\Home;
 
 use BaseController;
 use SzentirasHu\Models\Entities\Article;
-use SzentirasHu\Models\Entities\News;
-use SzentirasHu\Models\Entities\Translation;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 
 /**
@@ -34,9 +32,7 @@ class HomeController extends BaseController
     public function index()
     {
         return \View::make("home", [
-            'news' => Article::where('frontpage', true)->orderBy('publish_date', 'desc')->get(),
-            'pageTitle' => 'Fordítások | Szentírás',
-            'title' => 'Katolikus bibliafordítások',
+            'pageTitle' => 'Szentírás - A Biblia teljes szövege, katolikus és protestáns fordításokban',
             'cathBibles' => $this->translationRepository->getByDenom('katolikus'),
             'otherBibles' => $this->translationRepository->getByDenom('protestáns'),
             'lectures' => $this->lectureSelector->getLectures()

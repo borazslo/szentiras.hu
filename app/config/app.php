@@ -1,6 +1,8 @@
 <?php
 
-return array(
+return [
+
+    'cipher' => MCRYPT_RIJNDAEL_256,
 
 	/*
 	|--------------------------------------------------------------------------
@@ -78,7 +80,7 @@ return array(
 	|
 	*/
 
-	'providers' => array(
+	'providers' => [
 
 		'Illuminate\Foundation\Providers\ArtisanServiceProvider',
 		'Illuminate\Auth\AuthServiceProvider',
@@ -111,8 +113,9 @@ return array(
         'Barryvdh\Cors\CorsServiceProvider',
         'Barryvdh\Debugbar\ServiceProvider',
         'SzentirasHu\Lib\Sphinx\SphinxSearchServiceProvider',
-        'SzentirasHu\Models\Repositories\RepositoriesProvider'
-	),
+        'SzentirasHu\Models\Repositories\RepositoriesProvider',
+        'SzentirasHu\Lib\Imagine\ImagineServiceProvider',
+	],
 
 
 	/*
@@ -139,7 +142,7 @@ return array(
 	|
 	*/
 
-	'aliases' => array(
+	'aliases' => [
 
 		'App'             => 'Illuminate\Support\Facades\App',
 		'Artisan'         => 'Illuminate\Support\Facades\Artisan',
@@ -179,6 +182,7 @@ return array(
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
         'SphinxSearch' => 'SzentirasHu\Lib\Sphinx\SphinxSearchFacade',
-	),
+        'Imagine' => 'SzentirasHu\Lib\Imagine\ImagineFacade',
+	],
 
-);
+];

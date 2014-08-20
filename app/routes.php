@@ -4,16 +4,16 @@ require('views/Composers/viewComposers.php');
 
 Route::get('/', 'SzentirasHu\Controllers\Home\HomeController@index');
 
-Route::controller("kereses", 'SzentirasHu\Controllers\Search\SearchController');
+Route::controller("/kereses", 'SzentirasHu\Controllers\Search\SearchController');
 
 /** API */
-Route::controller("api", 'SzentirasHu\Controllers\Api\ApiController');
+Route::controller("/api", 'SzentirasHu\Controllers\Api\ApiController');
 
-Route::get('info', function() {
-   return View::make('info.info');
-});
+Route::controller('/info', 'SzentirasHu\Controllers\Home\InfoController');
 
-Route::get('API', function () {
+Route::controller('/pdf', 'SzentirasHu\Controllers\Display\PdfController');
+
+Route::get('/API', function () {
     if (Input::get('feladat') === 'idezet') {
         return Redirect::action('SzentirasHu\Controllers\Api\ApiController@getIdezet', [Input::get('hivatkozas'), Input::get('forditas')], 301);
     } else if (Input::get('feladat') === '') {
@@ -31,6 +31,10 @@ Route::get('/hang/{id}', 'SzentirasHu\Controllers\Display\AudioBookController@sh
 
 /** TEXT DISPLAY */
 
+/** QR code */
+Route::get('/qr/dialog/{url}', 'SzentirasHu\Controllers\Display\QrCodeController@dialog')->where('url', '.+');
+Route::get('/qr/img/{url}', 'SzentirasHu\Controllers\Display\QrCodeController@index')->where('url', '.+');
+
 Route::get('/forditasok', 'SzentirasHu\Controllers\Display\TextDisplayController@showTranslationList');
 
 Route::get('/{TRANSLATION_ABBREV}', 'SzentirasHu\\Controllers\\Display\\TextDisplayController@showTranslation')
@@ -42,3 +46,4 @@ Route::get('/{TRANSLATION_ABBREV}/{REFERENCE}', 'SzentirasHu\\Controllers\\Displ
 
 Route::get('/{REFERENCE}', 'SzentirasHu\\Controllers\\Display\\TextDisplayController@showReferenceText')
     ->where('REFERENCE', '[^/]+');
+

@@ -2,15 +2,16 @@
 
 <html lang="hu">
     <head>
+        {% if app.environment != 'production' %}<meta name="robots" content="noindex,nofollow">{% endif %}
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ pageTitle }}</title>
+        <title>{{ pageTitle ? pageTitle : metaTitle }}</title>
 
         <meta property="fb:admins" content="1819502454" />
         <meta property="fb:appId" content="{{ config_get('settings.facebookAppId') }}" />
 
-        <meta name="description" content="A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban">
+        <meta name="description" content="{{ teaser ? teaser : 'A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban' }}">
         <meta name="keywords" content="biblia, katolikus, protestáns, szentírás, keresztény, keresztyén, református, hivatalos">
         <meta name="author" content="szentiras.hu">
         <meta http-equiv="cleartype" content="on">
@@ -21,6 +22,7 @@
 
         <link href="/css/bootstrap.min.css" rel="stylesheet">
         <link href="/css/jquery-ui.min.css" rel="stylesheet">
+        <link href="/css/font-awesome.min.css" rel="stylesheet">
 
         <link href="/css/style.css" rel="stylesheet">
         <link href="/css/autocomplete.css" rel="stylesheet">
@@ -50,24 +52,15 @@
                 js.src = "//connect.facebook.net/hu_HU/sdk.js#xfbml=1&appId=679257202109581&version=v2.0";
                 fjs.parentNode.insertBefore(js, fjs);
             }(document, 'script', 'facebook-jssdk'));</script>
-        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
         <div class="container">
+            {% include 'navbar' %}
             <div class="row">
-                <div class="page-header">
-                    <h1><a href="/">Szentírás.hu</a>
-                        <small>Katolikus bibliafordítások az interneten</small></h1>
+                <div class="col-md-3 col-sm-4">
+                     {% include 'menu' %}
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3 col-sm-3">
-                    {% block menu %}
-                        {% include 'menu' %}
-                    {% endblock %}
-                </div>
-                <div class="col-md-9 col-sm-9">
+                <div class="col-md-9 col-sm-8">
+                    {% block pageHeader %}{% endblock %}
                     <div>
-                        {% block news %}{% endblock %}
-                        {% if title is defined %}<h3>{{ title }}</h3>{% endif %}
                         {% block content %}{% endblock %}
                         <br />
                         {% block abbrevlist %}{% endblock %}
@@ -85,6 +78,7 @@
                 {% if config_get('version.hash') %}- <small>verzió:
                     <a href="https://github.com/borazslo/szentiras.hu/commit/{{ config_get('version.hash') }}">
                     {{ config_get('version.hash') }}</a></small>{% endif %}</p>
+            <p>Programozók: <a href="https://github.com/briff">Fodor Bertalan</a>, <a href="https://github.com/borazslo">Elek László SJ</a>, <a href="https://github.com/molnarm">Molnár Márton</a></p>
         </div>
         {% if config_get('app.debug') %}
             {{ html_script('/js/lib/jquery.min.js') }}

@@ -81,7 +81,9 @@ class SearchController extends BaseController
             ];
         }
         $suggestions = $this->searchService->getSuggestionsFor($term);
-        $result = array_merge($result, $suggestions);
+        if (is_array($suggestions)) {
+            $result = array_merge($result, $suggestions);
+        }
         return Response::json($result);
     }
 
@@ -135,11 +137,13 @@ class SearchController extends BaseController
         if ($translatedRef) {
             $translation = $form->translation ? $form->translation : $this->translationRepository->getDefault();
             $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation->id);
-            $augmentedView = $view->with('bookRef', [
-                'label' => $translatedRef->toString(),
-                'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
-                'verseContainers' => $verseContainers
-            ]);
+            if ($verseContainers) {
+                $augmentedView = $view->with('bookRef', [
+                    'label' => $translatedRef->toString(),
+                    'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
+                    'verseContainers' => $verseContainers
+                ]);
+            }
         }
         return $augmentedView;
     }

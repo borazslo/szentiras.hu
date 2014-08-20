@@ -34,8 +34,10 @@ class BookRepositoryEloquent implements BookRepository {
      */
     public function getByAbbrevForTranslation($abbrev, $translationId)
     {
-        $number = $this->getByAbbrev($abbrev)->number;
-        return $this->getByNumberForTranslation($number, $translationId);
+        $book = $this->getByAbbrev($abbrev);
+        if ($book) {
+            return $this->getByNumberForTranslation($book->number, $translationId);
+        }
     }
 
     public function getByNumberForTranslation($number, $translationId)

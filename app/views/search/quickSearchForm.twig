@@ -1,0 +1,28 @@
+
+<div class="panel-group" id="accordion">
+    <div class="panel panel-default">
+        <div class="panel-heading visible-lg-block visible-md-block">
+            <h4 class="panel-title">
+                    Keresés a Bibliában
+            </h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse">
+            <div class="panel-body">
+                <form id="quickSearchForm" role="form" method="get" class="form-inline"
+                      action="/kereses/search">
+                    <div class="form-group" style="width:100%">
+                        <div class="input-group" style="width:100%">
+                            <input id="quickSearch" type="text" class="form-control" name="textToSearch" value="{{ form.textToSearch }}" placeholder="Gyorskeresés">
+                            <a id="quickSearchButton" class="btn btn-default input-group-addon"><span class="glyphicon glyphicon-search"></span></a>
+                            <a href="/kereses/search" title="Részletes keresés" class="hidden-sm hidden-md hidden-lg btn btn-default input-group-addon"><span class="glyphicon glyphicon-cog"></span></a></span>
+
+                        </div>
+                    </div>
+                </form>
+                <div class="hidden-xs row center-block" style="margin-top:5px">
+                    <a href="/kereses/search" class="btn btn-default center-block"><span class="glyphicon glyphicon-cog"></span> Részletes keresés</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
