@@ -93,7 +93,7 @@ class TextDisplayController extends \BaseController
                 'translations' => $translations,
                 'canonicalUrl' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
                 'metaTitle' => $this->getTitle($verseContainers, $translation),
-                'teaser' => $this->getTeaser($verseContainers),
+                'teaser' => $this->textService->getTeaser($verseContainers),
                 'chapterLinks' => $chapterLinks,
                 'translationLinks' => $translations->map(
                         function ($otherTranslation) use ($canonicalRef, $translation) {
@@ -133,7 +133,7 @@ class TextDisplayController extends \BaseController
                 if ($type == 'text') {
                     $verseContainer = new VerseContainer($book);
                     $verseContainer->addVerse($verse);
-                    $groupedVerses[$verse['chapter']][$verse['numv']] = $this->getTeaser([$verseContainer]);
+                    $groupedVerses[$verse['chapter']][$verse['numv']] = $this->textService->getTeaser([$verseContainer]);
                 }
             }
             $allTranslations = $this->translationRepository->getAllOrderedByDenom();
@@ -185,23 +185,6 @@ class TextDisplayController extends \BaseController
             }
         }
         return $title;
-    }
-
-    /**
-     * @param VerseContainer[] $verseContainers
-     * @return string
-     */
-    private function getTeaser($verseContainers)
-    {
-        $teaser = "";
-        foreach ($verseContainers as $verseContainer) {
-            $teaser .= preg_replace('/<\/?[^>]+>/', ' ', $verseContainer->getParsedVerses()[0]->text);
-            if ($verseContainer != last($verseContainers)) {
-                $teaser .= ' ... ';
-
-            }
-        }
-        return $teaser;
     }
 
     private function createChapterLinks(CanonicalReference $canonicalReference, Translation $translation)

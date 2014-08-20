@@ -8,16 +8,15 @@
         <div class="panel-body">
             {% for lecture in lectures %}
                 <div class="row">
-                    <div class="col-md-3">
-                        <a href='{{ lecture.link }}'>{{ lecture.ref }}</a>
-                    </div>
-                    <div class="col-md-4 btn-group">
-                        {% if loop.last %}
-                            <a href="http://evangelium.katolikus.hu/audio/NE{{ "now"|date('Ymd') }}.mp3"
-                               class="btn btn-default btn-xs" title="Evangélium és elmélkedés az evangelium365.hu honlapról."
-                               target="_blank">mp3</a>
-                        {% endif %}
-                    </div>
+                    <div class="col-md-12">
+                        <a href='{{ lecture.link }}'>{{ lecture.ref }}</a>                         {% if loop.last %}
+                        <a href="http://evangelium.katolikus.hu/audio/NE{{ "now"|date('Ymd') }}.mp3"
+                           class="btn btn-default btn-xs" title="Evangélium és elmélkedés az evangelium365.hu honlapról."
+                           target="_blank">mp3</a>
+                    {% endif %}
+
+                    <p><small>„{{ lecture.teaser }}”</small></p>
+                        </div>
                 </div>
             {% endfor %}
         </div>
