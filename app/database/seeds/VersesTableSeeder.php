@@ -19,19 +19,14 @@ class VersesTableSeeder extends Seeder
     private function addVerse($bookId, $bookNumber, $bookAbbrev, $chapter, $numv, $opts = [])
     {
         $v = new Verse();
-        $v->did = 1;
         $v->trans = 1;
         $v->gepi = sprintf("%d%03d%03d00", $bookNumber, $chapter, $numv);
         $v->book_number = $bookNumber;
         $v->book_id = $bookId;
         $v->chapter = $chapter;
         $v->numv = $numv;
-        $v->hiv = "{$bookAbbrev} {$chapter},{$numv}";
-        $v->old = 0;
         $v->tip = 6;
-        $v->jelenseg = "Könyvbeli versszöveg";
         $v->verse = "verse " . $v->hiv;
-        $v->versesimple = "versesimple" . $v->hiv;
         $v->verseroot = "verseroot" . $v->hiv;
         $v->save();
     }
