@@ -3,8 +3,7 @@
 namespace SzentirasHu\Controllers\Display;
 
 use Config;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\URL;
+use Redirect;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Reference\ReferenceService;

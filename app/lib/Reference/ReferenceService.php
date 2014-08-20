@@ -52,7 +52,7 @@ class ReferenceService
     private function findStoredBookRef($bookRef, $translationId)
     {
         $result = false;
-        $abbreviatedBook = $this->bookRepository->getByAbbrev($bookRef->bookId);
+        $abbreviatedBook = $this->bookRepository->getByAbbrev($bookRef->bookId, $translationId);
         if ($abbreviatedBook) {
             $book = $this->bookRepository->getByNumberForTranslation($abbreviatedBook->number, $translationId);
             if ($book) {
