@@ -63,28 +63,6 @@ class LectureSelector
             $lecture->translationId = $translationId;
             $lecture->bookAbbrev = $bookRef->bookId;
 
-            $extLinks = array();
-
-            $book = $this->bookRepository->getByAbbrev($lecture->bookAbbrev);
-            $verse = Verse::where('book_id', $book->id)->first();
-            if ($verse) {
-                $availableTranslatedVerses = Verse::whereIn('tip', array(60, 6, 901))
-                    ->where('gepi', $verse->gepi)->get()->sortBy(function($verse) {
-                    return $this->translationPriority[$verse->trans];
-                });
-
-                foreach ($availableTranslatedVerses as $verse) {
-                    $translation = $verse->book->translation;
-                    $extLink = new ExtLink();
-                    $extLink->label = $translation->abbrev;
-                    $extLink->title = $extLink->label;
-                    $extLink->url = "/{$translation->abbrev}/{$lecture->link}";
-                    $extLinks[] = $extLink;
-                }
-            }
-
-
-            $lecture->extLinks = $extLinks;
             $resultLectures[] = $lecture;
         }
         return $resultLectures;
