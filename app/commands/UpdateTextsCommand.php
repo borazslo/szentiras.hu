@@ -4,14 +4,14 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class UpdateText extends Command {
+class UpdateTextsCommand extends Command {
 
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'szentiras:updateText';
+    protected $name = 'szentiras:updateTexts';
 
     /**
      * The console command description.
