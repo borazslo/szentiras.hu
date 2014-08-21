@@ -1,14 +1,15 @@
 \documentclass[11pt]{article}
 \usepackage{fontspec}
-\usepackage[magyar]{babel}
-\setmainfont[Ligatures=TeX]{Linux Libertine O}
+\usepackage{polyglossia}
+\setdefaultlanguage{magyar}
+\setmainfont{Linux Libertine O}
 
 \begin{document}
 \thispagestyle{empty}
 
 {% for i in 1..options.quantity %}
     {% if options.quantity > 1 %}
-
+        \pagestyle{empty}
 
         \begin{minipage}{\textwidth}
     {% endif %}
