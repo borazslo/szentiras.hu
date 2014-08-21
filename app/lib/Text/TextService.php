@@ -95,4 +95,22 @@ class TextService {
         return $text;
     }
 
+    /**
+     * @param VerseContainer[] $verseContainers
+     * @return string
+     */
+    public function getTeaser($verseContainers)
+    {
+        $teaser = "";
+        foreach ($verseContainers as $verseContainer) {
+            $parsedVerses = $verseContainer->getParsedVerses();
+            $teaser .= preg_replace('/<\/?[^>]+>/', ' ', $parsedVerses[0]->text);
+            if ($verseContainer != last($verseContainers) || count($parsedVerses)>1) {
+                $teaser .= ' ... ';
+            }
+        }
+        return $teaser;
+    }
+
+
 } 

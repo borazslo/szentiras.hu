@@ -17,9 +17,23 @@ class BookRepositoryEloquent implements BookRepository {
         return Book::where('translation_id', $translationId)->remember(120)->orderBy('id')->get();
     }
 
-    public function getByAbbrev($bookAbbrev)
+    /**
+     * If translationId is not null, abbrevs associated with the given translation are preferred.
+     * If translationId is null, abbrevs not associated with anything are preferred..
+     *
+     */
+    public function getByAbbrev($bookAbbrev, $translationId = null)
     {
-        $abbrev = BookAbbrev::where('abbrev', $bookAbbrev)->remember(120)->first();
+        $query = BookAbbrev::where('abbrev', $bookAbbrev);
+        if ($translationId) {
+            $query = $query->where(function ($query) use ($translationId) {
+                $query->where('translation_id', $translationId)->orWhere('translation_id', null);
+            });
+            $query = $query ->orderBy('translation_id', 'desc');
+        } else {
+            $query = $query ->orderBy('translation_id', 'asc');
+        }
+        $abbrev = $query->remember(120)->first();
         if ($abbrev) {
             return $abbrev->books()->first();
         } else {
@@ -34,7 +48,7 @@ class BookRepositoryEloquent implements BookRepository {
      */
     public function getByAbbrevForTranslation($abbrev, $translationId)
     {
-        $book = $this->getByAbbrev($abbrev);
+        $book = $this->getByAbbrev($abbrev, $translationId);
         if ($book) {
             return $this->getByNumberForTranslation($book->number, $translationId);
         }

@@ -4,7 +4,7 @@ namespace SzentirasHu\Lib\Reference;
 
 /**
  * Class CanonicalReference to represent a unique reference to some Bible verses.
- * This reference is agnostic of translations, uses the primary
+ * This reference normally is agnostic to translation but to handle collisions, optionally can contain a translation id.
  *
  */
 class CanonicalReference
@@ -14,6 +14,8 @@ class CanonicalReference
      * @var BookRef[]
      */
     public $bookRefs;
+
+    public $translationId;
 
     public function __construct($bookRefs = [])
     {
@@ -30,12 +32,13 @@ class CanonicalReference
         return count($ref->bookRefs) > 0;
     }
 
-    public static function fromString($s)
+    public static function fromString($s, $translationId = null)
     {
         $ref = new CanonicalReference();
         $parser = new ReferenceParser($s);
         $bookRefs = $parser->bookRefs();
         $ref->bookRefs = $bookRefs;
+        $ref->translationId = $translationId;
         return $ref;
     }
 

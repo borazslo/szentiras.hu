@@ -5,6 +5,7 @@ namespace SzentirasHu\Controllers\Home;
 use SzentirasHu\Lib\LectureDownloader;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ReferenceService;
+use SzentirasHu\Lib\Text\TextService;
 use SzentirasHu\Models\Entities\Verse;
 use SzentirasHu\Models\Repositories\BookRepository;
 
@@ -31,17 +32,22 @@ class LectureSelector
      * @var \SzentirasHu\Lib\LectureDownloader
      */
     private $lectureDownloader;
+    /**
+     * @var \SzentirasHu\Lib\Text\TextService
+     */
+    private $textService;
 
-    public function __construct(BookRepository $bookRepository, ReferenceService $referenceService, LectureDownloader $lectureDownloader)
+    public function __construct(BookRepository $bookRepository, ReferenceService $referenceService, LectureDownloader $lectureDownloader, TextService $textService)
     {
         $this->bookRepository = $bookRepository;
         $this->referenceService = $referenceService;
         $this->lectureDownloader = $lectureDownloader;
+        $this->textService = $textService;
     }
 
     public function getLectures()
     {
-        $resultLectures = array();
+        $resultLectures = [];
         $referenceString = $this->lectureDownloader->getReferenceString();
         if (!$referenceString) {
             return $resultLectures;
@@ -59,32 +65,11 @@ class LectureSelector
             }
             $lecture = new Lecture();
             $lecture->ref = $bookRef->toString();
+            $lecture->teaser = $this->textService->getTeaser($this->textService->getTranslatedVerses(CanonicalReference::fromString($bookRef->toString()), $translationId));
             $lecture->link = str_replace(' ', '', $lecture->ref);
             $lecture->translationId = $translationId;
             $lecture->bookAbbrev = $bookRef->bookId;
 
-            $extLinks = array();
-
-            $book = $this->bookRepository->getByAbbrev($lecture->bookAbbrev);
-            $verse = Verse::where('book_id', $book->id)->first();
-            if ($verse) {
-                $availableTranslatedVerses = Verse::whereIn('tip', array(60, 6, 901))
-                    ->where('gepi', $verse->gepi)->get()->sortBy(function($verse) {
-                    return $this->translationPriority[$verse->trans];
-                });
-
-                foreach ($availableTranslatedVerses as $verse) {
-                    $translation = $verse->book->translation;
-                    $extLink = new ExtLink();
-                    $extLink->label = $translation->abbrev;
-                    $extLink->title = $extLink->label;
-                    $extLink->url = "/{$translation->abbrev}/{$lecture->link}";
-                    $extLinks[] = $extLink;
-                }
-            }
-
-
-            $lecture->extLinks = $extLinks;
             $resultLectures[] = $lecture;
         }
         return $resultLectures;

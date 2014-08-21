@@ -3,8 +3,7 @@
 namespace SzentirasHu\Controllers\Display;
 
 use Config;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\URL;
+use Redirect;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Reference\ReferenceService;
@@ -79,7 +78,7 @@ class TextDisplayController extends \BaseController
     {
         try {
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
-            $canonicalRef = CanonicalReference::fromString($reference);
+            $canonicalRef = CanonicalReference::fromString($reference, $translation->id);
             if ($canonicalRef->isBookLevel()) {
                 return $this->bookView($translationAbbrev, $canonicalRef);
             }
@@ -94,21 +93,22 @@ class TextDisplayController extends \BaseController
                 'translations' => $translations,
                 'canonicalUrl' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
                 'metaTitle' => $this->getTitle($verseContainers, $translation),
-                'teaser' => $this->getTeaser($verseContainers),
+                'teaser' => $this->textService->getTeaser($verseContainers),
                 'chapterLinks' => $chapterLinks,
                 'translationLinks' => $translations->map(
-                        function ($translation) use ($canonicalRef) {
+                        function ($otherTranslation) use ($canonicalRef, $translation) {
                             $allBooksExistInTranslation = true;
                             foreach ($canonicalRef->bookRefs as $bookRef) {
-                                if (!$this->getAllBookTranslations($bookRef->bookId)->contains($translation->id)) {
+                                $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translation->id);
+                                if (!$this->getAllBookTranslations($book->number)->contains($otherTranslation->id)) {
                                     $allBooksExistInTranslation = false;
                                     break;
                                 }
                             }
                             return [
-                                'id' => $translation->id,
-                                'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
-                                'abbrev' => $translation->abbrev,
+                                'id' => $otherTranslation->id,
+                                'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $otherTranslation->id, $translation->id),
+                                'abbrev' => $otherTranslation->abbrev,
                                 'enabled' => $allBooksExistInTranslation
                             ];
                         }
@@ -133,11 +133,11 @@ class TextDisplayController extends \BaseController
                 if ($type == 'text') {
                     $verseContainer = new VerseContainer($book);
                     $verseContainer->addVerse($verse);
-                    $groupedVerses[$verse['chapter']][$verse['numv']] = $this->getTeaser([$verseContainer]);
+                    $groupedVerses[$verse['chapter']][$verse['numv']] = $this->textService->getTeaser([$verseContainer]);
                 }
             }
             $allTranslations = $this->translationRepository->getAllOrderedByDenom();
-            $bookTranslations = $this->getAllBookTranslations($book->abbrev);
+            $bookTranslations = $this->getAllBookTranslations($book->number);
             return View::make('textDisplay.book', [
                 'translation' => $translation,
                 'reference' => $translatedRef,
@@ -187,23 +187,6 @@ class TextDisplayController extends \BaseController
         return $title;
     }
 
-    /**
-     * @param VerseContainer[] $verseContainers
-     * @return string
-     */
-    private function getTeaser($verseContainers)
-    {
-        $teaser = "";
-        foreach ($verseContainers as $verseContainer) {
-            $teaser .= preg_replace('/<\/?[^>]+>/', ' ', $verseContainer->getParsedVerses()[0]->text);
-            if ($verseContainer != last($verseContainers)) {
-                $teaser .= ' ... ';
-
-            }
-        }
-        return $teaser;
-    }
-
     private function createChapterLinks(CanonicalReference $canonicalReference, Translation $translation)
     {
         list($prevRef, $nextRef) = $this->referenceService->getPrevNextChapter($canonicalReference, $translation->id);
@@ -221,10 +204,10 @@ class TextDisplayController extends \BaseController
      * @param $book
      * @return mixed
      */
-    private function getAllBookTranslations($bookAbbrev)
+    private function getAllBookTranslations($bookNumber)
     {
-        $translations = $this->translationRepository->getAllOrderedByDenom()->filter(function ($translation) use ($bookAbbrev) {
-                return $this->bookRepository->getByAbbrevForTranslation($bookAbbrev, $translation->id);
+        $translations = $this->translationRepository->getAllOrderedByDenom()->filter(function ($translation) use ($bookNumber) {
+                return $this->bookRepository->getByNumberForTranslation($bookNumber, $translation->id);
             }
         );
         return $translations;
