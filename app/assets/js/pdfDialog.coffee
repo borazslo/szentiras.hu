@@ -19,6 +19,7 @@ define ['jquery'], ->
 
   resetProgressBar = ($progressBar) ->
     $progressBar.attr('aria-valuenow', 40).css('width', '40%');
+    $('.label', $progressBar).text('Előnézet készítése...')
     setTimeout(progressProgressBar($progressBar), 500);
 
   done = ->
