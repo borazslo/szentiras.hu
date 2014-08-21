@@ -6,6 +6,8 @@ Route::get('/', 'SzentirasHu\Controllers\Home\HomeController@index');
 
 Route::controller("/kereses", 'SzentirasHu\Controllers\Search\SearchController');
 
+Route::post('/searchbible.php', 'SzentirasHu\Controllers\Search\SearchController@postLegacy');
+
 /** API */
 Route::controller("/api", 'SzentirasHu\Controllers\Api\ApiController');
 

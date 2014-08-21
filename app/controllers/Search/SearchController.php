@@ -5,6 +5,7 @@ namespace SzentirasHu\Controllers\Search;
 use App;
 use BaseController;
 use Input;
+use Redirect;
 use Response;
 use SzentirasHu\Lib\Reference\CanonicalReference;
 use SzentirasHu\Lib\Reference\ParsingException;
@@ -232,6 +233,15 @@ class SearchController extends BaseController
             }
         } catch (ParsingException $e) {
         }
+    }
+
+    /**
+     * Search from old page, searchbible.php, texttosearch comes as post param
+     */
+    public function postLegacy()
+    {
+        $textToSearch = Input::get('texttosearch');
+        return Redirect::to("/kereses/search?textToSearch={$textToSearch}");
     }
 
 }
