@@ -31,11 +31,17 @@ class HomeController extends BaseController
 
     public function index()
     {
+        try {
+            $lectures = $this->lectureSelector->getLectures();
+        } catch (\Exception $e) {
+            $lectures = [];
+        }
+
         return \View::make("home", [
             'pageTitle' => 'Szentírás - A Biblia teljes szövege, katolikus és protestáns fordításokban',
             'cathBibles' => $this->translationRepository->getByDenom('katolikus'),
             'otherBibles' => $this->translationRepository->getByDenom('protestáns'),
-            'lectures' => $this->lectureSelector->getLectures()
+            'lectures' => $lectures
         ]);
     }
 
