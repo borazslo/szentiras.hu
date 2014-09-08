@@ -37,7 +37,6 @@ class UpdateTextsCommand extends Command {
      */
     public function fire()
     {    
-   
     if(!$this->option('nohunspell')) {
         //test hunspell
         $returnVal = shell_exec("which hunspell");
@@ -159,7 +158,7 @@ class UpdateTextsCommand extends Command {
         $this->info("Beolvasás sorról sorra...");
         
         $max = $objWorksheet->getHighestRow();
-        $insert = array();
+        $inserts = array();
         echo "\n";
         for($i = 3;$i<$max;$i++) {
             $row = $i;
@@ -174,7 +173,7 @@ class UpdateTextsCommand extends Command {
                 $values['tip'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($cols['jelstatusz'], $i)->getValue();
                 $values['verse'] = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($cols['jel'], $i)->getCalculatedValue();
                 $values['verseroot'] = '??';
-                $values['ido'] = gmdate ( 'Y-m-d H:i:s', PHPExcel_Shared_Date::ExcelToPHP( $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($cols['ido'], $i)->getValue()));
+                if(isset($cols['ido'])) $values['ido'] = gmdate ( 'Y-m-d H:i:s', PHPExcel_Shared_Date::ExcelToPHP( $objPHPExcel->getActiveSheet()->getCellByColumnAndRow($cols['ido'], $i)->getValue()));
                 if(isset($books_gepi2id[(int) substr($gepi,0,3)])) $values['book_id'] = $books_gepi2id[(int) substr($gepi,0,3)]; 
                 else {
                         $this->error("A ".(int) substr($gepi,0,3)."-hez nincs `book_id`");
@@ -186,6 +185,9 @@ class UpdateTextsCommand extends Command {
                 echo $abbrev." ".$values['gepi'];
                 if($this->option('verbose')) echo ": ".substr($values['verse'],0,140);
                 echo "\n"; 
+
+               // $values['id']=rand(1000,10000000);
+
                 $inserts[$i] = $values;
             }
         }
@@ -194,27 +196,47 @@ class UpdateTextsCommand extends Command {
         if(!$this->option('nohunspell')) {
             $this->info("Egyszerű szótövekből álló szöveg elkészítése...");
             echo "\n";
-            foreach($inserts as $key => $item) {                
-                $output = shell_exec('echo "'.$item['verse'].'" | hunspell -d hu_HU -s -i UTF-8');
-                $lines = explode("\n",$output);     
-                /* TODO: finomítandó, mert még mindig a legrosszabbat eszi meg (második ajánlat) */
-                $return = "";
-                foreach($lines as $line) {
-                    if($line == '' and isset($szo)) {
-                        $tmp = explode(' ',$szo);
-                        if(isset($tmp[1])) $return .= ' '.$tmp[1];
-                        else $return .= ' '.$tmp[0];          
-                    }
-                    $szo = $line;     
+            $descriptorspec = array(
+               0 => array("pipe", "r"), 
+               1 => array("pipe", "w"), 
+               2 => array("pipe", "r")
+            );
+            $process = proc_open('hunspell -d hu_HU -i UTF-8', $descriptorspec, $pipes, null, null); 
+            $this->info("Hunspell-hu indul...");
+            if(!$this->option('verbose')) fgets($pipes[1],4096); 
+            else echo fgets($pipes[1],4096); 
+
+
+            foreach($inserts as $key => $item) {
+                $item['verse'] = strtolower(strip_tags($item['verse']));
+                $item['verse'] = preg_replace("/(,|:|\?|!|;|\.|„|”|»|«|\")/i", '', $item['verse']);
+
+                $verseroot = ''; 
+                $worlds = explode(' ',$item['verse']);
+                foreach ($worlds as $k => $world) {
+
+                    fwrite($pipes[0], $world."\n");    // send start
+                    $return = fgets($pipes[1],4096); //get answer
+                    if(trim($return) != '') fgets($pipes[1],4096); //get answer
+                    if($return{0} == "+") {
+                        $verseroot .= " ".trim(substr($return,2));
+                    } else $verseroot .= " ".$world;
+
                 }
-                $return = strtolower(strip_tags($return));
-                $inserts[$key]['verseroot'] = trim($return);
+                $inserts[$key]['verseroot'] = trim($verseroot);
                 if(!$this->option('filter')) echo "\e[1A"; 
-                echo $item['gepi']." ".str_pad(substr(trim($return),0,140),140)."\n";
+                echo $item['gepi']." ".str_pad(substr(trim($verseroot),0,140),140)."\n";
             }
             if(!$this->option('verbose')) echo "\e[1A";
+
+            fclose($pipes[0]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $return_value = proc_close($process);  //stop test_gen.php
+            $this->info("\nHunspell-hu vége.");
       }
     
+    if(count($inserts) > 0) {
          $this->info("Mysql adatbázis lementése...");
          //TODO: larevelesíteni (http://bundles.laravel.com/bundle/mysqldump-php ?)
          $connections = Config::get('database.connections');
@@ -227,9 +249,19 @@ class UpdateTextsCommand extends Command {
         } else {
             DB::table('tdverse')->where('trans', '=', $translation->id)->where('gepi', 'REGEXP', $this->option('filter'))->delete();
         }
-         
-         $this->info("Mysql tábla feltöltése...");         
-         DB::table('tdverse')->insert($inserts);
+         $this->info("Mysql tábla feltöltése ". count($inserts)." sorral..."); 
+         echo "\n";
+         for($i=0;$i<count($inserts);$i += 100) {
+            $tmp = array_slice($inserts, $i, 100);
+            echo "\e[1A";
+             DB::table('tdverse')->insert($tmp);
+            //DB::table('tdverse')->insert($tmp);
+            $this->info($i + count($tmp));
+         }
+         echo "\n";
+    } else {
+        $this->info("Nincs mit feltölteni.");
+    }
 
 }
 
