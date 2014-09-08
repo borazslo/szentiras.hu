@@ -51,6 +51,8 @@ class LectureSelector
         $referenceString = $this->lectureDownloader->getReferenceString();
         if (!$referenceString) {
             return $resultLectures;
+        } else {
+            $referenceString = preg_replace('/\s+vagy\s+/', '; ', $referenceString);
         }
 
         $translationId = \Config::get('settings.defaultTranslationId');
