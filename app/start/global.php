@@ -67,7 +67,7 @@ App::error(function(Exception $exception, $code)
 
 App::down(function()
 {
-	return Response::make("Karbantartás", 503);
+	return Response::make("Karbantartás - pár perc múlva visszatérünk.", 503);
 });
 
 
