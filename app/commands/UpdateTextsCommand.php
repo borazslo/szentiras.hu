@@ -185,9 +185,6 @@ class UpdateTextsCommand extends Command {
                 echo $abbrev." ".$values['gepi'];
                 if($this->option('verbose')) echo ": ".substr($values['verse'],0,140);
                 echo "\n"; 
-
-               // $values['id']=rand(1000,10000000);
-
                 $inserts[$i] = $values;
             }
         }
@@ -195,7 +192,6 @@ class UpdateTextsCommand extends Command {
     
         if(!$this->option('nohunspell')) {
             $this->info("Egyszerű szótövekből álló szöveg elkészítése...");
-            echo "\n";
             $descriptorspec = array(
                0 => array("pipe", "r"), 
                1 => array("pipe", "w"), 
@@ -203,6 +199,7 @@ class UpdateTextsCommand extends Command {
             );
             $process = proc_open('hunspell -d hu_HU -i UTF-8', $descriptorspec, $pipes, null, null); 
             $this->info("Hunspell-hu indul...");
+            if(!$this->option('verbose')) echo "\n"; 
             if(!$this->option('verbose')) fgets($pipes[1],4096); 
             else echo fgets($pipes[1],4096); 
 
@@ -210,24 +207,28 @@ class UpdateTextsCommand extends Command {
             foreach($inserts as $key => $item) {
                 $item['verse'] = strtolower(strip_tags($item['verse']));
                 $item['verse'] = preg_replace("/(,|:|\?|!|;|\.|„|”|»|«|\")/i", '', $item['verse']);
+                $item['verse'] = preg_replace(array('/Í/i','/Ú/i','/Ő/i','/Ó/i','/Ü/i'),array('í','ú','ő','ó','ü'), $item['verse']);
+
 
                 $verseroot = ''; 
-                $worlds = explode(' ',$item['verse']);
-                foreach ($worlds as $k => $world) {
-
-                    fwrite($pipes[0], $world."\n");    // send start
+                fwrite($pipes[0], $item['verse']."\n");    // send start
+                $worlds = explode(' ',$item['verse']); 
+                $t = 0;               
+                foreach ($worlds as $k => $world) {                    
                     $return = fgets($pipes[1],4096); //get answer
-                    if(trim($return) != '') fgets($pipes[1],4096); //get answer
+                    //if(trim($return) == '') break;
                     if($return{0} == "+") {
+                        $t++;
                         $verseroot .= " ".trim(substr($return,2));
                     } else $verseroot .= " ".$world;
-
                 }
                 $inserts[$key]['verseroot'] = trim($verseroot);
-                if(!$this->option('filter')) echo "\e[1A"; 
-                echo $item['gepi']." ".str_pad(substr(trim($verseroot),0,140),140)."\n";
+                if(!$this->option('verbose')) echo "\e[1A"; 
+                echo sprintf('%02d', $t)." ".$item['gepi'];
+                if($this->option('verbose')) echo " ".str_pad(substr(trim($verseroot),0,140),140);
+                echo "\n";
             }
-            if(!$this->option('verbose')) echo "\e[1A";
+            echo "\e[1A";
 
             fclose($pipes[0]);
             fclose($pipes[1]);
@@ -255,14 +256,12 @@ class UpdateTextsCommand extends Command {
             $tmp = array_slice($inserts, $i, 100);
             echo "\e[1A";
              DB::table('tdverse')->insert($tmp);
-            //DB::table('tdverse')->insert($tmp);
-            $this->info($i + count($tmp));
+            $this->info($i + count($tmp)." sor feltöltve.");
          }
-         echo "\n";
     } else {
         $this->info("Nincs mit feltölteni.");
     }
-
+    $this->info("Ne feledd az újra indexelést az environmentnek megfelelően. Pl.: deploy/staging/sphinx/reindex.sh");
 }
 
     /**
