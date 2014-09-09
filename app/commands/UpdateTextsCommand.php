@@ -209,23 +209,31 @@ class UpdateTextsCommand extends Command {
                 $item['verse'] = preg_replace("/(,|:|\?|!|;|\.|„|”|»|«|\")/i", '', $item['verse']);
                 $item['verse'] = preg_replace(array('/Í/i','/Ú/i','/Ő/i','/Ó/i','/Ü/i'),array('í','ú','ő','ó','ü'), $item['verse']);
 
-
                 $verseroot = ''; 
-                fwrite($pipes[0], $item['verse']."\n");    // send start
                 $worlds = explode(' ',$item['verse']); 
-                $t = 0;               
-                foreach ($worlds as $k => $world) {                    
-                    $return = fgets($pipes[1],4096); //get answer
-                    //if(trim($return) == '') break;
-                    if($return{0} == "+") {
-                        $t++;
-                        $verseroot .= " ".trim(substr($return,2));
-                    } else $verseroot .= " ".$world;
+                $s = 0; $t = 0;
+                foreach ($worlds as $k => $world) {
+                    if(Cache::has('hunspell_'.$world)) {
+                        $verseroot .= " ".Cache::get('hunspell_'.$world);
+                        $s++;
+                    } else {
+                        fwrite($pipes[0], $world."\n");    // send start
+                        $return = fgets($pipes[1],4096); //get answer
+                        if(trim($return) != '') {
+                            fgets($pipes[1],4096);
+                            if($return{0} == "+") {
+                                $t++;
+                                $tocache = trim(substr($return,2));
+                            } else $tocache = $world;
+                            $verseroot .= " ".$tocache;
+                            Cache::put('hunspell_'.$world,$tocache,time()+3600);
+                        }
+                    }
                 }
                 $inserts[$key]['verseroot'] = trim($verseroot);
                 if(!$this->option('verbose')) echo "\e[1A"; 
-                echo sprintf('%02d', $t)." ".$item['gepi'];
-                if($this->option('verbose')) echo " ".str_pad(substr(trim($verseroot),0,140),140);
+                echo sprintf('%02d', $s)." ".sprintf('%02d', $t)." ".$item['gepi']." ".$item['tip'];
+                if($this->option('verbose'))    echo " ".str_pad(substr(trim($verseroot),0,140),140);
                 echo "\n";
             }
             echo "\e[1A";
