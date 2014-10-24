@@ -76,14 +76,14 @@ class UpdateTextsCommand extends Command
 
         for ($rowNumber = 2; $rowNumber <= $maxRowNumber; $rowNumber++) {
             $gepi = $bookWorksheet->getCellByColumnAndRow($columns[$abbrev]['gepi'], $rowNumber)->getValue();
-            $rov = $bookWorksheet>getCellByColumnAndRow($columns[$abbrev]['rov'], $rowNumber)->getValue();
+            $rov = $bookWorksheet->getCellByColumnAndRow($columns[$abbrev]['rov'], $rowNumber)->getValue();
             if (!isset($books_abbrev2id[$rov]) AND $rov != '-') {
                 $badAbbrevs[] = $rov;
             } else if ($rov != '-') {
                 $books_gepi2id[$gepi] = $books_abbrev2id[$rov];
             }
         }
-        $this->verifyBadAbbrev($badAbbrevs, $books_abbrev2id);
+        if(isset($badAbbrevs)) $this->verifyBadAbbrev($badAbbrevs, $books_abbrev2id);
 
         $abbrevWorksheet = $this->getWorksheet($filePath, $abbrev);
         $headers = $this->getHeaders($abbrevWorksheet);
@@ -240,6 +240,7 @@ class UpdateTextsCommand extends Command
         $conn = $connections[Config::get('database.default')];
         exec('mysqldump -u ' . $conn['username'] . ' --password=' . $conn['password'] . ' ' . $conn['database'] . ' ' . $conn['prefix'] . 'tdverse > ' . Config::get('settings.sourceDirectory') . '/' . $conn['database'] . '_' . $conn['prefix'] . 'tdverse_' . $abbrev . '_' . date('YmdHis') . '.sql');
 
+        Artisan::call('down');
         $this->info("Mysql tábla ürítése...");
         if (!$this->option('filter')) {
             DB::table('tdverse')->where('trans', '=', $translation->id)->delete();
@@ -254,6 +255,7 @@ class UpdateTextsCommand extends Command
             DB::table('tdverse')->insert($tmp);
             $this->info($rowNumber + count($tmp) . " sor feltöltve.");
         }
+        Artisan::call('up');
     }
 
     /**
@@ -269,7 +271,7 @@ class UpdateTextsCommand extends Command
     private function readLines($abbrevWorksheet, $cols, $fields, $translation, $books_gepi2id, $abbrev)
     {
         $this->info("Beolvasás sorról sorra...");
-        echo '\n';
+        echo "\n";
         $maxRowNumber = $abbrevWorksheet->getHighestRow();
         for ($rowNumber = 3; $rowNumber < $maxRowNumber; $rowNumber++) {
             $gepi = $abbrevWorksheet->getCellByColumnAndRow($cols[$fields['gepi']], $rowNumber)->getValue();
@@ -391,7 +393,7 @@ class UpdateTextsCommand extends Command
      * @param $headers
      * @return array
      */
-    private function verifyColumns($fields, $headers)
+    private function verifyColumns(&$fields, $headers)
     {
         $errors = [];
         foreach ($fields as $field) {
