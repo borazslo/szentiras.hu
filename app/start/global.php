@@ -73,7 +73,7 @@ App::down(function()
 
 App::missing(function($exception) {
     Log::warning("404 for request: ". Request::url());
-    return Response::make('A kért oldal nem található. <a href="/">Vissza a címlapra</a>', 404);
+    return Response::make($exception->getMessage() ? $exception->getMessage() :'A kért oldal nem található. <a href="/">Vissza a címlapra</a>', 404);
 });
 
 /*
