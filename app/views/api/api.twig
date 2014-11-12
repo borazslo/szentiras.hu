@@ -55,10 +55,15 @@
     Példák:
     {% set example = '1Kor 2,2-3.4;Jn 1,1-2' %}
     <ul>
-    <li><a href='/api/ref/{{ example }}'>{{ url('/api/ref/' ~ example )}}</a></li>
-    <li><a href='/api/ref/{{ example }}/KG'>{{ url('/api/ref/' ~ example ~ '/KG')}}</a></li></li>
-</ul>
+        <li><a href='/api/ref/{{ example }}'>{{ url('/api/ref/' ~ example )}}</a></li>
+        <li><a href='/api/ref/{{ example }}/KG'>{{ url('/api/ref/' ~ example ~ '/KG')}}</a></li>
+        <li><a href='/api/ref/{{ example }}/*'>{{ url('/api/ref/' ~ example ~ '/*')}}</a> - Minden fordításból</li>
+    </ul>
 
     <h4>search</h4>
+    <p>Szó vagy szórészlet keresése, pl.
+    {% set example = 'bocsát' %}
+    <a href="/api/search/{{ example }}">{{ url('/api/ref/' ~ example) }}</a>
+        </p>
 
 {% endblock %}

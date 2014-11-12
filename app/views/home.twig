@@ -1,5 +1,20 @@
 {% extends "layout" %}
 
+{% block extraHead %}
+    <script type="application/ld+json">
+{
+   "@context": "http://schema.org",
+   "@type": "WebSite",
+   "url": "{{ url('/') }}",
+   "potentialAction": {
+     "@type": "SearchAction",
+     "target": "{{ url('/kereses/search?textToSearch={search_term_string}')}}",
+     "query-input": "required name=search_term_string"
+   }
+}
+</script>
+{% endblock %}
+
 {% block pageHeader %}
     <div class="page-header">
         <h1>Szentírás.hu <small><span class="hidden-xs hidden-sm">Bibliafordítások az interneten</span></small></h1>

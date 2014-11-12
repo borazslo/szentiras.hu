@@ -3,7 +3,6 @@
 namespace SzentirasHu\Controllers\Api;
 
 use BaseController;
-use Illuminate\Support\Facades\Config;
 use SzentirasHu\Lib\Search\FullTextSearchParams;
 use SzentirasHu\Lib\Search\SearcherFactory;
 use SzentirasHu\Lib\Search\SearchService;
@@ -158,13 +157,32 @@ class ApiController extends BaseController
 
     public function getRef($ref, $translationAbbrev = false)
     {
-        $translation = $this->findTranslation($translationAbbrev);
-        $canonicalRef = $this->referenceService->translateReference(CanonicalReference::fromString($ref), $translation->id);
-        return $this->formatJsonResponse([
-            'canonicalRef' => $canonicalRef->toString(),
-            'canonicalUrl' => URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id)),
-            'text' => $this->textService->getPureText($canonicalRef, $translation->id)
-        ]);
+        if ($translationAbbrev == "*") {
+            $translations = $this->translationRepository->getAllOrderedByDenom();
+        } else {
+            $translations = [$this->findTranslation($translationAbbrev)];
+        }
+        $results = [];
+        foreach ($translations as $translation) {
+            $canonicalRef = $this->referenceService->translateReference(CanonicalReference::fromString($ref), $translation->id);
+            $text = $this->textService->getPureText($canonicalRef, $translation->id);
+            $result = [];
+            if (!empty($text)) {
+                $result[] = ['canonicalRef'=> $canonicalRef->toString()];
+                $result[] = ['canonicalUrl' => URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id))];
+                $result[] = ['text' => $this->textService->getPureText($canonicalRef, $translation->id)];
+                $result[] = ['translationAbbrev' => $translation->abbrev];
+                $result[] = ['translationName' => $translation->name];
+                $results[] = $result;
+            }
+        }
+        if (empty($results)) {
+            \App::abort(404, "Nincs ilyen hivatkozás");
+        } else {
+            return $this->formatJsonResponse(count($results)<=1 ? $results[0] : $results);
+        }
+
+
     }
 
     public function getSearch($text)
@@ -178,7 +196,7 @@ class ApiController extends BaseController
 
     private function formatJsonResponse($data)
     {
-        $flags = Config::get('app.debug') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE : 0;
+        $flags = \Config::get('app.debug') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE : 0;
         return Response::json($data, 200, [
             'Content-Type' => 'application/json; charset=UTF-8'
         ], $flags)->setCallback(Input::get('callback'));
