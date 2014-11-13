@@ -3,6 +3,11 @@ while read oldrev newrev refname
 do
     branch=$(git rev-parse --symbolic --abbrev-ref $refname)
     echo Received ref $refname as $branch
+    echo Shutting down the app
+    cd $appEnv.szentiras.hu
+    if [ -f composer.lock ]; then
+       php artisan down
+    fi
     echo Updating deployment
     if [ "$branch" == "master" ]; then
       appEnv=staging

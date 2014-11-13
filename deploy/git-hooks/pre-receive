@@ -13,9 +13,4 @@ do
     if [ ! -d "$appEnv.szentiras.hu" ]; then
       git clone szentiras.hu.git $appEnv.szentiras.hu
     fi
-    echo Shutting down the app
-    cd $appEnv.szentiras.hu
-    if [ -f composer.lock ]; then
-       php artisan down
-    fi
 done
