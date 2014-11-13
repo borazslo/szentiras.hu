@@ -24,7 +24,7 @@ class BookRepositoryEloquent implements BookRepository {
      */
     public function getByAbbrev($bookAbbrev, $translationId = null)
     {
-        $query = BookAbbrev::where('abbrev', $bookAbbrev);
+        $query = BookAbbrev::whereRaw('LOWER(abbrev) = ?', [mb_strtolower($bookAbbrev)]);
         if ($translationId) {
             $query = $query->where(function ($query) use ($translationId) {
                 $query->where('translation_id', $translationId)->orWhere('translation_id', null);
