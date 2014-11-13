@@ -168,11 +168,11 @@ class ApiController extends BaseController
             $text = $this->textService->getPureText($canonicalRef, $translation->id);
             $result = [];
             if (!empty($text)) {
-                $result[] = ['canonicalRef'=> $canonicalRef->toString()];
-                $result[] = ['canonicalUrl' => URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id))];
-                $result[] = ['text' => $this->textService->getPureText($canonicalRef, $translation->id)];
-                $result[] = ['translationAbbrev' => $translation->abbrev];
-                $result[] = ['translationName' => $translation->name];
+                $result['canonicalRef'] = $canonicalRef->toString();
+                $result['canonicalUrl'] = URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id));
+                $result['text'] = $this->textService->getPureText($canonicalRef, $translation->id);
+                $result['translationAbbrev'] = $translation->abbrev;
+                $result['translationName'] = $translation->name;
                 $results[] = $result;
             }
         }
