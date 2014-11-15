@@ -69,6 +69,7 @@ class UpdateTextsCommand extends Command
             'KNB' => ['gepi'=>0, 'rov'=>4],
             'UF' => ['gepi'=>0, 'rov'=>4],
             'KG' => ['gepi'=>0, 'rov'=>4],
+            'BD' => ['gepi'=>0, 'rov'=>1],
         ];
         $this->verifyBookColumns($columns, $abbrev);
 
@@ -88,7 +89,7 @@ class UpdateTextsCommand extends Command
         $abbrevWorksheet = $this->getWorksheet($filePath, $abbrev);
         $headers = $this->getHeaders($abbrevWorksheet);
 
-        $fields = ['did' => '*Ssz', 'gepi' => 'DCB_hiv', 'hiv' => 'szephiv', 'old' => 'DCB_old', 'tip' => 'jelstatusz', 'verse' => 'jel', 'ido' => 'ido'];
+        $fields = ['did' => '*Ssz', 'gepi' => 'DCB_hiv','tip' => 'jelstatusz', 'verse' => 'jel', 'ido' => 'ido'];
         $this->verifyColumns($fields, $headers);
 
         $inserts = $this->readLines($abbrevWorksheet, $headers, $fields, $translation, $books_gepi2id, $abbrev);
