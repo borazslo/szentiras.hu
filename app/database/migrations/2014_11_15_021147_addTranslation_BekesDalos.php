@@ -12,8 +12,9 @@ class AddTranslationBekesDalos extends Migration {
 	 */
 	public function up()
 	{
-		$id = DB::table('translations')->insertGetId(
+		DB::table('translations')->insert(
 		    array(
+        		'id'=>5,
 		    	'created_at' => date('Y-m-d H:i:s'),
 		    	'updated_at' => date('Y-m-d H:i:s'),
 		    	'name' => 'Békés-Dalos Újszövetségi Szentírás', 
@@ -34,7 +35,7 @@ class AddTranslationBekesDalos extends Migration {
             		'number' => $data[0],
         			'created_at' => date('Y-m-d H:i:s'),
 		    		'updated_at' => date('Y-m-d H:i:s'),
-		    		'translation_id' => $id,
+		    		'translation_id' => 5,
 		    		'name' => $data[3],
 		    		'abbrev' => $data[1],
 		    		'link' => $data[2],
@@ -51,9 +52,8 @@ class AddTranslationBekesDalos extends Migration {
 	 */
 	public function down()
 	{
-		$translation_id = DB::table('translations')->where('abbrev', 'BD')->pluck('id');
 		DB::table('translations')->where('abbrev', 'BD')->delete();
-		DB::table('books')->where('translation_id', $translation_id)->delete();
+		DB::table('books')->where('translation_id', 5)->delete();
 			
 	}
 
