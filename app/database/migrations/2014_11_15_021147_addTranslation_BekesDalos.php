@@ -31,7 +31,7 @@ class AddTranslationBekesDalos extends Migration {
         $file = fopen("{$migrationsPath}/2014_11_15_021147_addTranslation_BekesDalos.csv", "r");
         while ($data= fgetcsv($file)) {
             DB::table('books')->insert(
-            	array(
+            	[
             		'number' => $data[0],
         			'created_at' => date('Y-m-d H:i:s'),
 		    		'updated_at' => date('Y-m-d H:i:s'),
@@ -40,7 +40,7 @@ class AddTranslationBekesDalos extends Migration {
 		    		'abbrev' => $data[1],
 		    		'link' => $data[2],
 		    		'old_testament'=>0,
-            		)
+            		]
             );
         }
 	}
@@ -52,9 +52,8 @@ class AddTranslationBekesDalos extends Migration {
 	 */
 	public function down()
 	{
-		DB::table('translations')->where('abbrev', 'BD')->delete();
 		DB::table('books')->where('translation_id', 5)->delete();
-			
+        DB::table('translations')->where('abbrev', 'BD')->delete();
 	}
 
 }

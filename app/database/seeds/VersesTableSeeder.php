@@ -7,13 +7,13 @@ class VersesTableSeeder extends Seeder
 
     public function run()
     {
-        $this->addVerse(1, 101, 'Ter', 2, 3);
-        $this->addVerse(1, 101, 'Ter', 2, 4);
-        $this->addVerse(1, 101, 'Ter', 50, 9);
-        $this->addVerse(2, 102, 'Kiv', 1, 1);
-        $this->addVerse(2, 102, 'Kiv', 2, 3);
-        $this->addVerse(2, 102, 'Kiv', 3, 3);
-        $this->addVerse(5, 101, '1Móz', 2, 3);
+        $this->addVerse(101, 101, 'Ter', 2, 3);
+        $this->addVerse(101, 101, 'Ter', 2, 4);
+        $this->addVerse(101, 101, 'Ter', 50, 9);
+        $this->addVerse(102, 102, 'Kiv', 1, 1);
+        $this->addVerse(102, 102, 'Kiv', 2, 3);
+        $this->addVerse(102, 102, 'Kiv', 3, 3);
+        $this->addVerse(201, 101, '1Móz', 2, 3);
     }
 
     private function addVerse($bookId, $bookNumber, $bookAbbrev, $chapter, $numv, $opts = [])
