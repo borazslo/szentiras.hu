@@ -78,11 +78,12 @@ class UpdateTextsCommand extends Command
         for ($rowNumber = 2; $rowNumber <= $maxRowNumber; $rowNumber++) {
             $gepi = $bookWorksheet->getCellByColumnAndRow($columns[$abbrev]['gepi'], $rowNumber)->getValue();
             $rov = $bookWorksheet->getCellByColumnAndRow($columns[$abbrev]['rov'], $rowNumber)->getValue();
-            if (!isset($books_abbrev2id[$rov]) AND $rov != '-') {
+            if (!isset($books_abbrev2id[$rov]) AND ($rov != '-' AND $rov != '') ) {
                 $badAbbrevs[] = $rov;
-            } else if ($rov != '-') {
+            } else if ($rov != '-' AND $rov != '') {
                 $books_gepi2id[$gepi] = $books_abbrev2id[$rov];
             }
+            if($rowNumber > 100) break;
         }
         if(isset($badAbbrevs)) $this->verifyBadAbbrev($badAbbrevs, $books_abbrev2id);
 
