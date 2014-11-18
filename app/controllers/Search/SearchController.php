@@ -42,10 +42,6 @@ class SearchController extends BaseController
      */
     private $verseRepository;
     /**
-     * @var \SzentirasHu\Lib\Reference\ReferenceService
-     */
-    private $referenceService;
-    /**
      * @var \SzentirasHu\Lib\Text\TextService
      */
     private $textService;
@@ -54,12 +50,11 @@ class SearchController extends BaseController
      */
     private $searchService;
 
-    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, ReferenceService $referenceService, TextService $textService, SearchService $searchService)
+    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, TextService $textService, SearchService $searchService)
     {
         $this->bookRepository = $bookRepository;
         $this->translationRepository = $translationRepository;
         $this->verseRepository = $verseRepository;
-        $this->referenceService = $referenceService;
         $this->textService = $textService;
         $this->searchService = $searchService;
     }
@@ -73,7 +68,7 @@ class SearchController extends BaseController
     {
         $result = [];
         $term = Input::get('term');
-        $ref = $this->findTranslatedRef($term);
+        $ref = $this->searchService->findTranslatedRef($term);
         if ($ref) {
             $result[] = [
                 'cat' => 'ref',
@@ -134,7 +129,7 @@ class SearchController extends BaseController
     private function searchBookRef($form, $view)
     {
         $augmentedView = $view;
-        $translatedRef = $this->findTranslatedRef($form->textToSearch, $form->translation);
+        $translatedRef = $this->searchService->findTranslatedRef($form->textToSearch, $form->translation);
         if ($translatedRef) {
             $translation = $form->translation ? $form->translation : $this->translationRepository->getDefault();
             $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation->id);
@@ -216,23 +211,6 @@ class SearchController extends BaseController
         $searchParams->bookNumbers = $this->extractBookNumbers($form);
         $searchParams->synonyms = true;
         return $searchParams;
-    }
-
-    /**
-     * @param $refToSearch
-     * @param $translation
-     */
-    private function findTranslatedRef($refToSearch, $translation = null)
-    {
-        try {
-            $ref = CanonicalReference::fromString($refToSearch);
-            $storedBookRef = $this->referenceService->getExistingBookRef($ref);
-            if ($storedBookRef) {
-                $translation = $translation ? $translation : $this->translationRepository->getDefault();
-                return $this->referenceService->translateBookRef($storedBookRef, $translation->id);
-            }
-        } catch (ParsingException $e) {
-        }
     }
 
     /**
