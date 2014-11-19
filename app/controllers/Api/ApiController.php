@@ -3,6 +3,7 @@
 namespace SzentirasHu\Controllers\Api;
 
 use BaseController;
+use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Search\FullTextSearchParams;
 use SzentirasHu\Lib\Search\SearcherFactory;
 use SzentirasHu\Lib\Search\SearchService;
@@ -213,16 +214,20 @@ class ApiController extends BaseController
         }
         $results = [];
         foreach ($translations as $translation) {
-            $canonicalRef = $this->referenceService->translateReference(CanonicalReference::fromString($ref), $translation->id);
-            $text = $this->textService->getPureText($canonicalRef, $translation->id);
-            $result = [];
-            if (!empty($text)) {
-                $result['canonicalRef'] = $canonicalRef->toString();
-                $result['canonicalUrl'] = URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id));
-                $result['text'] = $this->textService->getPureText($canonicalRef, $translation->id);
-                $result['translationAbbrev'] = $translation->abbrev;
-                $result['translationName'] = $translation->name;
-                $results[] = $result;
+            try {
+                $canonicalRef = $this->referenceService->translateReference(CanonicalReference::fromString($ref), $translation->id);
+                $text = $this->textService->getPureText($canonicalRef, $translation->id);
+                $result = [];
+                if (!empty($text)) {
+                    $result['canonicalRef'] = $canonicalRef->toString();
+                    $result['canonicalUrl'] = URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id));
+                    $result['text'] = $this->textService->getPureText($canonicalRef, $translation->id);
+                    $result['translationAbbrev'] = $translation->abbrev;
+                    $result['translationName'] = $translation->name;
+                    $results[] = $result;
+                }
+            } catch (ParsingException $parsingException) {
+
             }
         }
         return $results;
