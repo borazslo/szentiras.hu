@@ -13,10 +13,11 @@ class AddCselToBookAbbrevs extends Migration {
 	 */
 	public function up()
 	{
- 		$abbrev = new BookAbbrev();
-        $abbrev->abbrev = "Acs";
-        $abbrev->books_id = 205;
-        $abbrev->save();
+        DB::table('book_abbrevs')->insert(
+            [
+                'abbrev' => 'Acs',
+                'books_id' => 205]
+        );
 	}
 
 	/**
@@ -26,7 +27,7 @@ class AddCselToBookAbbrevs extends Migration {
 	 */
 	public function down()
 	{
-        BookAbbrev::whereIn('abbrev','Acs')->delete();
+        DB::table('book_abbrevs')->where('abbrev', 'Acs')->delete();
 	}
 
 }

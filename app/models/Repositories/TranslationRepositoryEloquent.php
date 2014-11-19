@@ -12,19 +12,20 @@ class TranslationRepositoryEloquent implements TranslationRepository
 
     public function getAll()
     {
-        return Translation::remember(120)->orderBy('name')->get();
+        $allTranslations = Translation::remember(120)->orderBy('name');
+        return $allTranslations->whereIn('id', \Config::get('settings.enabledTranslations'))->get();
     }
 
     public function getByDenom($denom = false)
     {
         $q = $denom ? Translation::where('denom', $denom) : Translation::all();
-        return $q->orderBy('denom')->orderBy('name')->remember(120)->get();
+        return $q->orderBy('denom')->orderBy('name')->whereIn('id', \Config::get('settings.enabledTranslations'))->remember(120)->get();
     }
 
 
     public function getAllOrderedByDenom()
     {
-        return Translation::orderBy('denom')->get();
+        return Translation::orderBy('denom')->whereIn('id', \Config::get('settings.enabledTranslations'))->get();
     }
 
     public function getBooks($translation)

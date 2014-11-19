@@ -5,6 +5,9 @@
 
 namespace SzentirasHu\Lib\Search;
 
+use SzentirasHu\Lib\Reference\CanonicalReference;
+use SzentirasHu\Lib\Reference\ParsingException;
+use SzentirasHu\Lib\Reference\ReferenceService;
 use SzentirasHu\Lib\VerseContainer;
 use SzentirasHu\Models\Entities\Verse;
 use SzentirasHu\Models\Repositories\TranslationRepository;
@@ -25,12 +28,17 @@ class SearchService {
      * @var \SzentirasHu\Models\Repositories\TranslationRepository
      */
     private $translationRepository;
+    /**
+     * @var \SzentirasHu\Lib\Reference\ReferenceService
+     */
+    private $referenceService;
 
-    function __construct(SearcherFactory $searcherFactory, VerseRepository $verseRepository, TranslationRepository $translationRepository)
+    function __construct(SearcherFactory $searcherFactory, VerseRepository $verseRepository, TranslationRepository $translationRepository, ReferenceService $referenceService)
     {
         $this->searcherFactory = $searcherFactory;
         $this->verseRepository = $verseRepository;
         $this->translationRepository = $translationRepository;
+        $this->referenceService = $referenceService;
     }
 
     function getSuggestionsFor($term)
@@ -152,5 +160,23 @@ class SearchService {
         $searcher = $this->searcherFactory->createSearcherFor($params);
         return $searcher->get();
     }
+
+    /**
+     * @param $refToSearch
+     * @param $translation
+     */
+    public function findTranslatedRef($refToSearch, $translation = null)
+    {
+        try {
+            $ref = CanonicalReference::fromString($refToSearch);
+            $storedBookRef = $this->referenceService->getExistingBookRef($ref);
+            if ($storedBookRef) {
+                $translation = $translation ? $translation : $this->translationRepository->getDefault();
+                return $this->referenceService->translateBookRef($storedBookRef, $translation->id);
+            }
+        } catch (ParsingException $e) {
+        }
+    }
+
 
 }

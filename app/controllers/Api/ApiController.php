@@ -3,6 +3,7 @@
 namespace SzentirasHu\Controllers\Api;
 
 use BaseController;
+use SzentirasHu\Lib\Reference\ParsingException;
 use SzentirasHu\Lib\Search\FullTextSearchParams;
 use SzentirasHu\Lib\Search\SearcherFactory;
 use SzentirasHu\Lib\Search\SearchService;
@@ -157,25 +158,7 @@ class ApiController extends BaseController
 
     public function getRef($ref, $translationAbbrev = false)
     {
-        if ($translationAbbrev == "*") {
-            $translations = $this->translationRepository->getAllOrderedByDenom();
-        } else {
-            $translations = [$this->findTranslation($translationAbbrev)];
-        }
-        $results = [];
-        foreach ($translations as $translation) {
-            $canonicalRef = $this->referenceService->translateReference(CanonicalReference::fromString($ref), $translation->id);
-            $text = $this->textService->getPureText($canonicalRef, $translation->id);
-            $result = [];
-            if (!empty($text)) {
-                $result['canonicalRef'] = $canonicalRef->toString();
-                $result['canonicalUrl'] = URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id));
-                $result['text'] = $this->textService->getPureText($canonicalRef, $translation->id);
-                $result['translationAbbrev'] = $translation->abbrev;
-                $result['translationName'] = $translation->name;
-                $results[] = $result;
-            }
-        }
+        $results = $this->searchRef($ref, $translationAbbrev);
         if (empty($results)) {
             \App::abort(404, "Nincs ilyen hivatkozás");
         } else {
@@ -190,8 +173,8 @@ class ApiController extends BaseController
         $params = new FullTextSearchParams();
         $params->text = $text;
         $results = $this->searchService->getDetailedResults($params);
-        return $this->formatJsonResponse($results);
-
+        $refResult = $this->searchRef($text, false);
+        return $this->formatJsonResponse(["refResult" => $refResult, "fullTextResult" => $results]);
     }
 
     private function formatJsonResponse($data)
@@ -215,5 +198,38 @@ class ApiController extends BaseController
             $translation = $this->translationRepository->getDefault();
             return $translation;
         }
+    }
+
+    /**
+     * @param $ref
+     * @param $translationAbbrev
+     * @return array
+     */
+    private function searchRef($ref, $translationAbbrev)
+    {
+        if ($translationAbbrev == "*") {
+            $translations = $this->translationRepository->getAllOrderedByDenom();
+        } else {
+            $translations = [$this->findTranslation($translationAbbrev)];
+        }
+        $results = [];
+        foreach ($translations as $translation) {
+            try {
+                $canonicalRef = $this->referenceService->translateReference(CanonicalReference::fromString($ref), $translation->id);
+                $text = $this->textService->getPureText($canonicalRef, $translation->id);
+                $result = [];
+                if (!empty($text)) {
+                    $result['canonicalRef'] = $canonicalRef->toString();
+                    $result['canonicalUrl'] = URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id));
+                    $result['text'] = $this->textService->getPureText($canonicalRef, $translation->id);
+                    $result['translationAbbrev'] = $translation->abbrev;
+                    $result['translationName'] = $translation->name;
+                    $results[] = $result;
+                }
+            } catch (ParsingException $parsingException) {
+
+            }
+        }
+        return $results;
     }
 }
