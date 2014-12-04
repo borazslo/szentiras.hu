@@ -1,0 +1,19 @@
+{% extends 'ad.adLayout' %}
+
+{% block title %}
+    Bibliai társasjáték
+{% endblock %}
+{% block subtitle %}
+    Könyvek Könyve
+{% endblock %}
+{% set link = 'href="http://konyvekkonyve.hu/megrendeles-2" target="_blank"' %}
+{% set adImage='konyvekkonyve.jpg' %}
+{% set adId='konyvekkonyve' %}
+{% block text %}
+    <p class="text-justify">
+        A Könyvek Könyve bibliai társasjáték rengeteg idézettel, különleges, csak az Ó- és Újszövetségből való szóval és kifejezéssel művel és szórakoztat egyszerre!
+<br>
+        Ez lesz idén az egyik legjobb meglepetés karácsonyra!
+    </p>
+    <p class="text-center"><a  {{ link|raw }} class="btn btn-primary btn-xs" data-ad="{{ adId }}">Megrendelés</a></p>
+{% endblock %}
