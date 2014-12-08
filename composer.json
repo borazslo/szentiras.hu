@@ -7,7 +7,7 @@
         "barryvdh/laravel-twigbridge": "0.3.3",
         "twig/extensions": "1.0.*",
         "doctrine/dbal": "2.3.*",
-        "barryvdh/laravel-cors": "0.2.2",
+        "barryvdh/laravel-cors": "0.2.x",
         "gigablah/sphinxphp": "2.0.*",
         "barryvdh/laravel-debugbar": "1.*",
 		"phpoffice/phpexcel": "1.*",
