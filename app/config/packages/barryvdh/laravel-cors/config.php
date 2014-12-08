@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 
     /*
      |--------------------------------------------------------------------------
@@ -15,22 +15,22 @@ return array(
      | the allowed methods however have to be explicitly listed.
      |
      */
-    'defaults' => array(
+    'defaults' => [
         'allow_credentials' => false,
-        'allow_origin' => array(),
-        'allow_headers' => array(),
-        'allow_methods' => array(),
-        'expose_headers' => array(),
+        'allow_origin' => [],
+        'allow_headers' => [],
+        'allow_methods' => [],
+        'expose_headers' => [],
         'max_age' => 0,
-    ),
+    ],
 
-    'paths' => array(
-        '^/api/' => array(
-            'allow_origin' => array('*'),
-            'allow_headers' => array('Content-Type'),
-            'allow_methods' => array('POST', 'PUT', 'GET', 'DELETE'),
+    'paths' => [
+        '^/api/' => [
+            'allow_origin' => ['*'],
+            'allow_headers' => ['*'],
+            'allow_methods' => ['POST', 'PUT', 'GET', 'DELETE'],
             'max_age' => 3600,
-        ),
-    ),
+        ],
+    ],
 
-);
+];
