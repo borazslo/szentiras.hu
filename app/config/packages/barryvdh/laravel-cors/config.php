@@ -28,7 +28,7 @@ return [
         '^/api/' => [
             'allow_origin' => ['*'],
             'allow_headers' => ['*'],
-            'allow_methods' => ['POST', 'PUT', 'GET', 'DELETE'],
+            'allow_methods' => ['POST', 'PUT', 'GET', 'DELETE', 'OPTIONS'],
             'max_age' => 3600,
         ],
     ],
