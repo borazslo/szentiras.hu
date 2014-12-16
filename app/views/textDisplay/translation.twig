@@ -13,7 +13,12 @@
 {% block content %}
     {% include 'textDisplay.breadcrumb' %}
     {% include 'bookAbbrevList' with { 'translation' : translation } %}
-    <h4>Ószövetség</h4>
+    
+    {% for book in books if book.old_testament %}
+        {% if loop.first %}
+            <h4>Ószövetség</h4>
+        {% endif %}
+    {% endfor %}
     <ul class="list-unstyled">
         {% for book in books if book.old_testament %}
             {{ temp.bookLink(translation, book) }}
