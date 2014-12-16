@@ -4,7 +4,7 @@ return [
     'defaultTranslationId' => 3,
     'defaultTranslationAbbrev' => 'KNB',
     'translationAbbrevRegex' => 'KNB|SZIT|UF|KG|BD|knb|szit|uf|kg|bd',
-    'enabledTranslations' => [ 1, 2, 3, 4],
+    'enabledTranslations' => [ 1, 2, 3, 4, 5],
     'audioDirectory' => 'hang',
     'sourceDirectory' => 'tmp',
     'facebookAppId' => '679257202109581',
