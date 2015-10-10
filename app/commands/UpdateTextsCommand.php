@@ -58,9 +58,36 @@ class UpdateTextsCommand extends Command
         $this->verifyAbbrev($abbrev);
 
         $translation = $this->translationRepository->getByAbbrev($abbrev);
+
+        if($this->option('file') AND $this->option('url')) {
+            App::abort(500, "A forrást vagy url-el VAGY file névvel lehet megadni. Mindkettővel nem.");
+        } elseif(!$this->option('file') AND !$this->option('url')) {
+            App::abort(500, "A forrást meg kell adni vagy url-el VAGY file névvel.");
+        }
+
         $fileName = $this->getFileName($abbrev);
         $books_abbrev2id = $this->getAbbrev2Id($translation);
         $sourceDir = Config::get('settings.sourceDirectory');
+
+
+        ini_set('memory_limit', '1024M');
+
+        if($this->option('url')) {
+            try{
+                $this->info("A fájl letöltése a megadott címről...");
+                $raw = file_get_contents($this->option('url'));
+            }catch(Exception $ex){
+                App::abort(500, "Nem sikerült fáljt letölteni a megadott url-ről.");
+            }
+            try{
+                file_put_contents("{$sourceDir}/{$fileName}", $raw);
+                unset($raw);
+            }catch(Exception $ex){
+                App::abort(500, "Nem sikerült a letöltött fájlt elmenteni.");
+            }    
+        }
+
+        
         $filePath = "{$sourceDir}/{$fileName}";
         $bookWorksheet = $this->getWorksheet($filePath, 'Könyvek');
 
@@ -127,7 +154,8 @@ class UpdateTextsCommand extends Command
     protected function getOptions()
     {
         return [
-            ['file', null, InputOption::VALUE_OPTIONAL, 'File to use for the import', '{abbrev}.xls'],
+            ['file', null, InputOption::VALUE_OPTIONAL, 'File to use for the import', null],
+            ['url', null, InputOption::VALUE_OPTIONAL, 'Url of the file to use for the import',null],
             ['nohunspell', null, InputOption::VALUE_NONE, 'Generate versesimple with hunspell'],
             ['filter', null, InputOption::VALUE_OPTIONAL, 'Filter the import by `gepi`', null],
         ];
@@ -153,7 +181,9 @@ class UpdateTextsCommand extends Command
     private function getWorksheet($path, $sheet)
     {
         try {
-            $this->info("A {$sheet} lap betöltése...");
+            $this->info("A '{$sheet}' lap betöltése...");
+            //set_time_limit(300);
+
             $filetype = PHPExcel_IOFactory::identify($path);
             $objReader = PHPExcel_IOFactory::createReader($filetype);
             $objReader->setReadDataOnly(true);
@@ -161,8 +191,7 @@ class UpdateTextsCommand extends Command
             $objPHPExcel = $objReader->load($path);
             $objWorksheet = $objPHPExcel->getActiveSheet();
         } catch (Exception $e) {
-            $this->error('nincs');
-            App::abort(500, 'Nem sikerült a fájlt betölteni!');
+            App::abort(500, "Nem sikerült a '$sheet' lap betöltése.");
         }
         return $objWorksheet;
     }
