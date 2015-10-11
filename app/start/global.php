@@ -98,7 +98,8 @@ App::instance("verseParsers", [
     2 => App::make('SzentirasHu\Lib\Text\VerseParsers\DefaultVerseParser'),
     3 => App::make('SzentirasHu\Lib\Text\VerseParsers\KNBVerseParser'),
     4 => App::make('SzentirasHu\Lib\Text\VerseParsers\KGVerseParser'),
-    5 => App::make('SzentirasHu\Lib\Text\VerseParsers\DefaultVerseParser')
+    5 => App::make('SzentirasHu\Lib\Text\VerseParsers\DefaultVerseParser'),
+    6 => App::make('SzentirasHu\Lib\Text\VerseParsers\DefaultVerseParser')
 ]);
 
 View::composer('menu', 'SzentirasHu\Views\Composers\MenuComposer');

@@ -97,6 +97,7 @@ class UpdateTextsCommand extends Command
             'UF' => ['gepi'=>0, 'rov'=>4],
             'KG' => ['gepi'=>0, 'rov'=>4],
             'BD' => ['gepi'=>0, 'rov'=>1],
+            'RUF' => ['gepi'=>0, 'rov'=>5],
         ];
         $this->verifyBookColumns($columns, $abbrev);
 
@@ -436,6 +437,7 @@ class UpdateTextsCommand extends Command
             foreach ($headers as $col => $val) {
                 if (preg_match('/[A-Z]{3}_hiv/', $col)) $fields['gepi'] = $col;
                 if (preg_match('/[A-Z]{3}_old/', $col)) $fields['old'] = $col;
+                if (preg_match('/ssz$/i', $col)) $fields['did'] = $col;
             }
             if (!isset($headers['ido'])) {
                 unset($fields['ido']);
