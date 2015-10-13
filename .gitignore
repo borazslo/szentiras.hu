@@ -16,3 +16,6 @@ app/storage
 node_modules
 bower_components
 version.php
+.vagrant
+Homestead.yaml
+Vagrantfile

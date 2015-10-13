@@ -26,6 +26,10 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(function () {
     $env = getenv('SZENTIRAS_WEBAPP_ENVIRONMENT');
+    // fall back to Laravel 5/Homestead default
+    if (!$env) {
+        $env = getenv('APP_ENV');
+    }
     return $env ? $env : 'production';
 
 });

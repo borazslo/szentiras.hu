@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use \App;
 
 class CreateSynonymsTable extends Migration {
 
@@ -52,7 +51,7 @@ class CreateSynonymsTable extends Migration {
 	}
 
     private function addInitialData() {
-        $synonymRepository = App::make('SzentirasHu\Models\Repositories\SynonymRepository');
+        $synonymRepository = \App::make('SzentirasHu\Models\Repositories\SynonymRepository');
         foreach ($this->data as $synonyms) {
             $synonymRepository->addSynonyms($synonyms);
         }
