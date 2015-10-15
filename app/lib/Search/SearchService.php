@@ -131,6 +131,23 @@ class SearchService {
                 $verseCount++;
             }
             $chapterCount += count($result['chapters']);
+            if (!$params->groupByVerse) {
+                foreach ($result['chapters'] as $chapterNumber => $verses) {
+                    usort($verses, function ($verseData1, $verseData2) {
+                        if ($verseData1['numv'] == $verseData2['numv']) {
+                            return 0;
+                        }
+                        return ($verseData1['numv'] < $verseData2['numv']) ? -1 : 1;
+                    });
+                    $currentNumv = 1;
+                    $result['chapters'][$chapterNumber] = $verses;
+                    foreach ($verses as $key => $verse) {
+                        if ($verse['numv'] > $currentNumv) {
+                            $result['chapters'][$chapterNumber][$key]['ellipseBefore'] = true;
+                        }
+                    }
+                }
+            }
             if (array_key_exists('verses', $result)) {
                 $results[] = $result;
             }
