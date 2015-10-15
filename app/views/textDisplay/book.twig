@@ -14,7 +14,7 @@
 
 
     {% for chapter, verses in groupedVerses %}
-        <h4><a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a></h4>
+        <h4><a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}</a></h4>
 
         {% for num in '1'..'2' %}
             <sup>{{ verses[num].numv }}</sup>{{ verses[num]|raw }}

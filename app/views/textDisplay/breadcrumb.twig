@@ -7,7 +7,7 @@
         {% if bookRef is defined %}
             {% if bookRef.chapterRanges|length == 1 and bookRef.chapterRanges[0].untilChapterRef is empty %}
                 {% set chapter = bookRef.chapterRanges[0].chapterRef.chapterId %}
-                <li><a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. fejezet</a></li>
+                <li><a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}</a></li>
             {% else %}
                 <li class="active">{{ bookRef.toString() }}</a></li>
             {% endif %}

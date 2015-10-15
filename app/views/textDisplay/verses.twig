@@ -28,10 +28,10 @@
             </p>
             <p>
                 {% if chapterLinks.prevLink %}
-                    <a href="/{{ chapterLinks.prevLink }}" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> Előző fejezet</a>
+                    <a href="/{{ chapterLinks.prevLink }}" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> Előző {{ verseContainer.book.number != 121 ? "fejezet" : "zsoltár"}}</a>
                 {% endif %}
                 {% if chapterLinks.nextLink %}
-                    <a href="/{{ chapterLinks.nextLink }}" class="btn btn-default">Következő fejezet <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a href="/{{ chapterLinks.nextLink }}" class="btn btn-default">Következő {{ verseContainer.book.number != 121 ? "fejezet" : "zsoltár"}} <span class="glyphicon glyphicon-chevron-right"></span></a>
                 {% endif %}
         </div>
         <hr>
