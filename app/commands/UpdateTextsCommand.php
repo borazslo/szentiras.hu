@@ -5,6 +5,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
+use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Common\Type;
+
 
 class UpdateTextsCommand extends Command
 {
@@ -30,6 +33,10 @@ class UpdateTextsCommand extends Command
      * @var SzentirasHu\Models\Repositories\BookRepository
      */
     private $bookRepository;
+
+    private $hunspellEnabled = false;
+
+    private $newStems = 0;
 
     /**
      * Create a new command instance.
@@ -69,7 +76,6 @@ class UpdateTextsCommand extends Command
         $books_abbrev2id = $this->getAbbrev2Id($translation);
         $sourceDir = Config::get('settings.sourceDirectory');
 
-
         ini_set('memory_limit', '1024M');
 
         if($this->option('url')) {
@@ -86,11 +92,8 @@ class UpdateTextsCommand extends Command
                 App::abort(500, "Nem sikerült a letöltött fájlt elmenteni.");
             }    
         }
-
         
         $filePath = "{$sourceDir}/{$fileName}";
-        $bookWorksheet = $this->getWorksheet($filePath, 'Könyvek');
-
         $columns = [
             'SZIT' => ['gepi'=>0, 'rov'=>5],
             'KNB' => ['gepi'=>0, 'rov'=>4],
@@ -101,31 +104,64 @@ class UpdateTextsCommand extends Command
         ];
         $this->verifyBookColumns($columns, $abbrev);
 
-        $maxRowNumber = $bookWorksheet->getHighestRow();
+        $this->info("A $filePath fájl betöltése...");
+        $reader = ReaderFactory::create(Type::XLSX);
+        $reader->open($filePath);
+        $this->info("A $filePath fájl megnyitva...");
 
-        for ($rowNumber = 2; $rowNumber <= $maxRowNumber; $rowNumber++) {
-            $gepi = $bookWorksheet->getCellByColumnAndRow($columns[$abbrev]['gepi'], $rowNumber)->getValue();
-            $rov = $bookWorksheet->getCellByColumnAndRow($columns[$abbrev]['rov'], $rowNumber)->getValue();
+        $sheets = $this->getSheets($reader);
+        $bookRowIterator = $sheets['Könyvek']->getRowIterator();
+        $linesRead = 0;
+        foreach ($bookRowIterator as $row) {
+            // skip first line
+            if ($linesRead == 0) {
+                $linesRead++;
+                continue;
+            }
+            // break on first empty line
+            if (empty($row[0])) {
+                break;
+            }
+            $gepi = $row[$columns[$abbrev]['gepi']];
+            $rov = $row[$columns[$abbrev]['rov']];
             if (!isset($books_abbrev2id[$rov]) AND ($rov != '-' AND $rov != '') ) {
                 $badAbbrevs[] = $rov;
             } else if ($rov != '-' AND $rov != '') {
                 $books_gepi2id[$gepi] = $books_abbrev2id[$rov];
             }
-            if($rowNumber > 100) break;
         }
         if(isset($badAbbrevs)) $this->verifyBadAbbrev($badAbbrevs, $books_abbrev2id);
 
-        $abbrevWorksheet = $this->getWorksheet($filePath, $abbrev);
-        $headers = $this->getHeaders($abbrevWorksheet);
+        $verseRowIterator = $sheets[$abbrev]->getRowIterator();
+        $headers = $this->getHeaders($verseRowIterator);
 
         $fields = ['did' => '*Ssz', 'gepi' => 'DCB_hiv','tip' => 'jelstatusz', 'verse' => 'jel', 'ido' => 'ido'];
         $this->verifyColumns($fields, $headers);
 
-        $inserts = $this->readLines($abbrevWorksheet, $headers, $fields, $translation, $books_gepi2id, $abbrev);
-
-        if (!$this->option('nohunspell')) {
-            $inserts = $this->processHunspell($inserts);
+        $pipes = [];
+        if ($this->hunspellEnabled) {
+            $descriptorspec = [
+                0 => ["pipe", "r"],
+                1 => ["pipe", "w"],
+                2 => ["pipe", "r"]
+            ];
+            $hunspellProcess = proc_open('hunspell -d hu_HU -i UTF-8', $descriptorspec, $pipes, null, null);
+            $this->info("Hunspell-hu indul...");
+            if (!$this->option('verbose')) echo "\n";
+            if (!$this->option('verbose')) fgets($pipes[1], 4096);
+            else echo fgets($pipes[1], 4096);
         }
+
+        $inserts = $this->readLines($verseRowIterator, $headers, $fields, $translation, $books_gepi2id, $abbrev, $pipes);
+
+        if ($this->hunspellEnabled) {
+            fclose($pipes[0]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($hunspellProcess);
+
+        }
+        $reader->close();
 
         if (count($inserts) > 0) {
             $this->saveToDb($abbrev, $translation, $inserts);
@@ -173,91 +209,59 @@ class UpdateTextsCommand extends Command
         if (preg_match('/Can\'t open affix or dictionary files for dictionary/i', $returnVal)) {
             App::abort(500, 'Can\'t open the hu_HU dictionary. Try to install hunspell-hu or use \'--nohunspell\' instead.');
         }
+        $this->hunspellEnabled = true;
     }
 
     /**
      * @param $path
-     * @return PHPExcel_Worksheet
+     * @return \Box\Spout\Reader\XLSX\Sheet[]
      */
-    private function getWorksheet($path, $sheet)
+    private function getSheets($reader)
     {
-        try {
-            $this->info("A '{$sheet}' lap betöltése...");
-            //set_time_limit(300);
-
-            $filetype = PHPExcel_IOFactory::identify($path);
-            $objReader = PHPExcel_IOFactory::createReader($filetype);
-            $objReader->setReadDataOnly(true);
-            $objReader->setLoadSheetsOnly($sheet);
-            $objPHPExcel = $objReader->load($path);
-            $objWorksheet = $objPHPExcel->getActiveSheet();
-        } catch (Exception $e) {
-            App::abort(500, "Nem sikerült a '$sheet' lap betöltése.");
+        $sheets = [];
+        foreach ($reader->getSheetIterator() as $sheet) {
+            $sheets[$sheet->getName()] = $sheet;
         }
-        return $objWorksheet;
+        if (empty($sheets)) {
+            App::abort(500, 'Sikertelen betöltés.');
+        }
+        return $sheets;
     }
 
-    /**
-     * @param $inserts
-     * @return mixed
-     */
-    private function processHunspell($inserts)
-    {
-        $this->info("Egyszerű szótövekből álló szöveg elkészítése...");
-        $descriptorspec = [
-            0 => ["pipe", "r"],
-            1 => ["pipe", "w"],
-            2 => ["pipe", "r"]
-        ];
-        $process = proc_open('hunspell -d hu_HU -i UTF-8', $descriptorspec, $pipes, null, null);
-        $this->info("Hunspell-hu indul...");
-        if (!$this->option('verbose')) echo "\n";
-        if (!$this->option('verbose')) fgets($pipes[1], 4096);
-        else echo fgets($pipes[1], 4096);
+    private function stem($verse, $pipes) {
+        $processedVerse = strtolower(strip_tags($verse));
+        $processedVerse = preg_replace("/(,|:|\?|!|;|\.|„|”|»|«|\")/i", ' ', $processedVerse);
+        $processedVerse = preg_replace(['/Í/i', '/Ú/i', '/Ő/i', '/Ó/i', '/Ü/i'], ['í', 'ú', 'ő', 'ó', 'ü'], $processedVerse);
 
-
-        foreach ($inserts as $key => $item) {
-            $item['verse'] = strtolower(strip_tags($item['verse']));
-            $item['verse'] = preg_replace("/(,|:|\?|!|;|\.|„|”|»|«|\")/i", '', $item['verse']);
-            $item['verse'] = preg_replace(['/Í/i', '/Ú/i', '/Ő/i', '/Ó/i', '/Ü/i'], ['í', 'ú', 'ő', 'ó', 'ü'], $item['verse']);
-
-            $verseroot = '';
-            $worlds = explode(' ', $item['verse']);
-            $s = 0;
-            $t = 0;
-            foreach ($worlds as $k => $world) {
-                if (Cache::has('hunspell_' . $world)) {
-                    $verseroot .= " " . Cache::get('hunspell_' . $world);
-                    $s++;
-                } else {
-                    fwrite($pipes[0], $world . "\n"); // send start
-                    $return = fgets($pipes[1], 4096); //get answer
-                    if (trim($return) != '') {
-                        fgets($pipes[1], 4096);
-                        if ($return{0} == "+") {
-                            $t++;
-                            $tocache = trim(substr($return, 2));
-                        } else $tocache = $world;
-                        $verseroot .= " " . $tocache;
-                        Cache::put('hunspell_' . $world, $tocache, time() + 3600);
+        $verseroot = '';
+        $words = preg_split('/\s+/', $processedVerse);
+        $s = 0;
+        $t = 0;
+        foreach ($words as $k => $word) {
+            if (Cache::has("hunspell_{$word}")) {
+                $verseroot .= " " . Cache::get("hunspell_{$word}");
+                $s++;
+            } else {
+                fwrite($pipes[0], $word . "\n"); // send start
+                $return = fgets($pipes[1], 4096); //get answer
+                if (trim($return) != '') {
+                    fgets($pipes[1], 4096);
+                    if ($return{0} == "+") {
+                        $t++;
+                        $stem = trim(substr($return, 2));
+                    } else {
+                        $stem = $word;
                     }
+                    $verseroot .= " " . $stem;
+                    $this->newStems++;
+                    Cache::put("hunspell_{$word}", $stem, 120);
                 }
             }
-            $inserts[$key]['verseroot'] = trim($verseroot);
-            if (!$this->option('verbose')) echo "\e[1A";
-            echo sprintf('%02d', $s) . " " . sprintf('%02d', $t) . " " . $item['gepi'] . " " . $item['tip'];
-            if ($this->option('verbose')) echo " " . str_pad(substr(trim($verseroot), 0, 140), 140);
-            echo "\n";
         }
-        echo "\e[1A";
-
-        fclose($pipes[0]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        proc_close($process); //stop test_gen.php
-        $this->info("\nHunspell-hu vége.");
-        return $inserts;
+        $processedVerse = trim($processedVerse);
+        return $processedVerse;
     }
+
 
     /**
      * @param $abbrev
@@ -300,23 +304,33 @@ class UpdateTextsCommand extends Command
      * @param $inserts
      * @return mixed
      */
-    private function readLines($abbrevWorksheet, $cols, $fields, $translation, $books_gepi2id, $abbrev)
+    private function readLines($verseRowIterator, $cols, $fields, $translation, $books_gepi2id, $abbrev, $pipes)
     {
-        $this->info("Beolvasás sorról sorra...");
-        echo "\n";
-        $maxRowNumber = $abbrevWorksheet->getHighestRow();
-        for ($rowNumber = 3; $rowNumber < $maxRowNumber; $rowNumber++) {
-            $gepi = $abbrevWorksheet->getCellByColumnAndRow($cols[$fields['gepi']], $rowNumber)->getValue();
+        $this->info("Beolvasás sorról sorra...\n");
+        $rowNumber = 0;
+        foreach ($verseRowIterator as $row) {
+            if ($rowNumber < 3) {
+                $rowNumber++;
+                continue;
+            }
+            $gepi = $row[$cols[$fields['gepi']]];
             if (!$this->option('filter') OR preg_match('/' . $this->option('filter') . '/i', $gepi)) {
                 $values['trans'] = $translation->id;
                 $values['gepi'] = $gepi;
                 $values['book_number'] = (int)substr($gepi, 0, 3);
                 $values['chapter'] = (int)substr($gepi, 3, 3);
                 $values['numv'] = (int)substr($gepi, 6, 3);
-                $values['tip'] = $abbrevWorksheet->getCellByColumnAndRow($cols['jelstatusz'], $rowNumber)->getValue();
-                $values['verse'] = $abbrevWorksheet->getCellByColumnAndRow($cols['jel'], $rowNumber)->getCalculatedValue();
-                $values['verseroot'] = '??';
-                if (isset($cols['ido'])) $values['ido'] = gmdate('Y-m-d H:i:s', PHPExcel_Shared_Date::ExcelToPHP($abbrevWorksheet->getCellByColumnAndRow($cols['ido'], $rowNumber)->getValue()));
+                $values['tip'] = $row[$cols['jelstatusz']];
+                $values['verse'] = $row[$cols['jel']];
+                if ($this->hunspellEnabled && in_array($values['tip'], [60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704])) {
+                    $verseRoot = $this->stem($values['verse'], $pipes);
+                } else {
+                    $verseRoot = '??';
+                }
+                $values['verseroot'] = $verseRoot;
+                if (isset($cols['ido']) && !empty($row[$cols['ido']])) {
+                    $values['ido'] = gmdate('Y-m-d H:i:s', PHPExcel_Shared_Date::ExcelToPHP($row[$cols['ido']]));
+                }
                 if (isset($books_gepi2id[(int)substr($gepi, 0, 3)])) {
                     $values['book_id'] = $books_gepi2id[(int)substr($gepi, 0, 3)];
                 } else {
@@ -325,16 +339,16 @@ class UpdateTextsCommand extends Command
                 }
 
                 //if((isset($_REQUEST['gepi']) AND preg_match('/'.$_REQUEST['gepi'].'/i',$gepi)) OR !isset($_REQUEST['gepi'])) {}
-                if (!$this->option('verbose')) {
-                    echo "\e[1A";
+                if ($rowNumber % 100 == 0) {
+                    echo "$rowNumber - {$abbrev}{$values['gepi']} - új szavak: {$this->newStems}\n" ;
+                    $this->newStems = 0;
                 }
-                echo $abbrev . " " . $values['gepi'];
                 if ($this->option('verbose')) {
                     echo ": " . substr($values['verse'], 0, 140);
                 }
-                echo "\n";
                 $inserts[$rowNumber] = $values;
             }
+            $rowNumber++;
         }
         if (!$this->option('verbose')) {
             echo "\e[1A";
@@ -403,17 +417,18 @@ class UpdateTextsCommand extends Command
     }
 
     /**
-     * @param $worksheet
+     * @param \Box\Spout\Reader\XLSX\RowIterator $verseRowIterator
      * @return array
      */
-    private function getHeaders(PHPExcel_Worksheet $worksheet)
+    private function getHeaders($verseRowIterator)
     {
         $this->info("A fejlécek megszerzése...");
-        foreach ($worksheet->getRowIterator() as $row) {
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(FALSE);
-            foreach ($cellIterator as $key => $cell) {
-                $cols[$cell->getValue()] = $key;
+        foreach  ($verseRowIterator as $row) {
+            $cols = [];
+            $i = 0;
+            foreach ($row as $cell) {
+                $cols[$cell] = $i;
+                $i++;
             }
             break;
         }
@@ -427,6 +442,7 @@ class UpdateTextsCommand extends Command
      */
     private function verifyColumns(&$fields, $headers)
     {
+        $this->info("Oszlopok ellenőrzése...");
         $errors = [];
         foreach ($fields as $field) {
             if (!isset($headers[$field])) {
