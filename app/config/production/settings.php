@@ -2,5 +2,6 @@
 
 return [
     'audioDirectory' => '/var/www/szentiras.hu/hang',
-    'logLevel' => 'warning'
+    'logLevel' => 'warning',
+    'sphinxConfig' => '/etc/sphinxsearch/sphinx_production.conf'
 ];

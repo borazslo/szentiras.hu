@@ -3,6 +3,8 @@
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 use SzentirasHu\Models\Repositories\BookRepository;
 use SzentirasHu\Models\Repositories\TranslationRepository;
 use Box\Spout\Reader\ReaderFactory;
@@ -37,6 +39,8 @@ class UpdateTextsCommand extends Command
     private $hunspellEnabled = false;
 
     private $newStems = 0;
+    private $sourceDirectory;
+
 
     /**
      * Create a new command instance.
@@ -48,6 +52,7 @@ class UpdateTextsCommand extends Command
         parent::__construct();
         $this->translationRepository = $translationRepository;
         $this->bookRepository = $bookRepository;
+        $this->sourceDirectory = Config::get('settings.sourceDirectory');
     }
 
     /**
@@ -66,41 +71,42 @@ class UpdateTextsCommand extends Command
 
         $translation = $this->translationRepository->getByAbbrev($abbrev);
 
-        if($this->option('file') AND $this->option('url')) {
+        if ($this->option('file') AND $this->option('url')) {
             App::abort(500, "A forrást vagy url-el VAGY file névvel lehet megadni. Mindkettővel nem.");
-        } elseif(!$this->option('file') AND !$this->option('url')) {
+        } elseif (!$this->option('file') AND !$this->option('url')) {
             App::abort(500, "A forrást meg kell adni vagy url-el VAGY file névvel.");
         }
 
-        $fileName = $this->getFileName($abbrev);
+        $filePath = $this->getFilePath($abbrev);
+
         $books_abbrev2id = $this->getAbbrev2Id($translation);
-        $sourceDir = Config::get('settings.sourceDirectory');
 
         ini_set('memory_limit', '1024M');
 
-        if($this->option('url')) {
-            try{
+        if ($this->option('url')) {
+            try {
                 $this->info("A fájl letöltése a megadott címről...");
                 $raw = file_get_contents($this->option('url'));
-            }catch(Exception $ex){
+            } catch (Exception $ex) {
                 App::abort(500, "Nem sikerült fáljt letölteni a megadott url-ről.");
             }
-            try{
-                file_put_contents("{$sourceDir}/{$fileName}", $raw);
+            try {
+
+                file_put_contents($filePath, $raw);
+
                 unset($raw);
-            }catch(Exception $ex){
+            } catch (Exception $ex) {
                 App::abort(500, "Nem sikerült a letöltött fájlt elmenteni.");
-            }    
+            }
         }
-        
-        $filePath = "{$sourceDir}/{$fileName}";
+
         $columns = [
-            'SZIT' => ['gepi'=>0, 'rov'=>5],
-            'KNB' => ['gepi'=>0, 'rov'=>4],
-            'UF' => ['gepi'=>0, 'rov'=>4],
-            'KG' => ['gepi'=>0, 'rov'=>4],
-            'BD' => ['gepi'=>0, 'rov'=>1],
-            'RUF' => ['gepi'=>0, 'rov'=>5],
+            'SZIT' => ['gepi' => 0, 'rov' => 5],
+            'KNB' => ['gepi' => 0, 'rov' => 4],
+            'UF' => ['gepi' => 0, 'rov' => 4],
+            'KG' => ['gepi' => 0, 'rov' => 4],
+            'BD' => ['gepi' => 0, 'rov' => 1],
+            'RUF' => ['gepi' => 0, 'rov' => 5],
         ];
         $this->verifyBookColumns($columns, $abbrev);
 
@@ -124,18 +130,18 @@ class UpdateTextsCommand extends Command
             }
             $gepi = $row[$columns[$abbrev]['gepi']];
             $rov = $row[$columns[$abbrev]['rov']];
-            if (!isset($books_abbrev2id[$rov]) AND ($rov != '-' AND $rov != '') ) {
+            if (!isset($books_abbrev2id[$rov]) AND ($rov != '-' AND $rov != '')) {
                 $badAbbrevs[] = $rov;
             } else if ($rov != '-' AND $rov != '') {
                 $books_gepi2id[$gepi] = $books_abbrev2id[$rov];
             }
         }
-        if(isset($badAbbrevs)) $this->verifyBadAbbrev($badAbbrevs, $books_abbrev2id);
+        if (isset($badAbbrevs)) $this->verifyBadAbbrev($badAbbrevs, $books_abbrev2id);
 
         $verseRowIterator = $sheets[$abbrev]->getRowIterator();
         $headers = $this->getHeaders($verseRowIterator);
 
-        $fields = ['did' => '*Ssz', 'gepi' => 'DCB_hiv','tip' => 'jelstatusz', 'verse' => 'jel', 'ido' => 'ido'];
+        $fields = ['did' => '*Ssz', 'gepi' => 'DCB_hiv', 'tip' => 'jelstatusz', 'verse' => 'jel', 'ido' => 'ido'];
         $this->verifyColumns($fields, $headers);
 
         $pipes = [];
@@ -168,7 +174,16 @@ class UpdateTextsCommand extends Command
         } else {
             $this->info("Nincs mit feltölteni.");
         }
-        $this->info("Ne feledd az újra indexelést az environmentnek megfelelően. Pl.: deploy/staging/sphinx/reindex.sh");
+        $sphinxConfig = Config::get('settings.sphinxConfig');
+        $indexerProcess = new Process("indexer --config {$sphinxConfig} --all --rotate");
+        try {
+            $indexerProcess->mustRun();
+            echo $indexerProcess->getOutput();
+        } catch (ProcessFailedException $e) {
+            echo $e->getMessage();
+        }
+
+
     }
 
     /**
@@ -179,7 +194,7 @@ class UpdateTextsCommand extends Command
     protected function getArguments()
     {
         return [
-            ['abbrev', InputArgument::REQUIRED, 'Abbreviation of the translation'],
+            ['abbrev', InputArgument::REQUIRED, 'A fordítás rövidítése'],
         ];
     }
 
@@ -191,10 +206,10 @@ class UpdateTextsCommand extends Command
     protected function getOptions()
     {
         return [
-            ['file', null, InputOption::VALUE_OPTIONAL, 'File to use for the import', null],
-            ['url', null, InputOption::VALUE_OPTIONAL, 'Url of the file to use for the import',null],
-            ['nohunspell', null, InputOption::VALUE_NONE, 'Generate versesimple with hunspell'],
-            ['filter', null, InputOption::VALUE_OPTIONAL, 'Filter the import by `gepi`', null],
+            ['file', null, InputOption::VALUE_OPTIONAL, 'Importálandó fájl neve (alapértelmezés: /tmp/[abbrev].xls)', null],
+            ['url', null, InputOption::VALUE_OPTIONAL, 'Importálandó fájl URL', null],
+            ['nohunspell', null, InputOption::VALUE_NONE, 'Szótöveket ne állítsa elő'],
+            ['filter', null, InputOption::VALUE_OPTIONAL, 'Szűrés `gepi` (regex) szerint', null],
         ];
     }
 
@@ -228,7 +243,8 @@ class UpdateTextsCommand extends Command
         return $sheets;
     }
 
-    private function stem($verse, $pipes) {
+    private function stem($verse, $pipes)
+    {
         $processedVerse = strtolower(strip_tags($verse));
         $processedVerse = preg_replace("/(,|:|\?|!|;|\.|„|”|»|«|\")/i", ' ', $processedVerse);
         $processedVerse = preg_replace(['/Í/i', '/Ú/i', '/Ő/i', '/Ó/i', '/Ü/i'], ['í', 'ú', 'ő', 'ó', 'ü'], $processedVerse);
@@ -274,7 +290,7 @@ class UpdateTextsCommand extends Command
         //TODO: larevelesíteni (http://bundles.laravel.com/bundle/mysqldump-php ?)
         $connections = Config::get('database.connections');
         $conn = $connections[Config::get('database.default')];
-        exec('mysqldump -u ' . $conn['username'] . ' --password=' . $conn['password'] . ' ' . $conn['database'] . ' ' . $conn['prefix'] . 'tdverse > ' . Config::get('settings.sourceDirectory') . '/' . $conn['database'] . '_' . $conn['prefix'] . 'tdverse_' . $abbrev . '_' . date('YmdHis') . '.sql');
+        exec('mysqldump -u ' . $conn['username'] . ' --password=' . $conn['password'] . ' ' . $conn['database'] . ' ' . $conn['prefix'] . 'tdverse > ' . $this->sourceDirectory . '/' . $conn['database'] . '_' . $conn['prefix'] . 'tdverse_' . $abbrev . '_' . date('YmdHis') . '.sql');
 
         Artisan::call('down');
         $this->info("Mysql tábla ürítése...");
@@ -287,15 +303,13 @@ class UpdateTextsCommand extends Command
         echo "\n";
         for ($rowNumber = 0; $rowNumber < count($inserts); $rowNumber += 100) {
             $tmp = array_slice($inserts, $rowNumber, 100);
-            echo "\e[1A";
             DB::table('tdverse')->insert($tmp);
-            $this->info($rowNumber + count($tmp) . " sor feltöltve.");
         }
         Artisan::call('up');
     }
 
     /**
-     * @param $abbrevWorksheet
+     * @param \Box\Spout\Reader\XLSX\RowIterator $verseRowIterator
      * @param $cols
      * @param $fields
      * @param $translation
@@ -307,11 +321,16 @@ class UpdateTextsCommand extends Command
     private function readLines($verseRowIterator, $cols, $fields, $translation, $books_gepi2id, $abbrev, $pipes)
     {
         $this->info("Beolvasás sorról sorra...\n");
+        $verseRowIterator->rewind();
+        $verseRowIterator->next();
+        $verseRowIterator->next();
+        $verseRowIterator->next();
         $rowNumber = 0;
-        foreach ($verseRowIterator as $row) {
-            if ($rowNumber < 3) {
-                $rowNumber++;
-                continue;
+        while ($verseRowIterator->valid()) {
+            $verseRowIterator->next();
+            $row = $verseRowIterator->current();
+            if (empty($row[0])) {
+                break;
             }
             $gepi = $row[$cols[$fields['gepi']]];
             if (!$this->option('filter') OR preg_match('/' . $this->option('filter') . '/i', $gepi)) {
@@ -331,28 +350,20 @@ class UpdateTextsCommand extends Command
                 if (isset($cols['ido']) && !empty($row[$cols['ido']])) {
                     $values['ido'] = gmdate('Y-m-d H:i:s', PHPExcel_Shared_Date::ExcelToPHP($row[$cols['ido']]));
                 }
-                if (isset($books_gepi2id[(int)substr($gepi, 0, 3)])) {
-                    $values['book_id'] = $books_gepi2id[(int)substr($gepi, 0, 3)];
+                if (isset($books_gepi2id[$values['book_number']])) {
+                    $values['book_id'] = $books_gepi2id[$values['book_number']];
                 } else {
                     $this->error("A " . (int)substr($gepi, 0, 3) . "-hez nincs `book_id`");
                     App::abort(500, 'Valami gond van a books id/gepi párossal!');
                 }
-
-                //if((isset($_REQUEST['gepi']) AND preg_match('/'.$_REQUEST['gepi'].'/i',$gepi)) OR !isset($_REQUEST['gepi'])) {}
                 if ($rowNumber % 100 == 0) {
-                    echo "$rowNumber - {$abbrev}{$values['gepi']} - új szavak: {$this->newStems}\n" ;
+                    echo "$rowNumber - {$abbrev}{$values['gepi']} - új szavak: {$this->newStems}\n";
                     $this->newStems = 0;
-                }
-                if ($this->option('verbose')) {
-                    echo ": " . substr($values['verse'], 0, 140);
                 }
                 $inserts[$rowNumber] = $values;
             }
+            $verseRowIterator->next();
             $rowNumber++;
-        }
-        if (!$this->option('verbose')) {
-            echo "\e[1A";
-            return $inserts;
         }
         return $inserts;
     }
@@ -361,14 +372,13 @@ class UpdateTextsCommand extends Command
      * @param $abbrev
      * @return array|string
      */
-    private function getFileName($abbrev)
+    private function getFilePath($abbrev)
     {
-        if ($this->option('file') && $this->option('file') != '{abbrev}.xls') {
-            $file = $this->option('file');
-            return $file;
+        if ($this->option('file')) {
+            return $this->option('file');
         } else {
-            $file = $abbrev . ".xls";
-            return $file;
+            $filePath = "{$this->sourceDir}/{$abbrev}.xls";
+            return $filePath;
         }
     }
 
@@ -423,7 +433,7 @@ class UpdateTextsCommand extends Command
     private function getHeaders($verseRowIterator)
     {
         $this->info("A fejlécek megszerzése...");
-        foreach  ($verseRowIterator as $row) {
+        foreach ($verseRowIterator as $row) {
             $cols = [];
             $i = 0;
             foreach ($row as $cell) {
