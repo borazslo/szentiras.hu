@@ -92,7 +92,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                         <li>
                             <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ chapter }}">{{ chapter }}</a>
                             {% for verse in verses %}
-                                {% if verse.ellipseBefore %}[...]{% endif %}<sup>{{ verse.numv }}</sup>{{ verse.text }}
+                                {% if verse.ellipseBefore %} [...] {% endif %}<sup>{{ verse.numv }}</sup>{{ verse.text }}
                             {% endfor %}
                         </li>
                     {% endfor %}
