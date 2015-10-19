@@ -1,15 +1,15 @@
 language: php
 
 php:
-  - 5.4
+  - 5.6
 
 before_script:
   - mysql -e 'create database bible;'
+  - php composer.phar selfupdate
   - php composer.phar install
-# migrate needs environment specification
-  - php artisan migrate --seed --env=testing
 
 script:
+# first test will run the migrations
   - phpunit --configuration phpunit.xml
 
 after_success:
