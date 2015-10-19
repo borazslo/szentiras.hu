@@ -7,7 +7,7 @@ apt-get update
 apt-get install -y sphinxsearch
 apt-get install -y hunspell
 apt-get install -y hunspell-hu
-apt-get install -y imagemagick
+apt-get install -y graphicsmagick
 mysql -u homestead -psecret < /home/vagrant/szentiras-hu/tmp/database.sql
 export APP_HOME=/home/vagrant/szentiras-hu
 
