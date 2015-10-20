@@ -6,6 +6,7 @@ php:
 
 before_script:
   - mysql -e 'create database bible;'
+  - npm install
   - php composer.phar selfupdate
   - php composer.phar install
   - gulp default
