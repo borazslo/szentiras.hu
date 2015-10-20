@@ -28,10 +28,9 @@ cache:
     - bower_components
 
 env:
-  matrix:
+  global:
   - DB_USERNAME=travis
   - DB_PASSWORD=
-  global:
   - secure: EMWhgRZT6WGhjmFlhw63hivKAr1zq3MfW4TNErwer8XAllXTWuV+T1KSb+1aNsH4JG34Y4KOn20mGBLEG29WiZ0k8dx99afnlJtw5xY76vHfTT+RvST9MFLo17mlthdIu40MIxnyMKUVgS4y0kohAUT7uFD+LTWjx0G0V8QVF4w=
   - secure: KRNcmD/E4B0D6Tco2v3vKEpAFfeuBRtth7sEc3qZKyzp/lPqRpfVuJBOdtkP05Wd6XbjhSaAVQ08RwhRSGtAMlq7JQGjm+RJxB5bXtyRJQtgSeBYJNVa+qhUpAJ22BLo3pBZU7m+Zp3u0qBXi5euGgqyyPes7gjTPk6Wvg0Erx8=
   - secure: KUaxJ0Ke+LMxkoS92Axx14Z4TmlT7DvKqKZFXF/vbt8hwMptlPEeEqJ5/r+n8yYYuP60fSBXzM7ZW7EV/n2Rvu9HxbIGuvssLvFEE+ePwkXJViOikA4crh9UsTb1C/40TNShEPaY1ZWvAO6qwxj1kdrCJ4rHpPNC32pUj59jHRo=
