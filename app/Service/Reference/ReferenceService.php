@@ -41,6 +41,7 @@ class ReferenceService
         } else {
             $translations = $this->translationRepository->getAll();
         }
+        Log::debug("Read {$translations}");
         foreach ($translations as $translation) {
             $storedBookRef = $this->findStoredBookRef($ref->bookRefs[0], $translation->id);
             if ($storedBookRef) {
@@ -62,6 +63,8 @@ class ReferenceService
             } else {
                 Log::debug("Book not found in database: {$bookRef->toString()}");
             }
+        } else {
+            Log:debug("Book not found for abbrev {$bookRef->bookId} in translation {$refTranslationId}");
         }
         return $result;
     }
