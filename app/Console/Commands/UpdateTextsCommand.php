@@ -329,7 +329,7 @@ class UpdateTextsCommand extends Command
         while ($verseRowIterator->valid()) {
             $verseRowIterator->next();
             $row = $verseRowIterator->current();
-            if (empty($row[0])) {
+            if (empty($row[$cols[$fields['gepi']]])) {
                 break;
             }
             $gepi = $row[$cols[$fields['gepi']]];
@@ -377,7 +377,7 @@ class UpdateTextsCommand extends Command
         if ($this->option('file')) {
             return $this->option('file');
         } else {
-            $filePath = "{$this->sourceDir}/{$abbrev}.xls";
+            $filePath = "{$this->sourceDirectory}/{$abbrev}.xls";
             return $filePath;
         }
     }
