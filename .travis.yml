@@ -23,6 +23,8 @@ after_success:
   - git remote add deploy szentiras_hu_git@szentiras.hu:/home/szentiras_hu_git/github/borazslo/szentiras.hu.git
   - git push deploy $TRAVIS_BRANCH
 
+after_failure: "cat /home/travis/build/borazslo/szentiras.hu/storage/logs/laravel.log"
+
 cache:
   directories:
     - vendor

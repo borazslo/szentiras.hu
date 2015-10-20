@@ -6,6 +6,7 @@
 namespace SzentirasHu\Service\Reference;
 
 
+use Log;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
@@ -59,7 +60,7 @@ class ReferenceService
                 $result = new BookRef($book->abbrev);
                 $result->chapterRanges = $bookRef->chapterRanges;
             } else {
-                \Log::debug("Book not found in database: {$bookRef->toString()}");
+                Log::debug("Book not found in database: {$bookRef->toString()}");
             }
         }
         return $result;
