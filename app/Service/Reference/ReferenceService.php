@@ -41,7 +41,7 @@ class ReferenceService
         } else {
             $translations = $this->translationRepository->getAll();
         }
-        Log::debug("Read {$translations}");
+        Log::debug("Read {$translations} as translations");
         foreach ($translations as $translation) {
             $storedBookRef = $this->findStoredBookRef($ref->bookRefs[0], $translation->id);
             if ($storedBookRef) {

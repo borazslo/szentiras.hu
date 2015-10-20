@@ -4,7 +4,7 @@ return [
     'defaultTranslationId' => env("DEFAULT_TRANSLATION_ID", 3),
     'defaultTranslationAbbrev' => env("DEFAULT_TRANSLATION_ABBREV", "KNB"),
     'translationAbbrevRegex' => env("TRANSLATION_ABBREV_REGEX", "KNB|SZIT|UF|KG|BD|RUF|knb|szit|uf|kg|bd|ruf"),
-    'enabledTranslations' => preg_split("/, ?/", env("ENABLED_TRANSLATIONS")),
+    'enabledTranslations' => preg_split("/, ?/", env("ENABLED_TRANSLATIONS", "1,2")),
     'audioDirectory' => env("AUDIO_DIRECTORY", 'hang'),
     'sourceDirectory' => '/tmp',
     'facebookAppId' => '679257202109581',
