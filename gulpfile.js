@@ -24,7 +24,16 @@ elixir(function(mix) {
             'compiled/sass.css',
             'font-awesome.min.css']);
     mix.
-        coffee(['ad.coffee', 'pdfDialog.coffee', 'quickSearch.coffee', 'textDisplay.coffee'], 'resources/assets/js/compiled/app.js')
+        coffee(['ad.coffee', 'pdfDialog.coffee', 'quickSearch.coffee', 'textDisplay.coffee', 'app.coffee'], 'resources/assets/js/compiled/coffee.js');
+    mix.scripts(['compiled/coffee.js'], 'resources/assets/js/compiled/app.js');
+
+    process.env.BROWSERIFYSHIM_DIAGNOSTICS=1;
+
+    elixir.config.js.browserify.transformers.push({
+        name: 'browserify-shim',
+        options: {}
+    });
+
     mix.browserify('resources/assets/js/compiled/app.js')
 
     mix.version(['css/all.css', 'js/app.js']);
@@ -33,5 +42,6 @@ elixir(function(mix) {
     mix.copy('resources/assets/fonts', 'public/build/fonts');
     mix.copy('node_modules/bootstrap-sass/assets/fonts/bootstrap', 'public/build/fonts/bootstrap');
     mix.copy('node_modules/jquery-ui/themes/base/images', 'public/build/css/images');
+    mix.copy('resources/assets/css/images', 'public/build/css/images');
 
 });

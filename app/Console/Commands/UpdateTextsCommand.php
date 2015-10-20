@@ -1,6 +1,15 @@
 <?php
 
+namespace SzentirasHu\Console\Commands;
+
+use App;
+use Artisan;
+use Cache;
+use Config;
+use DB;
+use Exception;
 use Illuminate\Console\Command;
+use PHPExcel_Shared_Date;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -28,11 +37,11 @@ class UpdateTextsCommand extends Command
      */
     protected $description = 'Update texts from external source (xls)';
     /**
-     * @var SzentirasHu\Data\Repository\TranslationRepository
+     * @var TranslationRepository
      */
     private $translationRepository;
     /**
-     * @var SzentirasHu\Data\Repository\BookRepository
+     * @var BookRepository
      */
     private $bookRepository;
 
@@ -70,6 +79,7 @@ class UpdateTextsCommand extends Command
         $this->verifyAbbrev($abbrev);
 
         $translation = $this->translationRepository->getByAbbrev($abbrev);
+        $this->info("Fordítás: {$translation->name} (id: {$translation->id})");
 
         if ($this->option('file') AND $this->option('url')) {
             App::abort(500, "A forrást vagy url-el VAGY file névvel lehet megadni. Mindkettővel nem.");
@@ -78,8 +88,6 @@ class UpdateTextsCommand extends Command
         }
 
         $filePath = $this->getFilePath($abbrev);
-
-        $books_abbrev2id = $this->getAbbrev2Id($translation);
 
         ini_set('memory_limit', '1024M');
 
@@ -91,9 +99,7 @@ class UpdateTextsCommand extends Command
                 App::abort(500, "Nem sikerült fáljt letölteni a megadott url-ről.");
             }
             try {
-
                 file_put_contents($filePath, $raw);
-
                 unset($raw);
             } catch (Exception $ex) {
                 App::abort(500, "Nem sikerült a letöltött fájlt elmenteni.");
@@ -128,15 +134,18 @@ class UpdateTextsCommand extends Command
             if (empty($row[0])) {
                 break;
             }
-            $gepi = $row[$columns[$abbrev]['gepi']];
+            $bookAbbrev2Id = $this->getAbbrev2Id($translation);
+            $bookNumber = $row[$columns[$abbrev]['gepi']];
             $rov = $row[$columns[$abbrev]['rov']];
-            if (!isset($books_abbrev2id[$rov]) AND ($rov != '-' AND $rov != '')) {
+            if (!isset($bookAbbrev2Id[$rov]) AND ($rov != '-' AND $rov != '')) {
                 $badAbbrevs[] = $rov;
             } else if ($rov != '-' AND $rov != '') {
-                $books_gepi2id[$gepi] = $books_abbrev2id[$rov];
+                $bookNumber2Id[$bookNumber] = $bookAbbrev2Id[$rov];
             }
         }
-        if (isset($badAbbrevs)) $this->verifyBadAbbrev($badAbbrevs, $books_abbrev2id);
+        if (isset($badAbbrevs)) {
+            App::abort(500, "A következő rövidítések csak a szövegforrásban találhatóak meg, az adatbázisban nem!\n" . implode(', ', $badAbbrevs) . print_r($bookAbbrev2Id, 1));
+        }
 
         $verseRowIterator = $sheets[$abbrev]->getRowIterator();
         $headers = $this->getHeaders($verseRowIterator);
@@ -158,15 +167,17 @@ class UpdateTextsCommand extends Command
             else echo fgets($pipes[1], 4096);
         }
 
-        $inserts = $this->readLines($verseRowIterator, $headers, $fields, $translation, $books_gepi2id, $abbrev, $pipes);
+        $inserts = $this->readLines($verseRowIterator, $headers, $fields, $translation, $bookNumber2Id, $abbrev, $pipes);
 
         if ($this->hunspellEnabled) {
             fclose($pipes[0]);
             fclose($pipes[1]);
             fclose($pipes[2]);
-            proc_close($hunspellProcess);
-
+            if (isset($hunspellProcess)) {
+                proc_close($hunspellProcess);
+            }
         }
+
         $reader->close();
 
         if (count($inserts) > 0) {
@@ -413,17 +424,6 @@ class UpdateTextsCommand extends Command
             return $konyvoszlopok;
         }
         return $konyvoszlopok;
-    }
-
-    /**
-     * @param $hibasrov
-     * @param $books_abbrev2id
-     */
-    private function verifyBadAbbrev($hibasrov, $books_abbrev2id)
-    {
-        if (isset($hibasrov)) {
-            App::abort(500, "A következő rövidítések csak a szövegforrásban találhatóak meg, az adatbázisban nem!\n" . implode(', ', $hibasrov) . print_r($books_abbrev2id, 1));
-        }
     }
 
     /**

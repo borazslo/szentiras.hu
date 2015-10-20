@@ -64,7 +64,7 @@ class ReferenceService
                 Log::debug("Book not found in database: {$bookRef->toString()}");
             }
         } else {
-            Log:debug("Book not found for abbrev {$bookRef->bookId} in translation {$refTranslationId}");
+            Log::debug("Book not found for abbrev {$bookRef->bookId} in translation {$refTranslationId}");
         }
         return $result;
     }

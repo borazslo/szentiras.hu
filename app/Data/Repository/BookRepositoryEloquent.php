@@ -6,6 +6,7 @@
 namespace SzentirasHu\Data\Repository;
 
 
+use Cache;
 use SzentirasHu\Data\Entity\Book;
 use SzentirasHu\Data\Entity\BookAbbrev;
 
@@ -14,7 +15,7 @@ class BookRepositoryEloquent implements BookRepository {
 
     public function getBooksByTranslation($translationId)
     {
-        return \Cache::remember('book', 120, function() use ($translationId) {
+        return Cache::remember('book', 120, function() use ($translationId) {
          return Book::where('translation_id', $translationId)->orderBy('id')->get();
         });
     }

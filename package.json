@@ -1,12 +1,26 @@
 {
   "private": true,
   "devDependencies": {
-    "gulp": "^3.8.8"
+    "gulp": "^3.8.8",
+    "browserify": "~11.2.0",
+    "browserify-shim": "~3.8.10"
   },
   "dependencies": {
     "laravel-elixir": "^3.0.0",
     "bootstrap-sass": "^3.0.0",
     "jquery": "~2.1.4",
     "jquery-ui": "~1.10.5"
+  },
+
+  "browser": {
+    "bootstrap" : "./node_modules/bootstrap-sass/assets/javascripts/bootstrap.min.js"
+  },
+
+  "browserify-shim": {
+    "bootstrap": {
+      "depends": [
+        "jquery:jQuery"
+      ]
+    }
   }
 }

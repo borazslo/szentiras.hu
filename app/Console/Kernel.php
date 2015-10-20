@@ -4,6 +4,7 @@ namespace SzentirasHu\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use SzentirasHu\Console\Commands\UpdateTextsCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -13,7 +14,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \SzentirasHu\Console\Commands\Inspire::class,
+        UpdateTextsCommand::class,
     ];
 
     /**
@@ -24,7 +25,5 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('inspire')
-                 ->hourly();
     }
 }
