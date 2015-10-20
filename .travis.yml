@@ -28,6 +28,7 @@ cache:
     - bower_components
 
 env:
+  matrix:
   - DB_USERNAME=travis
   - DB_PASSWORD=
   global:
