@@ -213,7 +213,7 @@ class CanonicalReferenceTest extends TestCase
     {
         /** @var ReferenceService $referenceService */
         $referenceService = App::make(ReferenceService::class);
-        $bookRef = $referenceService->getExistingBookRef(CanonicalReference::fromString('1Moz 2,3.4-5'));
+        $bookRef = $referenceService->getExistingBookRef(CanonicalReference::fromString('1Móz 2,3.4-5'));
         $translatedBookRef = $referenceService->translateBookRef($bookRef, 1);
         $this->assertEquals("Ter", $translatedBookRef->bookId);
     }

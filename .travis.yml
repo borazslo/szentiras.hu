@@ -5,7 +5,7 @@ php:
   - 5.6
 
 before_script:
-  - mysql -e 'create database bible;'
+  - mysql -e 'create database bible character set utf8 collate utf8_unicode_ci;'
   - npm install
   - php composer.phar selfupdate
   - php composer.phar install
