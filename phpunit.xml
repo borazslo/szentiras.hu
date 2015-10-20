@@ -9,8 +9,11 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
+        <testsuite name="Smoke Test">
+            <directory>./tests/smoke</directory>
+        </testsuite>
         <testsuite name="Application Test Suite">
-            <directory>./tests/</directory>
+            <directory>./tests/feature</directory>
         </testsuite>
     </testsuites>
     <filter>

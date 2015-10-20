@@ -2,7 +2,7 @@
 
 use SzentirasHu\Data\Entity\Verse;
 
-class VersesTableSeeder extends Seeder
+class VersesTableSeeder extends \Illuminate\Database\Seeder
 {
 
     public function run()

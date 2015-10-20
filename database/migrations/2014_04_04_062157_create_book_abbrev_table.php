@@ -12,14 +12,14 @@ class CreateBookAbbrevTable extends Migration {
 	 */
 	public function up()
 	{
-        Log::info("Create table...");
+        Log::info("Create book abbreviation table...");
 		Schema::create('book_abbrev', function(Blueprint $table)
 		{
 			$table->increments('id');
             $table->string("abbrev");
             $table->unsignedInteger("bookId");
         });
-        Log::info("Insert data...");
+        Log::info("Insert book abbreviation data...");
         $migrationsPath = base_path('database/migrations');
         $file = fopen("{$migrationsPath}/2014_04_04_062157_book_abbrevs.csv", "r");
         while ($data= fgetcsv($file)) {

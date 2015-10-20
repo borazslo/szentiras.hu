@@ -25,12 +25,14 @@
             "database"
         ],
         "psr-4": {
-            "SzentirasHu\\": "app/"
+            "SzentirasHu\\": "app/",
+            "SzentirasHu\\Test\\": "tests/feature",
+            "SzentirasHu\\Test\\Smoke\\": "tests/smoke",
+            "SzentirasHu\\Test\\Common\\": "tests/common"
         }
     },
     "autoload-dev": {
         "classmap": [
-            "tests/TestCase.php"
         ]
     },
     "scripts": {

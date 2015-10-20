@@ -17,7 +17,7 @@ class MigrateTdbook extends Migration
             SELECT `id`, `trans`, `name`, `abbrev`, `url`, `oldtest`, now(), now() FROM {$prefix}tdbook
             ");
         } else {
-            Log::info("tdbook table doesn't exist");
+            Log::info("tdbook table doesn't exist, so no need to migrate");
 
         }
     }

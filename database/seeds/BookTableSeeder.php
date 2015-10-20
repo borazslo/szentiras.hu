@@ -3,10 +3,11 @@
 /**
 
  */
-class BookTableSeeder extends Seeder
+class BookTableSeeder extends \Illuminate\Database\Seeder
 {
     public function run()
     {
+        \Log::info('Running book table seeder');
         $translation = $this->addTranslation(1, 'Translation Name 1', 'TESTTRANS');
         $this->addBook(101, 101, "Ter", $translation);
         $this->addBook(102, 102, "Kiv", $translation);

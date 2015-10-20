@@ -1,6 +1,6 @@
 <?php
 
-class ArticlesTableSeeder extends Seeder
+class ArticlesTableSeeder extends \Illuminate\Database\Seeder
 {
     public function run()
     {
@@ -10,7 +10,6 @@ class ArticlesTableSeeder extends Seeder
         $article->text = 'Front page article text';
         $article->publish_date = '2014-01-01';
         $article->save();
-        
     }
 }
 

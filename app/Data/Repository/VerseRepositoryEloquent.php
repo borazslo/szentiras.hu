@@ -32,7 +32,6 @@ class VerseRepositoryEloquent implements VerseRepository {
             ->whereIn('numv', ['1', '2'])
             ->orderBy('chapter')
             ->orderBy('numv')
-            ->remember(120)
             ->get();
     }
 
