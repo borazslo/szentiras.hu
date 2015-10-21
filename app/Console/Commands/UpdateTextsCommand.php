@@ -337,8 +337,8 @@ class UpdateTextsCommand extends Command
         $verseRowIterator->next();
         $verseRowIterator->next();
         $rowNumber = 0;
+        $verseRowIterator->next();
         while ($verseRowIterator->valid()) {
-            $verseRowIterator->next();
             $row = $verseRowIterator->current();
             if (empty($row[$cols[$fields['gepi']]])) {
                 break;
