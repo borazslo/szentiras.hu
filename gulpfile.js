@@ -19,9 +19,9 @@ elixir(function(mix) {
         .less(['autocomplete.less'], 'resources/assets/css/compiled/less.css')
         .styles([
             '../../../node_modules/jquery-ui/themes/base/jquery-ui.css',
+            'compiled/sass.css',
             'style.css',
             'compiled/less.css',
-            'compiled/sass.css',
             'font-awesome.min.css']);
     mix.
         coffee(['ad.coffee', 'pdfDialog.coffee', 'quickSearch.coffee', 'textDisplay.coffee', 'app.coffee'], 'resources/assets/js/compiled/coffee.js');
