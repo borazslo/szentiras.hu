@@ -106,8 +106,9 @@ class PdfController extends Controller {
         fwrite($tmpFile, $content);
         $builder = new ProcessBuilder(['xelatex', '-interaction=batchmode', '-no-shell-escape', "-output-directory={$workingDir}", $tmpFileName]);
         $builder->setWorkingDirectory($workingDir);
-        $builder->getProcess()->run(function ($type, $buffer) {
-        });
+        $process = $builder->getProcess();
+        $process->setEnv(['PATH' => '/usr/bin']);
+        $process->mustRun();
         fclose($tmpFile);
         return preg_replace('/\.tmp$/', '', $tmpFileName) . '.pdf';
     }
