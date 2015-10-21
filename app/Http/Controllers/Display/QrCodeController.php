@@ -7,15 +7,16 @@ namespace SzentirasHu\Http\Controllers\Display;
 
 
 use Endroid\QrCode\QrCode;
-use Imagine;
 use Imagine\Gd\Font;
+use Imagine;
 use Imagine\Image\Color;
 use Imagine\Image\Point;
 use Request;
 use Response;
+use SzentirasHu\Http\Controllers\Controller;
 use View;
 
-class QrCodeController extends \BaseController{
+class QrCodeController extends Controller{
 
     public function index($url)
     {
@@ -30,7 +31,7 @@ class QrCodeController extends \BaseController{
         $qrCode->render();
         $image = Imagine::load(ob_get_contents());
         ob_end_clean();
-        $font = new Font(base_path()."/resources/fonts/DejaVuSans.ttf", 9, new Color(0));
+        $font = new Font(base_path()."/resources/assets/fonts/DejaVuSans.ttf", 9, new Color(0));
         $logoText = 'szentiras.hu';
         $margin = 10;
         $textBox = $font->box($logoText)->increase($margin);

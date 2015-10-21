@@ -149,6 +149,7 @@ return [
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         'TwigBridge\ServiceProvider',
         SzentirasHu\Providers\ViewComposerServiceProvider::class,
+        \SzentirasHu\Service\Imagine\ImagineServiceProvider::class
     ],
 
     /*
@@ -198,6 +199,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View'      => Illuminate\Support\Facades\View::class,
         'SphinxSearch' => SzentirasHu\Service\Sphinx\SphinxSearchFacade::class,
+        'Imagine' => \SzentirasHu\Service\Imagine\ImagineFacade::class
 
     ],
 
