@@ -140,6 +140,7 @@ return [
         /*
          * Application Service Providers...
          */
+        Barryvdh\Debugbar\ServiceProvider::class,
         SzentirasHu\Providers\AppServiceProvider::class,
         SzentirasHu\Providers\AuthServiceProvider::class,
         SzentirasHu\Providers\EventServiceProvider::class,

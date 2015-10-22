@@ -13,7 +13,7 @@ class TranslationRepositoryEloquent implements TranslationRepository
     public function getAll()
     {
         $allTranslations = \Cache::remember(
-            'translations', 120, function () {
+            'getAllTranslations', 120, function () {
             return Translation::orderBy('order')->orderBy('name')->whereIn('id', \Config::get('settings.enabledTranslations'))->get();
         });
         return $allTranslations;
@@ -28,7 +28,12 @@ class TranslationRepositoryEloquent implements TranslationRepository
 
     public function getAllOrderedByDenom()
     {
-        return Translation::orderBy('denom')->orderBy('order')->whereIn('id', \Config::get('settings.enabledTranslations'))->get();
+        $allTranslations = \Cache::remember(
+            'translations_allOrderedByDenom', 120, function () {
+            return Translation::orderBy('denom')->orderBy('order')->whereIn('id', \Config::get('settings.enabledTranslations'))->get();
+        });
+        return $allTranslations;
+
     }
 
     public function getBooks($translation)
