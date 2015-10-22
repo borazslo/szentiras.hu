@@ -1,27 +1,71 @@
-## Laravel PHP Framework
+Szentírás .hu
+========
 
-[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
-[![Total Downloads](https://poser.pugx.org/laravel/framework/d/total.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework)
-[![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)
+A [szentiras.hu](http://szentiras.hu) teljes kódja.
+[![Build Status](https://travis-ci.org/borazslo/szentiras.hu.png)](https://travis-ci.org/borazslo/szentiras.hu)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as authentication, routing, sessions, queueing, and caching.
 
-Laravel is accessible, yet powerful, providing powerful tools needed for large, robust applications. A superb inversion of control container, expressive migration system, and tightly integrated unit testing support give you the tools you need to build any application with which you are tasked.
+## Felépítés
 
-## Official Documentation
+### Framework
+A Laravel keretrendszert használjuk.
 
-Documentation for the framework can be found on the [Laravel website](http://laravel.com/docs).
+#### Könyvtár struktúra
+- **app** - Maga a webalkalmazás.
+- **bootstrap** - Framework beizzítás
+- **deploy** - deployment konfigurációk és scriptek (apache, git hook stb.)
+- **old** - a régi, össze-vissza programozott szentiras.hu kódja
+- **public** - a közvetlenül kiszolgált fájlok, az index.php, css, js és hasonlók
+- **tmp** - tesztadatbázis-példa
 
-## Contributing
+## Alapvet? funkciók
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+### F?oldal:
+- fordítások listája, néhány információval kiegészítve
+- igenaptár adott napi megjelenítése a katolikus.hu/igenaptar-ból kihalászva minden alkalommal
+- mysql-b?l hírek (szerkeszt? felület nélkül)
 
-## Security Vulnerabilities
+### Könyvnézegetés
+- Fordítás könyveinek listája
+- Egy-egy könyv fejezeteinek listája bevezet?vel
+- Egy-egy fejezet megjelenítése
+    - Lépés a következ?/el?z? fejezetre
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+###Idézés
+- Url-be vagy keres?be beírt szentírás hivatkozás észrevétele, elemzése és megjelenítése. pl. Mk3,4-7.9-12 vagy Mk3-6 vagy Mk 5,3-7,4.7 stb.
+- Adott igehely/rész megjelenítése lábjegyzettel és magyarázattal - PARTLY DONE Egyel?re a lábjegyzet és magyarázat nem támogatott
+- Link a többi fordítás azonos könyvére (sokszor már a rövidítés!)
+- Hibás fordítás/könyvrövidítés estén átvisz a helyes kombinációra
 
-### License
+###Szövegmegjelenítés - Idézésnél és fejezet nézetnél is
+- Vannak címsorok, alcímsorok és a szöveg
+- A vers száma fels? indexben nem mindig a tényleges sorszám (akár bet? is lehet)
+- Twitter és facebook megosztás (hozzávaló html tag-ek hogy szebb legyen a megosztott anyag)
+- Link a többi fordítás azonos könyvére (sokszor már a rövidítés!)
+- Lábjegyztekkel és magyrázatokkal. Ezek nem versekhez, hanem verstartományokhoz tartoznak.(Éppen nem m?ködik, mert nincs az adatbázisban.)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+###Keresés
+- Url-be vagy keres?be beírt kifejezés keresése
+- sz?ri lehet?ség: bármely könyvre ill. Újszöv/Ószöv; fordítás
+- találatok csoportosítása: versenként vagy fejezetenként
+- A találatokat súlyozza és a legsúlyosabbal kezdi (tehát nem el?fordulási könyvbeli sorrendben jelennek meg)
+- Amit figyel
+    - Sphinx extended search nyelvtan szerint
+    - szótóben keres (megkeresi a hunspell a keres?szó szótöveit, a szentírás minden versét szótöves változatban is tároljuk) PARTLY DONE (a keres?szót nem tövezzük) 
+- Extrák
+    - megnézni, hogy az alternatív fordításokban ugyan erre mennyi a találat - csak a Sphinx indexben nézi, ezért villámgyors
+    - tippeket ad hasonló kifejezésekre ill. azonos szótöv? szavakra
+    - tippeket ad kézzel készül? szinoníma szótár alapján: létra/lajtorja, Nebukodonozor/Nebukadanazzár, stb.
+    - ugyan ezen szótár szerint elgépelt nevekre is tippeket ad
+
+###API/Fejleszt?knek
+- JSON válaszokat ad megfelel? kérésekre
+- f?ként a keresésekre válaszol és elvileg mindent tudnia kéne, amit a keres?nek, csak más formátumban válaszol
+- TODO: könyvek automatikus /epub kimenetele ill. abból generált /mobi (havont egyszer gyárt, onnantól mindig azt hviatkozza)
+
+###Egyéb
+- pár statikusabb oldal van (címlap, infó, impresszum, stb.) (nem kell szerkeszt? felület)
+- cache: van egy csomó cache-elés, f?leg db
+- mysql cache: a kereséseket logolja és cacheli, hogy az alternítvákat jól mutassa és lássam mi megy az életben DONE
+- rövid urlek (és régi-régi linkek hosszú url-jeit is értelmezi)
+- GoogleAnalytics
