@@ -2,4 +2,4 @@
 npm install
 php composer.phar install
 php artisan migrate
-gulp default
+node_modules/.bin/gulp default
