@@ -1,71 +1,71 @@
-Szentírás .hu
+SzentÃ­rÃ¡s .hu
 ========
 
-A [szentiras.hu](http://szentiras.hu) teljes kódja.
+A [szentiras.hu](http://szentiras.hu) teljes kÃ³dja.
 [![Build Status](https://travis-ci.org/borazslo/szentiras.hu.png)](https://travis-ci.org/borazslo/szentiras.hu)
 
 
-## Felépítés
+## FelÃ©pÃ­tÃ©s
 
 ### Framework
-A Laravel keretrendszert használjuk.
+A Laravel keretrendszert hasznÃ¡ljuk.
 
-#### Könyvtár struktúra
-- **app** - Maga a webalkalmazás.
-- **bootstrap** - Framework beizzítás
-- **deploy** - deployment konfigurációk és scriptek (apache, git hook stb.)
-- **old** - a régi, össze-vissza programozott szentiras.hu kódja
-- **public** - a közvetlenül kiszolgált fájlok, az index.php, css, js és hasonlók
-- **tmp** - tesztadatbázis-példa
+#### KÃ¶nyvtÃ¡r struktÃºra
+- **app** - Maga a webalkalmazÃ¡s.
+- **bootstrap** - Framework beizzÃ­tÃ¡s
+- **deploy** - deployment konfigurÃ¡ciÃ³k Ã©s scriptek (apache, git hook stb.)
+- **old** - a rÃ©gi, Ã¶ssze-vissza programozott szentiras.hu kÃ³dja
+- **public** - a kÃ¶zvetlenÃ¼l kiszolgÃ¡lt fÃ¡jlok, az index.php, css, js Ã©s hasonlÃ³k
+- **tmp** - tesztadatbÃ¡zis-pÃ©lda
 
-## Alapvet? funkciók
+## AlapvetÅ‘ funkciÃ³k
 
-### F?oldal:
-- fordítások listája, néhány információval kiegészítve
-- igenaptár adott napi megjelenítése a katolikus.hu/igenaptar-ból kihalászva minden alkalommal
-- mysql-b?l hírek (szerkeszt? felület nélkül)
+### FÅ‘oldal:
+- fordÃ­tÃ¡sok listÃ¡ja, nÃ©hÃ¡ny informÃ¡ciÃ³val kiegÃ©szÃ­tve
+- igenaptÃ¡r adott napi megjelenÃ­tÃ©se a katolikus.hu/igenaptar-bÃ³l kihalÃ¡szva minden alkalommal
+- mysql-bÅ‘l hÃ­rek (szerkesztÅ‘ felÃ¼let nÃ©lkÃ¼l)
 
-### Könyvnézegetés
-- Fordítás könyveinek listája
-- Egy-egy könyv fejezeteinek listája bevezet?vel
-- Egy-egy fejezet megjelenítése
-    - Lépés a következ?/el?z? fejezetre
+### KÃ¶nyvnÃ©zegetÃ©s
+- FordÃ­tÃ¡s kÃ¶nyveinek listÃ¡ja
+- Egy-egy kÃ¶nyv fejezeteinek listÃ¡ja bevezetÅ‘vel
+- Egy-egy fejezet megjelenÃ­tÃ©se
+    - LÃ©pÃ©s a kÃ¶vetkezÅ‘/elÅ‘zÅ‘ fejezetre
 
-###Idézés
-- Url-be vagy keres?be beírt szentírás hivatkozás észrevétele, elemzése és megjelenítése. pl. Mk3,4-7.9-12 vagy Mk3-6 vagy Mk 5,3-7,4.7 stb.
-- Adott igehely/rész megjelenítése lábjegyzettel és magyarázattal - PARTLY DONE Egyel?re a lábjegyzet és magyarázat nem támogatott
-- Link a többi fordítás azonos könyvére (sokszor már a rövidítés!)
-- Hibás fordítás/könyvrövidítés estén átvisz a helyes kombinációra
+###IdÃ©zÃ©s
+- Url-be vagy keresÅ‘be beÃ­rt szentÃ­rÃ¡s hivatkozÃ¡s Ã©szrevÃ©tele, elemzÃ©se Ã©s megjelenÃ­tÃ©se. pl. Mk3,4-7.9-12 vagy Mk3-6 vagy Mk 5,3-7,4.7 stb.
+- Adott igehely/rÃ©sz megjelenÃ­tÃ©se lÃ¡bjegyzettel Ã©s magyarÃ¡zattal - PARTLY DONE EgyelÅ‘re a lÃ¡bjegyzet Ã©s magyarÃ¡zat nem tÃ¡mogatott
+- Link a tÃ¶bbi fordÃ­tÃ¡s azonos kÃ¶nyvÃ©re (sokszor mÃ¡r a rÃ¶vidÃ­tÃ©s!)
+- HibÃ¡s fordÃ­tÃ¡s/kÃ¶nyvrÃ¶vidÃ­tÃ©s estÃ©n Ã¡tvisz a helyes kombinÃ¡ciÃ³ra
 
-###Szövegmegjelenítés - Idézésnél és fejezet nézetnél is
-- Vannak címsorok, alcímsorok és a szöveg
-- A vers száma fels? indexben nem mindig a tényleges sorszám (akár bet? is lehet)
-- Twitter és facebook megosztás (hozzávaló html tag-ek hogy szebb legyen a megosztott anyag)
-- Link a többi fordítás azonos könyvére (sokszor már a rövidítés!)
-- Lábjegyztekkel és magyrázatokkal. Ezek nem versekhez, hanem verstartományokhoz tartoznak.(Éppen nem m?ködik, mert nincs az adatbázisban.)
+###SzÃ¶vegmegjelenÃ­tÃ©s - IdÃ©zÃ©snÃ©l Ã©s fejezet nÃ©zetnÃ©l is
+- Vannak cÃ­msorok, alcÃ­msorok Ã©s a szÃ¶veg
+- A vers szÃ¡ma felsÅ‘ indexben nem mindig a tÃ©nyleges sorszÃ¡m (akÃ¡r betÅ± is lehet)
+- Twitter Ã©s facebook megosztÃ¡s (hozzÃ¡valÃ³ html tag-ek hogy szebb legyen a megosztott anyag)
+- Link a tÃ¶bbi fordÃ­tÃ¡s azonos kÃ¶nyvÃ©re (sokszor mÃ¡r a rÃ¶vidÃ­tÃ©s!)
+- LÃ¡bjegyztekkel Ã©s magyrÃ¡zatokkal. Ezek nem versekhez, hanem verstartomÃ¡nyokhoz tartoznak.(Ã‰ppen nem mÅ±kÃ¶dik, mert nincs az adatbÃ¡zisban.)
 
-###Keresés
-- Url-be vagy keres?be beírt kifejezés keresése
-- sz?ri lehet?ség: bármely könyvre ill. Újszöv/Ószöv; fordítás
-- találatok csoportosítása: versenként vagy fejezetenként
-- A találatokat súlyozza és a legsúlyosabbal kezdi (tehát nem el?fordulási könyvbeli sorrendben jelennek meg)
+###KeresÃ©s
+- Url-be vagy keresÅ‘be beÃ­rt kifejezÃ©s keresÃ©se
+- szÅ±ri lehetÅ‘sÃ©g: bÃ¡rmely kÃ¶nyvre ill. ÃšjszÃ¶v/Ã“szÃ¶v; fordÃ­tÃ¡s
+- talÃ¡latok csoportosÃ­tÃ¡sa: versenkÃ©nt vagy fejezetenkÃ©nt
+- A talÃ¡latokat sÃºlyozza Ã©s a legsÃºlyosabbal kezdi (tehÃ¡t nem elÅ‘fordulÃ¡si kÃ¶nyvbeli sorrendben jelennek meg)
 - Amit figyel
     - Sphinx extended search nyelvtan szerint
-    - szótóben keres (megkeresi a hunspell a keres?szó szótöveit, a szentírás minden versét szótöves változatban is tároljuk) PARTLY DONE (a keres?szót nem tövezzük) 
-- Extrák
-    - megnézni, hogy az alternatív fordításokban ugyan erre mennyi a találat - csak a Sphinx indexben nézi, ezért villámgyors
-    - tippeket ad hasonló kifejezésekre ill. azonos szótöv? szavakra
-    - tippeket ad kézzel készül? szinoníma szótár alapján: létra/lajtorja, Nebukodonozor/Nebukadanazzár, stb.
-    - ugyan ezen szótár szerint elgépelt nevekre is tippeket ad
+    - szÃ³tÃ³ben keres (megkeresi a hunspell a keresÅ‘szÃ³ szÃ³tÃ¶veit, a szentÃ­rÃ¡s minden versÃ©t szÃ³tÃ¶ves vÃ¡ltozatban is tÃ¡roljuk) PARTLY DONE (a keresÅ‘szÃ³t nem tÃ¶vezzÃ¼k) 
+- ExtrÃ¡k
+    - megnÃ©zni, hogy az alternatÃ­v fordÃ­tÃ¡sokban ugyan erre mennyi a talÃ¡lat - csak a Sphinx indexben nÃ©zi, ezÃ©rt villÃ¡mgyors
+    - tippeket ad hasonlÃ³ kifejezÃ©sekre ill. azonos szÃ³tÃ¶vÅ± szavakra
+    - tippeket ad kÃ©zzel kÃ©szÃ¼lÅ‘ szinonÃ­ma szÃ³tÃ¡r alapjÃ¡n: lÃ©tra/lajtorja, Nebukodonozor/NebukadanazzÃ¡r, stb.
+    - ugyan ezen szÃ³tÃ¡r szerint elgÃ©pelt nevekre is tippeket ad
 
-###API/Fejleszt?knek
-- JSON válaszokat ad megfelel? kérésekre
-- f?ként a keresésekre válaszol és elvileg mindent tudnia kéne, amit a keres?nek, csak más formátumban válaszol
-- TODO: könyvek automatikus /epub kimenetele ill. abból generált /mobi (havont egyszer gyárt, onnantól mindig azt hviatkozza)
+###API/FejlesztÅ‘knek
+- JSON vÃ¡laszokat ad megfelelÅ‘ kÃ©rÃ©sekre
+- fÅ‘kÃ©nt a keresÃ©sekre vÃ¡laszol Ã©s elvileg mindent tudnia kÃ©ne, amit a keresÅ‘nek, csak mÃ¡s formÃ¡tumban vÃ¡laszol
+- TODO: kÃ¶nyvek automatikus /epub kimenetele ill. abbÃ³l generÃ¡lt /mobi (havont egyszer gyÃ¡rt, onnantÃ³l mindig azt hviatkozza)
 
-###Egyéb
-- pár statikusabb oldal van (címlap, infó, impresszum, stb.) (nem kell szerkeszt? felület)
-- cache: van egy csomó cache-elés, f?leg db
-- mysql cache: a kereséseket logolja és cacheli, hogy az alternítvákat jól mutassa és lássam mi megy az életben DONE
-- rövid urlek (és régi-régi linkek hosszú url-jeit is értelmezi)
+###EgyÃ©b
+- pÃ¡r statikusabb oldal van (cÃ­mlap, infÃ³, impresszum, stb.) (nem kell szerkesztÅ‘ felÃ¼let)
+- cache: van egy csomÃ³ cache-elÃ©s, fÅ‘leg db
+- mysql cache: a keresÃ©seket logolja Ã©s cacheli, hogy az alternÃ­tvÃ¡kat jÃ³l mutassa Ã©s lÃ¡ssam mi megy az Ã©letben DONE
+- rÃ¶vid urlek (Ã©s rÃ©gi-rÃ©gi linkek hosszÃº url-jeit is Ã©rtelmezi)
 - GoogleAnalytics
