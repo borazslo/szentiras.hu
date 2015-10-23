@@ -48,7 +48,10 @@ class TranslationRepositoryEloquent implements TranslationRepository
 
     public function getById($id)
     {
-        return Translation::find($id);
+        return \Cache::remember(
+            "translations_getById_{$id}", 120, function() use ($id) {
+            return Translation::find($id);
+        });
     }
 
     public function getDefault()
