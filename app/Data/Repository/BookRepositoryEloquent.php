@@ -65,7 +65,12 @@ class BookRepositoryEloquent implements BookRepository {
     public function getByNumberForTranslation($number, $translationId)
     {
         return Cache::remember("getBookByNumberForTranslation_{$number}_{$translationId}", 120, function() use ($translationId, $number) {
-            return Book::where('number', $number)->where('translation_id', $translationId)->first() || false;
+            $book = Book::where('number', $number)->where('translation_id', $translationId)->first();
+            if ($book == null) {
+                return false;
+            } else {
+                return $book;
+            }
         });
     }
 }
