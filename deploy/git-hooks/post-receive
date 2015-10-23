@@ -18,9 +18,7 @@ do
     unset GIT_DIR
     git checkout $branch
     git pull
-    echo "<?php return [ 'hash' => '`git rev-parse HEAD`' ];" > app/config/$appEnv/version.php
+    echo "<?php return [ 'hash' => '`git rev-parse HEAD`' ];" > config/version.php
     sh install.sh
-    php artisan cache:clear
-    php artisan twig:clean
     php artisan up
 done
