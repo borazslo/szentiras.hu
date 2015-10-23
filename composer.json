@@ -17,7 +17,8 @@
         "imagine/imagine": "~0.5.0",
         "box/spout": "~2.0",
         "phpoffice/phpexcel": "1.*",
-        "barryvdh/laravel-debugbar": "^2.0"
+        "barryvdh/laravel-debugbar": "^2.0",
+        "google/apiclient": "1.0.*@beta"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

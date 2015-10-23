@@ -5,6 +5,9 @@ namespace SzentirasHu\Service;
 use Cache;
 use Carbon\Carbon;
 use ErrorException;
+use Google_Auth_AssertionCredentials;
+use Google_Client;
+use Google_Service_Calendar;
 use Illuminate\Support\Facades\Log;
 
 class LectureDownloader {
@@ -16,6 +19,39 @@ class LectureDownloader {
      * @return null|string
      */
     public function getReferenceString($date = null) {
+        $referenceString = null;
+        // $referenceString = $this->getReferenceStringGoogleCal($date);
+        if (!$referenceString) {
+            $referenceString = $this->getReferenceStringKatolikusHu($date);
+        }
+        return $referenceString;
+    }
+
+    /**
+     * @param Carbon $date
+     */
+    private function getReferenceStringGoogleCal($date) {
+        $client = new Google_Client();
+        $client->setApplicationName(\Config::get('settings.googleAppName'));
+        $client->setDeveloperKey(\Config::get('settings.googleApiKey'));
+        /** @var Google_Service_Calendar $service */
+        $service = new Google_Service_Calendar($client);
+        $calendarId = \Config::get('settings.googleCalendarId');
+        $params = array(
+            'singleEvents' => true,
+            'orderBy' => 'startTime',
+            'timeMin' => date(DATE_ATOM),
+            'maxResults' => 7
+        );
+        $events = $service->events->listEvents($calendarId, $params);
+        /** @var \Google_Service_Calendar_Event $event */
+        foreach ($events->getItems() as $event) {
+            \Log::debug($event->getSummary());
+        }
+
+    }
+
+    private function getReferenceStringKatolikusHu($date) {
         $downloadedDate = $date ? $date : Carbon::now();
         $dailyLecture = "http://katolikus.hu/igenaptar/{$downloadedDate->format('Ymd')}.html";
         try {

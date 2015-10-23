@@ -16,5 +16,8 @@ return [
     'sphinxIndexes' => [
         'name' => ['verse', 'verse_root'],
         'mapping' => false
-    ]
+    ],
+    'googleAppName' => 'szentiras-hu',
+    'googleApiKey' => env('GOOGLE_API_KEY'),
+    'googleCalendarId' => 'katolikus.hu@gmail.com'
 ];
