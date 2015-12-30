@@ -18,11 +18,12 @@ elixir(function(mix) {
         .sass(['app.scss'], 'resources/assets/css/compiled/sass.css')
         .less(['autocomplete.less'], 'resources/assets/css/compiled/less.css')
         .styles([
-            '../../../node_modules/jquery-ui/themes/base/jquery-ui.css',
+			'font-awesome.min.css',
+            '../../../node_modules/jquery-ui/themes/base/minified/jquery-ui.min.css',
             'compiled/sass.css',
             'style.css',
-            'compiled/less.css',
-            'font-awesome.min.css']);
+            'compiled/less.css'
+            ]);
     mix.
         coffee(['ad.coffee', 'pdfDialog.coffee', 'quickSearch.coffee', 'textDisplay.coffee', 'app.coffee'], 'resources/assets/js/compiled/coffee.js');
     mix.scripts(['compiled/coffee.js'], 'resources/assets/js/compiled/app.js');
