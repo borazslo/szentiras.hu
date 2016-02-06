@@ -13,6 +13,8 @@ use Eloquent;
  */
 class Book extends Eloquent {
 
+
+
     public function abbrevs() {
         return $this->hasMany('SzentirasHu\Data\Entity\BookAbbrev', 'number');
     }

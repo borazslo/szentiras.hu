@@ -129,13 +129,13 @@ class ReferenceParser
         } else {
             // a bit hard to understand, but this is used when the ranges are through chapters, 2,3-3,4
             if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR) {
-                $range->untilChapterRef = $this->chapterRef();
+                $range->untilChapterRef = $this->chapterRef(true);
             }
         }
         return $range;
     }
 
-    public function chapterRef()
+    public function chapterRef($fromPreviousChapter = false)
     {
         $chapterRef = new ChapterRef($this->chapterId());
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_TEXT) {
@@ -145,7 +145,7 @@ class ReferenceParser
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_CHAPTER_VERSE_SEPARATOR) {
             $this->lexer->moveNext();
             $this->lexer->moveNext();
-            $chapterRef->verseRanges = $this->verseRanges();
+            $chapterRef->verseRanges = $this->verseRanges($fromPreviousChapter);
         }
         return $chapterRef;
     }
@@ -157,10 +157,10 @@ class ReferenceParser
         return $chapterId;
     }
 
-    public function verseRanges()
+    public function verseRanges($fromPreviousChapter = false)
     {
         $verseRanges = [];
-        $verseRanges[] = $this->verseRange();
+        $verseRanges[] = $this->verseRange($fromPreviousChapter);
         $nextToken = $this->lexer->peek();
         if ($nextToken['type'] == ReferenceLexer::T_VERSE_RANGE_SEPARATOR
         ) {
@@ -181,10 +181,14 @@ class ReferenceParser
         return $verseRanges;
     }
 
-    public function verseRange()
+    public function verseRange($fromPreviousChapter = false)
     {
         $range = new VerseRange();
-        $range->verseRef = $this->verseRef();
+        if (!$fromPreviousChapter) {
+            $range->verseRef = $this->verseRef();
+        } else {
+            $range->untilVerseRef = $this->verseRef();
+        }
         if ($this->lexer->glimpse()['type'] == ReferenceLexer::T_RANGE_OPERATOR) {
             $this->lexer->moveNext();
             $this->lexer->moveNext();
@@ -305,20 +309,18 @@ class ChapterRange
                 }
             }
         }
+
         if ($this->untilChapterRef) {
-            foreach ($this->untilChapterRef->verseRanges as $verseRange) {
-                if ($verseRange->contains($verse)) {
-                    return true;
-                }
-            }
             if ($chapter == $this->chapterRef->chapterId) {
                 if ($verse >= last($this->chapterRef->verseRanges)->verseRef->verseId) {
                     return true;
                 }
             } else if ($chapter == $this->untilChapterRef->chapterId) {
-                if ($verse <= head($this->untilChapterRef->verseRanges)->verseRef->verseId) {
+                if ($verse <= head($this->untilChapterRef->verseRanges)->untilVerseRef->verseId) {
                     return true;
                 }
+            } else if ($chapter > $this->chapterRef->chapterId && $chapter < $this->untilChapterRef->chapterId) {
+                return true;
             }
         }
         return false;
@@ -375,17 +377,28 @@ class VerseRange
 
     public function toString()
     {
-        $s = $this->verseRef->toString();
+        $s="";
+        if ($this->verseRef) {
+            $s .= $this->verseRef->toString();
+        }
         if ($this->untilVerseRef) {
-            $s .= "-{$this->untilVerseRef->toString()}";
+            if ($this->verseRef) {
+                $s .= "-";
+            }
+            $s .= $this->untilVerseRef->toString();
         }
         return $s;
     }
 
     public function contains($verse)
     {
-        $inside = $verse >= $this->verseRef->verseId && $this->untilVerseRef && $verse <= $this->untilVerseRef->verseId;
-        $exact = $verse === $this->verseRef->verseId;
+        $exact = false;
+        if ($this->verseRef) {
+            $inside = $verse >= $this->verseRef->verseId && $this->untilVerseRef && $verse <= $this->untilVerseRef->verseId;
+            $exact = $verse === $this->verseRef->verseId;
+        } else {
+            $inside = $this->untilVerseRef && $verse <= $this->untilVerseRef->verseId;
+        }
         return $inside || $exact;
     }
 }

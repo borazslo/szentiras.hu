@@ -112,8 +112,8 @@ class CanonicalReferenceTest extends TestCase
         $this->assertEquals("1", $bookRef->chapterRanges[0]->chapterRef->verseRanges[0]->verseRef->verseId);
         $this->assertEquals("a", $bookRef->chapterRanges[0]->chapterRef->verseRanges[0]->verseRef->versePart);
         $this->assertEquals("14", $bookRef->chapterRanges[0]->untilChapterRef->chapterId);
-        $this->assertEquals("2", $bookRef->chapterRanges[0]->untilChapterRef->verseRanges[0]->verseRef->verseId);
-        $this->assertEquals("b", $bookRef->chapterRanges[0]->untilChapterRef->verseRanges[0]->verseRef->versePart);
+        $this->assertEquals("2", $bookRef->chapterRanges[0]->untilChapterRef->verseRanges[0]->untilVerseRef->verseId);
+        $this->assertEquals("b", $bookRef->chapterRanges[0]->untilChapterRef->verseRanges[0]->untilVerseRef->versePart);
 
         $canonicalRef = CanonicalReference::fromString("Kor 13,1a-14,2b;14,2");
         $this->assertEquals("Kor 13,1a-14,2b;14,2", $canonicalRef->toString());
@@ -242,14 +242,19 @@ class CanonicalReferenceTest extends TestCase
         $this->assertTrue($range->hasVerse(2, 1));
         $this->assertTrue($range->hasVerse(4, 99));
 
-        $range = CanonicalReference::fromString("Mt 1,2-3,4.6-8")->bookRefs[0]->chapterRanges[0];
+        $range = CanonicalReference::fromString("Mt 1,2-3,4;3,6-8")->bookRefs[0]->chapterRanges[0];
         $this->assertFalse($range->hasVerse(1, 1));
         $this->assertTrue($range->hasVerse(1, 2));
         $this->assertTrue($range->hasVerse(2, 99));
         $this->assertTrue($range->hasVerse(3, 3));
         $this->assertTrue($range->hasVerse(3, 4));
-        $this->assertTrue($range->hasVerse(3, 7));
+
+        $range = CanonicalReference::fromString("Mt 1,2-3,4")->bookRefs[0]->chapterRanges[0];
+        $this->assertFalse($range->hasVerse(1, 1));
         $this->assertFalse($range->hasVerse(3, 5));
+        $this->assertTrue($range->hasVerse(1, 4));
+        $this->assertTrue($range->hasVerse(2, 1));
+        $this->assertTrue($range->hasVerse(3, 2));
     }
 
     public function testDashes()
@@ -266,7 +271,8 @@ class CanonicalReferenceTest extends TestCase
             $referenceService->getCanonicalUrl(CanonicalReference::fromString($ref), 1));
     }
 
-    public function testIsOneChapter() {
+    public function testIsOneChapter()
+    {
         $this->assertTrue(CanonicalReference::fromString('ApCsel 1')->isOneChapter());
         $this->assertFalse(CanonicalReference::fromString('ApCsel 1,2')->isOneChapter());
         $this->assertFalse(CanonicalReference::fromString('ApCsel 1,2-5')->isOneChapter());
@@ -274,7 +280,8 @@ class CanonicalReferenceTest extends TestCase
         $this->assertFalse(CanonicalReference::fromString('ApCsel')->isOneChapter());
     }
 
-    public function testPrevNextChapter() {
+    public function testPrevNextChapter()
+    {
         $referenceService = App::make(ReferenceService::class);
         $ref = CanonicalReference::fromString('Ter 50');
         list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1);
@@ -292,7 +299,8 @@ class CanonicalReferenceTest extends TestCase
         $this->assertEquals('Kiv 1', $prevRef->toString());
     }
 
-    public function testCollectChapterIds() {
+    public function testCollectChapterIds()
+    {
         $range = new ChapterRange();
         $range->chapterRef = new ChapterRef(2);
         $range->untilChapterRef = new ChapterRef(4);

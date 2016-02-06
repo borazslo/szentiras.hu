@@ -14,7 +14,7 @@ class CleanTdverse extends Migration {
     { 
         Schema::table('tdverse', function(Blueprint $table)
         {
-            $table->dropUnique('`Index 1`');
+            $table->dropUnique('index_did_trans');
             $table->dropColumn('did');
             $table->dropColumn('hiv');
             $table->dropColumn('old');
@@ -47,7 +47,7 @@ class CleanTdverse extends Migration {
         
         Schema::table('tdverse', function(Blueprint $table)
         {     
-            $table->unique(array('did','trans'),'`Index 1`');        
+            $table->unique(array('did','trans'),'index_did_trans');
         }); 
     }
 

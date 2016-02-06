@@ -53,7 +53,7 @@ class LectureDownloader {
 
     private function getReferenceStringKatolikusHu($date) {
         $downloadedDate = $date ? $date : Carbon::now();
-        $dailyLecture = "http://katolikus.hu/igenaptar/{$downloadedDate->format('Ymd')}.html";
+        $dailyLecture = "http://igenaptar.katolikus.hu/nap?holnap={$downloadedDate->format('Y-m-d')}";
         try {
             if (!$date) {
                 // today's lecture is cached
