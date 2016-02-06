@@ -7,6 +7,9 @@
         </{{ tag }}>
     {% endif %}
     {% endfor %}
+    {% if verse.numv == 1 %}
+        <span class="text-muted numchapter">{{ verse.chapter }}</span>
+    {% endif %}
     <span class="text-muted numv"><sup>{{ verse.numv }}</sup></span>{{ verse.text|raw }}
     {% if verse.xrefs is not empty %}
         <span class="xref">

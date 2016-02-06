@@ -3,10 +3,10 @@ initToggler = ->
   delay = 400;
   $('#toggleNumv').click ->
     if ($('#toggleNumv').hasClass('active'))
-      $('.numv').fadeOut(delay)
+      $('.numv, .numchapter').fadeOut(delay)
       $('#toggleNumv').removeClass('active')
     else
-      $('.numv').fadeIn(delay)
+      $('.numv, .numchapter').fadeIn(delay)
       $('#toggleNumv').addClass('active')
   $('#toggleXrefs').click ->
     if ($('#toggleXrefs').hasClass('active'))

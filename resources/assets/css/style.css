@@ -31,3 +31,10 @@ span.toggle.active {
 .active span.toggle.active {
     display: inline;
 }
+
+.numchapter {
+    font-size: 42px;
+    float: left;
+    padding-right: 6px;
+    line-height: 40px;
+}
