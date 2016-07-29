@@ -1,6 +1,7 @@
 #!/bin/sh
-npm install
-node_modules/.bin/bower --config.interactive=false install
-node_modules/.bin/grunt
+npm --no-bin-link install
 php composer.phar install
-php artisan migrate --env=$SZENTIRAS_WEBAPP_ENVIRONMENT
+php artisan migrate
+node_modules/gulp/bin/gulp.js
+php artisan cache:clear
+php artisan twig:clean

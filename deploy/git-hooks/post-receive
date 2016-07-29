@@ -18,10 +18,7 @@ do
     unset GIT_DIR
     git checkout $branch
     git pull
-    echo "<?php return [ 'hash' => '`git rev-parse HEAD`' ];" > app/config/$appEnv/version.php
-    export SZENTIRAS_WEBAPP_ENVIRONMENT=$appEnv
+    echo "<?php return [ 'hash' => '`git rev-parse HEAD`' ];" > config/version.php
     sh install.sh
-    php artisan cache:clear
-    php artisan twig:clear
     php artisan up
 done

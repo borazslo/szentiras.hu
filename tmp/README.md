@@ -1,2 +1,0 @@
-- database.sql: a teljes adatbázis a bibliai versek kivételével.
-- SZIT/KNB/UF/KG .xls: a bibliai versek szövegforrásai fordításonként

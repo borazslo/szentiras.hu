@@ -1,9 +1,6 @@
 /bootstrap/compiled.php
 /vendor
-.env.production.php
-.env.staging.php
-.env.php
-.env.local.php
+.env
 .DS_Store
 Thumbs.db
 .idea
@@ -12,7 +9,11 @@ _ide_helper.php
 
 nbproject
 *~
-app/storage
 node_modules
 bower_components
 version.php
+.vagrant
+Homestead.yaml
+Vagrantfile
+.phpstorm.meta.php
+PROVISIONED

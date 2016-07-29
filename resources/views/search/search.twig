@@ -1,0 +1,108 @@
+{% extends 'layout' %}
+
+{% set pageTitle %}
+Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %} | Szentírás
+{% endset %}
+
+{% block content %}
+    <h2>Keresés a Bibliában</h2>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form role="form" class="form-horizontal" method="get"
+                  action="{{ action('Search\\SearchController@anySearch') }}">
+                <div class="form-group">
+                    <label for="textToSearch" class="col-sm-3 control-label">Keresendő</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="textToSearch" id="textToSearch" value="{{ form.textToSearch }}" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="book" class="col-sm-3 control-label">Könyv</label>
+                    <div class="col-sm-9">
+                        <select name="book" class="form-control" id="book">
+                            <option value="all" {{ 'all' == form.book ? 'selected' }}>mind</option>
+                            <option value="old_testament" {{ 'old_testament' == form.book ? 'selected' }}>Ószövetség</option>
+                            <option value="new_testament" {{ 'new_testament' == form.book ? 'selected' }}>Újszövetség</option>
+                            {% for book in books %}
+                                <option value="{{ book.number }}" {{ book.number == form.book ? 'selected' }}>{{ book.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="translation" class="col-sm-3 control-label">Fordítás</label>
+                    <div class="col-sm-9">
+                        <select name="translation" class="form-control" id="translation">
+                            <option value="0" {{ form.translation is not defined ? 'selected' }}>mind</option>
+                            {% for translation in translations %}
+                                <option value="{{ translation.id }}" {{ translation.id == form.translation.id ? 'selected' }}>{{ translation.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="grouping" class="col-sm-3 control-label">Csoportosítás</label>
+                    <div class="col-sm-9">
+                        <select name="grouping" class="form-control" id="grouping">
+                            <option value="chapter" {{ form.grouping == 'chapter' ? 'selected' }}>fejezetenként</option>
+                            <option value="verse" {{ form.grouping == 'verse' ? 'selected' }}>versenként</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="submit" value="Keresés" class="btn btn-default"/>
+            </form>
+        </div>
+    </div>
+
+    {% if bookRef is defined %}
+        <h4>Igehely</h4>
+        {% for verseContainer in bookRef.verseContainers %}
+            <blockquote>
+                <footer>
+                    <a href="{{ bookRef.link }}">{{ bookRef.label }}</a>
+                </footer>
+                {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  translation } %}
+            </blockquote>
+        {% endfor %}
+    {% endif %}
+
+    {% for translationHit in translationHits %}
+        <a href="/kereses/search?textToSearch={{ form.textToSearch }}&translation={{ translationHit.translation.id }}&book={{ form.book }}&grouping={{ form.grouping }}"
+           class="btn btn-default btn-xs">{{ translationHit.translation.abbrev }} <sup>{% if translationHit.hitCount > 999 %}&gt;{% endif %}{{ translationHit.hitCount }}</sup>
+        </a>
+    {% endfor %}
+
+    {% if fullTextResults is defined %}
+        <h4>Találatok a szövegben <span class="badge">{{ fullTextResults.hitCount }} találat</span></h4>
+        {% for result in fullTextResults.results %}
+            <h5><a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }}"><span
+                            class="glyphicon glyphicon-book"></span> {{ result.book.name }}
+                    ({{ result.translation.name }})</a></h5>
+            <ul class="list-unstyled">
+                {% if form.grouping != 'chapter' %}
+                    {% for verse in result.verses %}
+                        <li>
+                            <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">
+                                {{ verse.chapter }},{{ verse.numv }}</a>
+                            {{ verse.text }}
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    {% for chapter, verses in result.chapters %}
+                        <li>
+                            <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ chapter }}">{{ chapter }}</a>
+                            {% for verse in verses %}
+                                {% if verse.ellipseBefore %} [...] {% endif %}<sup>{{ verse.numv }}</sup>{{ verse.text }}
+                            {% endfor %}
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        {% endfor %}
+    {% endif %}
+
+    {% if form.textToSearch is not defined %}
+        {% include 'searchInfo' %}
+    {% endif %}
+
+{% endblock %}

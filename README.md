@@ -1,4 +1,4 @@
-﻿Szentírás .hu
+Szentírás .hu
 ========
 
 A [szentiras.hu](http://szentiras.hu) teljes kódja.

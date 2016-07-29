@@ -1,49 +1,59 @@
 {
-    "name": "szentiras.hu/szentiras-webapp",
-    "description": "Szentiras.hu web application",
+    "name": "laravel/laravel",
+    "description": "The Laravel Framework.",
+    "keywords": ["framework", "laravel"],
     "license": "MIT",
+    "type": "project",
     "require": {
-        "laravel/framework": "4.2.*",
-        "barryvdh/laravel-twigbridge": "0.3.3",
-        "twig/extensions": "1.0.*",
-        "doctrine/dbal": "2.3.*",
-        "barryvdh/laravel-cors": "0.2.x",
-        "gigablah/sphinxphp": "2.0.*",
-        "barryvdh/laravel-debugbar": "1.*",
-		"phpoffice/phpexcel": "1.*",
+        "php": ">=5.5.9",
+        "laravel/framework": "5.1.*",
+        "predis/predis": "^1.0",
+        "rcrowe/twigbridge": "0.9.x",
+        "twig/extensions": "^1.3",
+        "gigablah/sphinxphp": "^2.0",
+        "barryvdh/laravel-ide-helper": "^2.1",
+        "doctrine/dbal": "^2.5",
         "endroid/qrcode": "1.2.4",
-        "imagine/imagine": "~0.5.0"
+        "imagine/imagine": "~0.5.0",
+        "box/spout": "~2.0",
+        "phpoffice/phpexcel": "1.*",
+        "barryvdh/laravel-debugbar": "^2.0",
+        "google/apiclient": "1.0.*@beta"
     },
     "require-dev": {
-        "phpunit/phpunit": "3.7.*",
-        "mockery/mockery": "0.9.0",
-        "barryvdh/laravel-ide-helper": "1.11.1"
+        "fzaninotto/faker": "~1.4",
+        "mockery/mockery": "0.9.*",
+        "phpunit/phpunit": "~4.0",
+        "phpspec/phpspec": "~2.1"
     },
     "autoload": {
         "classmap": [
-            "app/commands",
-            "app/database/migrations",
-            "app/database/seeds",
-            "app/tests/TestCase.php",
-            "app/tests/lib"
+            "database"
         ],
         "psr-4": {
-            "SzentirasHu\\Controllers\\": "app/controllers",
-            "SzentirasHu\\Lib\\": "app/lib",
-            "SzentirasHu\\Models\\": "app/models",
-            "SzentirasHu\\Views\\": "app/views"
+            "SzentirasHu\\": "app/",
+            "SzentirasHu\\Test\\": "tests/feature",
+            "SzentirasHu\\Test\\Smoke\\": "tests/smoke",
+            "SzentirasHu\\Test\\Common\\": "tests/common"
         }
-
+    },
+    "autoload-dev": {
+        "classmap": [
+        ]
     },
     "scripts": {
         "post-install-cmd": [
             "php artisan clear-compiled",
             "php artisan optimize"
         ],
+        "pre-update-cmd": [
+            "php artisan clear-compiled"
+        ],
         "post-update-cmd": [
-            "php artisan clear-compiled",
-            "php artisan ide-helper:generate --env=dev",
             "php artisan optimize"
+        ],
+        "post-root-package-install": [
+            "php -r \"copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
             "php artisan key:generate"
@@ -51,6 +61,5 @@
     },
     "config": {
         "preferred-install": "dist"
-    },
-    "minimum-stability": "stable"
+    }
 }

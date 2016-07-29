@@ -1,15 +1,18 @@
+sudo: false
 language: php
 
 php:
-  - 5.4
+  - 5.6
 
 before_script:
-  - mysql -e 'create database bible;'
+  - mysql -e 'create database bible character set utf8 collate utf8_unicode_ci;'
+  - npm install
+  - php composer.phar selfupdate
   - php composer.phar install
-# migrate needs environment specification
-  - php artisan migrate --seed --env=testing
+  - gulp default
 
 script:
+# first test will run the migrations
   - phpunit --configuration phpunit.xml
 
 after_success:
@@ -20,6 +23,8 @@ after_success:
   - git remote add deploy szentiras_hu_git@szentiras.hu:/home/szentiras_hu_git/github/borazslo/szentiras.hu.git
   - git push deploy $TRAVIS_BRANCH
 
+after_failure: "cat /home/travis/build/borazslo/szentiras.hu/storage/logs/laravel.log"
+
 cache:
   directories:
     - vendor
@@ -28,6 +33,9 @@ cache:
 
 env:
   global:
+  - DB_USERNAME=root
+  - DB_PASSWORD=""
+  - APP_KEY=NbtLDkclj9j3pmj4hOONo8vhgXmSASdD
   - secure: EMWhgRZT6WGhjmFlhw63hivKAr1zq3MfW4TNErwer8XAllXTWuV+T1KSb+1aNsH4JG34Y4KOn20mGBLEG29WiZ0k8dx99afnlJtw5xY76vHfTT+RvST9MFLo17mlthdIu40MIxnyMKUVgS4y0kohAUT7uFD+LTWjx0G0V8QVF4w=
   - secure: KRNcmD/E4B0D6Tco2v3vKEpAFfeuBRtth7sEc3qZKyzp/lPqRpfVuJBOdtkP05Wd6XbjhSaAVQ08RwhRSGtAMlq7JQGjm+RJxB5bXtyRJQtgSeBYJNVa+qhUpAJ22BLo3pBZU7m+Zp3u0qBXi5euGgqyyPes7gjTPk6Wvg0Erx8=
   - secure: KUaxJ0Ke+LMxkoS92Axx14Z4TmlT7DvKqKZFXF/vbt8hwMptlPEeEqJ5/r+n8yYYuP60fSBXzM7ZW7EV/n2Rvu9HxbIGuvssLvFEE+ePwkXJViOikA4crh9UsTb1C/40TNShEPaY1ZWvAO6qwxj1kdrCJ4rHpPNC32pUj59jHRo=
