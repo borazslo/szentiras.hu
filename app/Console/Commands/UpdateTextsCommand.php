@@ -281,7 +281,7 @@ class UpdateTextsCommand extends Command
                     }
                     $verseroot .= " " . $stem;
                     $this->newStems++;
-                    Cache::put("hunspell_{$word}", $stem, 120);
+                    Cache::put("hunspell_{$word}", $stem, 525948);
                 }
             }
         }
@@ -333,8 +333,6 @@ class UpdateTextsCommand extends Command
     {
         $this->info("Beolvasás sorról sorra...\n");
         $verseRowIterator->rewind();
-        $verseRowIterator->next();
-        $verseRowIterator->next();
         $verseRowIterator->next();
         $rowNumber = 0;
         $verseRowIterator->next();
