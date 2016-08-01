@@ -74,6 +74,6 @@ return [
     |
     */
 
-    'prefix' => 'szentirashu'.app()->environment(),
+    'prefix' => 'szentirashu'.env('APP_ENV')
 
 ];
