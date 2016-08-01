@@ -161,15 +161,12 @@ class UpdateTextsCommand extends Command
         $pipes = [];
         if ($this->hunspellEnabled) {
             $descriptorspec = [
-                0 => ["pipe", "r"],
-                1 => ["pipe", "w"],
-                2 => ["pipe", "r"]
+                0 => ["pipe", "r"], // stdin
+                1 => ["pipe", "w"], // stdout
+                2 => ["pipe", "w"]  // stderr
             ];
-            $hunspellProcess = proc_open('hunspell -d hu_HU -i UTF-8', $descriptorspec, $pipes, null, null);
+            $hunspellProcess = proc_open('stdbuf -oL hunspell -m -d hu_HU -i UTF-8', $descriptorspec, $pipes, null, null);
             $this->info("Hunspell-hu indul...");
-            if (!$this->option('verbose')) echo "\n";
-            if (!$this->option('verbose')) fgets($pipes[1], 4096);
-            else echo fgets($pipes[1], 4096);
         }
 
         $inserts = $this->readLines($verseRowIterator, $headers, $fields, $translation, $bookNumber2Id, $abbrev, $pipes);
@@ -221,7 +218,7 @@ class UpdateTextsCommand extends Command
             App::abort(500, 'Hunspell-hu is not installed. Please install it or use \'--nohunspell\' instead.');
         }
         //test hunspell dictionary??
-        $returnVal = shell_exec("echo medve | hunspell -d hu_HU -s -i UTF-8  2>&1");
+        $returnVal = shell_exec("echo medve | hunspell -d hu_HU -i UTF-8 -m  2>&1");
         if (preg_match('/Can\'t open affix or dictionary files for dictionary/i', $returnVal)) {
             App::abort(500, 'Can\'t open the hu_HU dictionary. Try to install hunspell-hu or use \'--nohunspell\' instead.');
         }
@@ -246,37 +243,39 @@ class UpdateTextsCommand extends Command
 
     private function stem($verse, $pipes)
     {
-        $processedVerse = strtolower(strip_tags($verse));
+        $processedVerse = strip_tags($verse);
         $processedVerse = preg_replace("/(,|:|\?|!|;|\.|„|”|»|«|\")/i", ' ', $processedVerse);
         $processedVerse = preg_replace(['/Í/i', '/Ú/i', '/Ő/i', '/Ó/i', '/Ü/i'], ['í', 'ú', 'ő', 'ó', 'ü'], $processedVerse);
 
-        $verseroot = '';
-        $words = preg_split('/\s+/', $processedVerse);
-        $s = 0;
-        $t = 0;
-        foreach ($words as $k => $word) {
+        $verseroots = collect();
+        preg_match_all('/(\p{L}+)/u', $processedVerse, $words);
+        foreach ($words[1] as $word) {
             if (Cache::has("hunspell_{$word}")) {
-                $verseroot .= " " . Cache::get("hunspell_{$word}");
-                $s++;
+                $cachedStems = Cache::get("hunspell_{$word}");
+                $verseroots = $verseroots->merge($cachedStems);
+//                print ("\nAlready cached {$word}\n");
             } else {
-                fwrite($pipes[0], $word . "\n"); // send start
-                $return = fgets($pipes[1], 4096); //get answer
-                if (trim($return) != '') {
-                    fgets($pipes[1], 4096);
-                    if ($return{0} == "+") {
-                        $t++;
-                        $stem = trim(substr($return, 2));
+//                print("\nnot yet cached {$word}, sending to hunspell\n");
+                fwrite($pipes[0], "{$word}\n"); // send start
+                $stems = collect();
+                while ($line = fgets($pipes[1])) {
+                    if (trim($line) !== '') {
+                        if (preg_match_all("/st:(\p{L}+)/u", $line, $matches)) {
+                            $stems = $stems->merge($matches[1]);
+                        } else {
+                            $stems->push($word);
+                        }
                     } else {
-                        $stem = $word;
+                        $cachedStems = $stems->unique();
+                        Cache::put("hunspell_{$word}", $cachedStems, 525948);
+                        $verseroots = $verseroots->merge($stems);
+                        $this->newStems++;
+                        break;
                     }
-                    $verseroot .= " " . $stem;
-                    $this->newStems++;
-                    Cache::put("hunspell_{$word}", $stem, 525948);
-                }
+                } //get answer
             }
         }
-        $processedVerse = trim($processedVerse);
-        return $processedVerse;
+        return join(' ', $verseroots->unique()->toArray());
     }
 
 
@@ -351,7 +350,7 @@ class UpdateTextsCommand extends Command
                 if ($this->hunspellEnabled && in_array($values['tip'], [60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704])) {
                     $verseRoot = $this->stem($values['verse'], $pipes);
                 } else {
-                    $verseRoot = '??';
+                    $verseRoot = null;
                 }
                 $values['verseroot'] = $verseRoot;
                 if (isset($cols['ido']) && !empty($row[$cols['ido']])) {
@@ -362,9 +361,6 @@ class UpdateTextsCommand extends Command
                 } else {
                     $this->error("A " . (int)substr($gepi, 0, 3) . "-hez nincs `book_id`");
                     App::abort(500, 'Valami gond van a books id/gepi párossal!');
-                }
-                if ($rowNumber > 0 && $rowNumber % 100 == 0) {
-                    $this->newStems = 0;
                 }
                 $inserts[$rowNumber] = $values;
             }
