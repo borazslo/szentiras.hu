@@ -31,10 +31,12 @@ class Verse extends Eloquent {
         return $this->belongsTo('SzentirasHu\Data\Entity\Translation','trans');
     }
 
+    // this is a bit dodgy, as doesn't take translations into consideration, so if different
+    // translations have conflicting type definitions that can be a problem
     public function getType() {
         if (!self::$typeMap) {
-            foreach (\Config::get('verseTypes') as $typeDefs) {
-                foreach($typeDefs as $typeName => $typeIds) {
+            foreach (\Config::get('translations') as $translationId => $typeDefs) {
+                foreach($typeDefs['verseTypes'] as $typeName => $typeIds) {
                     foreach ($typeIds as $key => $typeId) {
                         if ($typeName == 'heading') {
                             $t = $typeName.$key;
