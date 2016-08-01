@@ -331,6 +331,7 @@ class UpdateTextsCommand extends Command
         $progressBar->setFormat("[%bar%] %message%");
         $verseRowIterator->rewind();
         $verseRowIterator->next();
+        $verseRowIterator->next();
         $rowNumber = 0;
         $verseRowIterator->next();
         while ($verseRowIterator->valid()) {
@@ -354,7 +355,6 @@ class UpdateTextsCommand extends Command
                 }
                 $values['verseroot'] = $verseRoot;
                 if (isset($cols['ido']) && !empty($row[$cols['ido']])) {
-                    // $values['ido'] = gmdate('Y-m-d H:i:s', PHPExcel_Shared_Date::ExcelToPHP($row[$cols['ido']]));
                     $values['ido'] = $row[$cols['ido']];
                 }
                 if (isset($books_gepi2id[$values['book_number']])) {
