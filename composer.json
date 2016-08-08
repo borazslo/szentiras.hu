@@ -18,7 +18,8 @@
         "box/spout": "~2.0",
         "phpoffice/phpexcel": "1.*",
         "barryvdh/laravel-debugbar": "^2.0",
-        "google/apiclient": "1.0.*@beta"
+        "google/apiclient": "1.0.*@beta",
+        "barryvdh/laravel-cors": "^0.8.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

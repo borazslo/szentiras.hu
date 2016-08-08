@@ -148,6 +148,7 @@ return [
         SzentirasHu\Providers\RepositoriesProvider::class,
         SzentirasHu\Providers\SphinxSearchServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        Barryvdh\Cors\ServiceProvider::class,
         'TwigBridge\ServiceProvider',
         SzentirasHu\Providers\ViewComposerServiceProvider::class,
         \SzentirasHu\Service\Imagine\ImagineServiceProvider::class
