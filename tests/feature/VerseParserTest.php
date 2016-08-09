@@ -24,7 +24,7 @@ class VerseParserTest extends TestCase
         $numv = 3;
         $v->numv = $numv;
         $v->verse = "abc {Mk 12,34} xyz {Mt 23,45} zyx";
-        $v->tip = \Config::get('verseTypes.KNB.text.0');
+        $v->tip = \Config::get('translations.KNB.verseTypes.text.0');
         $verseData = $parser->parse([$v], $book);
 
         $this->assertEquals("abc xyz zyx", $verseData->text);
@@ -46,13 +46,13 @@ class VerseParserTest extends TestCase
         $numv = 3;
         $v->numv = $numv;
         $v->verse = "abc " . KGVerseParser::$xrefSigns[0] . " xyz";
-        $v->tip = \Config::get('verseTypes.KG.text.0');
+        $v->tip = \Config::get('translations.KG.verseTypes.text.0');
 
         $xrefVerse = new Verse();
         $xrefVerse->chapter = $chapter;
         $xrefVerse->numv = $numv;
         $xrefVerse->verse = KGVerseParser::$xrefSigns[0] . " Mk. 12,34.";
-        $xrefVerse->tip = \Config::get('verseTypes.KG.xref.0');;
+        $xrefVerse->tip = \Config::get('translations.KG.verseTypes.xref.0');;
 
         $verseData = $parser->parse([$v, $xrefVerse], $book);
 
@@ -69,7 +69,7 @@ class VerseParserTest extends TestCase
         $numv = 3;
         $v->numv = $numv;
         $v->verse = "abc xyz";
-        $v->tip = \Config::get('verseTypes.KG.text.0');
+        $v->tip = \Config::get('translations.KG.verseTypes.text.0');
 
         $verseData = $parser->parse([$v, $xrefVerse], $book);
 
@@ -80,12 +80,12 @@ class VerseParserTest extends TestCase
         $v->chapter = $chapter;
         $v->numv = $numv;
         $v->verse = "Abc • cde † fgh";
-        $v->tip = \Config::get('verseTypes.KG.text.0');
+        $v->tip = \Config::get('translations.KG.verseTypes.text.0');
         $ref = new Verse();
         $ref->chapter = $chapter;
         $ref->numv = $numv;
         $ref->verse = "• rész 5,7. † Zsolt. 16,10.";
-        $ref->tip = \Config::get('verseTypes.KG.xref.0');
+        $ref->tip = \Config::get('translations.KG.verseTypes.xref.0');
         $verseData = $parser->parse([$v, $ref], $book);
         $this->assertCount(2, $verseData->xrefs);
         $this->assertEquals("Abc cde fgh", $verseData->text);

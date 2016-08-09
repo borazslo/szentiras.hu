@@ -75,34 +75,36 @@ class UpdateTextsCommand extends Command
             $this->testHunspell();
         }
 
-        $abbrev = $this->argument('abbrev');
+        $abbrev = $this->choice('Melyik fordítást töltsük be?', ['BD', 'KG', 'KNB', 'RUF', 'UF', 'SZIT']);
         $this->verifyAbbrev($abbrev);
 
         $translation = $this->translationRepository->getByAbbrev($abbrev);
         $this->info("Fordítás: {$translation->name} (id: {$translation->id})");
 
-        if ($this->option('file') AND $this->option('url')) {
-            App::abort(500, "A forrást vagy url-el VAGY file névvel lehet megadni. Mindkettővel nem.");
-        } elseif (!$this->option('file') AND !$this->option('url')) {
-            App::abort(500, "A forrást meg kell adni vagy url-el VAGY file névvel.");
-        }
-
-        $filePath = $this->getFilePath($abbrev);
-
         ini_set('memory_limit', '1024M');
 
-        if ($this->option('url')) {
-            try {
-                $this->info("A fájl letöltése a megadott címről...");
-                $raw = file_get_contents($this->option('url'));
-            } catch (Exception $ex) {
-                App::abort(500, "Nem sikerült fáljt letölteni a megadott url-ről.");
+        if ($this->option('file')) {
+            $filePath = $this->option('file');
+            $this->info("A fájl betöltése innen: " . $this->option('file'));
+        } else {
+            $filePath = $this->sourceDirectory . "/{$abbrev}";
+            $url = Config::get("translations.{$abbrev}.textSource");
+            if (empty($url)) {
+                App::abort(500, "Nincs megadva a TEXT_SOURCE_{$abbrev} konfiguráció.");
             }
             try {
-                file_put_contents($filePath, $raw);
-                unset($raw);
+                $this->info("A fájl letöltése a $url címről...");
+                $fp = fopen ($filePath, 'w+');
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_FILE, $fp);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+                curl_exec($ch);
+                curl_close($ch);
+                fclose($fp);
             } catch (Exception $ex) {
-                App::abort(500, "Nem sikerült a letöltött fájlt elmenteni.");
+                App::abort(500, "Nem sikerült fáljt letölteni a megadott url-ről.");
             }
         }
 
@@ -122,16 +124,19 @@ class UpdateTextsCommand extends Command
         $this->info("A $filePath fájl megnyitva...");
 
         $sheets = $this->getSheets($reader);
+        $this->info("Könyvek lap ellenőrzése");
         $bookRowIterator = $sheets['Könyvek']->getRowIterator();
         $linesRead = 0;
         foreach ($bookRowIterator as $row) {
             // skip first line
             if ($linesRead == 0) {
+                $this->info("Első sor átugrása...");
                 $linesRead++;
                 continue;
             }
             // break on first empty line
             if (empty($row[0])) {
+                $this->info("$linesRead sor beolvasva, kész.");
                 break;
             }
             $bookAbbrev2Id = $this->getAbbrev2Id($translation);
@@ -156,15 +161,12 @@ class UpdateTextsCommand extends Command
         $pipes = [];
         if ($this->hunspellEnabled) {
             $descriptorspec = [
-                0 => ["pipe", "r"],
-                1 => ["pipe", "w"],
-                2 => ["pipe", "r"]
+                0 => ["pipe", "r"], // stdin
+                1 => ["pipe", "w"], // stdout
+                2 => ["pipe", "w"]  // stderr
             ];
-            $hunspellProcess = proc_open('hunspell -d hu_HU -i UTF-8', $descriptorspec, $pipes, null, null);
+            $hunspellProcess = proc_open('stdbuf -oL hunspell -m -d hu_HU -i UTF-8', $descriptorspec, $pipes, null, null);
             $this->info("Hunspell-hu indul...");
-            if (!$this->option('verbose')) echo "\n";
-            if (!$this->option('verbose')) fgets($pipes[1], 4096);
-            else echo fgets($pipes[1], 4096);
         }
 
         $inserts = $this->readLines($verseRowIterator, $headers, $fields, $translation, $bookNumber2Id, $abbrev, $pipes);
@@ -193,20 +195,6 @@ class UpdateTextsCommand extends Command
         } catch (ProcessFailedException $e) {
             echo $e->getMessage();
         }
-
-
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['abbrev', InputArgument::REQUIRED, 'A fordítás rövidítése'],
-        ];
     }
 
     /**
@@ -217,8 +205,7 @@ class UpdateTextsCommand extends Command
     protected function getOptions()
     {
         return [
-            ['file', null, InputOption::VALUE_OPTIONAL, 'Importálandó fájl neve (alapértelmezés: /tmp/[abbrev].xls)', null],
-            ['url', null, InputOption::VALUE_OPTIONAL, 'Importálandó fájl URL', null],
+            ['file', null, InputOption::VALUE_OPTIONAL, 'Ha fájlból szeretnéd betölteni, nem dropboxból, az importálandó fájl elérési útja', null],
             ['nohunspell', null, InputOption::VALUE_NONE, 'Szótöveket ne állítsa elő'],
             ['filter', null, InputOption::VALUE_OPTIONAL, 'Szűrés `gepi` (regex) szerint', null],
         ];
@@ -231,7 +218,7 @@ class UpdateTextsCommand extends Command
             App::abort(500, 'Hunspell-hu is not installed. Please install it or use \'--nohunspell\' instead.');
         }
         //test hunspell dictionary??
-        $returnVal = shell_exec("echo medve | hunspell -d hu_HU -s -i UTF-8  2>&1");
+        $returnVal = shell_exec("echo medve | hunspell -d hu_HU -i UTF-8 -m  2>&1");
         if (preg_match('/Can\'t open affix or dictionary files for dictionary/i', $returnVal)) {
             App::abort(500, 'Can\'t open the hu_HU dictionary. Try to install hunspell-hu or use \'--nohunspell\' instead.');
         }
@@ -256,37 +243,39 @@ class UpdateTextsCommand extends Command
 
     private function stem($verse, $pipes)
     {
-        $processedVerse = strtolower(strip_tags($verse));
+        $processedVerse = strip_tags($verse);
         $processedVerse = preg_replace("/(,|:|\?|!|;|\.|„|”|»|«|\")/i", ' ', $processedVerse);
         $processedVerse = preg_replace(['/Í/i', '/Ú/i', '/Ő/i', '/Ó/i', '/Ü/i'], ['í', 'ú', 'ő', 'ó', 'ü'], $processedVerse);
 
-        $verseroot = '';
-        $words = preg_split('/\s+/', $processedVerse);
-        $s = 0;
-        $t = 0;
-        foreach ($words as $k => $word) {
+        $verseroots = collect();
+        preg_match_all('/(\p{L}+)/u', $processedVerse, $words);
+        foreach ($words[1] as $word) {
             if (Cache::has("hunspell_{$word}")) {
-                $verseroot .= " " . Cache::get("hunspell_{$word}");
-                $s++;
+                $cachedStems = Cache::get("hunspell_{$word}");
+                $verseroots = $verseroots->merge($cachedStems);
+//                print ("\nAlready cached {$word}\n");
             } else {
-                fwrite($pipes[0], $word . "\n"); // send start
-                $return = fgets($pipes[1], 4096); //get answer
-                if (trim($return) != '') {
-                    fgets($pipes[1], 4096);
-                    if ($return{0} == "+") {
-                        $t++;
-                        $stem = trim(substr($return, 2));
+//                print("\nnot yet cached {$word}, sending to hunspell\n");
+                fwrite($pipes[0], "{$word}\n"); // send start
+                $stems = collect();
+                while ($line = fgets($pipes[1])) {
+                    if (trim($line) !== '') {
+                        if (preg_match_all("/st:(\p{L}+)/u", $line, $matches)) {
+                            $stems = $stems->merge($matches[1]);
+                        } else {
+                            $stems->push($word);
+                        }
                     } else {
-                        $stem = $word;
+                        $cachedStems = $stems->unique();
+                        Cache::put("hunspell_{$word}", $cachedStems, 525948);
+                        $verseroots = $verseroots->merge($stems);
+                        $this->newStems++;
+                        break;
                     }
-                    $verseroot .= " " . $stem;
-                    $this->newStems++;
-                    Cache::put("hunspell_{$word}", $stem, 120);
-                }
+                } //get answer
             }
         }
-        $processedVerse = trim($processedVerse);
-        return $processedVerse;
+        return join(' ', $verseroots->unique()->toArray());
     }
 
 
@@ -297,7 +286,8 @@ class UpdateTextsCommand extends Command
      */
     private function saveToDb($abbrev, $translation, $inserts)
     {
-        $this->info("Mysql adatbázis lementése...");
+        $this->info("\nMysql adatbázis lementése...");
+        $progressBar = $this->output->createProgressBar(count($inserts));
         //TODO: larevelesíteni (http://bundles.laravel.com/bundle/mysqldump-php ?)
         $connections = Config::get('database.connections');
         $conn = $connections[Config::get('database.default')];
@@ -313,9 +303,11 @@ class UpdateTextsCommand extends Command
         $this->info("Mysql tábla feltöltése " . count($inserts) . " sorral...");
         echo "\n";
         for ($rowNumber = 0; $rowNumber < count($inserts); $rowNumber += 100) {
-            $tmp = array_slice($inserts, $rowNumber, 100);
-            DB::table('tdverse')->insert($tmp);
+            $slice = array_slice($inserts, $rowNumber, 100);
+            DB::table('tdverse')->insert($slice);
+            $progressBar->advance(100);
         }
+        $progressBar->finish();
         Artisan::call('up');
     }
 
@@ -332,8 +324,11 @@ class UpdateTextsCommand extends Command
     private function readLines($verseRowIterator, $cols, $fields, $translation, $books_gepi2id, $abbrev, $pipes)
     {
         $this->info("Beolvasás sorról sorra...\n");
+        $progressBar = $this->output->createProgressBar();
+        $progressBar->setRedrawFrequency(25);
+        $progressBar->setBarWidth(24);
+        $progressBar->setFormat("[%bar%] %message%");
         $verseRowIterator->rewind();
-        $verseRowIterator->next();
         $verseRowIterator->next();
         $verseRowIterator->next();
         $rowNumber = 0;
@@ -355,11 +350,10 @@ class UpdateTextsCommand extends Command
                 if ($this->hunspellEnabled && in_array($values['tip'], [60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704])) {
                     $verseRoot = $this->stem($values['verse'], $pipes);
                 } else {
-                    $verseRoot = '??';
+                    $verseRoot = null;
                 }
                 $values['verseroot'] = $verseRoot;
                 if (isset($cols['ido']) && !empty($row[$cols['ido']])) {
-                    // $values['ido'] = gmdate('Y-m-d H:i:s', PHPExcel_Shared_Date::ExcelToPHP($row[$cols['ido']]));
                     $values['ido'] = $row[$cols['ido']];
                 }
                 if (isset($books_gepi2id[$values['book_number']])) {
@@ -368,30 +362,15 @@ class UpdateTextsCommand extends Command
                     $this->error("A " . (int)substr($gepi, 0, 3) . "-hez nincs `book_id`");
                     App::abort(500, 'Valami gond van a books id/gepi párossal!');
                 }
-                if ($rowNumber % 100 == 0) {
-                    echo "$rowNumber - {$abbrev}{$values['gepi']} - új szavak: {$this->newStems}\n";
-                    $this->newStems = 0;
-                }
                 $inserts[$rowNumber] = $values;
             }
             $verseRowIterator->next();
             $rowNumber++;
+            $progressBar->setMessage("$rowNumber - {$values['gepi']} - új szavak: {$this->newStems}");
+            $progressBar->advance();
         }
+        $progressBar->finish();
         return $inserts;
-    }
-
-    /**
-     * @param $abbrev
-     * @return array|string
-     */
-    private function getFilePath($abbrev)
-    {
-        if ($this->option('file')) {
-            return $this->option('file');
-        } else {
-            $filePath = "{$this->sourceDirectory}/{$abbrev}.xls";
-            return $filePath;
-        }
     }
 
     private function getAbbrev2Id($translation)

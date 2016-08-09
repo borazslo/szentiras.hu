@@ -67,6 +67,7 @@ class ApiController extends Controller
         $this->bookRepository = $bookRepository;
         $this->referenceService = $referenceService;
         $this->searchService = $searchService;
+        $this->middleware('cors');
     }
 
     public function getIndex()
@@ -110,7 +111,7 @@ class ApiController extends Controller
         $verseDataList = [];
         foreach ($verses as $verse) {
             $translation = $verse->translation()->first();
-            if (in_array($verse->tip, \Config::get("verseTypes.{$translation->abbrev}.text"))) {
+            if (in_array($verse->tip, \Config::get("translations.{$translation->abbrev}.verseTypes.text"))) {
                 $verseData['hely']['gepi'] = $verse->gepi;
                 $book = $verse->book;
                 $verseData['hely']['szep'] = "{$book->abbrev} {$verse->chapter},{$verse->numv}";

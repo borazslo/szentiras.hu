@@ -26,7 +26,7 @@ class AddTitToAbbrevs extends Migration {
 	 */
 	public function down()
 	{
-        BookAbbrev::whereIn('abbrev', [ '1Tesz', '2Tesz'])->delete();
+        BookAbbrev::whereIn('abbrev', [ 'Tit' ])->delete();
 	}
 
 }
