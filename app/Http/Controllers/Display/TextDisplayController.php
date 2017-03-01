@@ -89,7 +89,7 @@ class TextDisplayController extends Controller
             $verseContainers = $this->textService->getTranslatedVerses($canonicalRef, $translation->id);
             $translations = $this->translationRepository->getAllOrderedByDenom();
             return View::make('textDisplay.verses')->with([
-				'canonicalRef' => $canonicalRef,
+				'canonicalRef' => $canonicalRef->toString(),
                 'verseContainers' => $verseContainers,
                 'translation' => $translation,
                 'translations' => $translations,
