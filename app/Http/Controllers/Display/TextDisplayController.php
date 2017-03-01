@@ -89,7 +89,7 @@ class TextDisplayController extends Controller
             $verseContainers = $this->textService->getTranslatedVerses($canonicalRef, $translation->id);
             $translations = $this->translationRepository->getAllOrderedByDenom();
             return View::make('textDisplay.verses')->with([
-				'canonicalRef' => urlencode($canonicalRef->toString()),
+				'canonicalRef' => str_replace(" ", "%20", $canonicalRef->toString()),
                 'verseContainers' => $verseContainers,
                 'translation' => $translation,
                 'translations' => $translations,
