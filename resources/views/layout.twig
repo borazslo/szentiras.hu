@@ -10,13 +10,13 @@
 
         <meta property="fb:admins" content="1819502454" />
         <meta property="fb:appId" content="{{ config_get('settings.facebookAppId') }}" />
+		<meta property="og:type" content="website" />
 
         <meta name="description" content="{{ teaser ? teaser : 'A teljes Szentírás, azaz a Biblia magyarul az interneten: katolikus és protestáns fordításban' }}">
         <meta name="keywords" content="biblia, katolikus, protestáns, szentírás, keresztény, keresztyén, református, hivatalos">
         <meta name="author" content="szentiras.hu">
         <meta http-equiv="cleartype" content="on">
 
-        <meta property="og:image" content="/img/biblia.jpg">
         {% block meta %}{% endblock %}
         <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
 

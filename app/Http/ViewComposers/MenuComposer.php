@@ -15,15 +15,6 @@ class MenuComposer
     public function compose($view)
     {
 
-        $currentSecond = Carbon::now()->second;
-        if ($currentSecond > 30) {
-            $adView = "ad.simontl";
-        } else {
-            $adView = "ad.konyvekkonyve";
-        }
-
-        $view
-            ->with('adview', $adView);
     }
 
 }
