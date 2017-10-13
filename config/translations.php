@@ -54,5 +54,12 @@ return [
             'xref' => [2021]
         ],
         'textSource' => env('TEXT_SOURCE_RUF')
+    ],
+    'STL' => [
+        'verseTypes' =>
+        [
+            'text' => [901],
+            'footnote' => [2001]
+        ]
     ]
 ];
