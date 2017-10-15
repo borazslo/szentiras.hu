@@ -9,7 +9,7 @@ before_script:
   - npm install
   - php composer.phar selfupdate
   - php composer.phar install
-  - gulp default
+  - node_modules/.bin/gulp default
 
 script:
 # first test will run the migrations
