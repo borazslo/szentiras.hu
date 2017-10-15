@@ -38,9 +38,9 @@ class AddTranslationSTL extends Migration {
         			'created_at' => date('Y-m-d H:i:s'),
 		    		'updated_at' => date('Y-m-d H:i:s'),
 		    		'translation_id' => 7,
-		    		'name' => $data[1],
-		    		'abbrev' => $data[2],
-		    		'link' => $data[3],
+		    		'name' => $data[3],
+		    		'abbrev' => $data[1],
+		    		'link' => $data[2],
 		    		'old_testament'=>$data[4],
             		]
             );

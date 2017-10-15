@@ -60,6 +60,7 @@ return [
         [
             'text' => [901],
             'footnote' => [2001]
-        ]
+        ],
+		'textSource' => env('TEXT_SOURCE_STL')
     ]
 ];
