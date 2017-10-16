@@ -59,7 +59,7 @@ return [
         'verseTypes' =>
         [
             'text' => [901],
-            'footnote' => [2001]
+            'footnote' => [2001, 2004, 2023]
         ],
 		'textSource' => env('TEXT_SOURCE_STL')
     ]
