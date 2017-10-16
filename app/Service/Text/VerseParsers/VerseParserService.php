@@ -19,7 +19,7 @@ class VerseParserService
                 4 => \App::make('\SzentirasHu\Service\Text\VerseParsers\KGVerseParser'),
                 5 => \App::make('\SzentirasHu\Service\Text\VerseParsers\DefaultVerseParser'),
                 6 => \App::make('\SzentirasHu\Service\Text\VerseParsers\DefaultVerseParser'),
-                7 => \App::make('\SzentirasHu\Service\Text\VerseParsers\DefaultVerseParser'),
+                7 => \App::make('\SzentirasHu\Service\Text\VerseParsers\STLVerseParser'),
             ];
     }
 

@@ -13,6 +13,7 @@ class VerseData
      * @var Xref[]
      */
     public $xrefs = [];
+    public $footnotes = [];
     public $text;
     public $gepi;
     public $book;
