@@ -34,14 +34,18 @@ class DefaultVerseParser extends AbstractVerseParser
 
     protected function parseFootnoteVerse(Verse $rawVerse, VerseData $verse) {
         $footnoteText = $rawVerse->verse;
-        $footnoteSymbol = substr($footnoteText, 0, 1);
-        $footnoteText = substr($footnoteText, strlen($footnoteSymbol));
-        if (array_key_exists($footnoteSymbol, $verse->footnotes)) {
-            $verse->footnotes[$footnoteSymbol]->text = $footnoteText;
-        } else {
+        $footnoteSaved=false;
+        foreach ($verse->footnotes as $footnote) {
+            if (!$footnote->text) {
+                $footnote->text = $footnoteText;
+                $footnoteSaved = true;
+            }
+        }
+        if (!$footnoteSaved) {
             $footnote = new Footnote();
             $footnote->text = $footnoteText;
-            $verse->footnotes[$footnoteSymbol] = $footnote;
+            $verse->footnotes[] = $footnote;
+
         }
     }
 }
