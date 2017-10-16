@@ -52,12 +52,15 @@ abstract class AbstractVerseParser implements VerseParser {
      */
     protected function parseRawVerses($book, $rawVerse, $verse)
     {
-        if ($rawVerse->getType() == 'text') {
+        $type = $rawVerse->getType();
+        if ($type == 'text') {
             $this->parseTextVerse($rawVerse, $verse);
-        } else if ($rawVerse ->getType() == 'xref') {
+        } else if ($type == 'xref') {
             $this->parseXrefVerse($book, $rawVerse, $verse);
-        } else if (strpos($rawVerse->getType(), 'heading') === 0) {
+        } else if (strpos($type, 'heading') === 0) {
             $this->parseHeading($rawVerse, $verse);
+        } else if ($type == 'footnote' ) {
+            $this->parseFootnoteVerse($rawVerse, $verse);
         }
     }
 
@@ -74,7 +77,9 @@ abstract class AbstractVerseParser implements VerseParser {
      * @param VerseData $verse
      * @return void
      */
-    abstract protected function parseXrefverse($book, $rawVerse, $verse);
+    abstract protected function parseXrefVerse($book, $rawVerse, $verse);
+
+    abstract protected function parseFootnoteVerse(Verse $rawVerse, VerseData $verse);
 
     abstract protected function parseHeading($rawVerse, VerseData $verse);
 

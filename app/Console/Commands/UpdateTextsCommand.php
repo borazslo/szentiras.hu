@@ -75,7 +75,7 @@ class UpdateTextsCommand extends Command
             $this->testHunspell();
         }
 
-        $abbrev = $this->choice('Melyik fordítást töltsük be?', ['BD', 'KG', 'KNB', 'RUF', 'UF', 'SZIT']);
+        $abbrev = $this->choice('Melyik fordítást töltsük be?', ['BD', 'KG', 'KNB', 'RUF', 'UF', 'SZIT', 'STL']);
         $this->verifyAbbrev($abbrev);
 
         $translation = $this->translationRepository->getByAbbrev($abbrev);
@@ -93,7 +93,7 @@ class UpdateTextsCommand extends Command
                 App::abort(500, "Nincs megadva a TEXT_SOURCE_{$abbrev} konfiguráció.");
             }
             try {
-                $this->info("A fájl letöltése a $url címről...");
+                $this->info("A fájl letöltése a $url címről...: $filePath");
                 $fp = fopen ($filePath, 'w+');
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);
@@ -115,6 +115,7 @@ class UpdateTextsCommand extends Command
             'KG' => ['gepi' => 0, 'rov' => 4],
             'BD' => ['gepi' => 0, 'rov' => 1],
             'RUF' => ['gepi' => 0, 'rov' => 5],
+			'STL' => ['gepi' => 0, 'rov' => 2],
         ];
         $this->verifyBookColumns($columns, $abbrev);
 
@@ -133,7 +134,9 @@ class UpdateTextsCommand extends Command
                 $this->info("Első sor átugrása...");
                 $linesRead++;
                 continue;
-            }
+            } else {
+				$linesRead++;
+			}
             // break on first empty line
             if (empty($row[0])) {
                 $this->info("$linesRead sor beolvasva, kész.");
@@ -149,7 +152,10 @@ class UpdateTextsCommand extends Command
             }
         }
         if (isset($badAbbrevs)) {
-            App::abort(500, "A következő rövidítések csak a szövegforrásban találhatóak meg, az adatbázisban nem!\n" . implode(', ', $badAbbrevs) . print_r($bookAbbrev2Id, 1));
+            $this->info("A következő rövidítések csak a szövegforrásban találhatóak meg, az adatbázisban nem!\n" . implode(', ', $badAbbrevs) . print_r($bookAbbrev2Id, 1));
+            if (!$this->confirm('Folytassuk?')) {
+                App::abort(500, "Kilépés");
+            }
         }
 
         $verseRowIterator = $sheets[$abbrev]->getRowIterator();
@@ -332,7 +338,6 @@ class UpdateTextsCommand extends Command
         $verseRowIterator->next();
         $verseRowIterator->next();
         $rowNumber = 0;
-        $verseRowIterator->next();
         while ($verseRowIterator->valid()) {
             $row = $verseRowIterator->current();
             if (empty($row[$cols[$fields['gepi']]])) {
@@ -359,7 +364,6 @@ class UpdateTextsCommand extends Command
                 if (isset($books_gepi2id[$values['book_number']])) {
                     $values['book_id'] = $books_gepi2id[$values['book_number']];
                 } else {
-                    $this->error("A " . (int)substr($gepi, 0, 3) . "-hez nincs `book_id`");
                     App::abort(500, 'Valami gond van a books id/gepi párossal!');
                 }
                 $inserts[$rowNumber] = $values;

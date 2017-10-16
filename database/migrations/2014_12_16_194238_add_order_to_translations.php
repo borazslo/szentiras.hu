@@ -19,7 +19,7 @@ class AddOrderToTranslations extends Migration {
 
         DB::table('translations')->where('id', 1)->update(array('order' => 3));
         DB::table('translations')->where('id', 3)->update(array('order' => 1));
-        DB::table('translations')->where('id', 5)->update(array('order' => 5));
+        DB::table('translations')->where('id', 5)->update(array('order' => 5)); // Bekes-Dalos
 
         DB::table('translations')->where('id', 2)->update(array('order' => 10));
         DB::table('translations')->where('id', 4)->update(array('order' => 11));

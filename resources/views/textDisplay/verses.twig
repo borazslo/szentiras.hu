@@ -27,6 +27,20 @@
             <p>
                 {% include 'textDisplay.translationButtons' with { 'translations' : translations, 'translation': translation, 'translationLinks' : translationLinks } %}
             </p>
+            <div>
+                {% for verse in verseContainer.parsedVerses %}
+                    {% if verse.footnotes is not empty %}
+                        {% if not hasFootnote %}
+                            <h5>Jegyzetek</h5>
+                            {% set hasFootnote = true %}
+                        {% endif %}
+                        {% for footnote in verse.footnotes %}
+                            <p class="footnote"><strong>{{ verse.chapter }},{{ verse.numv }}</strong>
+                                {{ footnote.text|raw }}</p>
+                        {%endfor %}
+                    {% endif %}
+                    {% endfor %}
+            </div>
             <p>
                 {% if chapterLinks.prevLink %}
                     <a href="/{{ chapterLinks.prevLink }}" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> Előző {{ verseContainer.book.number != 121 ? "fejezet" : "zsoltár"}}</a>
