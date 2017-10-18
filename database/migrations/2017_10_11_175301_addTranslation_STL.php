@@ -18,7 +18,7 @@ class AddTranslationSTL extends Migration {
         		'id'=>7,
 		    	'created_at' => date('Y-m-d H:i:s'),
 		    	'updated_at' => date('Y-m-d H:i:s'),
-		    	'name' => 'Simon T. László Újszövetség fordítása',
+		    	'name' => 'Simon Tamás László Újszövetség-fordítása',
 		    	'abbrev' => 'STL',
 		    	'order' => 4,
 		    	'denom' => 'katolikus',
