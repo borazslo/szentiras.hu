@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "bootstrap-sass": "^3.0.0",
-    "jquery": "~2.1.4",
+    "jquery": "~3.4.1",
     "jquery-ui": "~1.10.5",
     "laravel-elixir": "^3.0.0",
     "node-sass": "^4.5.3"
