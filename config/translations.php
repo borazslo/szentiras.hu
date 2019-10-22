@@ -1,5 +1,43 @@
 <?php
 
+/*
+301	Korpuszcím
+320	Belső korpusz címe
+330	Könyvcím
+340	Belső korpusz bevezetője
+501	Címsor1
+601	Címsor2
+650	Címsor3
+660	Zsoltárcím
+665	Héber betűnév
+670	Címsor4
+680	Címsor5
+701	Címsor6
+850	Kihúzott sor
+890	Kimaradó versszám (nullás)
+891	Különlegesen írt versszám
+892	Magyarázat a folyamatos szövegben (dőlt betűs)
+900	2018 előtti szöveg
+901	Netre kitett versszöveg
+902	Idézett verssor (dőlt betűs)
+903	Keresztidézet (dőlt betűs)
+904	A következővel összevont vers
+905	Verssor (álló betűs)
+918	2019-es revízióval javított címsor
+920	Kereszthivatkozás
+950	Eltérő, egysoros teljes vers (pl. az ujszov.hu-ra)
+1990	Több soros lábjegyzet teljes hivatkozása
+1995	Szinoptikus párhuzam teljes hivatkozása
+2001	Lábjegyzet a neten és a könyvben
+2002	Több soros lábjegyzet szövege
+2003	Több soros lábjegyzet zárósora
+2004	Ismételt lábjegyzet, csak a neten
+2018	2019-es revízióval javított lábjegyzetszöveg
+2023	Lábjegyzet csak a könyvben
+2024	Lábjegyzet csak a neten
+
+*/
+
 return [
     'KNB' => [
         'verseTypes' =>
