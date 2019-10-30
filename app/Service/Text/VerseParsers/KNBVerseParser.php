@@ -7,7 +7,7 @@ use SzentirasHu\Http\Controllers\Display\VerseParsers\Xref;
 
 class KNBVerseParser extends DefaultVerseParser
 {
-    const XREF_REGEXP = '\s*\{([^\}]+)\}';
+    const XREF_REGEXP = '\s*\{([A-Z][^\}^\{]+)\}';
 
     protected function replaceTags($rawText) {
         $rawText = preg_replace('/\{\{br\}\}/', '<br>', $rawText);

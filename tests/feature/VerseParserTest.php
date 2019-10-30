@@ -23,11 +23,11 @@ class VerseParserTest extends TestCase
         $v->chapter = $chapter;
         $numv = 3;
         $v->numv = $numv;
-        $v->verse = "abc {Mk 12,34} xyz {Mt 23,45} zyx";
+        $v->verse = "abc {Mk 12,34} xyz {Mt 23,45} zyx {{br}}";
         $v->tip = \Config::get('translations.KNB.verseTypes.text.0');
         $verseData = $parser->parse([$v], $book);
 
-        $this->assertEquals("abc xyz zyx", $verseData->getText(), $verseData);
+        $this->assertEquals("abc xyz zyx <br>", $verseData->getText(), $verseData);
         $this->assertCount(2, $verseData->xrefs);
         $this->assertEquals("Mk 12,34", $verseData->xrefs[0]->text);
 
