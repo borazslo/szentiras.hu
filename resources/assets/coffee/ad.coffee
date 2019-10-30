@@ -1,4 +1,3 @@
-$ = require('jquery')
 trackAdLink = (url, adId) ->
   ga('send', 'event', 'ad', adId, url,
     'hitCallback': ->

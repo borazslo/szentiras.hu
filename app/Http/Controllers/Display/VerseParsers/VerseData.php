@@ -4,6 +4,9 @@
  */
 namespace SzentirasHu\Http\Controllers\Display\VerseParsers;
 
+/**
+ * This class represents all information we have regarding a given bible verse.
+ */
 class VerseData
 {
     public $headings;
@@ -14,9 +17,10 @@ class VerseData
      */
     public $xrefs = [];
     public $footnotes = [];
-    public $text;
+    public $simpleText;
     public $gepi;
     public $book;
+    public $poemLines;
 
     function __construct($chapter, $numv)
     {
@@ -36,6 +40,15 @@ class VerseData
             return $headingText;
         } else {
             return false;
+        }
+    }
+
+    public function getText() {
+        if ($this->poemLines) {
+            $poemText = join("<br>", $this->poemLines);
+            return $this->simpleText . $poemText;
+        } else {
+            return $this->simpleText;
         }
     }
 

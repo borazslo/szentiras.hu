@@ -4,7 +4,7 @@ namespace SzentirasHu\Data\Entity;
 use Eloquent;
 
 /**
- * Model for verses.
+ * This class represents ONE database record for a given bible verse, that means, its type will vary.
  *
  * @property string verse
  * @property int tip

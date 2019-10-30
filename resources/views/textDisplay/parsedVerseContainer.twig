@@ -10,7 +10,12 @@
     {% if verse.numv == 1 %}
         <span class="text-muted numchapter">{{ verse.chapter }}</span>
     {% endif %}
-    <span class="text-muted numv"><sup>{{ verse.numv }}</sup></span>{{ verse.text|raw }}
+    {% if verse.poemLines %}
+        <p class="poem"><span class="text-muted numv"><sup>{{ verse.numv }}</sup></span>{{ verse.text|raw }}</p>
+    {% else %}
+        <span class="text-muted numv"><sup>{{ verse.numv }}</sup></span>{{ verse.text|raw }}
+    {% endif %}
+
     {% if verse.xrefs is not empty %}
         <span class="xref">
             <sup>
@@ -20,5 +25,4 @@
             </sup>
         </span>
     {% endif %}
-    {% if verseContainer.book.number == 121 %}<br>{% endif %}
 {% endfor %}

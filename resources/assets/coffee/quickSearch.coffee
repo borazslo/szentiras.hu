@@ -1,6 +1,3 @@
-$ = require('jquery')
-require('jquery-ui/autocomplete')
-
 $('#quickSearch').autocomplete
   source: '/kereses/suggest'
   minLength: 2
