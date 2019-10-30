@@ -23,7 +23,7 @@ class KGVerseParser extends DefaultVerseParser
             if ($xrefSignPos) {
                 $this->createXrefHolder($verse, $xrefSign);
                 $verse->xrefs[$xrefSign]->position = $xrefSignPos;
-                $verse->simpleText = preg_replace("/" . $xrefSign . " ?/u", '', $verse->text);
+                $verse->simpleText = preg_replace("/" . $xrefSign . " ?/u", '', $verse->getText());
             }
         }
     }
