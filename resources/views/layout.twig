@@ -19,9 +19,9 @@
 
         {% block meta %}{% endblock %}
         <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
-
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="{{ elixir('css/all.css') }}">
-
         <link href="https://fonts.googleapis.com/css?family=Noto+Serif:r,i,b,bi&subset=latin-ext" rel="stylesheet">
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -61,7 +61,9 @@
                 <div class="col-md-9 col-sm-8">
                     {% block pageHeader %}{% endblock %}
                     <div>
+                        <main>
                         {% block content %}{% endblock %}
+                        </main>
                         <br />
                         {% block abbrevlist %}{% endblock %}
                     </div>
@@ -71,15 +73,26 @@
                 </div>
             </div>
         </div>
+        <footer>
         <div class="footer">
-            <p>Kérdések, ötletek, problémák: <a href='mailto:eleklaszlosj@gmail.com'>Elek László SJ</a> (<a
-                        href="http://jezsuita.hu">JTMR</a>)</p>
-            <p>Fejlesztés: <a href="https://github.com/borazslo/szentiras.hu">GitHub</a>
+            <p>&copy; Szent Jeromos Katolikus Bibliatársulat<br>Kérdések, ötletek, problémák: <a href='mailto:eleklaszlosj@gmail.com'>Elek László SJ</a> (<a
+                        href="http://jezsuita.hu">JTMR</a>)<br>
+            Fejlesztés: <a href="https://github.com/borazslo/szentiras.hu">GitHub</a>
                 {% if config_get('version.hash') %}- <small>verzió:
                     <a href="https://github.com/borazslo/szentiras.hu/commit/{{ config_get('version.hash') }}">
-                    {{ config_get('version.hash')[0:7] }}</a></small>{% endif %}</p>
-            <p>Programozók: <a href="https://github.com/briff">Fodor Bertalan</a>, <a href="https://github.com/borazslo">Elek László SJ</a>, <a href="https://github.com/molnarm">Molnár Márton</a></p>
+                    {{ config_get('version.hash')[0:7] }}</a></small>{% endif %}<br>
+            Programozók: <a href="https://github.com/briff">Fodor Bertalan</a>, <a href="https://github.com/borazslo">Elek László SJ</a>, <a href="https://github.com/molnarm">Molnár Márton</a></p>
         </div>
-        <script src="{{ elixir('js/app.js') }}"></script>
+        </footer>
+        <script
+                src="https://code.jquery.com/jquery-1.12.4.min.js"
+                integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+                crossorigin="anonymous"></script>
+        <script
+                src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
+                integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
+                crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script src="{{ elixir('js/all.js') }}"></script>
     </body>
 </html>

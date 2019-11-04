@@ -1,5 +1,3 @@
-$ = require('jquery')
-
 options = ->
   $.param(
     'headings' : $('#pdfHeadings').prop('checked')

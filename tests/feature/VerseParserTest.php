@@ -23,11 +23,11 @@ class VerseParserTest extends TestCase
         $v->chapter = $chapter;
         $numv = 3;
         $v->numv = $numv;
-        $v->verse = "abc {Mk 12,34} xyz {Mt 23,45} zyx";
+        $v->verse = "abc {Mk 12,34} xyz {Mt 23,45} zyx {{br}}";
         $v->tip = \Config::get('translations.KNB.verseTypes.text.0');
         $verseData = $parser->parse([$v], $book);
 
-        $this->assertEquals("abc xyz zyx", $verseData->text);
+        $this->assertEquals("abc xyz zyx <br>", $verseData->getText(), $verseData);
         $this->assertCount(2, $verseData->xrefs);
         $this->assertEquals("Mk 12,34", $verseData->xrefs[0]->text);
 
@@ -58,7 +58,7 @@ class VerseParserTest extends TestCase
 
         $this->assertEquals($v->chapter, $verseData->chapter);
         $this->assertEquals($v->numv, $verseData->numv);
-        $this->assertEquals("abc xyz", $verseData->text);
+        $this->assertEquals("abc xyz", $verseData->getText());
         $this->assertCount(1, $verseData->xrefs);
         $this->assertEquals("Mk 12,34", $verseData->xrefs[KGVerseParser::$xrefSigns[0]]->text);
 
@@ -88,7 +88,7 @@ class VerseParserTest extends TestCase
         $ref->tip = \Config::get('translations.KG.verseTypes.xref.0');
         $verseData = $parser->parse([$v, $ref], $book);
         $this->assertCount(2, $verseData->xrefs);
-        $this->assertEquals("Abc cde fgh", $verseData->text);
+        $this->assertEquals("Abc cde fgh", $verseData->getText());
         $this->assertEquals("Mt 5,7", $verseData->xrefs[KGVerseParser::$xrefSigns[0]]->text);
         $this->assertEquals("Zsolt 16,10", $verseData->xrefs[KGVerseParser::$xrefSigns[1]]->text);
 

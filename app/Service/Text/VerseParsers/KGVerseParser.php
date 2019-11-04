@@ -17,13 +17,13 @@ class KGVerseParser extends DefaultVerseParser
      */
     protected function parseTextVerse($rawVerse, $verse)
     {
-        $verse->text = $rawVerse->verse;
+        $verse->simpleText = $rawVerse->verse;
         foreach (self::$xrefSigns as $xrefSign) {
             $xrefSignPos = mb_strpos($rawVerse->verse, $xrefSign);
             if ($xrefSignPos) {
                 $this->createXrefHolder($verse, $xrefSign);
                 $verse->xrefs[$xrefSign]->position = $xrefSignPos;
-                $verse->text = preg_replace("/" . $xrefSign . " ?/u", '', $verse->text);
+                $verse->simpleText = preg_replace("/" . $xrefSign . " ?/u", '', $verse->getText());
             }
         }
     }

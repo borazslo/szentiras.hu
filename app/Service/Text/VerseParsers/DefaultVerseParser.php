@@ -16,7 +16,7 @@ class DefaultVerseParser extends AbstractVerseParser
 
     protected function parseTextVerse($rawVerse, $verse)
     {
-        $verse->text = $rawVerse->verse;
+        $verse->simpleText = $rawVerse->verse;
     }
 
     protected function parseXrefverse($book, $rawVerse, $verse)
@@ -29,7 +29,7 @@ class DefaultVerseParser extends AbstractVerseParser
     protected function parseHeading($rawVerse, VerseData $verse)
     {
         $level = str_replace('heading','', $rawVerse->getType());
-        $verse->headings[$level] = $rawVerse->verse;
+        $verse->headings[$level] = $this->replaceTags($rawVerse->verse);
     }
 
     protected function parseFootnoteVerse(Verse $rawVerse, VerseData $verse) {
@@ -48,4 +48,14 @@ class DefaultVerseParser extends AbstractVerseParser
 
         }
     }
+
+    protected function parsePoemLine($rawVerse, VerseData $verse) {
+        $poemLine = $this->replaceTags($rawVerse->verse);
+        $verse->poemLines[] = $poemLine;
+    }
+
+    protected function replaceTags($rawVerse) {
+        return $rawVerse;
+    }
+
 }

@@ -35,7 +35,7 @@ class STLVerseParser extends DefaultVerseParser
             }
             $purified = preg_replace('/\s*' . self::FOOTNOTE_REGEXP . '/u', '', $purified);
         }
-        $verseData->text = $purified;
+        $verseData->simpleText = $purified;
     }
 
     protected function parseFootnoteVerse(Verse $rawVerse, VerseData $verse)

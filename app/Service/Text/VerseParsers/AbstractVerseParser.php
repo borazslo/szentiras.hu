@@ -6,6 +6,7 @@
 namespace SzentirasHu\Service\Text\VerseParsers;
 
 
+use Log;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\VerseData;
 use SzentirasHu\Data\Entity\Book;
 use SzentirasHu\Data\Entity\Verse;
@@ -61,6 +62,8 @@ abstract class AbstractVerseParser implements VerseParser {
             $this->parseHeading($rawVerse, $verse);
         } else if ($type == 'footnote' ) {
             $this->parseFootnoteVerse($rawVerse, $verse);
+        } else if ($type == 'poemLine') {
+            $this->parsePoemLine($rawVerse, $verse);
         }
     }
 
@@ -70,6 +73,8 @@ abstract class AbstractVerseParser implements VerseParser {
      * @return void
      */
     abstract protected function parseTextVerse($rawVerse, $verseData);
+
+    abstract protected function replaceTags($rawVerse);
 
     /**
      * @param Book $book
@@ -83,4 +88,5 @@ abstract class AbstractVerseParser implements VerseParser {
 
     abstract protected function parseHeading($rawVerse, VerseData $verse);
 
+    abstract protected function parsePoemLine($rawVerse, VerseData $verse);
 }

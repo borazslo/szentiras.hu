@@ -1,4 +1,3 @@
-$ = require('jquery')
 initToggler = ->
   delay = 400;
   $('#toggleNumv').click ->

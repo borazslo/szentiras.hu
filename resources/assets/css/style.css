@@ -34,7 +34,7 @@ span.toggle.active {
 }
 
 .active span.toggle.inactive {
-    display:none;
+    display: none;
 }
 
 .active span.toggle.active {
@@ -46,4 +46,9 @@ span.toggle.active {
     float: left;
     padding-right: 6px;
     line-height: 40px;
+}
+
+.poem {
+    text-align: left;
+    margin: 10px 0 10px 10px;
 }
