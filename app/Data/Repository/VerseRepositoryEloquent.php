@@ -20,7 +20,7 @@ class VerseRepositoryEloquent implements VerseRepository {
     {
         $verses = Verse::where('book_id', $bookId)->
         whereIn('chapter', $chapters)->
-        orderBy('gepi')
+        orderBy('id')
             ->get();
         return $verses;
 
@@ -32,6 +32,7 @@ class VerseRepositoryEloquent implements VerseRepository {
             ->whereIn('numv', ['1', '2'])
             ->orderBy('chapter')
             ->orderBy('numv')
+            ->orderBy('id')
             ->get();
     }
 
