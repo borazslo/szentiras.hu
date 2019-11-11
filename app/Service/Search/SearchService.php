@@ -85,7 +85,7 @@ class SearchService {
         if ($parsedVerses[0]->getHeadingText()) {
             return $parsedVerses[0]->getHeadingText();
         } else {
-            return $parsedVerses[0]->text;
+            return $parsedVerses[0]->getText();
         }
     }
 
