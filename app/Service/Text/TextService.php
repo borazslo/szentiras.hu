@@ -87,7 +87,7 @@ class TextService {
         foreach ($verseContainers as $verseContainer) {
             $verses = $verseContainer->getParsedVerses();
             foreach ($verses as $verse) {
-                $verseText = $verse -> $this->getText();
+                $verseText = $verse -> getText();
                 $verseText = preg_replace('/<[^>]*>/', ' ', $verseText);
                 $text .= $verseText.' ';
             }
