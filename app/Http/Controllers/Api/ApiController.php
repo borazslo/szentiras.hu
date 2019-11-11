@@ -87,7 +87,7 @@ class ApiController extends Controller
         $verses = [];
         foreach ($verseContainers as $verseContainer) {
             foreach ($verseContainer->getParsedVerses() as $verse) {
-                $jsonVerse["szoveg"] = $verse->text;
+                $jsonVerse["szoveg"] = $verse->getText();
                 $jsonVerse["jegyzetek"] = $verse->footnotes;
                 $jsonVerse["hely"] = ["gepi" => $verse->gepi];
                 $jsonVerse["hely"]["szep"] = $verse->book->abbrev . " " . $verse->chapter . ',' . $verse->numv;
