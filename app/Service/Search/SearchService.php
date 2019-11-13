@@ -123,8 +123,8 @@ class SearchService {
                         $verseData['text'] .= $heading . ' ';
                     }
                 }
-                if ($verse->text) {
-                    $verseData['text'] .= preg_replace('/<[^>]*>/', ' ', $verse->text);
+                if ($verse->getText()) {
+                    $verseData['text'] .= preg_replace('/<[^>]*>/', ' ', $verse->getText());
                 }
                 $result['chapters'][$verse->chapter][] = $verseData;
                 $result['verses'][] = $verseData;
