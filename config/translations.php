@@ -47,7 +47,8 @@ return [
             'footnote' => [120, 2001, 2002],
             'poemLine' => [902]
         ],
-        'textSource' => env('TEXT_SOURCE_KNB')
+        'textSource' => env('TEXT_SOURCE_KNB'),
+        'id' => 3
     ],
 
     'KG' => [
@@ -57,7 +58,8 @@ return [
             'heading' => [1=>1, 2=>2, 3=>3],
             'xref' => [13]
         ],
-        'textSource' => env('TEXT_SOURCE_KG')
+        'textSource' => env('TEXT_SOURCE_KG'),
+        'id' => 4
     ],
     'SZIT' => [
         'verseTypes' =>
@@ -66,7 +68,8 @@ return [
             'heading' => [0=>401, 1=>501, 2=>601, 3=>701, 4=>704],
             'footnote' => [2001]
         ],
-        'textSource' => env('TEXT_SOURCE_SZIT')
+        'textSource' => env('TEXT_SOURCE_SZIT'),
+        'id' => 1
     ],
     'UF' => [
         'verseTypes' =>
@@ -74,7 +77,8 @@ return [
             'text' => [901],
             'heading' => [3=>703]
         ],
-        'textSource' => env('TEXT_SOURCE_UF')
+        'textSource' => env('TEXT_SOURCE_UF'),
+        'id' => 2
     ],
     'BD' => [
         'verseTypes' =>
@@ -82,7 +86,8 @@ return [
             'text' => [901],
             'heading' => [2=>701, 3=>704]
         ],
-        'textSource' => env('TEXT_SOURCE_BD')
+        'textSource' => env('TEXT_SOURCE_BD'),
+        'id' => 5,
     ],
     'RUF' => [
         'verseTypes' =>
@@ -92,7 +97,8 @@ return [
             'footnote' => [2001],
             'xref' => [2021]
         ],
-        'textSource' => env('TEXT_SOURCE_RUF')
+        'textSource' => env('TEXT_SOURCE_RUF'),
+        'id' => 6
     ],
     'STL' => [
         'verseTypes' =>
@@ -100,6 +106,7 @@ return [
             'text' => [901],
             'footnote' => [2001, 2004, 2023]
         ],
-		'textSource' => env('TEXT_SOURCE_STL')
+		'textSource' => env('TEXT_SOURCE_STL'),
+        'id' => 7
     ]
 ];
