@@ -21,8 +21,10 @@ after_success:
   - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
   - chmod 600 ~/.ssh/id_rsa
   - echo -e "Host szentiras.hu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - git config user.name "Travis"
+  - git config user.email "travis@example.com"
   - git remote add deploy szentiras_hu_git@szentiras.hu:/home/szentiras_hu_git/github/borazslo/szentiras.hu.git
-  - git push deploy $TRAVIS_BRANCH
+  - git push -f deploy $TRAVIS_BRANCH
 
 after_failure: "cat /home/travis/build/borazslo/szentiras.hu/storage/logs/laravel.log"
 
