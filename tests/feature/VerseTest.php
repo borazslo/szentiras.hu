@@ -11,14 +11,19 @@ class VerseTest extends TestCase {
 	{
         $verse = new Verse();
         $verse->tip=6;
+            $verse->trans = 4;
         $this->assertEquals('text', $verse->getType());
 
         $verse = new Verse();
         $verse->tip=5;
+            $verse->trans = 3;
+
         $this->assertEquals('heading0', $verse->getType());
 
         $verse = new Verse();
         $verse->tip=9999;
+            $verse->trans = 4;
+
         $this->assertEquals('unknown', $verse->getType());
 	}
 
