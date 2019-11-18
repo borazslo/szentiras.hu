@@ -132,10 +132,16 @@ class TextDisplayController extends Controller
             $groupedVerses = [];
             foreach ($firstVerses as $verse) {
                 $type = $verse->getType();
-                if ($type == 'text') {
+                if ($type == 'text' || $type == 'poemLine') {
                     $verseContainer = new VerseContainer($book);
                     $verseContainer->addVerse($verse);
-                    $groupedVerses[$verse['chapter']][$verse['numv']] = $this->textService->getTeaser([$verseContainer]);
+                    $oldText = "";
+                    if (array_has($groupedVerses, $verse['chapter'])) {
+                        if (array_has($groupedVerses[$verse['chapter']], $verse['numv'])) {
+                            $oldText = $groupedVerses[$verse['chapter']][$verse['numv']];
+                        }
+                    }
+                    $groupedVerses[$verse['chapter']][$verse['numv']] = $oldText . $this->textService->getTeaser([$verseContainer]);
                 }
             }
             $allTranslations = $this->translationRepository->getAllOrderedByDenom();

@@ -10,7 +10,7 @@ class VerseTest extends TestCase {
 	public function testType()
 	{
         $verse = new Verse();
-        $verse->tip=6;
+        $verse->tip=901;
             $verse->trans = 4;
         $this->assertEquals('text', $verse->getType());
 
