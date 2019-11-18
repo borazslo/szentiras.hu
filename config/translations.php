@@ -54,9 +54,9 @@ return [
     'KG' => [
         'verseTypes' =>
         [
-            'text' => [6],
+            'text' => [901],
             'heading' => [1=>1, 2=>2, 3=>3],
-            'xref' => [13]
+            'xref' => [2017]
         ],
         'textSource' => env('TEXT_SOURCE_KG'),
         'id' => 4
