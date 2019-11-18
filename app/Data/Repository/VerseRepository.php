@@ -9,6 +9,9 @@ interface VerseRepository {
 
     public function getTranslatedChapterVerses($bookId, $chapters);
 
+    /**
+     * @return Verse
+     */
     public function getLeadVerses($bookId);
 
     /**

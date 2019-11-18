@@ -1,6 +1,5 @@
 <?php
 /**
-
  */
 
 namespace SzentirasHu\Service\Text;
@@ -12,7 +11,8 @@ use SzentirasHu\Service\VerseContainer;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
 
-class TextService {
+class TextService
+{
     /**
      * @var \SzentirasHu\Service\Reference\ReferenceService
      */
@@ -87,9 +87,9 @@ class TextService {
         foreach ($verseContainers as $verseContainer) {
             $verses = $verseContainer->getParsedVerses();
             foreach ($verses as $verse) {
-                $verseText = $verse -> getText();
+                $verseText = $verse->getText();
                 $verseText = preg_replace('/<[^>]*>/', ' ', $verseText);
-                $text .= $verseText.' ';
+                $text .= $verseText . ' ';
             }
         }
         return $text;
@@ -105,7 +105,7 @@ class TextService {
         foreach ($verseContainers as $verseContainer) {
             $parsedVerses = $verseContainer->getParsedVerses();
             $teaser .= preg_replace('/<\/?[^>]+>/', ' ', $parsedVerses[0]->getText());
-            if ($verseContainer != last($verseContainers) || count($parsedVerses)>1) {
+            if ($verseContainer != last($verseContainers) || count($parsedVerses) > 1) {
                 $teaser .= ' ... ';
             }
         }
