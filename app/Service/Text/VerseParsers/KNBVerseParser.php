@@ -43,7 +43,7 @@ class KNBVerseParser extends DefaultVerseParser
     {
         $rawText = $rawVerse->verse;
         $this->parseXrefs($rawText, $verseData);
-        $verseData->simpleText = $this->replaceTags($rawText);
+        $verseData->simpleText .= $this->replaceTags($rawText);
     }
 
 }

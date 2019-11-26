@@ -16,7 +16,7 @@ class DefaultVerseParser extends AbstractVerseParser
 
     protected function parseTextVerse($rawVerse, $verse)
     {
-        $verse->simpleText = $rawVerse->verse;
+        $verse->simpleText .= $rawVerse->verse;
     }
 
     protected function parseXrefverse($book, $rawVerse, $verse)
