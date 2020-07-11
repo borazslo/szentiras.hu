@@ -9,21 +9,23 @@ namespace SzentirasHu\Service\Text\VerseParsers;
 use SzentirasHu\Data\Entity\Verse;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\Footnote;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\VerseData;
-use SzentirasHu\Http\Controllers\Display\VerseParsers\XRef;
+use SzentirasHu\Http\Controllers\Display\VerseParsers\Xref;
 
 class DefaultVerseParser extends AbstractVerseParser
 {
 
-    protected function parseTextVerse($rawVerse, $verse)
+    protected function parseTextVerse($rawVerse, VerseData $verse)
     {
         $verse->simpleText .= $rawVerse->verse;
+        $verse->elements[] = $rawVerse->verse;
     }
 
-    protected function parseXrefverse($book, $rawVerse, $verse)
+    protected function parseXrefverse($book, $rawVerse, VerseData $verse)
     {
-        $xref = new XRef();
+        $xref = new Xref();
         $xref->text = $rawVerse->verse;
         $verse->xrefs[]= $xref;
+        $verse->elements[] = $xref;
     }
 
     protected function parseHeading($rawVerse, VerseData $verse)
@@ -51,7 +53,8 @@ class DefaultVerseParser extends AbstractVerseParser
 
     protected function parsePoemLine($rawVerse, VerseData $verse) {
         $poemLine = $this->replaceTags($rawVerse->verse);
-        $verse->poemLines[] = $poemLine;
+        $verse->poemLines[0] = $verse->poemLines[0]." ".$poemLine;
+        $verse->elements[] = $poemLine;
     }
 
     protected function replaceTags($rawVerse) {

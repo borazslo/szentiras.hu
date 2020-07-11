@@ -19,7 +19,7 @@ class KNBVerseParser extends DefaultVerseParser
         return $purified;
     }
 
-    private function parseXrefs($rawText, $verseData)
+    private function parseXrefs($rawText, VerseData $verseData)
     {
         preg_match_all("/".self::XREF_REGEXP."/u", $rawText, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE);
         $count = count($matches[1]);
@@ -35,11 +35,19 @@ class KNBVerseParser extends DefaultVerseParser
 
     }
 
+    protected function parseXrefverse($book, $rawVerse, VerseData $verse)
+    {
+        $xref = new Xref();
+        $xref->text = substr($rawVerse->verse, 1, -1);
+        $verse->xrefs[]= $xref;
+        $verse->elements[] = $xref;
+    }
+
     /**
      * @param $rawVerse
      * @param VerseData $verseData
      */
-    protected function parseTextVerse($rawVerse, $verseData)
+    protected function parseTextVerse($rawVerse, VerseData $verseData)
     {
         $rawText = $rawVerse->verse;
         $this->parseXrefs($rawText, $verseData);
