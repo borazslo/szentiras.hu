@@ -3,7 +3,7 @@
     {% if verse.headings[headingLevel] is defined %}
         {% set tag = 'h' ~ (headingLevel+1) %}
         <{{ tag }}>
-        <small>{{ verse.headings[headingLevel] }}</small>
+        <small>{{ verse.headings[headingLevel]|striptags('<br><a>')|raw }}</small>
         </{{ tag }}>
     {% endif %}
     {% endfor %}
