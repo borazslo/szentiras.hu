@@ -31,7 +31,8 @@ class DefaultVerseParser extends AbstractVerseParser
     protected function parseHeading($rawVerse, VerseData $verse)
     {
         $level = str_replace('heading','', $rawVerse->getType());
-        $verse->headings[$level] = $this->replaceTags($rawVerse->verse);
+        $heading = preg_replace('/([ ]{0,1})<br([\/]{0,1})>([ ]{0,1})/',' – ',$rawVerse->verse);
+        $verse->headings[$level] = $this->replaceTags($heading);
     }
 
     protected function parseFootnoteVerse(Verse $rawVerse, VerseData $verse) {
