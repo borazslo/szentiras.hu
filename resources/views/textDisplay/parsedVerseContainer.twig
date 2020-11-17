@@ -2,7 +2,7 @@
     {% for headingLevel in 0..4 %}
     {% if verse.headings[headingLevel] is defined %}
         {% set tag = 'h' ~ (headingLevel+1) %}
-        <{{ tag }}>
+        <{{ tag }} id="heading_{{ verse.gepi }}_{{ headingLevel }}">        
         <small>{{ verse.headings[headingLevel]|striptags('<br><a>')|raw }}</small>
         </{{ tag }}>
     {% endif %}

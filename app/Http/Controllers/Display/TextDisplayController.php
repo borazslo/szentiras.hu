@@ -139,8 +139,13 @@ class TextDisplayController extends Controller
                 if ( preg_match('/^heading[0-9]{1}/',$type)) {
                     $verseContainer = new VerseContainer($book);
                     $verseContainer->addVerse($verse);
+                    $headings = $this->textService->getHeadings([$verseContainer])[0];
                     
-                    $chapters[$verse['chapter']]['headings'][$verse['numv']] = $this->textService->getHeadings([$verseContainer])[0];
+                    $chapters[$verse['chapter']]['headings'][$verse['numv']] = array (
+                        'gepi' => $verse->gepi,
+                        'level' => key($headings),
+                        'text' => $headings[key($headings)]
+                    );
                 } 
             }
             

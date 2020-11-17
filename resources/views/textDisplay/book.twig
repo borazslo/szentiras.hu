@@ -18,11 +18,8 @@
         {% set headings = chapter.headings %}
         {% if headings|length > 0 %}
             <h4><small>
-        {% for headingg in headings %}
-            {% for level, heading in headingg %}
-            <!--<h{{ level }}><small>{{ heading }}</small></h{{ level }}>-->
-                {{ heading|striptags('<br><a>')|raw  }}<br/>
-            {% endfor %}
+        {% for heading in headings %}
+             {{ heading.text|striptags('<br><a>')|raw  }} <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapterId}}#heading_{{ heading.gepi }}_{{ heading.level }}' class='link'>&raquo;</a><br/>
         {% endfor %}        
         </small></h4>
         {% endif %}        
