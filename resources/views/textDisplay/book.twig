@@ -11,15 +11,27 @@
     <p>
         {% include 'textDisplay.translationButtons' with { 'translations': translations, 'translation': translation, 'link': book.abbrev } %}
     </p>
+   
+    {% for chapterId, chapter in chapters %}
+        <h4><a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapterId }}">{{ chapterId }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}</a></h4>
 
-
-    {% for chapter, verses in groupedVerses %}
-        <h4><a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}</a></h4>
-
-        {% for num in '1'..'2' %}
-            <sup>{{ verses[num].numv }}</sup>{{ verses[num]|raw }}
+        {% set headings = chapter.headings %}
+        {% if headings|length > 0 %}
+            <h4><small>
+        {% for headingg in headings %}
+            {% for level, heading in headingg %}
+            <!--<h{{ level }}><small>{{ heading }}</small></h{{ level }}>-->
+                {{ heading|striptags('<br><a>')|raw  }}<br/>
+            {% endfor %}
+        {% endfor %}        
+        </small></h4>
+        {% endif %}        
+        
+        {% set leadVerses = chapter.leadVerses %} 
+        {% for numv, verse in leadVerses %}
+            <sup>{{ numv }}</sup>{{ verse|raw }}
         {% endfor %}
-        <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter}}' class='link'>&gt;&gt;</a><br>
+        <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapterId}}' class='link'>&raquo;</a><br>
         <br />
     {% endfor %}
 
