@@ -54,6 +54,10 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         </div>
     </div>
 
+    {% if bookRef is not defined and fullTextResults is not defined and form.textToSearch != '' %} 
+        <h4>A keresés sajnos nem hozott találatot.</h4>
+    {% endif %}
+                        
     {% if bookRef is defined %}
         <h4>Igehely</h4>
         {% for verseContainer in bookRef.verseContainers %}
