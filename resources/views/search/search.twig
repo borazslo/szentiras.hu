@@ -101,8 +101,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         {% endfor %}
     {% endif %}
 
-    {% if form.textToSearch is not defined %}
-        {% include 'searchInfo' %}
+    {% if form.textToSearch == ''  %}
+        {% include 'search/searchInfo' %}
     {% endif %}
 
 {% endblock %}
