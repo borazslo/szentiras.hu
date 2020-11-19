@@ -76,6 +76,61 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         </a>
     {% endfor %}
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    {% if fullTextResults.resultsByBookNumber is defined %}
+        {% set results =  fullTextResults.resultsByBookNumber %}
+        <h4>Találatok a szövegekben</h4>
+        <style>
+            .bs-example{
+                margin-bottom: 0px;
+            }
+            .tab-content {
+                border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;            
+                padding: 10px;
+                padding-bottom: 5px;
+            }
+            .nav-tabs {
+                margin-bottom: 0;
+            }
+        </style>
+        {% for key, bookGroup in results %}                        
+            <div class="bs-example">            
+                <ul class="nav nav-tabs">
+                {% for translation_id,book in bookGroup %}
+                    <li role="presentation" class="nav-item {% if loop.first %}active{% endif %}">                
+                    <a href="#g{{ key }}_{{ translation_id }}" class="nav-link" data-toggle="tab">{{ book.translation.abbrev }}: {{ book.book.abbrev }} {{ book.chapter }}</a>            
+                    </li>                               
+                {% endfor %}
+                </ul>
+                <div class="tab-content ">                   
+                    {% for translation_id,book in bookGroup %}
+                        <div class="tab-pane {% if loop.first %}active{% endif %}" id="g{{ key }}_{{ translation_id }}">
+                        
+                        
+                        
+                        
+                        {% for verse in book.verses %}
+                            <sup>{{ verse.numv }}</sup> {{ verse.text }}
+                        {% endfor %}
+                        
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>                                    
+        {% endfor %}
+    {% endif %}
+    
     {% if fullTextResults is defined %}
         <h4>Találatok a szövegben <span class="badge">{{ fullTextResults.hitCount }} találat</span></h4>
         {% for result in fullTextResults.results %}

@@ -102,8 +102,27 @@ class SearchService {
 
     private function handleFullTextResults($sphinxResults, FullTextSearchParams $params)
     {
-        $sortedVerses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
+        //echo "<pre>".print_r($sphinxResults,1)."</pre>";
+        $sortedVerses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);        
+        /* new part */                
+        // echo "<pre>".print_r($sortedVerses,1)."</pre>";        
+        $verseContainers = $this->groupVersesByBookNumber($sortedVerses, $params->groupByVerse); //groupByVerse mindig üres. :(
+        
+        
+        foreach($verseContainers as $key => $group) {
+            foreach ($group as $translation_id => $translation) {
+                $m = $verseContainers[$key][$translation_id]['verses'];
+                $verseContainers[$key][$translation_id]['verses'] = $m->getParsedVerses();
+            }
+        }
+        //echo "<pre>".print_r($verseContainers,1)."</pre>";
+        $resultsByBookNumber = $verseContainers;
+        
+        
+        /* original */
+        
         $verseContainers = $this->groupVersesByBook($sortedVerses, $params->translationId);
+        //echo "<pre>".print_r($verseContainers,1)."</pre>";
         $results = [];
         $chapterCount = 0;
         $verseCount = 0;
@@ -120,7 +139,7 @@ class SearchService {
                 $verseData['text'] = '';
                 if ($verse->headings) {
                     foreach ($verse->headings as $heading) {
-                        $verseData['text'] .= $heading . ' ';
+                        $verseData['text'] .= "<i>".$heading . '</i> ';
                     }
                 }
                 if ($verse->getText()) {
@@ -131,7 +150,7 @@ class SearchService {
                 $verseCount++;
             }
             $chapterCount += count($result['chapters']);
-            if (!$params->groupByVerse) {
+            if (!$params->groupByVerse) { //groupByVerse mindig false??
                 foreach ($result['chapters'] as $chapterNumber => $verses) {
                     usort($verses, function ($verseData1, $verseData2) {
                         if ($verseData1['numv'] == $verseData2['numv']) {
@@ -152,9 +171,38 @@ class SearchService {
                 $results[] = $result;
             }
         }
-        return ['results' => $results, 'hitCount' => $params->groupByVerse ?  $verseCount : $chapterCount];
+        //echo "<pre>".print_r($results,1)."</pre>";
+        return ['resultsByBookNumber' => $resultsByBookNumber,'results' => $results, 'hitCount' => $params->groupByVerse ?  $verseCount : $chapterCount];
     }
 
+    private function groupVersesByBookNumber($sortedVerses, $groupByVerse = false)
+    {
+        $verseContainers = [];
+        foreach ($sortedVerses as $verse) {
+            $book = $verse->book;
+            if($groupByVerse) $key = $verse->gepi;
+            else $key = $book->number."_".$verse->chapter;
+            
+            if (!array_key_exists($key, $verseContainers)) {
+                $verseContainers[$key] = [];
+            }
+            if (!array_key_exists($book->translation_id, $verseContainers[$key])) {
+                $verseContainers[$key][$book->translation_id] = [
+                    'translation' => $verse->translation,
+                    'book' => $book,
+                    'chapter' => $verse->chapter,
+                    'numv' => $verse->numv,                    
+                    'verses' => new VerseContainer($book)
+                ];
+            }
+                     
+            $book->translation_id . '/' . $book->abbrev ;
+            
+            $verseContainer = $verseContainers[$key][$book->translation_id]['verses'];
+            $verseContainer->addVerse($verse);
+        }
+        return $verseContainers;
+    }
     private function groupVersesByBook($sortedVerses, $translationId)
     {
         $verseContainers = [];
