@@ -210,6 +210,7 @@ class SearchController extends Controller
         }
         $searchParams->bookNumbers = $this->extractBookNumbers($form);
         $searchParams->synonyms = true;
+        $searchParams->grouping = $form->grouping;        
         return $searchParams;
     }
 

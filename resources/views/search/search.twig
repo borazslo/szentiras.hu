@@ -44,8 +44,9 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                     <label for="grouping" class="col-sm-3 control-label">Csoportosítás</label>
                     <div class="col-sm-9">
                         <select name="grouping" class="form-control" id="grouping">
-                            <option value="chapter" {{ form.grouping == 'chapter' ? 'selected' }}>fejezetenként</option>
                             <option value="verse" {{ form.grouping == 'verse' ? 'selected' }}>versenként</option>
+                            <option value="chapter" {{ form.grouping == 'chapter' ? 'selected' }}>fejezetenként</option>                            
+                            <option value="book" {{ form.grouping == 'book' ? 'selected' }}>könyvenként</option>
                         </select>
                     </div>
                 </div>
@@ -103,25 +104,26 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
             .nav-tabs {
                 margin-bottom: 0;
             }
+            .nav>li>a {    
+                padding: 5px 7px;
+            }
         </style>
-        {% for key, bookGroup in results %}                        
+        {% for key, chapters in results %}                        
             <div class="bs-example">            
                 <ul class="nav nav-tabs">
-                {% for translation_id,book in bookGroup %}
+                    {{ chapters.weight }}
+                {% for abbrev,group in chapters.translations %}
                     <li role="presentation" class="nav-item {% if loop.first %}active{% endif %}">                
-                    <a href="#g{{ key }}_{{ translation_id }}" class="nav-link" data-toggle="tab">{{ book.translation.abbrev }}: {{ book.book.abbrev }} {{ book.chapter }}</a>            
+                    <a href="#g{{ key }}_{{ group.trans.abbrev }}" class="nav-link" data-toggle="tab">{{ group.trans.abbrev }}: {{ group.verses[0].book_number }} {{ group.verses[0].chapter }}</a>            
                     </li>                               
                 {% endfor %}
                 </ul>
                 <div class="tab-content ">                   
-                    {% for translation_id,book in bookGroup %}
-                        <div class="tab-pane {% if loop.first %}active{% endif %}" id="g{{ key }}_{{ translation_id }}">
+                {% for abbrev,group in chapters.translations %}
+                        <div class="tab-pane {% if loop.first %}active{% endif %}" id="g{{ key }}_{{ group.trans.abbrev }}">
                         
-                        
-                        
-                        
-                        {% for verse in book.verses %}
-                            <sup>{{ verse.numv }}</sup> {{ verse.text }}
+                        {% for verse in group.verses %}
+                            <sup>{{ verse.numv }}</sup> {{ verse.verse|raw }}
                         {% endfor %}
                         
                         </div>
@@ -138,12 +140,12 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                             class="glyphicon glyphicon-book"></span> {{ result.book.name }}
                     ({{ result.translation.name }})</a></h5>
             <ul class="list-unstyled">
-                {% if form.grouping != 'chapter' %}
+                {% if form.grouping == 'verse' %}
                     {% for verse in result.verses %}
                         <li>
                             <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">
                                 {{ verse.chapter }},{{ verse.numv }}</a>
-                            {{ verse.text }}
+                            {{ verse.text|raw }}
                         </li>
                     {% endfor %}
                 {% else %}
@@ -151,7 +153,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                         <li>
                             <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ chapter }}">{{ chapter }}</a>
                             {% for verse in verses %}
-                                {% if verse.ellipseBefore %} [...] {% endif %}<sup>{{ verse.numv }}</sup>{{ verse.text }}
+                                {% if verse.ellipseBefore %} [...] {% endif %}<sup>{{ verse.numv }}</sup>{{ verse.text|raw }}
                             {% endfor %}
                         </li>
                     {% endfor %}

@@ -46,7 +46,7 @@ class SearchService {
         $searchParams = new FullTextSearchParams;
         $searchParams->text = $term;
         $searchParams->limit = 10;
-        $searchParams->groupByVerse = true;
+        $searchParams->grouping = 'verse';
         $searchParams->synonyms = true;
         $sphinxSearcher = $this->searcherFactory->createSearcherFor($searchParams);
         $sphinxResults = $sphinxSearcher->get();
@@ -102,21 +102,66 @@ class SearchService {
 
     private function handleFullTextResults($sphinxResults, FullTextSearchParams $params)
     {
-        //echo "<pre>".print_r($sphinxResults,1)."</pre>";
-        $sortedVerses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);        
-        /* new part */                
-        // echo "<pre>".print_r($sortedVerses,1)."</pre>";        
-        $verseContainers = $this->groupVersesByBookNumber($sortedVerses, $params->groupByVerse); //groupByVerse mindig üres. :(
         
-        
-        foreach($verseContainers as $key => $group) {
-            foreach ($group as $translation_id => $translation) {
-                $m = $verseContainers[$key][$translation_id]['verses'];
-                $verseContainers[$key][$translation_id]['verses'] = $m->getParsedVerses();
+        $sortedVerses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
+//        echo "<pre>".print_r($params,1)."</pre>";
+        /* beginning of new part */                
+        $results = [];
+        $translations = []; 
+        foreach($sphinxResults->verses as $id => $verse) {
+            switch ($params->grouping) {
+                case 'book':
+                    $limit = 4;
+                    break;
+                case 'chapter':
+                    $limit = 6;
+                    break;
+                case 'verse':
+                    $limit = 9;
+                    break;                
+                default:
+                    break;
             }
+            $key = substr($verse['attrs']['gepi'],0,$limit);
+            if(!array_key_exists($key, $results)) {
+                $results[$key] = ['weights' => [], 'translations' => [] ];                
+            }
+            if(!array_key_exists($verse['attrs']['trans'], $translations)) {
+                $translations[$verse['attrs']['trans']] = $this->translationRepository->getById($verse['attrs']['trans']); 
+            }                
+            $trans = $translations[$verse['attrs']['trans']];
+                
+            if(!array_key_exists($trans['abbrev'], $results[$key]['translations'])) {
+
+                //$book = $this->bookRepository->getByNumberForTranslation($verse['attrs']['book_number'],$verse['attrs']['trans']);
+                $results[$key]['translations'][$trans['abbrev']] = [                       
+                       'verseIds' => [],
+                       'verses' => [],
+                       'trans' => $trans
+                    ];                
+            }
+            $results[$key]['weights'][] = $verse['weight'];
+            $results[$key]['translations'][$trans['abbrev']]['verseIds'][] = $id;
+            $results[$key]['translations'][$trans['abbrev']]['verses'][] = $sortedVerses[$id];
         }
-        //echo "<pre>".print_r($verseContainers,1)."</pre>";
-        $resultsByBookNumber = $verseContainers;
+
+        //echo "<pre> ".print_r($results,1)."</pre>";/**/
+        
+        foreach($results as $key => $result) {            
+             $results[$key]['weight'] = reset($result['weights']) + log10(array_sum($result['weights']));
+             foreach($result['translations'] as $abbrev => $group ) {             
+                $gepis = array_column($group['verses'],'gepi');
+                array_multisort($gepis, SORT_ASC, $results[$key]['translations'][$abbrev]['verses']);
+             }
+        }
+        $weights  = array_column($results, 'weight');
+        array_multisort($weights, SORT_DESC, $results);
+        
+        //echo "<pre> ".print_r($results,1)."</pre>";/**/
+                
+        /* end of new part */                
+        
+        $resultsByBookNumber = $results;
         
         
         /* original */
@@ -139,7 +184,7 @@ class SearchService {
                 $verseData['text'] = '';
                 if ($verse->headings) {
                     foreach ($verse->headings as $heading) {
-                        $verseData['text'] .= "<i>".$heading . '</i> ';
+                        $verseData['text'] .= "<small>".$heading . '</small> ';
                     }
                 }
                 if ($verse->getText()) {
@@ -150,7 +195,7 @@ class SearchService {
                 $verseCount++;
             }
             $chapterCount += count($result['chapters']);
-            if (!$params->groupByVerse) { //groupByVerse mindig false??
+            if ($params->grouping == 'chapter') { 
                 foreach ($result['chapters'] as $chapterNumber => $verses) {
                     usort($verses, function ($verseData1, $verseData2) {
                         if ($verseData1['numv'] == $verseData2['numv']) {
@@ -172,7 +217,9 @@ class SearchService {
             }
         }
         //echo "<pre>".print_r($results,1)."</pre>";
-        return ['resultsByBookNumber' => $resultsByBookNumber,'results' => $results, 'hitCount' => $params->groupByVerse ?  $verseCount : $chapterCount];
+        if($params->grouping == 'verse') $hitCount = $verseCount;
+        else $hitCount = $chapterCount;
+        return ['resultsByBookNumber' => $resultsByBookNumber,'results' => $results, 'hitCount' => $hitCount ];
     }
 
     private function groupVersesByBookNumber($sortedVerses, $groupByVerse = false)
@@ -180,7 +227,7 @@ class SearchService {
         $verseContainers = [];
         foreach ($sortedVerses as $verse) {
             $book = $verse->book;
-            if($groupByVerse) $key = $verse->gepi;
+            if($groupByVerse OR 4==4) $key = $verse->gepi;
             else $key = $book->number."_".$verse->chapter;
             
             if (!array_key_exists($key, $verseContainers)) {

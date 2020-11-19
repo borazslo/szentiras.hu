@@ -12,7 +12,7 @@ class FullTextSearchParams {
     public $translationId;
     public $bookNumbers;
     public $limit;
-    public $groupByVerse;
+    public $grouping;
     public $synonyms;
 
 } 
