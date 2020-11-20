@@ -27,7 +27,7 @@ class SphinxSearcher implements Searcher
         $text = trim($params->text);
         $originalWords = preg_split('/\W+/u', $text);
         $searchedTerm = " ( @verse \"{$text}\"~".(count($originalWords)+2)." ) ";
-        $searchedTerm .= " | ( @verse3 ( {$text} | *{$text}* ) )";        
+        $searchedTerm .= " | ( @verse2 ( {$text} | *{$text}* ) )";        
         $synonyms = [];
         $synonymRepository = \App::make('SzentirasHu\Data\Repository\SynonymRepository');
         $searchedTerm .= ' | ( ';
@@ -49,7 +49,7 @@ class SphinxSearcher implements Searcher
             }
         }
         $searchedTerm .= ' )';
-        //print_r(">>".$searchedTerm."<<<br/>",1);
+        //echo ">>".$searchedTerm."<<<br/>";
         return $searchedTerm;
     }
 
@@ -68,9 +68,13 @@ class SphinxSearcher implements Searcher
             $limit = (int)Config::get('settings.searchLimit') + 1;
         }
         $this->sphinxClient->limit($limit);
-        if ($params->grouping == 'verse') {
+        
+        /*
+         * Itt if($params->groupByVerse ) volt, de az mindig false volt. Viszont, ha valaha true, akkor nem működik valami.
+        if ($params->grouping == 'verse') {        
             $this->sphinxClient->setGroupBy('gepi', SphinxClient::SPH_GROUPBY_ATTR, '@relevance desc');
         }
+         */
         if ($params->translationId) {
             $this->sphinxClient->filter('trans', $params->translationId);
         }

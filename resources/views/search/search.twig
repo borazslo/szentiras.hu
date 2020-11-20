@@ -76,17 +76,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
            class="btn btn-default btn-xs">{{ translationHit.translation.abbrev }} <sup>{% if translationHit.hitCount > 999 %}&gt;{% endif %}{{ translationHit.hitCount }}</sup>
         </a>
     {% endfor %}
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        
     
     {% if fullTextResults.resultsByBookNumber is defined %}
         {% set results =  fullTextResults.resultsByBookNumber %}
@@ -98,8 +88,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
             .tab-content {
                 border-left: 1px solid #ddd;
                 border-right: 1px solid #ddd;            
-                padding: 10px;
-                padding-bottom: 5px;
+                padding: 13px;
+                padding-bottom: 7px;
             }
             .nav-tabs {
                 margin-bottom: 0;
@@ -114,7 +104,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                     {{ chapters.weight }}
                 {% for abbrev,group in chapters.translations %}
                     <li role="presentation" class="nav-item {% if loop.first %}active{% endif %}">                
-                    <a href="#g{{ key }}_{{ group.trans.abbrev }}" class="nav-link" data-toggle="tab">{{ group.trans.abbrev }}: {{ group.verses[0].book_number }} {{ group.verses[0].chapter }}</a>            
+                    <a href="#g{{ key }}_{{ group.trans.abbrev }}" class="nav-link" data-toggle="tab">{{ group.trans.abbrev }}: {{ group.verses[0].book_number }} {{ group.verses[0].chapter }}<sup>{{ group.verses|length }} vers</sup></a>            
                     </li>                               
                 {% endfor %}
                 </ul>

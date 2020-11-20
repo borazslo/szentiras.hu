@@ -104,14 +104,15 @@ class SearchService {
     {
         
         $sortedVerses = $this->verseRepository->getVersesInOrder($sphinxResults->verseIds);
-//        echo "<pre>".print_r($params,1)."</pre>";
+        //echo "<pre>".print_r($sphinxResults ,1)."</pre>";
+
         /* beginning of new part */                
         $results = [];
         $translations = []; 
         foreach($sphinxResults->verses as $id => $verse) {
             switch ($params->grouping) {
                 case 'book':
-                    $limit = 4;
+                    $limit = 3;
                     break;
                 case 'chapter':
                     $limit = 6;
@@ -128,9 +129,8 @@ class SearchService {
             }
             if(!array_key_exists($verse['attrs']['trans'], $translations)) {
                 $translations[$verse['attrs']['trans']] = $this->translationRepository->getById($verse['attrs']['trans']); 
-            }                
+            }          
             $trans = $translations[$verse['attrs']['trans']];
-                
             if(!array_key_exists($trans['abbrev'], $results[$key]['translations'])) {
 
                 //$book = $this->bookRepository->getByNumberForTranslation($verse['attrs']['book_number'],$verse['attrs']['trans']);
@@ -145,10 +145,13 @@ class SearchService {
             $results[$key]['translations'][$trans['abbrev']]['verses'][] = $sortedVerses[$id];
         }
 
-        //echo "<pre> ".print_r($results,1)."</pre>";/**/
+        // echo "<pre> ".print_r($results,1)."</pre>";/**/
         
-        foreach($results as $key => $result) {            
-             $results[$key]['weight'] = reset($result['weights']) + log10(array_sum($result['weights']));
+        foreach($results as $key => $result) {
+            rsort($result['weights']);
+            //echo "<pre>"; print_R($result['weights']); echo "</pre>";
+             $results[$key]['weight'] = reset($result['weights']) + sqrt(array_sum($result['weights'])); // log10()
+
              foreach($result['translations'] as $abbrev => $group ) {             
                 $gepis = array_column($group['verses'],'gepi');
                 array_multisort($gepis, SORT_ASC, $results[$key]['translations'][$abbrev]['verses']);
@@ -165,7 +168,7 @@ class SearchService {
         
         
         /* original */
-        
+
         $verseContainers = $this->groupVersesByBook($sortedVerses, $params->translationId);
         //echo "<pre>".print_r($verseContainers,1)."</pre>";
         $results = [];
