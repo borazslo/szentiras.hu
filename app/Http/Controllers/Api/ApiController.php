@@ -176,6 +176,7 @@ class ApiController extends Controller
         $params->text = $text;
         $results = $this->searchService->getDetailedResults($params);
         $refResult = $this->searchRef($text, false);
+        unset($results['resultsByBookNumber']); // don't use new search results view in the API yet
         return $this->formatJsonResponse(["refResult" => $refResult, "fullTextResult" => $results]);
     }
 
