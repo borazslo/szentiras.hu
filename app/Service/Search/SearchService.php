@@ -162,6 +162,47 @@ class SearchService {
                  else {
                     $gepis = array_column($group['verses'],'gepi');
                     array_multisort($gepis, SORT_ASC, $results[$key]['translations'][$abbrev]['verses']);
+                 
+                $currentNumv = false;
+                $currentChapter = false;
+                foreach ($group['verses'] as $k => $verse) {
+                    $verseData = [];
+                    $verseData['chapter'] = $verse->chapter;
+                    $verseData['numv'] = $verse->numv;
+                    $verseData['text'] = preg_replace('/<[^>]*>/', ' ', $verse->verse);
+                    if ($verse->headings) { // Ez nem üzemel, mert nem volt getParsedVerse mert nem volt VerseContainer, mert book-onként kall azt csináni.
+                        echo "bizony";
+                        foreach ($verse->headings as $heading) {
+                            $verseData['text'] .= "<small>".$heading . '</small> ';
+                        }
+                    }
+                    
+                    if($verse->chapter > $currentChapter ) {                        
+                        $verseData['chapterStart'] = true;
+                        $currentNumv = $verse->numv;
+                    }
+                    $currentChapter = $verse->chapter;
+                    
+                    if($verse->numv > $currentNumv + 1 AND $currentNumv = $verse->numv) {
+                        $verseData['ellipseBefore'] = true;
+                    } 
+                    $currentNumv = $verse->numv;
+                    
+                    $results[$key]['translations'][$abbrev]['verses'][$k] = $verseData;
+                    
+                }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                  }
              }
         }

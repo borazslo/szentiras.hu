@@ -86,16 +86,21 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                 margin-bottom: 0px;
             }
             .tab-content {
-                border-left: 1px solid #ddd;
+                /* border-left: 1px solid #ddd;
                 border-right: 1px solid #ddd;            
                 padding: 8px;
-                padding-bottom: 3px;
+                padding-bottom: 3px; */
             }
             .nav-tabs {
                 margin-bottom: 0;
+                border-bottom: 0px;;
             }
-            .nav>li>a {    
-                padding: 5px 7px;
+            .nav>li>h5>a {    
+                margin-right: 2px;
+            }
+            .nav>li>h5>a.nav-link {    
+                /* padding: 5px 7px; */
+                margin-right: 10px;
             }
             span.active {
                 display: inline;
@@ -111,17 +116,19 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                     <!--{{ chapters.weight }}-->
                 {% for abbrev,group in chapters.translations %}
                     <li role="presentation" class="nav-item {% if loop.first %}active{% endif %}">                
-                        <a href="#g{{ key }}_{{ group.trans.abbrev }}" class="nav-link" data-toggle="tab">
+                        <h5><a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}"><span
+                                    class="glyphicon glyphicon-book"></span></a><a href="#g{{ key }}_{{ group.trans.abbrev }}" 
+                                      class="nav-link" data-toggle="tab"  ><!--
                             
-                        {% if form.translation is not defined or form.translation.id < 1 %}{{ group.trans.abbrev }}<!--
-                        <!-- --><span class="header-colon {{ loop.first ? 'active' : 'hidden-xs hidden-sm' }}">:</span>
+                        -->{% if form.translation is not defined or form.translation.id < 1 %}<span title="{{ group.trans.name }}">{{ group.trans.abbrev }}</span><!--
+                        --><span class="header-colon {{ loop.first ? 'active' : 'hidden-xs hidden-sm' }}">:</span>
                         {% endif %}
                         
                         {% if form.translation is defined and form.translation.id > 0 %}{{ group.book.name }}
                         {% else %}
                             <span class="header-bookname {{ loop.first ? 'active visible-md-inline visible-lg-inline' : 'inactive'}}">{{ group.book.name }}</span>
                         {% endif %}                        
-                            <span class="header-bookabbrev {{ loop.first ? 'active visible-xs-inline visible-sm-inline' : 'inactive visible-md-inline visible-lg-inline'}}">{{ group.book.abbrev }}</span>
+                            <span class="header-bookabbrev {{ loop.first ? 'active visible-xs-inline visible-sm-inline' : 'inactive visible-md-inline visible-lg-inline'}}" title="{{ group.book.name }}">{{ group.book.abbrev }}</span>
                             <span class="header-ref {{ loop.first ? 'active' : 'hidden-xs hidden-sm'}}">{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}</span>
                             
                             
@@ -129,7 +136,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                         <!--<sup>{{ group.verses|length }} vers</sup>    -->
                         
                         
-                            </a>
+                            </a></h5>
                     </li>                               
                 {% endfor %}
                 </ul>                
@@ -138,9 +145,10 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                         <div class="tab-pane {% if loop.first %}active{% endif %}" id="g{{ key }}_{{ group.trans.abbrev }}">
                         
                         {% for verse in group.verses %}
-                            <sup>{{ verse.numv }}</sup> {{ verse.verse|raw }}
+                            {% if verse.chapterStart %}{% if form.grouping == 'book' %}{{ loop.first ? "" : "<br>" }}<strong><a href="/{{ group.trans.abbrev }}/{{ group.book.abbrev }}{{ verse.chapter }}">{{ verse.chapter }}</a></strong> {% endif %}{% endif %}
+                            {% if verse.ellipseBefore %} [...] {% endif %}{% if form.grouping == 'book' or  form.grouping == 'chapter' %}<sup><a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">{{ verse.numv }}</a></sup>{% endif %}{{ verse.text|raw }}
                         {% endfor %}
-                        
+                        <a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}">&raquo;</a>
                         </div>
                     {% endfor %}
                 </div>

@@ -98,17 +98,17 @@
 $(function() {
               $('ul a.nav-link').on('click', function(e) {
               /* nem aktavakat beállítani */
-              $(this).parent().parent().find('span.header-colon').removeClass('active').addClass('hidden-xs hidden-sm');
-              $(this).parent().parent().find('span.header-bookname').removeClass('active visible-md-inline visible-lg-inline').addClass('inactive');
-              $(this).parent().parent().find('span.header-bookabbrev').removeClass('active visible-xs-inline visible-sm-inline').addClass('inactive visible-md-inline visible-lg-inline');
-              $(this).parent().parent().find('span.header-ref').removeClass('active').addClass('hidden-xs hidden-sm');
+              $(this).parent().parent().parent().find('span.header-colon').removeClass('active').addClass('hidden-xs hidden-sm');
+              $(this).parent().parent().parent().find('span.header-bookname').removeClass('active visible-md-inline visible-lg-inline').addClass('inactive');
+              $(this).parent().parent().parent().find('span.header-bookabbrev').removeClass('active visible-xs-inline visible-sm-inline').addClass('inactive visible-md-inline visible-lg-inline');
+              $(this).parent().parent().parent().find('span.header-ref').removeClass('active').addClass('hidden-xs hidden-sm');
               
               $(this).find('span.header-colon').addClass('active').removeClass('hidden-xs hidden-sm');
               $(this).find('span.header-bookname').addClass('active visible-md-inline visible-lg-inline').removeClass('inactive');
               $(this).find('span.header-bookabbrev').addClass('active visible-xs-inline visible-sm-inline').removeClass('inactive visible-md-inline visible-lg-inline');
               $(this).find('span.header-ref').addClass('active').removeClass('hidden-xs hidden-sm');              
-
             });
+
 });
         </script>
     </body>
