@@ -77,10 +77,22 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         </a>
     {% endfor %}
         
+   
+    {% if fullTextResults.resultsByBookNumber is defined or  fullTextResults is defined %}
+    <div class="btn-group" style="float:right" role="group" aria-label="...">
+       <a type="button" class="style-btn btn btn-primary nav-link" href="#newstyle" data-toggle="tab" >Új kinézet</a>  
+        <a type="button" class="style-btn btn btn-default nav-link" href="#oldstyle" data-toggle="tab"">Régi kinézt</a>
+    </div>
+
+    <div class="tab-content ">                   
+    <div class="tab-pane active" id="newstyle">
     
     {% if fullTextResults.resultsByBookNumber is defined %}
         {% set results =  fullTextResults.resultsByBookNumber %}
         <h4>Találatok a szövegekben</h4>
+
+        
+        
         <style>
             .bs-example{
                 margin-bottom: 0px;
@@ -156,6 +168,9 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         {% endfor %}
     {% endif %}
     
+        </div>                   
+        <div class="tab-pane" id="oldstyle">
+        
     {% if fullTextResults is defined %}
         <h4>Találatok a szövegben <span class="badge">{{ fullTextResults.hitCount }} találat</span></h4>
         {% for result in fullTextResults.results %}
@@ -184,7 +199,10 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
             </ul>
         {% endfor %}
     {% endif %}
-
+        
+        </div></div>
+    {% endif %}    
+        
     {% if form.textToSearch == ''  %}
         {% include 'search/searchInfo' %}
     {% endif %}

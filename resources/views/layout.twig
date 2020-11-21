@@ -109,6 +109,11 @@ $(function() {
               $(this).find('span.header-ref').addClass('active').removeClass('hidden-xs hidden-sm');              
             });
 
+            $('.style-btn').on('click', function(e) {
+                $(this).parent().find('.style-btn').removeClass('btn-primary');        
+                $(this).addClass('btn-primary');                
+                
+            });
 });
         </script>
     </body>
