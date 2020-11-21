@@ -58,7 +58,8 @@ class SphinxSearcher implements Searcher
         $term = $this->addAlternatives($params);
         $this->sphinxClient = SphinxSearch::search($term);
         \Log::debug('searching', ['params' => $params, 'term' => $term]);
-        $this->sphinxClient->setFieldWeights(['verse'=>1000,'verse2'=>100,'verse3'=>1]);
+        $this->sphinxClient->setFieldWeights(['verse'=>100,'verse2'=>10,'verse3'=>1]);
+        $this->sphinxClient->setIndexWeights(['verse'=>2,'verse_root'=>1]);
         $this->sphinxClient->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED);
         $this->sphinxClient->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@weight DESC, gepi ASC");
         
