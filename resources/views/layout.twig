@@ -94,5 +94,27 @@
                 crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <script src="{{ elixir('js/all.js') }}"></script>
+               <script>
+$(function() {
+              $('ul a.nav-link').on('click', function(e) {
+              /* nem aktavakat beállítani */
+              $(this).parent().parent().parent().find('span.header-colon').removeClass('active').addClass('hidden-xs hidden-sm');
+              $(this).parent().parent().parent().find('span.header-bookname').removeClass('active visible-md-inline visible-lg-inline').addClass('inactive');
+              $(this).parent().parent().parent().find('span.header-bookabbrev').removeClass('active visible-xs-inline visible-sm-inline').addClass('inactive visible-md-inline visible-lg-inline');
+              $(this).parent().parent().parent().find('span.header-ref').removeClass('active').addClass('hidden-xs hidden-sm');
+              
+              $(this).find('span.header-colon').addClass('active').removeClass('hidden-xs hidden-sm');
+              $(this).find('span.header-bookname').addClass('active visible-md-inline visible-lg-inline').removeClass('inactive');
+              $(this).find('span.header-bookabbrev').addClass('active visible-xs-inline visible-sm-inline').removeClass('inactive visible-md-inline visible-lg-inline');
+              $(this).find('span.header-ref').addClass('active').removeClass('hidden-xs hidden-sm');              
+            });
+
+            $('.style-btn').on('click', function(e) {
+                $(this).parent().find('.style-btn').removeClass('btn-primary');        
+                $(this).addClass('btn-primary');                
+                
+            });
+});
+        </script>
     </body>
 </html>

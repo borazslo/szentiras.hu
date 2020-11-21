@@ -44,8 +44,9 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                     <label for="grouping" class="col-sm-3 control-label">Csoportosítás</label>
                     <div class="col-sm-9">
                         <select name="grouping" class="form-control" id="grouping">
-                            <option value="chapter" {{ form.grouping == 'chapter' ? 'selected' }}>fejezetenként</option>
                             <option value="verse" {{ form.grouping == 'verse' ? 'selected' }}>versenként</option>
+                            <option value="chapter" {{ form.grouping == 'chapter' ? 'selected' }}>fejezetenként</option>                            
+                            <option value="book" {{ form.grouping == 'book' ? 'selected' }}>könyvenként</option>
                         </select>
                     </div>
                 </div>
@@ -75,7 +76,101 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
            class="btn btn-default btn-xs">{{ translationHit.translation.abbrev }} <sup>{% if translationHit.hitCount > 999 %}&gt;{% endif %}{{ translationHit.hitCount }}</sup>
         </a>
     {% endfor %}
+        
+   
+    {% if fullTextResults.resultsByBookNumber is defined or  fullTextResults is defined %}
+    <div class="btn-group" style="float:right" role="group" aria-label="...">
+       <a type="button" class="style-btn btn btn-primary nav-link" href="#newstyle" data-toggle="tab" >Új kinézet</a>  
+        <a type="button" class="style-btn btn btn-default nav-link" href="#oldstyle" data-toggle="tab"">Régi kinézt</a>
+    </div>
 
+    <div class="tab-content ">                   
+    <div class="tab-pane active" id="newstyle">
+    
+    {% if fullTextResults.resultsByBookNumber is defined %}
+        {% set results =  fullTextResults.resultsByBookNumber %}
+        <h4>Találatok a szövegekben</h4>
+
+        
+        
+        <style>
+            .bs-example{
+                margin-bottom: 0px;
+            }
+            .tab-content {
+                /* border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;            
+                padding: 8px;
+                padding-bottom: 3px; */
+            }
+            .nav-tabs {
+                margin-bottom: 0;
+                border-bottom: 0px;;
+            }
+            .nav>li>h5>a {    
+                margin-right: 2px;
+            }
+            .nav>li>h5>a.nav-link {    
+                /* padding: 5px 7px; */
+                margin-right: 10px;
+            }
+            span.active {
+                display: inline;
+            }
+            span.inactive {
+                display: none;
+            }
+        </style>
+ 
+        {% for key, chapters in results %}                        
+            <div class="bs-example">            
+                <ul class="nav nav-tabs nav-pills ">
+                    <!--{{ chapters.weight }}-->
+                {% for abbrev,group in chapters.translations %}
+                    <li role="presentation" class="nav-item {% if loop.first %}active{% endif %}">                
+                        <h5><a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}"><span
+                                    class="glyphicon glyphicon-book"></span></a><a href="#g{{ key }}_{{ group.trans.abbrev }}" 
+                                      class="nav-link" data-toggle="tab"  ><!--
+                            
+                        -->{% if form.translation is not defined or form.translation.id < 1 %}<span title="{{ group.trans.name }}">{{ group.trans.abbrev }}</span><!--
+                        --><span class="header-colon {{ loop.first ? 'active' : 'hidden-xs hidden-sm' }}">:</span>
+                        {% endif %}
+                        
+                        {% if form.translation is defined and form.translation.id > 0 %}{{ group.book.name }}
+                        {% else %}
+                            <span class="header-bookname {{ loop.first ? 'active visible-md-inline visible-lg-inline' : 'inactive'}}">{{ group.book.name }}</span>
+                        {% endif %}                        
+                            <span class="header-bookabbrev {{ loop.first ? 'active visible-xs-inline visible-sm-inline' : 'inactive visible-md-inline visible-lg-inline'}}" title="{{ group.book.name }}">{{ group.book.abbrev }}</span>
+                            <span class="header-ref {{ loop.first ? 'active' : 'hidden-xs hidden-sm'}}">{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}</span>
+                            
+                            
+                                      
+                        <!--<sup>{{ group.verses|length }} vers</sup>    -->
+                        
+                        
+                            </a></h5>
+                    </li>                               
+                {% endfor %}
+                </ul>                
+                <div class="tab-content ">                   
+                {% for abbrev,group in chapters.translations %}
+                        <div class="tab-pane {% if loop.first %}active{% endif %}" id="g{{ key }}_{{ group.trans.abbrev }}">
+                        
+                        {% for verse in group.verses %}
+                            {% if verse.chapterStart %}{% if form.grouping == 'book' %}{{ loop.first ? "" : "<br>" }}<strong><a href="/{{ group.trans.abbrev }}/{{ group.book.abbrev }}{{ verse.chapter }}">{{ verse.chapter }}</a></strong> {% endif %}{% endif %}
+                            {% if verse.ellipseBefore %} [...] {% endif %}{% if form.grouping == 'book' or  form.grouping == 'chapter' %}<sup><a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">{{ verse.numv }}</a></sup>{% endif %}{{ verse.text|raw }}
+                        {% endfor %}
+                        <a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}">&raquo;</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>                                    
+        {% endfor %}
+    {% endif %}
+    
+        </div>                   
+        <div class="tab-pane" id="oldstyle">
+        
     {% if fullTextResults is defined %}
         <h4>Találatok a szövegben <span class="badge">{{ fullTextResults.hitCount }} találat</span></h4>
         {% for result in fullTextResults.results %}
@@ -83,12 +178,12 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                             class="glyphicon glyphicon-book"></span> {{ result.book.name }}
                     ({{ result.translation.name }})</a></h5>
             <ul class="list-unstyled">
-                {% if form.grouping != 'chapter' %}
+                {% if form.grouping == 'verse' %}
                     {% for verse in result.verses %}
                         <li>
                             <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">
                                 {{ verse.chapter }},{{ verse.numv }}</a>
-                            {{ verse.text }}
+                            {{ verse.text|raw }}
                         </li>
                     {% endfor %}
                 {% else %}
@@ -96,7 +191,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                         <li>
                             <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ chapter }}">{{ chapter }}</a>
                             {% for verse in verses %}
-                                {% if verse.ellipseBefore %} [...] {% endif %}<sup>{{ verse.numv }}</sup>{{ verse.text }}
+                                {% if verse.ellipseBefore %} [...] {% endif %}<sup>{{ verse.numv }}</sup>{{ verse.text|raw }}
                             {% endfor %}
                         </li>
                     {% endfor %}
@@ -104,7 +199,10 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
             </ul>
         {% endfor %}
     {% endif %}
-
+        
+        </div></div>
+    {% endif %}    
+        
     {% if form.textToSearch == ''  %}
         {% include 'search/searchInfo' %}
     {% endif %}
