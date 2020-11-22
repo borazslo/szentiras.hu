@@ -33,7 +33,8 @@
         <![endif]-->
 
         {% block extraHead %}{% endblock %}
-        <!-- Global site tag (gtag.js) - Google Analytics -->
+        {% if app.environment == 'production' %}
+                <!-- Global site tag (gtag.js) - Google Analytics -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-VRKF03LHHG"></script>
 		<script>
 		  window.dataLayer = window.dataLayer || [];
@@ -42,6 +43,7 @@
 
 		  gtag('config', 'G-VRKF03LHHG');
 		</script>
+         {% endif %}
     </head>
     <body>
         <div id="fb-root"></div>
