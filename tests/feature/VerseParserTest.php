@@ -28,7 +28,7 @@ class VerseParserTest extends TestCase
         $v->trans = 3;
         $verseData = $parser->parse([$v], $book);
 
-        $this->assertEquals("abc xyz zyx <br>", $verseData->getText(), $verseData);
+        $this->assertEquals("abc xyz zyx <br>", $verseData->getText());
         $this->assertCount(2, $verseData->xrefs);
         $this->assertEquals("Mk 12,34", $verseData->xrefs[0]->text);
 
