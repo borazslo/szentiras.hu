@@ -22,6 +22,8 @@ class VerseData
     public $book;
     public $poemLines;
 
+    public $elements = [];
+
     function __construct($chapter, $numv)
     {
         $this->chapter = $chapter;

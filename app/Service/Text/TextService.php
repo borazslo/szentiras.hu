@@ -112,5 +112,20 @@ class TextService
         return $teaser;
     }
 
+     /**
+     * @param VerseContainer[] $verseContainers
+     * @return string
+     */
+    public function getHeadings($verseContainers)
+    {
+        
+        $headings = [];
+        foreach ($verseContainers as $verseContainer) {
+            $parsedVerses = $verseContainer->getParsedVerses();
+            $headings[] = $parsedVerses[0]->headings;
+            
+        }      
+        return $headings;
+    }
 
 } 

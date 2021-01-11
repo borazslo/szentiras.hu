@@ -10,5 +10,6 @@ class FullTextSearchResult {
 
     public $hitCount;
     public $verseIds;
+    public $verses;
 
 } 

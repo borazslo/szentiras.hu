@@ -15,7 +15,7 @@ class AddCselToBookAbbrevs extends Migration {
 	{
         DB::table('book_abbrevs')->insert(
             [
-                'abbrev' => 'Acs',
+                'abbrev' => 'Csel',
                 'books_id' => 205]
         );
 	}

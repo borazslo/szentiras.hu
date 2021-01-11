@@ -51,7 +51,7 @@ abstract class AbstractVerseParser implements VerseParser {
      * @param Verse $rawVerse
      * @param VerseData $verse
      */
-    protected function parseRawVerses($book, $rawVerse, $verse)
+    protected function parseRawVerses($book, $rawVerse, VerseData $verse)
     {
         $type = $rawVerse->getType();
         if ($type == 'text') {
@@ -72,7 +72,7 @@ abstract class AbstractVerseParser implements VerseParser {
      * @param VerseData $verseData
      * @return void
      */
-    abstract protected function parseTextVerse($rawVerse, $verseData);
+    abstract protected function parseTextVerse($rawVerse, VerseData $verseData);
 
     abstract protected function replaceTags($rawVerse);
 
@@ -82,7 +82,7 @@ abstract class AbstractVerseParser implements VerseParser {
      * @param VerseData $verse
      * @return void
      */
-    abstract protected function parseXrefVerse($book, $rawVerse, $verse);
+    abstract protected function parseXrefVerse($book, $rawVerse, VerseData $verse);
 
     abstract protected function parseFootnoteVerse(Verse $rawVerse, VerseData $verse);
 

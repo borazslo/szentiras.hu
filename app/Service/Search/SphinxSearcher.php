@@ -25,13 +25,14 @@ class SphinxSearcher implements Searcher
     private function addAlternatives($params)
     {
         $text = trim($params->text);
-        $searchedTerm = "(\"{$text}\" | {$text} | *{$text}*)";
         $originalWords = preg_split('/\W+/u', $text);
+        $searchedTerm = " ( @verse \"{$text}\"~".(count($originalWords)+2)." ) ";
+        $searchedTerm .= " | ( @verse2 ( {$text} | *{$text}* ) )";        
         $synonyms = [];
         $synonymRepository = \App::make('SzentirasHu\Data\Repository\SynonymRepository');
         $searchedTerm .= ' | ( ';
         foreach ($originalWords as $word) {
-            $searchedTerm .= "(";
+            $searchedTerm .= "(@verse3 (";
             $searchedTerm .= "\"{$word}\" | {$word} | *{$word}*";
             $foundSyns = $synonymRepository->findSynonyms($word);
             if ($foundSyns) {
@@ -42,12 +43,13 @@ class SphinxSearcher implements Searcher
                     }
                 }
             }
-            $searchedTerm .= ")";
+            $searchedTerm .= "))";
             if ($word != end($originalWords)) {
                 $searchedTerm .= "   ";
             }
         }
         $searchedTerm .= ' )';
+        //echo ">>".$searchedTerm."<<<br/>";
         return $searchedTerm;
     }
 
@@ -56,17 +58,24 @@ class SphinxSearcher implements Searcher
         $term = $this->addAlternatives($params);
         $this->sphinxClient = SphinxSearch::search($term);
         \Log::debug('searching', ['params' => $params, 'term' => $term]);
+        $this->sphinxClient->setFieldWeights(['verse'=>100,'verse2'=>10,'verse3'=>1]);
+        $this->sphinxClient->setIndexWeights(['verse'=>2,'verse_root'=>1]);
         $this->sphinxClient->setMatchMode(SphinxClient::SPH_MATCH_EXTENDED);
         $this->sphinxClient->setSortMode(SphinxClient::SPH_SORT_EXTENDED, "@weight DESC, gepi ASC");
+        
         if ($params->limit) {
             $limit = $params->limit;
         } else {
             $limit = (int)Config::get('settings.searchLimit') + 1;
         }
         $this->sphinxClient->limit($limit);
-        if ($params->groupByVerse) {
+        
+        /*
+         * Itt if($params->groupByVerse ) volt, de az mindig false volt. Viszont, ha valaha true, akkor nem működik valami.
+        if ($params->grouping == 'verse') {        
             $this->sphinxClient->setGroupBy('gepi', SphinxClient::SPH_GROUPBY_ATTR, '@relevance desc');
         }
+         */
         if ($params->translationId) {
             $this->sphinxClient->filter('trans', $params->translationId);
         }
@@ -85,8 +94,10 @@ class SphinxSearcher implements Searcher
     {
         $sphinxResult = $this->sphinxClient->get();
         if ($sphinxResult) {
+            //echo "<pre>".print_R($sphinxResult['matches'],1)."</pre>";       
             $fullTextSearchResult = new FullTextSearchResult();
             $fullTextSearchResult->verseIds = array_keys($sphinxResult['matches']);
+            $fullTextSearchResult->verses = $sphinxResult['matches'];
             $fullTextSearchResult->hitCount = count($sphinxResult['matches']);
 
             return $fullTextSearchResult;

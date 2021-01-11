@@ -128,6 +128,28 @@ class TextDisplayController extends Controller
         $translatedRef = $this->referenceService->translateReference($canonicalRef, $translation->id);
         $book = $this->bookRepository->getByAbbrevForTranslation($translatedRef->bookRefs[0]->bookId, $translation->id);
         if ($book) {
+            
+            $chapters = [];
+            
+            
+            $verses = $this->verseRepository->getVerses($book->id);
+            foreach ($verses as $verse) {
+                $type = $verse->getType();
+                
+                if ( preg_match('/^heading[0-9]{1}/',$type)) {
+                    $verseContainer = new VerseContainer($book);
+                    $verseContainer->addVerse($verse);
+                    $headings = $this->textService->getHeadings([$verseContainer])[0];
+                    
+                    $chapters[$verse['chapter']]['headings'][$verse['numv']] = array (
+                        'gepi' => $verse->gepi,
+                        'level' => key($headings),
+                        'text' => $headings[key($headings)]
+                    );
+                } 
+            }
+            
+            
             $firstVerses = $this->verseRepository->getLeadVerses($book->id);
             $groupedVerses = [];
             foreach ($firstVerses as $verse) {
@@ -135,13 +157,13 @@ class TextDisplayController extends Controller
                 if ($type == 'text' || $type == 'poemLine') {
                     $verseContainer = new VerseContainer($book);
                     $verseContainer->addVerse($verse);
-                    $oldText = "";
-                    if (array_has($groupedVerses, $verse['chapter'])) {
-                        if (array_has($groupedVerses[$verse['chapter']], $verse['numv'])) {
-                            $oldText = $groupedVerses[$verse['chapter']][$verse['numv']];
+                    $oldText = "";                    
+                    if(isset($chapters[$verse['chapter']]['leadVerses'])) {                   
+                        if (array_has($chapters[$verse['chapter']]['leadVerses'], $verse['numv'])) {
+                            $oldText = $chapters[$verse['chapter']]['leadVerses'][$verse['numv']];
                         }
                     }
-                    $groupedVerses[$verse['chapter']][$verse['numv']] = $oldText . $this->textService->getTeaser([$verseContainer]);
+                    $chapters[$verse['chapter']]['leadVerses'][$verse['numv']] = $oldText . $this->textService->getTeaser([$verseContainer]);
                 }
             }
             $allTranslations = $this->translationRepository->getAllOrderedByDenom();
@@ -150,7 +172,7 @@ class TextDisplayController extends Controller
                 'translation' => $translation,
                 'reference' => $translatedRef,
                 'book' => $book,
-                'groupedVerses' => $groupedVerses,
+                'chapters' => $chapters,
                 'translations' => $allTranslations,
                 'translationLinks' => $allTranslations->map(
                         function ($translation) use ($canonicalRef, $bookTranslations) {

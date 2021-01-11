@@ -45,7 +45,8 @@ return [
             'text' => [901],
             'heading' => [0=>5, 1=>10, 2=>20, 3=>30],
             'footnote' => [120, 2001, 2002],
-            'poemLine' => [902]
+            'poemLine' => [902],
+            'xref' => [920]
         ],
         'textSource' => env('TEXT_SOURCE_KNB'),
         'id' => 3

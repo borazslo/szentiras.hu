@@ -60,6 +60,16 @@ class SphinxSearch {
   }
 
     /**
+     * @param $weights
+     * @return $this
+     */
+    public function setIndexWeights($weights)
+  {
+    $this->_connection->setFieldWeights($weights);
+    return $this;
+  }
+  
+    /**
      * @param $mode
      * @return $this
      */

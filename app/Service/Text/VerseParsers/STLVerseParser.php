@@ -15,7 +15,7 @@ class STLVerseParser extends DefaultVerseParser
      * @param $rawVerse
      * @param VerseData $verseData
      */
-    protected function parseTextVerse($rawVerse, $verseData)
+    protected function parseTextVerse($rawVerse, VerseData $verseData)
     {
         $purified = $rawVerse->verse;
         if (preg_match_all("/" . self::FOOTNOTE_REGEXP . "/u", $purified, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE)) {

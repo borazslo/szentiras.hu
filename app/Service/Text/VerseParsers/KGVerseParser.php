@@ -4,7 +4,10 @@ namespace SzentirasHu\Service\Text\VerseParsers;
 
 use Log;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\Xref;
+use SzentirasHu\Http\Controllers\Display\VerseParsers\VerseData;
+
 use SzentirasHu\Service\Reference\CanonicalReference;
+
 use SzentirasHu\Service\Reference\ParsingException;
 
 class KGVerseParser extends DefaultVerseParser
@@ -15,7 +18,7 @@ class KGVerseParser extends DefaultVerseParser
      * @param $rawVerse
      * @param $verse
      */
-    protected function parseTextVerse($rawVerse, $verse)
+    protected function parseTextVerse($rawVerse, VerseData $verse)
     {
         $verse->simpleText = $rawVerse->verse;
         foreach (self::$xrefSigns as $xrefSign) {
@@ -26,6 +29,7 @@ class KGVerseParser extends DefaultVerseParser
                 $verse->simpleText = preg_replace("/" . $xrefSign . " ?/u", '', $verse->getText());
             }
         }
+        $verse->elements[] = $verse->simpleText;
     }
 
     /**
@@ -33,7 +37,7 @@ class KGVerseParser extends DefaultVerseParser
      * @param $rawVerse
      * @param $verse
      */
-    protected function parseXrefVerse($book, $rawVerse, $verse)
+    protected function parseXrefVerse($book, $rawVerse, VerseData $verse)
     {
         $xrefParts = preg_split("/([•†][^•†]+)/u", $rawVerse->verse, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE);
         // " • A † B" becomes [ [" ", 0"], ["• A ", 1], ["† B", 5] ]
