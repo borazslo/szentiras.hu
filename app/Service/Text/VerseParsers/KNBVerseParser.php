@@ -10,11 +10,14 @@ class KNBVerseParser extends DefaultVerseParser
     const XREF_REGEXP = '\s*\{([A-Z][^\}^\{]+)\}';
 
     protected function replaceTags($rawText) {
-        $rawText = preg_replace('/<tv>/', '&nbsp;', $rawText);
-        $rawText = preg_replace('/\{\{br\}\}/', '<br>', $rawText);
-        $rawText = preg_replace('/\{\{ej\}\}/', '', $rawText);
-        $rawText = preg_replace('/\{\{i\}\}/', '<em>', $rawText);
-        $rawText = preg_replace('/\{\{\/i\}\}/', '</em>', $rawText);
+        $rawText = preg_replace('/<tv>/', ' ', $rawText);
+        $rawText = preg_replace('/<tp>/', ' ', $rawText);
+        $rawText = preg_replace('/<tk>/', '', $rawText);
+        $rawText = preg_replace('/<br>/', '<br>', $rawText);
+        $rawText = preg_replace('/<brx>/', '<br>', $rawText);
+        $rawText = preg_replace('/<i>/', '<em>', $rawText);
+        $rawText = preg_replace('/<\/i>/', '</em>', $rawText);
+        $rawText = preg_replace('/<fs>/', '', $rawText);
         $purified = preg_replace('/\s*'.self::XREF_REGEXP.'/u', '', $rawText);
         $purified = preg_replace('/<\/?i>/', '', $purified);
         return $purified;

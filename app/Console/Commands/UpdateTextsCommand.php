@@ -74,7 +74,6 @@ class UpdateTextsCommand extends Command
         if (!$this->option('nohunspell')) {
             $this->testHunspell();
         }
-
         $abbrev = $this->choice('Melyik fordítást töltsük be?', ['BD', 'KG', 'KNB', 'RUF', 'UF', 'SZIT', 'STL']);
         $this->verifyAbbrev($abbrev);
 
@@ -146,7 +145,13 @@ class UpdateTextsCommand extends Command
             $bookNumber = $row[$columns[$abbrev]['gepi']];
             $rov = $row[$columns[$abbrev]['rov']];
             if (!isset($bookAbbrev2Id[$rov]) AND ($rov != '-' AND $rov != '')) {
-                $badAbbrevs[] = $rov;
+                $book = $this->bookRepository->getByAbbrev($rov, $translation);
+                if ($book) {
+                    $bookNumber2Id[$bookNumber] = $book->id;
+                } else {
+                    $badAbbrevs[]= $rov;
+                }
+                
             } else if ($rov != '-' AND $rov != '') {
                 $bookNumber2Id[$bookNumber] = $bookAbbrev2Id[$rov];
             }
@@ -273,7 +278,7 @@ class UpdateTextsCommand extends Command
                         }
                     } else {
                         $cachedStems = $stems->unique();
-                        Cache::put("hunspell_{$word}", $cachedStems, 525948);
+                        Cache::put("hunspell_{$word}", $cachedStems, 60*24);
                         $verseroots = $verseroots->merge($stems);
                         $this->newStems++;
                         break;
@@ -334,12 +339,12 @@ class UpdateTextsCommand extends Command
         $progressBar->setRedrawFrequency(25);
         $progressBar->setBarWidth(24);
         $progressBar->setFormat("[%bar%] %message%");
-        $verseRowIterator->rewind();
-        $verseRowIterator->next();
-        $verseRowIterator->next();
         $rowNumber = 0;
-        while ($verseRowIterator->valid()) {
-            $row = $verseRowIterator->current();
+        foreach ($verseRowIterator as $row) {
+            if ($rowNumber < 2) {
+                $rowNumber++;
+                continue;
+            }
             if (empty($row[$cols[$fields['gepi']]])) {
                 break;
             }
@@ -364,11 +369,12 @@ class UpdateTextsCommand extends Command
                 if (isset($books_gepi2id[$values['book_number']])) {
                     $values['book_id'] = $books_gepi2id[$values['book_number']];
                 } else {
-                    App::abort(500, 'Valami gond van a books id/gepi párossal!');
+                    print_r($values);
+                    print_r($books_gepi2id);
+                    App::abort(500, 'Nincs meg a book number a gepi2id listában');
                 }
                 $inserts[$rowNumber] = $values;
             }
-            $verseRowIterator->next();
             $rowNumber++;
             $progressBar->setMessage("$rowNumber - {$values['gepi']} - új szavak: {$this->newStems}");
             $progressBar->advance();
