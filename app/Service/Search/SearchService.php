@@ -160,7 +160,8 @@ class SearchService {
              foreach($result['translations'] as $abbrev => $group ) {
                  if($group == []) unset($results[$key]['translations'][$abbrev]);
                  else {
-                    $gepis = array_column($group['verses'],'gepi');
+                    $gepis = [];
+                    foreach($group['verses'] as $verse) $gepis[] = $verse['gepi'];
                     array_multisort($gepis, SORT_ASC, $results[$key]['translations'][$abbrev]['verses']);
                  
                 $currentNumv = false;
