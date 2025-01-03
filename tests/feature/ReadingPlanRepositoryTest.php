@@ -16,7 +16,7 @@ class ReadingPlanRepositoryTest extends TestCase {
         $plans = $repo->getAll();
 
         $this->assertEquals(1, $plans->count());
-        $daysOfFirstPlan = $repo->getDaysByPlan($plans->first());
+        $daysOfFirstPlan = $repo->getDaysByPlanId($plans->first()->id);
         $this->assertEquals(365, $daysOfFirstPlan->count());
     }
 

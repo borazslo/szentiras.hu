@@ -17,9 +17,9 @@ interface ReadingPlanRepository {
     /**
      * List the days in a reading plan
      *
-     * @param ReadingPlan $plan
+     * @param int $id
      * @return ReadingPlanDay[]
      */
-    public function getDaysByPlan(ReadingPlan $plan);
+    public function getDaysByPlanId($id);
 
 }

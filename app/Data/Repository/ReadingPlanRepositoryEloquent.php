@@ -17,7 +17,9 @@ class ReadingPlanRepositoryEloquent implements ReadingPlanRepository {
 		});
 	}
 
-	public function getDaysByPlan(ReadingPlan $plan) {
-		return $plan->days()->orderBy('day_number')->get();
+	public function getDaysByPlanId($id) {
+		return Cache::remember("reading_plan_{$id}_days", 60, function () use ($id) {
+			return ReadingPlanDay::where('plan_id', $id)->orderBy('day_number')->get();
+		});
 	}
 }
