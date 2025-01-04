@@ -15,11 +15,10 @@ interface ReadingPlanRepository {
     public function getAll();
 
     /**
-     * List the days in a reading plan
+     * Get a reading plan by id
      *
      * @param int $id
-     * @return ReadingPlanDay[]
+     * @return ReadingPlan
      */
-    public function getDaysByPlanId($id);
-
+    public function getReadingPlanByPlanId($id);
 }
