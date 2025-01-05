@@ -22,4 +22,4 @@ service mysql restart
 node_modules/gulp/bin/gulp.js
 
 php artisan cache:clear
-php5.6 artisan twig:clean
+php artisan twig:clean
