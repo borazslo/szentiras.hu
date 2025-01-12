@@ -1,0 +1,26 @@
+{% extends 'layout' %}
+
+{% block content %}
+    <h1>{{ readingPlan.name }}</h1>
+
+    <p>{{ readingPlan.description|raw }}</p>
+
+    {% if readingPlan.days|length > 0 %}
+        <h2>Napok:</h2>
+        <ul class="list-group">
+            {% for day in readingPlan.days %}
+                <li class="list-group-item">
+                    <a href="/tervek/{{ readingPlan.id }}/{{ day.day_number }}" class="list-group-item-action">
+                        {{ day.day_number }}. nap
+                    </a>
+                    <p class="mb-1">{{ day.description }}</p>
+                    <small class="text-muted">{{ day.verses|replace({';': ', '}) }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-warning mt-3" role="alert">
+            Nincsenek napok ehhez a tervhez.
+        </div>
+    {% endif %}
+{% endblock %}

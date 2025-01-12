@@ -14,6 +14,7 @@ use SzentirasHu\Data\Entity\Translation;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
+use SzentirasHu\Data\Repository\ReadingPlanRepository;
 use View;
 
 
@@ -37,6 +38,10 @@ class TextDisplayController extends Controller
      * @var \SzentirasHu\Data\Repository\VerseRepository
      */
     private $verseRepository;
+    /**
+     * @var \SzentirasHu\Data\Repository\ReadingPlanRepository
+     */
+    private $readingPlanRepository;
 
     private $referenceService;
     /**
@@ -44,11 +49,12 @@ class TextDisplayController extends Controller
      */
     private $textService;
 
-    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository, VerseRepository $verseRepository, ReferenceService $referenceService, TextService $textService)
+    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository, VerseRepository $verseRepository, ReadingPlanRepository $readingPlanRepository, ReferenceService $referenceService, TextService $textService)
     {
         $this->translationRepository = $translationRepository;
         $this->bookRepository = $bookRepository;
         $this->verseRepository = $verseRepository;
+        $this->readingPlanRepository = $readingPlanRepository;
         $this->referenceService = $referenceService;
         $this->textService = $textService;
     }
@@ -75,7 +81,7 @@ class TextDisplayController extends Controller
         return $this->showTranslatedReferenceText(null, $reference);
     }
 
-    public function showTranslatedReferenceText($translationAbbrev, $reference)
+    public function showTranslatedReferenceText($translationAbbrev, $reference, $previousDay = null, $readingPlanDay = null, $nextDay = null)
     {
         try {
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
@@ -89,6 +95,10 @@ class TextDisplayController extends Controller
             $verseContainers = $this->textService->getTranslatedVerses($canonicalRef, $translation->id);
             $translations = $this->translationRepository->getAllOrderedByDenom();
             return View::make('textDisplay.verses')->with([
+                'previousDay' => $previousDay,
+                'readingPlan' => $readingPlanDay ? $readingPlanDay->plan : null,
+                'readingPlanDay' => $readingPlanDay,
+                'nextDay' => $nextDay,
 				'canonicalRef' => str_replace(" ", "%20", $canonicalRef->toString()),
                 'verseContainers' => $verseContainers,
                 'translation' => $translation,
@@ -122,6 +132,40 @@ class TextDisplayController extends Controller
         }
     }
 
+    public function showReadingPlanList()
+    {
+        $readingPlans = $this->readingPlanRepository->getAll();
+        return View::make('textDisplay.readingPlanList', [
+            'readingPlans' => $readingPlans
+        ]);
+    }
+
+    public function showReadingPlan($id)
+    {
+        $readingPlan = $this->readingPlanRepository->getReadingPlanByPlanId($id);
+        return View::make('textDisplay.readingPlanDayList', [
+            'readingPlan' => $readingPlan
+        ]);
+    }
+
+    public function showReadingPlanDay($planId, $dayNumber)
+    {
+        $readingPlan = $this->readingPlanRepository->getReadingPlanByPlanId($planId);
+        if (!$readingPlan) {
+            return Redirect::to('/');
+        }
+
+        $readingPlanDay = $readingPlan->days()->where('day_number', '=', $dayNumber)->first();
+        if (!$readingPlanDay) {
+            return Redirect::to('/');
+        }
+
+        $previousDay = $readingPlan->days()->where('day_number', '=', $dayNumber - 1)->first();
+        $nextDay = $readingPlan->days()->where('day_number', '=', $dayNumber + 1)->first();
+
+        return $this->showTranslatedReferenceText(null, $readingPlanDay->verses, $previousDay, $readingPlanDay, $nextDay);
+    }
+
     private function bookView($translationAbbrev, CanonicalReference $canonicalRef)
     {
         $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
@@ -135,7 +179,6 @@ class TextDisplayController extends Controller
             $verses = $this->verseRepository->getVerses($book->id);
             foreach ($verses as $verse) {
                 $type = $verse->getType();
-                
                 if ( preg_match('/^heading[0-9]{1}/',$type)) {
                     $verseContainer = new VerseContainer($book);
                     $verseContainer->addVerse($verse);

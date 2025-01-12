@@ -48,6 +48,14 @@ Route::get('/qr/img/{url}', 'Display\\QrCodeController@index')->where('url', '.+
 
 Route::get('/forditasok', 'Display\\TextDisplayController@showTranslationList');
 
+Route::get('/tervek/{plan_id}/{day_number}', 'Display\\TextDisplayController@showReadingPlanDay')
+    ->where(['plan_id' => '.+', 'day_number' => '.+']);
+
+Route::get('/tervek/{id}', 'Display\\TextDisplayController@showReadingPlan')
+    ->where('id', '.+');
+
+Route::get('/tervek', 'Display\\TextDisplayController@showReadingPlanList');
+
 Route::get('/{TRANSLATION_ABBREV}', 'Display\\TextDisplayController@showTranslation')
     ->where('TRANSLATION_ABBREV', Config::get('settings.translationAbbrevRegex'));
 
