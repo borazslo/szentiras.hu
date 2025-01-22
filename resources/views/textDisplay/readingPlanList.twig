@@ -1,0 +1,22 @@
+{% extends 'layout' %}
+
+{% block content %}
+    <h1>Olvasási tervek</h1>
+
+    {% if readingPlans|length > 0 %}
+        <ul class="list-group">
+            {% for readingPlan in readingPlans %}
+                <li class="list-group-item">
+                    <a href="/tervek/{{ readingPlan.id }}" class="list-group-item-action">
+                        {{ readingPlan.name }}
+                    </a>
+                    <p class="mb-1">{{ readingPlan.description }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-warning mt-3" role="alert">
+            Nincsenek elérhető olvasási tervek.
+        </div>
+    {% endif %}
+{% endblock %}

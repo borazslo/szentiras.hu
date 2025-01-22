@@ -22,6 +22,7 @@ class RepositoriesProvider extends ServiceProvider
         $this->app->bind('SzentirasHu\Data\Repository\TranslationRepository', 'SzentirasHu\Data\Repository\TranslationRepositoryEloquent');
         $this->app->bind('SzentirasHu\Data\Repository\VerseRepository', 'SzentirasHu\Data\Repository\VerseRepositoryEloquent');
         $this->app->bind('SzentirasHu\Data\Repository\SynonymRepository', 'SzentirasHu\Data\Repository\SynonymRepositoryEloquent');
+        $this->app->bind('SzentirasHu\Data\Repository\ReadingPlanRepository', 'SzentirasHu\Data\Repository\ReadingPlanRepositoryEloquent');
 
     }
 }
