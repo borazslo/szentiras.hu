@@ -1,6 +1,21 @@
 Szentírás .hu
 ========
 
+> [!WARNING]
+> **2025 januárjában átvette ennek a kódnak a helyét a [szentiras.hu](http://szentiras.hu) oldalon egy új (zárt) kód!**
+> 
+> Így ezzel ez a repo idejétmúltá válik, és elveszett az API, az url-ek, a pdf generálás, a gyors kereső, stb. Azért mert nem sikerült kellően frissen tartanunk közösségi erőből. :(
+
+> [!IMPORTANT]
+> Milyen funkciók frissítése hiányzott, ami miatt kellett az új?
+> - **import** - A komplex, cloud-ban található xlsx forrásfájlok egy gombnyomásos importálása. Így a sok-sok szöveghibát hiába javították ki az excelben, nem jelent meg az oldalon.
+> - **lábjegyezek és előszavak** - Ennek megvolt egy része, de aztán...
+> - **további fordítások** - Ez nem lett volna akkora trúváj ha az import megy
+> 
+> A szövegforrás fájlok struktúrálisan nem változtak nagyok. Így ezekhez "csak" frissíteni kellett volna az alapokat: vasat, php-t, laravelt. ...
+> 
+> (Sosem késő? - [regi.szentiras.hu](http://regi.szentiras.hu) )  
+
 A [szentiras.hu](http://szentiras.hu) teljes kódja.
 [![Build Status](https://travis-ci.org/borazslo/szentiras.hu.png)](https://travis-ci.org/borazslo/szentiras.hu)
 
