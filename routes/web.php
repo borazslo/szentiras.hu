@@ -34,10 +34,10 @@ Route::get('/pdf/preview', 'Display\PdfController@getPreview');
 Route::get('/pdf/ref', 'Display\PdfController@getRef');
 
 Route::get('/API', function () {
-    if (Input::get('feladat') === 'idezet') {
-        return Redirect::action('SzentirasHu\Http\Controllers\Api\ApiController@getIdezet', [Input::get('hivatkozas'), Input::get('forditas')], 301);
-    } else if (Input::get('feladat') === '') {
-        return Redirect::action('SzentirasHu\Http\Controllers\Api\ApiController@getForditasok', [Input::get('hivatkozas')], 301);
+    if (Request::get('feladat') === 'idezet') {
+        return Redirect::action('SzentirasHu\Http\Controllers\Api\ApiController@getIdezet', [Request::get('hivatkozas'), Request::get('forditas')], 301);
+    } else if (Request::get('feladat') === '') {
+        return Redirect::action('SzentirasHu\Http\Controllers\Api\ApiController@getForditasok', [Request::get('hivatkozas')], 301);
     }
     return Redirect::to('api');
 });

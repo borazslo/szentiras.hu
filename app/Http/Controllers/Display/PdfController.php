@@ -9,7 +9,7 @@ namespace SzentirasHu\Http\Controllers\Display;
 use App;
 use Config;
 use Illuminate\Http\Request;
-use Input;
+use Request;
 use Response;
 use Symfony\Component\Process\ProcessBuilder;
 use SzentirasHu\Http\Controllers\Controller;
@@ -56,7 +56,7 @@ class PdfController extends Controller {
 
     public function getPreview($translationId, $refString)
     {
-        $pdfFile = $this->generatePdf($translationId, $refString, Input::instance());
+        $pdfFile = $this->generatePdf($translationId, $refString, Request::instance());
         $pngFile = "{$pdfFile}.png";
         $processBuilder = new ProcessBuilder();
         $imageMagickCommand = Config::get('settings.imageMagickCommand');
@@ -87,7 +87,7 @@ class PdfController extends Controller {
     public function getRef($translationId, $refString)
     {
         $response = Response::download(
-            $this->generatePdf($translationId, $refString, Input::instance()),
+            $this->generatePdf($translationId, $refString, Request::instance()),
             "szentiras.hu-{$refString}.pdf",
             ['Content-Type' => 'application/pdf']);
         return $response;

@@ -3,7 +3,7 @@
 namespace SzentirasHu\Http\Controllers\Search;
 
 use App;
-use Input;
+use Request;
 use Redirect;
 use Response;
 use SzentirasHu\Http\Controllers\Controller;
@@ -67,7 +67,7 @@ class SearchController extends Controller
     public function anySuggest()
     {
         $result = [];
-        $term = Input::get('term');
+        $term = Request::get('term');
         $ref = $this->searchService->findTranslatedRef($term);
         if ($ref) {
             $result[] = [
@@ -85,7 +85,7 @@ class SearchController extends Controller
 
     public function anySearch()
     {
-        if (Input::get('textToSearch') == null) {
+        if (Request::get('textToSearch') == null) {
             return $this->getIndex();
         }
         $form = $this->prepareForm();
@@ -101,11 +101,11 @@ class SearchController extends Controller
     private function prepareForm()
     {
         $form = new SearchForm();
-        $form->textToSearch = Input::get('textToSearch');
-        $form->grouping = Input::get('grouping');
-        $form->book = Input::get('book');
-        if (Input::get('translation') > 0) {
-            $form->translation = $this->translationRepository->getById(Input::get('translation'));
+        $form->textToSearch = Request::get('textToSearch');
+        $form->grouping = Request::get('grouping');
+        $form->book = Request::get('book');
+        if (Request::get('translation') > 0) {
+            $form->translation = $this->translationRepository->getById(Request::get('translation'));
         }
         return $form;
     }
@@ -219,7 +219,7 @@ class SearchController extends Controller
      */
     public function postLegacy()
     {
-        $textToSearch = Input::get('texttosearch');
+        $textToSearch = Request::get('texttosearch');
         return Redirect::to("/kereses/search?textToSearch={$textToSearch}");
     }
 

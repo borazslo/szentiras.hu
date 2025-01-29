@@ -8,7 +8,6 @@ use SzentirasHu\Service\Search\FullTextSearchParams;
 use SzentirasHu\Service\Search\SearcherFactory;
 use SzentirasHu\Service\Search\SearchService;
 use URL;
-use Input;
 use Response;
 use SzentirasHu\Http\Controllers\Home\LectureSelector;
 use SzentirasHu\Service\Reference\CanonicalReference;
@@ -19,6 +18,7 @@ use SzentirasHu\Data\Entity\Verse;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use View;
+use Request;
 
 class ApiController extends Controller
 {
@@ -127,7 +127,7 @@ class ApiController extends Controller
             "valasz" => [
                 "versek" => $verseDataList
             ]
-        ])->setCallback(Input::get('callback'));
+        ])->setCallback(Request::input('callback'));
     }
 
     public function getLectures()
@@ -185,7 +185,7 @@ class ApiController extends Controller
         $flags = \Config::get('app.debug') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE : 0;
         return Response::json($data, 200, [
             'Content-Type' => 'application/json; charset=UTF-8'
-        ], $flags)->setCallback(Input::get('callback'));
+        ], $flags)->setCallback(Request::input('callback'));
     }
 
     /**
