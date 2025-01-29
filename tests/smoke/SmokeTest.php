@@ -39,40 +39,40 @@ class SmokeTest extends TestCase
         $this->artisan('migrate:refresh');
         $this->artisan('db:seed');
 
-        $this->visit('/')->assertResponseOk();
+        $this->get('/')->assertStatus(200);
 
     }
 
     public function testBasicTranslationPage()
     {
-        $this->visit('/TESTTRANS')->assertResponseOk();
+        $this->get('/TESTTRANS')->assertStatus(200);
     }
 
     public function testBasicApi()
     {
-        $this->visit('/api/idezet/Ter 2,3')->assertResponseOk();
+        $this->get('/api/idezet/Ter 2,3')->assertStatus(200);
     }
 
     public function testBasicApiTranslation()
     {
-        $this->visit('/api/forditasok/10100100200')->assertResponseOk();
+        $this->get('/api/forditasok/10100100200')->assertStatus(200);
     }
 
     public function testBasicSearch()
     {
-        $this->visit('/kereses/search?textToSearch=Ter&book=all&translation=0&grouping=chapter')->assertResponseOk();
+        $this->get('/kereses/search?textToSearch=Ter&book=all&translation=0&grouping=chapter')->assertStatus(200);
     }
 
     public function testBookWithExplicitTranslation() {
-        $this->visit('/TESTTRANS/Ter')->assertResponseOk();
+        $this->get('/TESTTRANS/Ter')->assertStatus(200);
     }
 
     public function testChapterWithExplicitTranslation() {
-        $this->visit('/TESTTRANS/Ter2')->assertResponseOk();
+        $this->get('/TESTTRANS/Ter2')->assertStatus(200);
     }
 
     public function testRefWithExplicitTranslation() {
-        $this->visit('/TESTTRANS/Ter2,3')->assertResponseOk();
+        $this->get('/TESTTRANS/Ter2,3')->assertStatus(200);
     }
 
 }

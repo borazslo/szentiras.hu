@@ -30,7 +30,7 @@ class ImagineServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		$this->app['imagine'] = $this->app->share(function($app)
+		$this->app['imagine'] = $this->app->singleton('Imagine', function()
 		{
 			return new Imagine();
 		});

@@ -16,18 +16,22 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', 'Home\HomeController@index');
 
 Route::get("/kereses", 'Search\SearchController@getIndex');
-Route::post("/kereses", 'Search\SearchController@postLegacy');
+Route::get("/kereses/search", 'Search\SearchController@anySearch');
+Route::post("/kereses/search", 'Search\SearchController@anySearch');
+Route::get("/kereses/suggest", 'Search\SearchController@anySuggest');
+Route::post("/kereses/suggest", 'Search\SearchController@anySuggest');
+Route::post("/kereses/legacy", 'Search\SearchController@postLegacy');
 
 Route::post('/searchbible.php', 'SzentirasHu\Http\Controllers\Search\SearchController@postLegacy');
 
 /** API */
 Route::get("/api", 'Api\ApiController@getIndex');
-Route::get("/api/idezet", 'Api\ApiController@getIdezet');
-Route::get("/api/forditasok", 'Api\ApiController@getForditasok');
+Route::get("/api/idezet/{refString}/{translationAbbrev?}", 'Api\ApiController@getIdezet');
+Route::get("/api/forditasok/{gepi}", 'Api\ApiController@getForditasok');
 Route::get("/api/lectures", 'Api\ApiController@getLectures');
-Route::get("/api/books", 'Api\ApiController@getBooks');
-Route::get("/api/ref", 'Api\ApiController@getRef');
-Route::get("/api/search", 'Api\ApiController@getSearch');
+Route::get("/api/books/{translationAbbrev?}", 'Api\ApiController@getBooks');
+Route::get("/api/ref/{ref}/{translationAbbrev?}", 'Api\ApiController@getRef');
+Route::get("/api/search/{text}", 'Api\ApiController@getSearch');
 
 Route::get('/info', 'Home\InfoController@getIndex');
 
