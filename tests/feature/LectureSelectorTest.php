@@ -14,7 +14,8 @@ class LectureSelectorTest extends TestCase {
     private $downloader;
     private $textService;
 
-    public function setUp() {
+    public function setUp() : void 
+    {
         parent::setUp();
         $this->downloader = Mockery::mock(LectureDownloader::class);
         $this->app->instance(LectureDownloader::class, $this->downloader);

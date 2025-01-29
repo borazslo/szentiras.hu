@@ -279,7 +279,7 @@ class UpdateTextsCommand extends Command
                         }
                     } else {
                         $cachedStems = $stems->unique();
-                        Cache::put("hunspell_{$word}", $cachedStems, 60*24);
+                        Cache::put("hunspell_{$word}", $cachedStems, 60*60*24);
                         $verseroots = $verseroots->merge($stems);
                         $this->newStems++;
                         break;

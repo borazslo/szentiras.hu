@@ -10,7 +10,7 @@ use SzentirasHu\Test\Common\TestCase;
 
 class SmokeTest extends TestCase
 {
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
