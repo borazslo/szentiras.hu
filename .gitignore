@@ -17,3 +17,4 @@ Homestead.yaml
 Vagrantfile
 .phpstorm.meta.php
 PROVISIONED
+.phpunit.result.cache
