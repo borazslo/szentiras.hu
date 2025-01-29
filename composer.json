@@ -5,45 +5,55 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "7.1.*",
-        "laravel/framework": "5.5.*",
-        "predis/predis": "^1.0",
-        "rcrowe/twigbridge": "0.9.x",
-        "twig/extensions": "^1.3",
-        "gigablah/sphinxphp": "^2.0",
+        "barryvdh/laravel-debugbar": "3.4.2",
         "barryvdh/laravel-ide-helper": "^2.1",
+        "box/spout": "~2.0",
         "doctrine/dbal": "^2.5",
         "endroid/qrcode": "1.2.4",
+        "fideloper/proxy": "^4.0",
+        "gigablah/sphinxphp": "^2.0",
+        "google/apiclient": "1.0.*@beta",
         "imagine/imagine": "~0.5.0",
-        "box/spout": "~2.0",
+        "laravel/framework": "5.6.*",
+        "laravel/tinker": "^1.0",
+        "php": "7.1.*",
         "phpoffice/phpexcel": "1.*",
-        "barryvdh/laravel-debugbar": "^2.0",
-        "google/apiclient": "1.0.*@beta",        
-        "laravel/tinker": "^1.0"
+        "predis/predis": "^1.0",
+        "rcrowe/twigbridge": "0.9.x",
+        "twig/extensions": "^1.3"
     },
     "require-dev": {
         "filp/whoops": "~2.0",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "~6.0",
-        "phpspec/phpspec": "~2.1",
+        "phpunit/phpunit": "^7.0",
         "symfony/dom-crawler": "3.1.*",
         "symfony/css-selector": "3.1.*"
     },
     "autoload": {
         "classmap": [
-            "database"
+            "database/seeds",
+            "database/factories"
         ],
         "psr-4": {
-            "SzentirasHu\\": "app/",
-            "SzentirasHu\\Test\\": "tests/feature",
-            "SzentirasHu\\Test\\Smoke\\": "tests/smoke",
-            "SzentirasHu\\Test\\Common\\": "tests/common"
+            "SzentirasHu\\": "app/"
         }
     },
     "autoload-dev": {
         "classmap": [
-        ]
+        ],
+        "psr-4": {
+            "SzentirasHu\\Test\\": "tests/feature",
+            "SzentirasHu\\Test\\Smoke\\": "tests/smoke",
+            "SzentirasHu\\Test\\Common\\": "tests/common"
+        }
+
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": [
+            ]
+        }
     },
     "scripts": {
         "post-install-cmd": [
@@ -67,6 +77,13 @@
     },
     "config": {
         "preferred-install": "dist",
-        "optimize-autoloader": true
-    }
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "kylekatarnls/update-helper": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+
 }
