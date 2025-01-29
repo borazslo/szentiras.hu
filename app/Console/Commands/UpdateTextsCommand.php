@@ -129,8 +129,8 @@ class UpdateTextsCommand extends Command
         $linesRead = 0;
         foreach ($bookRowIterator as $row) {
             // skip first line
-            if ($linesRead == 0) {
-                $this->info("Első sor átugrása...");
+            if ($linesRead == 0 or $linesRead == 1) {
+                $this->info("Első két sor átugrása...");
                 $linesRead++;
                 continue;
             } else {
@@ -143,6 +143,7 @@ class UpdateTextsCommand extends Command
             }
             $bookAbbrev2Id = $this->getAbbrev2Id($translation);
             $bookNumber = $row[$columns[$abbrev]['gepi']];
+            $this->info("Könyv: $bookNumber");
             $rov = $row[$columns[$abbrev]['rov']];
             if (!isset($bookAbbrev2Id[$rov]) AND ($rov != '-' AND $rov != '')) {
                 $book = $this->bookRepository->getByAbbrev($rov, $translation);
