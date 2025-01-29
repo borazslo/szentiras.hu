@@ -69,7 +69,7 @@ class UpdateTextsCommand extends Command
      *
      * @return mixed
      */
-    public function fire()
+    public function handle()
     {
         if (!$this->option('nohunspell')) {
             $this->testHunspell();

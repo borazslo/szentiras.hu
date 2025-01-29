@@ -26,12 +26,6 @@ Route::post('/searchbible.php', 'SzentirasHu\Http\Controllers\Search\SearchContr
 
 /** API */
 Route::get("/api", 'Api\ApiController@getIndex');
-Route::get("/api/idezet/{refString}/{translationAbbrev?}", 'Api\ApiController@getIdezet');
-Route::get("/api/forditasok/{gepi}", 'Api\ApiController@getForditasok');
-Route::get("/api/lectures", 'Api\ApiController@getLectures');
-Route::get("/api/books/{translationAbbrev?}", 'Api\ApiController@getBooks');
-Route::get("/api/ref/{ref}/{translationAbbrev?}", 'Api\ApiController@getRef');
-Route::get("/api/search/{text}", 'Api\ApiController@getSearch');
 
 Route::get('/info', 'Home\InfoController@getIndex');
 

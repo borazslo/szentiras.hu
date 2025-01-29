@@ -152,7 +152,7 @@ return [
         SzentirasHu\Providers\RepositoriesProvider::class,
         SzentirasHu\Providers\SphinxSearchServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
-        Barryvdh\Cors\ServiceProvider::class,
+        # TODO: Put back CORS provider later
         'TwigBridge\ServiceProvider',
         SzentirasHu\Providers\ViewComposerServiceProvider::class,
         \SzentirasHu\Service\Imagine\ImagineServiceProvider::class

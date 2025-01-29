@@ -40,6 +40,7 @@ class Kernel extends HttpKernel
         'auth' => \SzentirasHu\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'guest' => \SzentirasHu\Http\Middleware\RedirectIfAuthenticated::class,
-        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class
+        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class
     ];
 }

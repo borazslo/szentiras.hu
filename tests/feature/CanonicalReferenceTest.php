@@ -180,7 +180,7 @@ class CanonicalReferenceTest extends TestCase
         $this->assertEquals('Mk 1,1', CanonicalReference::fromString('Mk. 1,1')->toString());
         $this->assertEquals('Mk 1,1', CanonicalReference::fromString('Mk, 1,1')->toString());
 
-        $this->setExpectedException('\SzentirasHu\Service\Reference\ParsingException');
+        $this->expectException(\SzentirasHu\Service\Reference\ParsingException::class);
         CanonicalReference::fromString("1,2");
 
     }
