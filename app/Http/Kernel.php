@@ -6,6 +6,17 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
 {
+
+    protected $middlewareGroups = [
+        'api' => [
+            'throttle:60,1',
+            'bindings',
+        ],
+        'web' => [
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]
+    ];
+
     /**
      * The application's global HTTP middleware stack.
      *
@@ -29,5 +40,6 @@ class Kernel extends HttpKernel
         'auth' => \SzentirasHu\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'guest' => \SzentirasHu\Http\Middleware\RedirectIfAuthenticated::class,
+        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class
     ];
 }

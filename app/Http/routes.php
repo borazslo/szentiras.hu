@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -13,16 +15,25 @@
 
 Route::get('/', 'Home\HomeController@index');
 
-Route::controller("/kereses", 'Search\SearchController');
+Route::get("/kereses", 'Search\SearchController@getIndex');
+Route::post("/kereses", 'Search\SearchController@postLegacy');
 
 Route::post('/searchbible.php', 'SzentirasHu\Http\Controllers\Search\SearchController@postLegacy');
 
 /** API */
-Route::controller("/api", 'Api\ApiController');
+Route::get("/api", 'Api\ApiController@getIndex');
+Route::get("/api/idezet", 'Api\ApiController@getIdezet');
+Route::get("/api/forditasok", 'Api\ApiController@getForditasok');
+Route::get("/api/lectures", 'Api\ApiController@getLectures');
+Route::get("/api/books", 'Api\ApiController@getBooks');
+Route::get("/api/ref", 'Api\ApiController@getRef');
+Route::get("/api/search", 'Api\ApiController@getSearch');
 
-Route::controller('/info', 'Home\InfoController');
+Route::get('/info', 'Home\InfoController@getIndex');
 
-Route::controller('/pdf', 'Display\PdfController');
+Route::get('/pdf/dialog', 'Display\PdfController@getDialog');
+Route::get('/pdf/preview', 'Display\PdfController@getPreview');
+Route::get('/pdf/ref', 'Display\PdfController@getRef');
 
 Route::get('/API', function () {
     if (Input::get('feladat') === 'idezet') {
