@@ -67,7 +67,7 @@ class ApiController extends Controller
         $this->bookRepository = $bookRepository;
         $this->referenceService = $referenceService;
         $this->searchService = $searchService;
-        # TODO: Fix this later, $this->middleware('cors');
+        $this->middleware('cors');
     }
 
     public function getIndex()

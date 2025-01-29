@@ -207,6 +207,7 @@ class UpdateTextsCommand extends Command
         } catch (ProcessFailedException $e) {
             echo $e->getMessage();
         }
+        return 0;
     }
 
     /**
