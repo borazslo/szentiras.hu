@@ -44,7 +44,7 @@ docker exec -it szentiras-dev /bin/bash
 
 To connect to the database setting the right character encoding:
 ```
-mysql -u bible -p
+mysql -u homestead -p
 # password: secret
 SET character_set_client = 'utf8mb4';
 SET character_set_connection = 'utf8mb4';
