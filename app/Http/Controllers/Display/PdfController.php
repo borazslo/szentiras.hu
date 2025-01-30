@@ -8,8 +8,10 @@ namespace SzentirasHu\Http\Controllers\Display;
 
 use App;
 use Config;
+use Illuminate\Http\Request as HttpRequest;
 use Request;
 use Response;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use SzentirasHu\Http\Controllers\Controller;
 use SzentirasHu\Data\Repository\TranslationRepository;
@@ -23,7 +25,7 @@ class PdfOptions {
     public $nums = false;
     public $quantity = 1;
 
-    public function __construct(Request $request) {
+    public function __construct(HttpRequest $request) {
         $this->headings = $request->input('headings', 'true') == 'true';
         $this->nums = $request->input('nums', 'false') == 'true';
         $this->refs = $request->input('refs', 'false') == 'true';
@@ -57,19 +59,19 @@ class PdfController extends Controller {
     {
         $pdfFile = $this->generatePdf($translationId, $refString, Request::instance());
         $pngFile = "{$pdfFile}.png";
-        $processBuilder = new ProcessBuilder();
         $imageMagickCommand = Config::get('settings.imageMagickCommand');
+        $command = [];
         if (is_array($imageMagickCommand)) {
             foreach ($imageMagickCommand as $arg) {
-                $processBuilder->add($arg);
-            }
+                $command[] = $arg;            }
         } else {
-            $processBuilder->add($imageMagickCommand);
+            $command[] = $imageMagickCommand;
         }
         foreach (['-density','300', '-resize','24%', '-trim', $pdfFile, $pngFile ] as $arg) {
-            $processBuilder->add($arg);
+            $command[] = $arg;        
         }
-        $processBuilder->getProcess()->run();
+        $process = new Process($command);
+        $process->run();
         if (!file_exists($pngFile)) {
             $pngFile = "$pdfFile-0.png";
             if (!file_exists($pngFile)) {
@@ -103,9 +105,16 @@ class PdfController extends Controller {
         $tmpFileName = tempnam($workingDir, 'szentiras-pdf-');
         $tmpFile = fopen($tmpFileName, 'w+');
         fwrite($tmpFile, $content);
-        $builder = new ProcessBuilder(['xelatex', '-interaction=batchmode', '-no-shell-escape', "-output-directory={$workingDir}", $tmpFileName]);
-        $builder->setWorkingDirectory($workingDir);
-        $process = $builder->getProcess();
+        $command = [
+            'xelatex',
+            '-interaction=batchmode',
+            '-no-shell-escape',
+            "-output-directory={$workingDir}",
+            $tmpFileName
+        ];
+        
+        $process = new Process($command);
+        $process->setWorkingDirectory($workingDir);
         $process->setEnv(['PATH' => '/usr/bin']);
         $process->mustRun();
         fclose($tmpFile);

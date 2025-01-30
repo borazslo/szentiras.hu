@@ -10,7 +10,15 @@ WORKDIR /app
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
 RUN apt update
+
+RUN apt install -y locales && \
+    locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8
 
 RUN apt install -y vim curl make g++
 RUN apt install -y python2
@@ -33,10 +41,12 @@ RUN apt install -y php8.2-xml php8.2-zip php8.2-gd php8.2-mbstring php8.2-mysql 
 RUN apt install -y hunspell hunspell-hu
 
 RUN apt install -y sphinxsearch
+
+RUN apt install -y graphicsmagick
+
 RUN apt install -y texlive
 RUN apt install -y texlive-xetex
-RUN apt install -y texlive-latex-extra
-RUN apt install -y texlive-lang-hungarian
+RUN apt install -y texlive-lang-european
 RUN apt install -y fonts-linuxlibertine
 
 COPY /app/deploy/local/sphinx/sphinx.conf /etc/sphinxsearch
