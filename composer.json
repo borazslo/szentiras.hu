@@ -64,6 +64,8 @@
             "php artisan clear-compiled"
         ],
         "post-update-cmd": [
+            "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:models --nowrite"
         ],
         "post-root-package-install": [
             "php -r \"copy('.env.example', '.env');\""

@@ -2,7 +2,7 @@
 
 namespace SzentirasHu\Data\Repository;
 
-
+use Illuminate\Support\Collection;
 use SzentirasHu\Data\Entity\Book;
 use SzentirasHu\Data\Entity\Translation;
 
@@ -13,10 +13,8 @@ interface TranslationRepository {
      */
     public function getAll();
 
-    /**
-     * @return Translation[]
-     */
-    public function getAllOrderedByDenom();
+
+    public function getAllOrderedByDenom() : Collection;
 
     /**
      * @param bool $denom

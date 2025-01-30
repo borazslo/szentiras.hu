@@ -5,6 +5,7 @@
 
 namespace SzentirasHu\Data\Repository;
 
+use Illuminate\Support\Collection;
 use SzentirasHu\Data\Entity\Translation;
 
 class TranslationRepositoryEloquent implements TranslationRepository
@@ -26,7 +27,7 @@ class TranslationRepositoryEloquent implements TranslationRepository
     }
 
 
-    public function getAllOrderedByDenom()
+    public function getAllOrderedByDenom() : Collection
     {
         $allTranslations = \Cache::remember(
             'translations_allOrderedByDenom', 120, function () {

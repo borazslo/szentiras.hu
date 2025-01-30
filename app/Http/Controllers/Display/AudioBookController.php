@@ -7,9 +7,10 @@ use Config;
 use Exception;
 use Log;
 use Response;
+use SzentirasHu\Http\Controllers\Controller;
 use View;
 
-class AudioBookController extends \BaseController
+class AudioBookController extends Controller
 {
 
     public function index()

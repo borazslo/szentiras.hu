@@ -8,7 +8,6 @@ namespace SzentirasHu\Http\Controllers\Display;
 
 use App;
 use Config;
-use Illuminate\Http\Request;
 use Request;
 use Response;
 use Symfony\Component\Process\ProcessBuilder;
