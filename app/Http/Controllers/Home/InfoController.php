@@ -21,4 +21,8 @@ class InfoController extends Controller
         ]);
     }
 
+    public function getReview2025() {
+        return \View::make("review2025");
+    }
+
 }
