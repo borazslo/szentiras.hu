@@ -127,8 +127,9 @@ class TextDisplayController extends Controller
                     )
             ]);
         } catch (ParsingException $e) {
-            // as this doesn't look like a valid reference, interpret as full text search
-            return $this->fallbackSearch($translationAbbrev ? $translation : null, $reference);
+            // as this doesn't look like a valid reference
+            abort(404);
+
         }
     }
 
@@ -231,7 +232,7 @@ class TextDisplayController extends Controller
             ]);
 
         } else {
-            return $this->fallbackSearch($translationAbbrev ? $translation : null, $canonicalRef->toString());
+            abort(404);
         }
 
     }
