@@ -9,17 +9,17 @@
         "barryvdh/laravel-debugbar": "^3.7",
         "barryvdh/laravel-ide-helper": "^2.1",
         "box/spout": "~2.0",
-        "doctrine/dbal": "^2.5",
+        "doctrine/dbal": "^3.0",
         "endroid/qrcode": "1.2.4",
-        "fideloper/proxy": "^4.0",
-        "fruitcake/laravel-cors": "^2.0",
         "gigablah/sphinxphp": "^2.0",
         "google/apiclient": "1.0.*@beta",
         "guzzlehttp/guzzle": "^7.0.1",
         "imagine/imagine": "~0.5.0",
-        "laravel/framework": "^9.0",
+        "laravel/framework": "^10.0",
+        "laravel/sanctum": "^3.2",
         "laravel/helpers": "^1.7",
         "laravel/tinker": "^2.5",
+        
         "phpoffice/phpexcel": "1.*",
         "predis/predis": "^1.0",
         "rcrowe/twigbridge": "0.14.3",
@@ -27,11 +27,11 @@
         "twig/extra-bundle": "^3.19"
     },
     "require-dev": {
-        "spatie/laravel-ignition": "^1.0",
+        "spatie/laravel-ignition": "^2.0",
         "fakerphp/faker": "^1.9.1",
         "mockery/mockery": "^1.3.1",
-        "nunomaduro/collision": "^6.1",
-        "phpunit/phpunit": "^9.5.10"
+        "nunomaduro/collision": "^7.0",
+        "phpunit/phpunit": "^10.0"
     },
     "autoload": {
         "psr-4": {
@@ -86,7 +86,6 @@
             "kylekatarnls/update-helper": true
         }
     },
-    "minimum-stability": "dev",
     "prefer-stable": true
 
 }

@@ -19,3 +19,4 @@ Vagrantfile
 .phpstorm.meta.php
 PROVISIONED
 .phpunit.result.cache
+*.bak

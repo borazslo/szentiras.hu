@@ -29,7 +29,7 @@ class Kernel extends HttpKernel
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \SzentirasHu\Http\Middleware\VerifyCsrfToken::class,
-        \Fruitcake\Cors\HandleCors::class
+        \Illuminate\Http\Middleware\HandleCors::class
     ];
 
     /**
@@ -37,12 +37,12 @@ class Kernel extends HttpKernel
      *
      * @var array
      */
-    protected $routeMiddleware = [
+    protected $middlewareAliases = [
         'auth' => \SzentirasHu\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'guest' => \SzentirasHu\Http\Middleware\RedirectIfAuthenticated::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'cors' => \Fruitcake\Cors\HandleCors::class
+        'cors' => \Illuminate\Http\Middleware\HandleCors::class
     ];
 }
