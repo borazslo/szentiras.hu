@@ -11,6 +11,7 @@ return [
      | to accept any value.
      |
      */
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
     'supportsCredentials' => false,
     'allowedOrigins' => ['*'],
     'allowedHeaders' => ['*'],

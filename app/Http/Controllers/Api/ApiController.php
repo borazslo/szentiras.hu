@@ -180,6 +180,15 @@ class ApiController extends Controller
         return $this->formatJsonResponse(["refResult" => $refResult, "fullTextResult" => $results]);
     }
 
+    public function getLegacyApiEndpoint() {
+        if (Request::get('feladat') === 'idezet') {
+            return Redirect::action('SzentirasHu\Http\Controllers\Api\ApiController@getIdezet', [Request::get('hivatkozas'), Request::get('forditas')], 301);
+        } else if (Request::get('feladat') === '') {
+            return Redirect::action('SzentirasHu\Http\Controllers\Api\ApiController@getForditasok', [Request::get('hivatkozas')], 301);
+        }
+        return Redirect::to('api');
+    }
+
     private function formatJsonResponse($data)
     {
         $flags = \Config::get('app.debug') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE : 0;
