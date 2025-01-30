@@ -59,16 +59,18 @@ class DefaultVerseParser extends AbstractVerseParser
 
     protected function parsePoemLine($rawVerse, VerseData $verse) {
         $poemLine = $this->replaceTags($rawVerse->verse);
-        if($verse->poemLines[0] != '') {
-            if (strlen($poemLine) > 1) { // don't add line breaks to one character lines.
-                $verse->poemLines[0] .= "<br>"; 
+        if ($verse != null && $poemLine !== null && $verse->poemLines !== null) {
+            if($verse->poemLines[0] != '') {
+                if (strlen($poemLine) > 1) { // don't add line breaks to one character lines.
+                    $verse->poemLines[0] .= "<br>"; 
+                }
+                $verse->poemLines[0] .= $poemLine;
             }
-            $verse->poemLines[0] .= $poemLine;
+            else
+                $verse->poemLines[0] = $poemLine;
+            
+            $verse->elements[] = $poemLine;
         }
-        else
-            $verse->poemLines[0] = $poemLine;
-        
-        $verse->elements[] = $poemLine;
     }
 
     protected function replaceTags($rawVerse) {

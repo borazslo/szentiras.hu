@@ -17,7 +17,7 @@ RUN apt install -y python2
 RUN apt install -y software-properties-common && \
     add-apt-repository -y ppa:ondrej/php && \
     add-apt-repository -y ppa:ondrej/nginx-mainline && \
-    apt install -y mysql-server php7.3
+    apt install -y mysql-server php8.0
 
 RUN apt install -y curl && \
     curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh -o install_nvm.sh && \
@@ -28,7 +28,7 @@ RUN apt install -y curl && \
     command -v nvm && \
     bash -c "source $NVM_DIR/nvm.sh && nvm install v6.2.2"
 
-RUN apt install -y php7.3-xml php7.3-zip php7.3-gd php7.3-mbstring php7.3-mysql php7.3-curl
+RUN apt install -y php8.0-xml php8.0-zip php8.0-gd php8.0-mbstring php8.0-mysql php8.0-curl
 
 RUN apt install -y hunspell hunspell-hu
 
