@@ -4,6 +4,7 @@ cp /app/.env.example /app/.env
 
 echo '[mysqld]' > /etc/mysql/conf.d/szentiras-hu.cnf
 echo 'default_authentication_plugin=mysql_native_password' >> /etc/mysql/conf.d/szentiras-hu.cnf
+echo 'query_cache_type=1' | tee --append /etc/mysql/conf.d/szentiras-hu.cnf
 
 service mysql start
 
@@ -27,3 +28,5 @@ php artisan route:clear
 php artisan cache:clear
 php artisan twig:clean
 
+indexer --all
+service sphinxsearch start

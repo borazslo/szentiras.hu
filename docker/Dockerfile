@@ -32,4 +32,14 @@ RUN apt install -y php8.2-xml php8.2-zip php8.2-gd php8.2-mbstring php8.2-mysql 
 
 RUN apt install -y hunspell hunspell-hu
 
+RUN apt install -y sphinxsearch
+RUN apt install -y texlive
+RUN apt install -y texlive-xetex
+RUN apt install -y texlive-latex-extra
+RUN apt install -y texlive-lang-hungarian
+RUN apt install -y fonts-linuxlibertine
+
+COPY /app/deploy/local/sphinx/sphinx.conf /etc/sphinxsearch
+RUN sed -i 's/^START=no/START=yes/' /etc/default/sphinxsearch
+
 CMD ["bash"]
