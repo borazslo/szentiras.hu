@@ -3,22 +3,24 @@ Szentírás .hu
 
 > [!WARNING]
 > **2025 januárjában átvette ennek a kódnak a helyét a [szentiras.hu](http://szentiras.hu) oldalon egy új (zárt) kód!**
-> 
-> Így ezzel ez a repo idejétmúltá válik, és elveszett az API, az url-ek, a pdf generálás, a gyors kereső, stb. Azért mert nem sikerült kellően frissen tartanunk közösségi erőből. :(
+> Az új helyen elveszett az API, az url-ek, a pdf generálás, a gyors kereső, stb., és koncepcionális változások is történtek.
+> Így jelenleg (és valószínűleg a jövőben) ez a repo más irányt vesz.
+> A változás oka részben az, hogy ennek a site-nak a rendszeres karbantartása és frissítése nem volt jól megoldott.
 
 > [!IMPORTANT]
-> Milyen funkciók frissítése hiányzott, ami miatt kellett az új?
-> - **import** - A komplex, cloud-ban található xlsx forrásfájlok egy gombnyomásos importálása. Így a sok-sok szöveghibát hiába javították ki az excelben, nem jelent meg az oldalon.
-> - **lábjegyezek és előszavak** - Ennek megvolt egy része, de aztán...
-> - **további fordítások** - Ez nem lett volna akkora trúváj ha az import megy
+> Milyen funkciók frissítése hiányzik nálunk, ami az új site-on viszont megvalósult?
+> - **import** - A komplex, cloud-ban található forrásfájlok egy gombnyomásos importálása. Így sok-sok szöveghibát hiába javították ki az excelben, nem jelent meg az oldalon. Az új site szövegforrása egy speciális XML formátum.
+> - **lábjegyzetek és előszavak** - Ennek megvolt egy része, de ez szorosan összefügg az előző ponttal.
+> - **további fordítások** - Ez szintén az első ponton múlik.
+> - **Frissített szerver** - Az új site frissített szerveren fut.
+> Más funkciója az új site-nak jelenleg nincs.
 > 
-> A szövegforrás fájlok struktúrálisan nem változtak nagyok. Így ezekhez "csak" frissíteni kellett volna az alapokat: vasat, php-t, laravelt. ...
-> 
-> (Sosem késő? - [regi.szentiras.hu](http://regi.szentiras.hu) )  
+> A régi oldalt életben tartjuk a [regi.szentiras.hu](http://regi.szentiras.hu) címen, de ha sikerül új szervert találnunk és a megfelelő szövegfelhasználási engedélyeket megszereznünk, akkor ismét önállóan létezni fog az oldal, az eredeti koncepció szerint.
 
-A [szentiras.hu](http://szentiras.hu) teljes kódja.
-[![Build Status](https://travis-ci.org/borazslo/szentiras.hu.png)](https://travis-ci.org/borazslo/szentiras.hu)
+A [szentiras.hu](http://szentiras.hu) 2025 előtti változatának teljes kódja.
 
+------
+Az alábbi információk elavultak.
 
 ## Felépítés
 
