@@ -32,6 +32,10 @@
                 </p>
             </div> #}
     {% endif %}
+    <div class="translationButtons">
+        {% include 'textDisplay.translationButtons' with { 'translations': translations, 'translation': translation, 'link': book.abbrev } %}
+    </div>
+
     {% for verseContainer in verseContainers %}
         <div>
             {% include 'textDisplay.breadcrumb' with {'book': verseContainer.book, 'bookRef': verseContainer.bookRef } %}

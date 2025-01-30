@@ -104,9 +104,11 @@ class TextService
         $teaser = "";
         foreach ($verseContainers as $verseContainer) {
             $parsedVerses = $verseContainer->getParsedVerses();
-            $teaser .= preg_replace('/<\/?[^>]+>/', ' ', $parsedVerses[0]->getText());
-            if ($verseContainer != last($verseContainers) || count($parsedVerses) > 1) {
-                $teaser .= ' ... ';
+            if (sizeof($parsedVerses) > 0) {
+                $teaser .= preg_replace('/<\/?[^>]+>/', ' ', $parsedVerses[0]->getText());
+                if ($verseContainer != last($verseContainers) || count($parsedVerses) > 1) {
+                    $teaser .= ' ... ';
+                }
             }
         }
         return $teaser;
