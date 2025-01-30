@@ -38,7 +38,7 @@ return [
             // When set to true, the generated templates have a __toString() method
             // that you can use to display the generated nodes.
             // default: false
-            'debug' => config('app.debug', false),
+            'debug' => env('APP_DEBUG', false),
 
             // The charset used by the templates.
             // default: utf-8
@@ -75,6 +75,19 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Safe Classes
+        |--------------------------------------------------------------------------
+        |
+        | When set, the output of the `__string` method of the following classes will not be escaped.
+        | default: Laravel's Htmlable, which the HtmlString class implements.
+        |
+        */
+        'safe_classes' => [
+            \Illuminate\Contracts\Support\Htmlable::class => ['html'],
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Global variables
         |--------------------------------------------------------------------------
         |
@@ -84,9 +97,9 @@ return [
         */
         'globals' => [],
     ],
-    
+
     'extensions' => [
-    
+
         /*
         |--------------------------------------------------------------------------
         | Extensions
@@ -94,7 +107,7 @@ return [
         |
         | Enabled extensions.
         |
-        | `Twig_Extension_Debug` is enabled automatically if twig.debug is TRUE.
+        | `Twig\Extension\DebugExtension` is enabled automatically if twig.debug is TRUE.
         |
         */
         'enabled' => [
@@ -110,7 +123,9 @@ return [
             'TwigBridge\Extension\Laravel\Str',
             'TwigBridge\Extension\Laravel\Translator',
             'TwigBridge\Extension\Laravel\Url',
-            
+            'TwigBridge\Extension\Laravel\Model',
+            // 'TwigBridge\Extension\Laravel\Gate',
+
             // 'TwigBridge\Extension\Laravel\Form',
             // 'TwigBridge\Extension\Laravel\Html',
             // 'TwigBridge\Extension\Laravel\Legacy\Facades',
@@ -153,7 +168,7 @@ return [
         | Available functions. Access like `{{ secure_url(...) }}`.
         |
         | Each function can take an optional array of options. These options are
-        | passed directly to `Twig_SimpleFunction`.
+        | passed directly to `Twig\TwigFunction`.
         |
         | So for example, to mark a function as safe you can do the following:
         |
@@ -175,8 +190,9 @@ return [
         */
         'functions' => [
             'elixir',
-            'head', 
+            'head',
             'last',
+            'mix',
         ],
 
         /*
@@ -187,7 +203,7 @@ return [
         | Available filters. Access like `{{ variable|filter }}`.
         |
         | Each filter can take an optional array of options. These options are
-        | passed directly to `Twig_SimpleFilter`.
+        | passed directly to `Twig\TwigFilter`.
         |
         | So for example, to mark a filter as safe you can do the following:
         |
@@ -207,6 +223,8 @@ return [
         | </code>
         |
         */
-        'filters' => [],
-    ],  
+        'filters' => [
+            'get' => 'data_get',
+        ],
+    ],
 ];

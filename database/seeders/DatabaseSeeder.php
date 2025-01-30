@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,9 +17,12 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call('BookTableSeeder');
-        $this->call('ArticlesTableSeeder');
-        $this->call('VersesTableSeeder');
+        $this->call([
+            ArticlesTableSeeder::class,
+            BookTableSeeder::class,
+            VersesTableSeeder::class,
+        ]);
+    
 
         Model::reguard();
     }

@@ -8,11 +8,21 @@ use SzentirasHu\Service\Search\SearcherFactory;
 use SzentirasHu\Service\Text\TextService;
 use SzentirasHu\Test\Common\TestCase;
 
+/* To run the app in this environment, you can use:
+TRANSLATION_ABBREV_REGEX='TESTTRANS\d*' php artisan route:cache && DB_PREFIX=testing_ DEFAULT_TRANSLATION_ID=1 DEFAULT_TRANSLATION_ABBREV=TESTTRANS php artisan serve --port 1024 --env=testing
+*/
 class SmokeTest extends TestCase
 {
     public function setUp() : void
     {
         parent::setUp();
+
+        /* Clean up caches, to not be affected by runtime */
+
+        \Artisan::call('route:clear');
+        \Artisan::call('config:clear');
+        \Artisan::call('view:clear');
+        \Artisan::call('cache:clear');
 
         $downloader = Mockery::mock(LectureDownloader::class);
         $this->app->instance(LectureDownloader::class, $downloader);

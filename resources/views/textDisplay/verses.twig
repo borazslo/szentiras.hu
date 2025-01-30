@@ -40,9 +40,9 @@
             <p>
              {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
             </p>
-            <p>
+            <div class="translationButtons">
                 {% include 'textDisplay.translationButtons' with { 'translations' : translations, 'translation': translation, 'translationLinks' : translationLinks } %}
-            </p>
+            </div>
             <div>
                 {% for verse in verseContainer.parsedVerses %}
                     {% if verse.footnotes is not empty %}

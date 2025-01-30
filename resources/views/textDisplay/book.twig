@@ -8,9 +8,9 @@
 
     {% include 'textDisplay.breadcrumb' %}
 
-    <p>
+    <div class="translationButtons">
         {% include 'textDisplay.translationButtons' with { 'translations': translations, 'translation': translation, 'link': book.abbrev } %}
-    </p>
+    </div>
    
     {% for chapterId, chapter in chapters %}
         <h4><a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapterId }}">{{ chapterId }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}</a></h4>

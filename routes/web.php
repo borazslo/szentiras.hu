@@ -64,5 +64,5 @@ Route::get('/{TRANSLATION_ABBREV}/{REFERENCE}', 'Display\\TextDisplayController@
         'REFERENCE' => '[^/]+']);
 
 Route::get('/{REFERENCE}', 'Display\\TextDisplayController@showReferenceText')
-    ->where('REFERENCE', '[^/]+');
+     ->where('REFERENCE', '[^/]+');
 

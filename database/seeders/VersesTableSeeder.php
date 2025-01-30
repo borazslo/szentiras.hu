@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use SzentirasHu\Data\Entity\Verse;
 
 class VersesTableSeeder extends \Illuminate\Database\Seeder
