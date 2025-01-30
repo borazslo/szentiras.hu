@@ -20,3 +20,4 @@ Vagrantfile
 PROVISIONED
 .phpunit.result.cache
 *.bak
+.phpunit.cache

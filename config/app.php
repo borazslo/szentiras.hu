@@ -129,17 +129,14 @@ return [
         /*
          * Application Service Providers...
          */
-        Barryvdh\Debugbar\ServiceProvider::class,
         SzentirasHu\Providers\AppServiceProvider::class,
         SzentirasHu\Providers\AuthServiceProvider::class,
         SzentirasHu\Providers\EventServiceProvider::class,
         SzentirasHu\Providers\RouteServiceProvider::class,
         SzentirasHu\Providers\RepositoriesProvider::class,
         SzentirasHu\Providers\SphinxSearchServiceProvider::class,
-        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         SzentirasHu\Providers\ViewComposerServiceProvider::class,
-        SzentirasHu\Service\Imagine\ImagineServiceProvider::class,
-        TwigBridge\ServiceProvider::class,
+        SzentirasHu\Service\Imagine\ImagineServiceProvider::class
 
     ],
 
