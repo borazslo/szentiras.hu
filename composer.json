@@ -23,7 +23,7 @@
         "phpoffice/phpexcel": "1.*",
         "predis/predis": "^1.0",
         "rcrowe/twigbridge": "0.14.1",
-        "twig/twig": "3.8.0",
+        "twig/twig": "3.11.2",
         "twig/extra-bundle": "^3.19"
     },
     "require-dev": {
