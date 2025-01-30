@@ -15,7 +15,7 @@ var elixir = require('laravel-elixir');
 
 elixir(function(mix) {
     mix
-        .less(['autocomplete.less'], 'resources/assets/css/compiled/less.css')
+        .less(['*.less'], 'resources/assets/css/compiled/less.css')
         .styles([
 			'font-awesome.min.css',
             'style.css',

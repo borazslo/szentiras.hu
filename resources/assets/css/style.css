@@ -1,16 +1,5 @@
-body {
-    background-color: #fafafa;
-    color: #2e2e2e;
-    font-family: 'Noto Sans', sans-serif;
-}
-
 .translationButtons {
     font-family: 'Noto Sans', sans-serif;
-}
-
-.parsedVerses {
-    font-family: 'Noto Serif', serif;
-    font-size: 16px;
 }
 
 p.footnote {

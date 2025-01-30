@@ -13,7 +13,9 @@
     </div>
    
     {% for chapterId, chapter in chapters %}
-        <h4><a href="/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapterId }}">{{ chapterId }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}</a></h4>
+        {%set chapterLink %}/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapterId }}{% endset %}
+        {%set chapterText %}{{ chapterId }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}{% endset %}
+        <h4><a href="{{ chapterLink }}">{{ chapterText }}</a></h4>
 
         {% set headings = chapter.headings %}
         {% if headings|length > 0 %}
@@ -25,9 +27,11 @@
         {% endif %}        
         
         {% set leadVerses = chapter.leadVerses %} 
+        <a href={{ chapterLink }} class='leadChapterLink'>
         {% for numv, verse in leadVerses %}
             <sup>{{ numv }}</sup>{{ verse|raw }}
         {% endfor %}
+        </a>
         <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapterId}}' class='link'>&raquo;</a><br>
         <br />
     {% endfor %}
