@@ -11,13 +11,13 @@ class BookTableSeeder extends \Illuminate\Database\Seeder
     public function run()
     {
         \Log::info('Running book table seeder');
-        $translation = $this->addTranslation(1, 'Translation Name 1', 'TESTTRANS');
+        $translation = $this->addTranslation(1001, 'Translation Name 1', 'TESTTRANS');
         $this->addBook(99101, 101, "Ter", $translation);
         $this->addBook(99102, 102, "Kiv", $translation);
         $this->addBook(99103, 103, "Lev", $translation);
         $this->addBook(99104, 104, "Szám", $translation);
 
-        $translation = $this->addTranslation(2, 'Translation Name 2', 'TESTTRANS2');
+        $translation = $this->addTranslation(1002, 'Translation Name 2', 'TESTTRANS2');
         $this->addBook(99201, 101, "1Móz", $translation);
         $this->addBook(99202, 102, "2Móz", $translation);
     }

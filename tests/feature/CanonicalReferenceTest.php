@@ -189,11 +189,11 @@ class CanonicalReferenceTest extends TestCase
     {
         $referenceService = App::make(\SzentirasHu\Service\Reference\ReferenceService::class);
         $ref = CanonicalReference::fromString("2Moz");
-        $translatedRef = $referenceService->translateReference($ref, 1);
+        $translatedRef = $referenceService->translateReference($ref, 1001);
         $this->assertEquals("Kiv", $translatedRef->bookRefs[0]->bookId);
 
         $ref = CanonicalReference::fromString("Kivonulas 2:3.4-5; 1Moz 4,5-6,12");
-        $translatedRef = $referenceService->translateReference($ref, 1);
+        $translatedRef = $referenceService->translateReference($ref, 1001);
         $this->assertEquals("Kiv", $translatedRef->bookRefs[0]->bookId);
         $this->assertEquals("Ter", $translatedRef->bookRefs[1]->bookId);
 
@@ -213,8 +213,8 @@ class CanonicalReferenceTest extends TestCase
     {
         /** @var ReferenceService $referenceService */
         $referenceService = App::make(ReferenceService::class);
-        $bookRef = $referenceService->getExistingBookRef(CanonicalReference::fromString('1Móz 2,3.4-5'));
-        $translatedBookRef = $referenceService->translateBookRef($bookRef, 1);
+        $bookRefs = $referenceService->getExistingBookRefs(CanonicalReference::fromString('1Móz 2,3.4-5'));
+        $translatedBookRef = $referenceService->translateBookRef($bookRefs[0], 1001);
         $this->assertEquals("Ter", $translatedBookRef->bookId);
     }
 
@@ -224,7 +224,6 @@ class CanonicalReferenceTest extends TestCase
         $this->assertFalse(CanonicalReference::fromString("Mt1")->isBookLevel());
 
     }
-
 
     public
     function testChapterRange()
@@ -268,7 +267,7 @@ class CanonicalReferenceTest extends TestCase
         $referenceService = App::make(ReferenceService::class);
         $ref = "Kiv 1,9-10; 1Móz 22";
         $this->assertEquals("TESTTRANS/Kiv1,9-10;Ter22",
-            $referenceService->getCanonicalUrl(CanonicalReference::fromString($ref), 1));
+            $referenceService->getCanonicalUrl(CanonicalReference::fromString($ref), 1001));
     }
 
     public function testIsOneChapter()
@@ -284,17 +283,17 @@ class CanonicalReferenceTest extends TestCase
     {
         $referenceService = App::make(ReferenceService::class);
         $ref = CanonicalReference::fromString('Ter 50');
-        list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1);
+        list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1001);
         $this->assertEquals('Ter 49', $prevRef->toString());
         $this->assertEquals(false, $nextRef);
 
         $ref = CanonicalReference::fromString('Kiv 1');
-        list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1);
+        list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1001);
         $this->assertEquals('Kiv 2', $nextRef->toString());
         $this->assertEquals(false, $prevRef);
 
         $ref = CanonicalReference::fromString('Kiv 2');
-        list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1);
+        list($prevRef, $nextRef) = $referenceService->getPrevNextChapter($ref, 1001);
         $this->assertEquals('Kiv 3', $nextRef->toString());
         $this->assertEquals('Kiv 1', $prevRef->toString());
     }

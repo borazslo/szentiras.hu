@@ -14,7 +14,7 @@
     <env name="SESSION_DRIVER" value="array"/>
     <env name="QUEUE_DRIVER" value="sync"/>
     <env name="DB_PREFIX" value="testing_"/>
-    <env name="DEFAULT_TRANSLATION_ID" value="1"/>
+    <env name="DEFAULT_TRANSLATION_ID" value="1001"/>
     <env name="DEFAULT_TRANSLATION_ABBREV" value="TESTTRANS"/>
     <env name="TRANSLATION_ABBREV_REGEX" value="TESTTRANS\d*"/>
   </php>

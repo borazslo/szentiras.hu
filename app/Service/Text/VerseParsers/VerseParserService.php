@@ -10,21 +10,25 @@ class VerseParserService
 
     private $parserMapping;
 
+    private $defaultParser; 
+
     public function __construct()
-    {
+    {        
+        $this->defaultParser = \App::make('\SzentirasHu\Service\Text\VerseParsers\DefaultVerseParser');
         $this->parserMapping =
-            [1 => \App::make('\SzentirasHu\Service\Text\VerseParsers\DefaultVerseParser'),
-                2 => \App::make('\SzentirasHu\Service\Text\VerseParsers\DefaultVerseParser'),
+            [1 => $this->defaultParser,
+                2 => $this->defaultParser,
                 3 => \App::make('\SzentirasHu\Service\Text\VerseParsers\KNBVerseParser'),
                 4 => \App::make('\SzentirasHu\Service\Text\VerseParsers\KGVerseParser'),
-                5 => \App::make('\SzentirasHu\Service\Text\VerseParsers\DefaultVerseParser'),
-                6 => \App::make('\SzentirasHu\Service\Text\VerseParsers\DefaultVerseParser'),
+                5 => $this->defaultParser,
+                6 => $this->defaultParser,
                 7 => \App::make('\SzentirasHu\Service\Text\VerseParsers\STLVerseParser'),
             ];
     }
 
     public function getParser($translation_id)
     {
-        return $this->parserMapping[$translation_id];
+        $parser = $this->parserMapping[$translation_id] ?? $this->defaultParser;
+        return $parser;
     }
 }

@@ -34,7 +34,7 @@ class ReferenceService
         $this->verseRepository = $verseRepository;
     }
 
-    public function getExistingBookRef(CanonicalReference $ref, $translationId = false)
+    public function getExistingBookRefs(CanonicalReference $ref, $translationId = false)
     {
         if ($translationId) {
             $translations = [ $this->translationRepository->getById($translationId) ];
@@ -43,17 +43,24 @@ class ReferenceService
         }
         Log::debug("Read {$translations} as translations");
         foreach ($translations as $translation) {
-            $storedBookRef = $this->findStoredBookRef($ref->bookRefs[0], $translation->id);
-            if ($storedBookRef) {
-                return $storedBookRef;
+            $storedBookRefs = [];
+            foreach ($ref->bookRefs as $bookRef) {
+                $storedBookRef = $this->findStoredBookRef($bookRef, $translation->id);
+                if ($storedBookRef) {
+                    $storedBookRefs[] = $storedBookRef;
+                }
+            }
+            
+            if (!empty($storedBookRefs)) {
+                return $storedBookRefs;
             }
         }
-        return false;
+        return [];
     }
 
     private function findStoredBookRef($bookRef, $translationId, $refTranslationId = null)
     {
-        $result = false;
+        $result = null;
         $abbreviatedBook = $this->bookRepository->getByAbbrev($bookRef->bookId, $refTranslationId);
         if ($abbreviatedBook) {
             $book = $this->bookRepository->getByNumberForTranslation($abbreviatedBook->number, $translationId);
@@ -61,11 +68,8 @@ class ReferenceService
                 $result = new BookRef($book->abbrev);
                 $result->chapterRanges = $bookRef->chapterRanges;
             } else {
-                Log::debug("Book not found in database: {$bookRef->toString()}");
             }
-        } else {
-            Log::debug("Book not found for abbrev {$bookRef->bookId} in translation {$refTranslationId}");
-        }
+        } 
         return $result;
     }
 

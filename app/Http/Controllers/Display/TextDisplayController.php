@@ -3,6 +3,7 @@
 namespace SzentirasHu\Http\Controllers\Display;
 
 use Config;
+use Illuminate\Support\Facades\Log;
 use Redirect;
 use SzentirasHu\Http\Controllers\Controller;
 use SzentirasHu\Service\Reference\CanonicalReference;
@@ -93,6 +94,10 @@ class TextDisplayController extends Controller
                 $this->createChapterLinks($canonicalRef, $translation)
                 : false;
             $verseContainers = $this->textService->getTranslatedVerses($canonicalRef, $translation->id);
+            Log::debug(json_encode($verseContainers));
+            if (sizeof($verseContainers) == 1 && empty($verseContainers[0]->rawVerses)) {
+                abort(404);
+            }
             $translations = $this->translationRepository->getAllOrderedByDenom();
             return View::make('textDisplay.verses')->with([
                 'previousDay' => $previousDay,

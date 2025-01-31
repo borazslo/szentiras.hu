@@ -329,15 +329,19 @@ class SearchService {
      * @param $refToSearch
      * @param $translation
      */
-    public function findTranslatedRef($refToSearch, $translation = null)
+    public function findTranslatedRefs($refToSearch, $translation = null)
     {
         try {
             $ref = CanonicalReference::fromString($refToSearch);
-            $storedBookRef = $this->referenceService->getExistingBookRef($ref);
-            if ($storedBookRef) {
-                $translation = $translation ? $translation : $this->translationRepository->getDefault();
-                return $this->referenceService->translateBookRef($storedBookRef, $translation->id);
+            $storedBookRefs = $this->referenceService->getExistingBookRefs($ref);
+            $translatedBookRefs = [];
+            foreach ($storedBookRefs as $storedBookRef) {
+                $bookRef = $this->referenceService->translateBookRef($storedBookRef, $translation === null ? null : $translation->id);
+                if ($bookRef !== null) {
+                    $translatedBookRefs[] = $bookRef;
+                }
             }
+            return $translatedBookRefs;
         } catch (ParsingException $e) {
         }
     }

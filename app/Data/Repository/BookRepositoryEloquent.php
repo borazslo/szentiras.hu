@@ -41,7 +41,7 @@ class BookRepositoryEloquent implements BookRepository {
             if ($abbrev) {
                 return $abbrev->books()->first();
             } else {
-                return false;
+                return null;
             }
         });
 

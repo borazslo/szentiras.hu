@@ -68,12 +68,17 @@ class SearchController extends Controller
     {
         $result = [];
         $term = Request::get('term');
-        $ref = $this->searchService->findTranslatedRef($term);
-        if ($ref) {
+        $refs = $this->searchService->findTranslatedRefs($term);
+        if (!empty($refs)) {
+            $labels = [];
+            foreach ($refs as $ref) {                
+                $labels[] = $ref->toString();
+            }
+            $concatenatedLabel = implode(';', $labels);
             $result[] = [
                 'cat' => 'ref',
-                'label' => $ref->toString(),
-                'link' => "/{$ref->toString()}"
+                'label' => $concatenatedLabel,
+                'link' => "/{$concatenatedLabel}"
             ];
         }
         $suggestions = $this->searchService->getSuggestionsFor($term);
@@ -129,14 +134,19 @@ class SearchController extends Controller
     private function searchBookRef($form, $view)
     {
         $augmentedView = $view;
-        $translatedRef = $this->searchService->findTranslatedRef($form->textToSearch, $form->translation);
-        if ($translatedRef) {
+        $translatedRefs = $this->searchService->findTranslatedRefs($form->textToSearch, $form->translation);
+        if (!empty($translatedRef)) {
             $translation = $form->translation ? $form->translation : $this->translationRepository->getDefault();
             $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation->id);
+            $labels = [];
+            foreach ($translatedRefs as $ref) {
+                $labels[] = $ref->toString();
+            }
+            $concatenatedLabel = implode(';', $labels);
             if ($verseContainers) {
                 $augmentedView = $view->with('bookRef', [
-                    'label' => $translatedRef->toString(),
-                    'link' => "/{$translation->abbrev}/{$translatedRef->toString()}",
+                    'label' => $concatenatedLabel,
+                    'link' => "/{$translation->abbrev}/{$concatenatedLabel}",
                     'verseContainers' => $verseContainers
                 ]);
             }
