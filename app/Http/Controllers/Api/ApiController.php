@@ -116,9 +116,10 @@ class ApiController extends Controller
                 $book = $verse->book;
                 $verseData['hely']['szep'] = "{$book->abbrev} {$verse->chapter},{$verse->numv}";
                 $verseData['szoveg'] = $verse->verse;
-                $verseDataList[] = $verseData;
                 $verseData['forditas']['nev'] = $translation->name;
                 $verseData['forditas']['szov'] = $translation->abbrev;
+
+                $verseDataList[] = $verseData;
             }
         }
         return $this->formatJsonResponse([
