@@ -9,15 +9,12 @@ use Config;
 use DB;
 use Exception;
 use Illuminate\Console\Command;
-use PHPExcel_Shared_Date;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
-use Box\Spout\Reader\ReaderFactory;
-use Box\Spout\Common\Type;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
 
 class UpdateTextsCommand extends Command
@@ -71,6 +68,7 @@ class UpdateTextsCommand extends Command
      */
     public function handle()
     {
+        \Artisan::call("cache:clear");
         if (!$this->option('nohunspell')) {
             $this->testHunspell();
         }
@@ -109,7 +107,7 @@ class UpdateTextsCommand extends Command
 
         $columns = [
             'SZIT' => ['gepi' => 0, 'rov' => 5],
-            'KNB' => ['gepi' => 0, 'rov' => 4],
+            'KNB' => ['gepi' => 0, 'rov' => 3],
             'UF' => ['gepi' => 0, 'rov' => 4],
             'KG' => ['gepi' => 0, 'rov' => 4],
             'BD' => ['gepi' => 0, 'rov' => 1],
@@ -119,7 +117,7 @@ class UpdateTextsCommand extends Command
         $this->verifyBookColumns($columns, $abbrev);
 
         $this->info("A $filePath fájl betöltése...");
-        $reader = ReaderFactory::create(Type::XLSX);
+        $reader = ReaderEntityFactory::createXLSXReader();
         $reader->open($filePath);
         $this->info("A $filePath fájl megnyitva...");
 
@@ -137,37 +135,38 @@ class UpdateTextsCommand extends Command
 				$linesRead++;
 			}
             // break on first empty line
-            if (empty($row[0])) {
+            if (empty($row->getCellAtIndex(0)->getValue())) {
                 $this->info("$linesRead sor beolvasva, kész.");
                 break;
             }
             $bookAbbrev2Id = $this->getAbbrev2Id($translation);
-            $bookNumber = $row[$columns[$abbrev]['gepi']];
-            $this->info("Könyv: $bookNumber");
-            $rov = $row[$columns[$abbrev]['rov']];
-            if (!isset($bookAbbrev2Id[$rov]) AND ($rov != '-' AND $rov != '')) {
-                $book = $this->bookRepository->getByAbbrev($rov, $translation);
+            $bookNumber = $row->getCellAtIndex($columns[$abbrev]['gepi'])->getValue();
+            $rov = $row->getCellAtIndex($columns[$abbrev]['rov'])->getValue();
+            $this->info("Könyv: $bookNumber : $rov");
+            if (!isset($bookAbbrev2Id[$rov]) && ($rov != '-' && $rov != '')) { // the abbreviation used in the source file is different than we think it is in the db
+                $book = $this->bookRepository->getByAbbrev($rov, $translation->id); // look up the correct abbreviation
                 if ($book) {
+                    $this->info("Könyv ID az adatbázisban: {$book->id}");
                     $bookNumber2Id[$bookNumber] = $book->id;
                 } else {
                     $badAbbrevs[]= $rov;
-                }
-                
-            } else if ($rov != '-' AND $rov != '') {
+                }                
+            } else if ($rov != '-' && $rov != '') {
                 $bookNumber2Id[$bookNumber] = $bookAbbrev2Id[$rov];
             }
         }
         if (isset($badAbbrevs)) {
-            $this->info("A következő rövidítések csak a szövegforrásban találhatóak meg, az adatbázisban nem!\n" . implode(', ', $badAbbrevs) . print_r($bookAbbrev2Id, 1));
+            $this->info("A következő rövidítések csak a szövegforrásban találhatóak meg, az adatbázisban nem!\n" . implode(', ', $badAbbrevs));
             if (!$this->confirm('Folytassuk?')) {
                 App::abort(500, "Kilépés");
             }
         }
-
+        
+        $this->info("$abbrev lap betöltése");
         $verseRowIterator = $sheets[$abbrev]->getRowIterator();
         $headers = $this->getHeaders($verseRowIterator);
 
-        $fields = ['did' => '*Ssz', 'gepi' => 'DCB_hiv', 'tip' => 'jelstatusz', 'verse' => 'jel', 'ido' => 'ido'];
+        $fields = ['did' => 'Ssz', 'gepi' => 'hiv', 'tip' => 'jelstatusz', 'verse' => 'jel'];
         $this->verifyColumns($fields, $headers);
 
         $pipes = [];
@@ -200,7 +199,7 @@ class UpdateTextsCommand extends Command
             $this->info("Nincs mit feltölteni.");
         }
         $sphinxConfig = Config::get('settings.sphinxConfig');
-        $indexerProcess = new Process("indexer --config {$sphinxConfig} --all --rotate");
+        $indexerProcess = new Process(["indexer", "--config", "{$sphinxConfig}", "--all", "--rotate"]);
         try {
             $indexerProcess->mustRun();
             echo $indexerProcess->getOutput();
@@ -343,22 +342,22 @@ class UpdateTextsCommand extends Command
         $progressBar->setFormat("[%bar%] %message%");
         $rowNumber = 0;
         foreach ($verseRowIterator as $row) {
-            if ($rowNumber < 2) {
+            if ($rowNumber < 3) { // now skip 3 lines
                 $rowNumber++;
                 continue;
             }
-            if (empty($row[$cols[$fields['gepi']]])) {
+            if (empty($row->getCellAtIndex($cols[$fields['gepi']])->getValue())) {
                 break;
             }
-            $gepi = $row[$cols[$fields['gepi']]];
+            $gepi = $row->getCellAtIndex($cols[$fields['gepi']])->getValue();
             if (!$this->option('filter') OR preg_match('/' . $this->option('filter') . '/i', $gepi)) {
                 $values['trans'] = $translation->id;
                 $values['gepi'] = $gepi;
                 $values['book_number'] = (int)substr($gepi, 0, 3);
                 $values['chapter'] = (int)substr($gepi, 3, 3);
                 $values['numv'] = (int)substr($gepi, 6, 3);
-                $values['tip'] = $row[$cols['jelstatusz']];
-                $values['verse'] = $row[$cols['jel']];
+                $values['tip'] = $row->getCellAtIndex($cols['jelstatusz']);
+                $values['verse'] = $row->getCellAtIndex($cols['jel'])->getValue();
                 if ($this->hunspellEnabled && in_array($values['tip'], [60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704])) {
                     $verseRoot = $this->stem($values['verse'], $pipes);
                 } else {
@@ -424,12 +423,13 @@ class UpdateTextsCommand extends Command
      */
     private function getHeaders($verseRowIterator)
     {
+        $cols = [];
+        $i = 0;
         $this->info("A fejlécek megszerzése...");
-        foreach ($verseRowIterator as $row) {
-            $cols = [];
-            $i = 0;
-            foreach ($row as $cell) {
-                $cols[$cell] = $i;
+        foreach ($verseRowIterator as $row) { // only go through the first row
+            foreach ($row->getCells() as $cell) {
+                $cols[$cell->getValue()] = $i;
+                $this->info("$i.oszlop: {$cell}");
                 $i++;
             }
             break;
