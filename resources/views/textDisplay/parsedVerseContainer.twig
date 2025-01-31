@@ -10,11 +10,15 @@
     {% if verse.numv == 1 %}
         <span class="text-muted numchapter">{{ verse.chapter }}</span>
     {% endif %}
-    {% if verse.poemLines %}
-        <p class="poem"><span class="text-muted numv"><sup>{{ verse.numv }}</sup></span>{{ verse.text|raw }}</p>
-    {% else %}
-        <span class="text-muted numv"><sup>{{ verse.numv }}</sup></span>{{ verse.text|raw }}
-    {% endif %}
+    <span class="text-muted numv"><sup>{{ verse.numv }}</sup></span>
+    {%- for versePart in verse.verseParts %}
+        {%- if versePart.poem %} 
+        {# poem class to use #}
+            {{- versePart.content|raw }}<br>
+        {% else %}
+            {{- versePart.content|raw }}
+        {% endif %}                
+    {% endfor %}
 
     {% if verse.xrefs is not empty %}
         <span class="xref">

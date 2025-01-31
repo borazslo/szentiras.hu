@@ -10,6 +10,7 @@ use SzentirasHu\Service\Reference\ReferenceService;
 use SzentirasHu\Service\VerseContainer;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
+use SzentirasHu\Http\Controllers\Display\VerseParsers\VersePart;
 
 class TextService
 {
@@ -116,16 +117,14 @@ class TextService
 
      /**
      * @param VerseContainer[] $verseContainers
-     * @return string
+     * @return VersePart[]
      */
     public function getHeadings($verseContainers)
     {
-        
         $headings = [];
         foreach ($verseContainers as $verseContainer) {
             $parsedVerses = $verseContainer->getParsedVerses();
-            $headings[] = $parsedVerses[0]->headings;
-            
+            $headings[] = $parsedVerses[0]->getHeadingVerseParts();            
         }      
         return $headings;
     }

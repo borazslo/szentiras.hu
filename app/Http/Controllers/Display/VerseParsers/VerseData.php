@@ -6,10 +6,12 @@ namespace SzentirasHu\Http\Controllers\Display\VerseParsers;
 
 /**
  * This class represents all information we have regarding a given bible verse.
+ * A given bible verse typically consists of 1 simple text. However, sometimes it contains multiple elements:
+ * headings, simpleTexts, poemLines, simpleTexts again etc. So it is an ordered list of various VerseParts. 
+ * They must be written one after the other with proper formatting.
  */
 class VerseData
 {
-    public $headings;
     public $chapter;
     public $numv;
     /**
@@ -22,7 +24,8 @@ class VerseData
     public $book;
     public $poemLines;
 
-    public $elements = [];
+    /** @var VersePart[] */
+    public array $verseParts = [];
 
     function __construct($chapter, $numv)
     {
@@ -30,27 +33,48 @@ class VerseData
         $this->numv = $numv;
     }
 
+    public function getVerseParts() {
+        return $this->verseParts;
+    }
+
+    /**
+     * @return VersePart[]
+     */
+    public function getHeadingVerseParts(): array {
+        return array_filter($this->verseParts, function(VersePart $versePart) {
+            return $versePart->type === VersePartType::HEADING && $versePart->headingLevel >=0 && $versePart->headingLevel <= 4;
+        });        
+    }
+
     public function getHeadingText()
     {
-        if ($this->headings !== null && count($this->headings) > 0) {
+        $headings = $this->getHeadingVerseParts();
+        if (count($headings) > 0) {
             $headingText = '';
-            foreach (range(0, 4) as $headingLevel) {
-                if (array_key_exists($headingLevel, $this->headings)) {
-                    $headingText .= $this->headings[$headingLevel];
+            $previousOrder = null;
+            foreach ($headings as $heading) {
+                if ($previousOrder !== null && $heading->order - $previousOrder > 1) {
+                    break;
                 }
+                $headingText .= $heading->content . ' ';
+                $previousOrder = $heading->order;
             }
             return $headingText;
         } else {
-            return false;
+            return null;
         }
     }
 
     public function getText() {
-        if ($this->poemLines) {
-            $poemText = join("<br>", $this->poemLines);
-            return $this->simpleText . $poemText;
-        } else {
-            return $this->simpleText;
+        $text = '';
+        foreach ($this->verseParts as $versePart) {
+            if ($versePart->type == VersePartType::POEM_LINE) {
+                $text .= "{$versePart->content}";
+            } else if ($versePart->type == VersePartType::HEADING) {
+                $text .= "<h{$versePart->headingLevel}>{$versePart->content}</h{$versePart->headingLevel}>";
+            } else {
+                $text = $versePart->content;
+            }
         }
     }
 

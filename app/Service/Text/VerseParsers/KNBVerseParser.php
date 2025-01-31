@@ -3,6 +3,8 @@
 namespace SzentirasHu\Service\Text\VerseParsers;
 
 use SzentirasHu\Http\Controllers\Display\VerseParsers\VerseData;
+use SzentirasHu\Http\Controllers\Display\VerseParsers\VersePart;
+use SzentirasHu\Http\Controllers\Display\VerseParsers\VersePartType;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\Xref;
 
 class KNBVerseParser extends DefaultVerseParser
@@ -44,7 +46,6 @@ class KNBVerseParser extends DefaultVerseParser
         $xref = new Xref();
         $xref->text = substr($rawVerse->verse, 1, -1);
         $verse->xrefs[]= $xref;
-        $verse->elements[] = $xref;
     }
 
     /**
@@ -55,7 +56,7 @@ class KNBVerseParser extends DefaultVerseParser
     {
         $rawText = $rawVerse->verse;
         $this->parseXrefs($rawText, $verseData);
-        $verseData->simpleText .= $this->replaceTags($rawText);
+        $verseData->verseParts[] = new VersePart($this->replaceTags($rawText), VersePartType::SIMPLE_TEXT, count($verseData->verseParts));
 
     }
 

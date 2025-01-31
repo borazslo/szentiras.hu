@@ -59,6 +59,8 @@ class VerseContainer
             $parsedVerseData->book = $this->book;
             $verseData[] = $parsedVerseData;
         }
+        
+        \Log::debug(json_encode($verseData));
         return $verseData;
     }
 
