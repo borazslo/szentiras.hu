@@ -3,6 +3,9 @@
 @text-font: 'Noto Sans', sans-serif;
 @book-font: 'Noto Serif', serif;
 
+@footnote-link-color: #0056b3;
+@footnote-hover-color: #007BFF;
+
 body {
     background-color: @background-color;
     color: @text-color;
@@ -14,6 +17,25 @@ a.leadChapterLink {
     font-family: @book-font;
 }
 
+a.footnote {
+    outline: none;
+    .numv {
+        color: @footnote-link-color;
+        font-weight: bold;
+    }    
+    cursor: pointer;
+    text-decoration: none;    
+    &:hover {
+        .numv {
+            color: @footnote-hover-color;
+        }    
+    }
+}
+
+p.popover-footnote {
+    font-family: @book-font;
+    margin: 0;
+}
 .parsedVerses {
     font-family: @book-font;
     font-size: 16px;
@@ -22,5 +44,12 @@ a.leadChapterLink {
 div.translationButtons {
     font-family: @text-font;
     margin-bottom: 6px;
+}
+
+span.numv {
+  position: relative; 
+  font-size: 0.8em; /* Adjust the size as needed */
+  top: -0.5em; /* Move the number up */
+  color: #6c757d; /* Muted text color */
 }
 

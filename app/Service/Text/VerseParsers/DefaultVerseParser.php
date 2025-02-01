@@ -18,7 +18,7 @@ class DefaultVerseParser extends AbstractVerseParser
 
     protected function parseTextVerse($rawVerse, VerseData $verse)
     {
-        $verse->verseParts[] = new VersePart($rawVerse->verse, VersePartType::SIMPLE_TEXT, count($verse->verseParts));
+        $verse->verseParts[] = new VersePart($verse, $rawVerse->verse, VersePartType::SIMPLE_TEXT, count($verse->verseParts));
     }
 
     protected function parseXrefverse($book, $rawVerse, VerseData $verse)
@@ -37,7 +37,7 @@ class DefaultVerseParser extends AbstractVerseParser
         $heading = preg_replace_callback($regexp, function($match) {
              return "<a href='{$match[0]}'>$match[0]</a>";
         }, $heading);     
-        $verse->verseParts[] = new VersePart($this->replaceTags($heading), VersePartType::HEADING, count($verse->verseParts), $level);   
+        $verse->verseParts[] = new VersePart($verse, $this->replaceTags($heading), VersePartType::HEADING, count($verse->verseParts), $level);   
     }
 
     protected function parseFootnoteVerse(Verse $rawVerse, VerseData $verse) {
@@ -68,7 +68,7 @@ class DefaultVerseParser extends AbstractVerseParser
         // } else {
         //     $verse->poemLines[0] = $poemLine;
         // }
-        $verse->verseParts[] = new VersePart($poemLine, VersePartType::POEM_LINE, count($verse->verseParts));
+        $verse->verseParts[] = new VersePart($verse, $poemLine, VersePartType::POEM_LINE, count($verse->verseParts));
     }
 
 

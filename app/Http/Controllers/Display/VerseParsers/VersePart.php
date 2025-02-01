@@ -14,12 +14,14 @@ class VersePart
     public VersePartType $type;
     public int $headingLevel;
     public int $order; // order of the parts, useful to find out if something is at the beginning (or end) of the verse
+    public VerseData $verse;
 
-    public function __construct(string $content, VersePartType $type, int $order, int $headingLevel = 0) {
+    public function __construct(VerseData $verse, string $content, VersePartType $type, int $order, int $headingLevel = 0) {
         $this->content = $content;
         $this->type = $type;
         $this->order = $order;
         $this->headingLevel = $headingLevel;
+        $this->verse = $verse;
     }
 
     public function getContent() {
@@ -28,5 +30,13 @@ class VersePart
 
     public function isPoem() {
         return $this->type == VersePartType::POEM_LINE;
+    }
+
+    public function isFirst() {
+        return $this->order == 0;
+    }
+
+    public function isLast() {
+        return $this->order == $this->verse->getCount()-1;
     }
 }

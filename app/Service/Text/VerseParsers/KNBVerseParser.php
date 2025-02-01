@@ -56,7 +56,7 @@ class KNBVerseParser extends DefaultVerseParser
     {
         $rawText = $rawVerse->verse;
         $this->parseXrefs($rawText, $verseData);
-        $verseData->verseParts[] = new VersePart($this->replaceTags($rawText), VersePartType::SIMPLE_TEXT, count($verseData->verseParts));
+        $verseData->verseParts[] = new VersePart($verseData, $this->replaceTags($rawText), VersePartType::SIMPLE_TEXT, count($verseData->verseParts));
 
     }
 

@@ -19,7 +19,9 @@
 
         {% block meta %}{% endblock %}
         <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
         <link rel="stylesheet" href="{{ elixir('css/all.css') }}">
@@ -78,7 +80,7 @@
         </div>
         <footer>
         <div class="footer">
-            <p>&copy; Szent Jeromos Katolikus Bibliatársulat<br>Kérdések, ötletek, problémák: <a href='mailto:eleklaszlosj@gmail.com'>Elek László SJ</a> (<a
+            <p><br>Kérdések, ötletek, problémák: <a href='mailto:eleklaszlosj@gmail.com'>Elek László SJ</a> (<a
                         href="http://jezsuita.hu">JTMR</a>)<br>
             Fejlesztés: <a href="https://github.com/borazslo/szentiras.hu">GitHub</a>
                 {% if config_get('version.hash') %}- <small>verzió:
@@ -95,8 +97,7 @@
                 src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
                 integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
                 crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-        <script src="{{ elixir('js/all.js') }}"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>        <script src="{{ elixir('js/all.js') }}"></script>
                <script>
 $(function() {
               $('ul a.nav-link').on('click', function(e) {
@@ -118,6 +119,13 @@ $(function() {
                 
             });
 });
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="tooltip"]').popover();
+});
+        </script>
+        <script>
+        {%block script%}{%endblock%}
         </script>
     </body>
 </html>

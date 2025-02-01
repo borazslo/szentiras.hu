@@ -1,3 +1,18 @@
+{% macro numv(verse) -%}
+{% if verse.footnotes is not empty %}
+    {% set currentFootnote %}
+    <p class='popover-footnote'>
+    {% for footnote in verse.footnotes %}
+        {{ footnote.text }}<br>
+    {% endfor %}
+    </p>
+    {% endset %}
+<a tabindex="0" class="footnote" data-placement="auto top" data-toggle="popover" data-trigger="focus" data-html="true" data-content="{{ currentFootnote }}">
+{% endif %}
+<span class="numv">{{ verse.numv }}</span>
+{% if verse.footnotes is not empty %}</a>{% endif %}
+{%- endmacro %}
+
 {% for verse in verseContainer.parsedVerses %}
     {% for headingLevel in 0..4 %}
     {% if verse.headings[headingLevel] is defined %}
@@ -10,12 +25,14 @@
     {% if verse.numv == 1 %}
         <span class="text-muted numchapter">{{ verse.chapter }}</span>
     {% endif %}
-    <span class="text-muted numv"><sup>{{ verse.numv }}</sup></span>
+    {% set inPoem = false %}
     {%- for versePart in verse.verseParts %}
-        {%- if versePart.poem %} 
-        {# poem class to use #}
-            {{- versePart.content|raw }}<br>
+        {%- if versePart.poem %}{% if not inPoem %}<p class="poem">{% set inPoem = true %}{%endif%}
+            {%- if versePart.order == 0 %}{{ _self.numv(verse) }}{% endif %}
+            {{- versePart.content|raw }}{% if versePart.last %}</p>{%else%}<br>{%endif%}
         {% else %}
+            {%- if inPoem %}</p>{% set inPoem =false %}{% endif %}
+            {%- if versePart.order == 0 %}{{ _self.numv(verse) }}{% endif %}
             {{- versePart.content|raw }}
         {% endif %}                
     {% endfor %}

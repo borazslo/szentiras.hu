@@ -100,3 +100,6 @@
     {% include 'textDisplay.share' with { 'canonicalUrl' : canonicalUrl, 'teaser' : teaser } %}
 
 {% endblock %}
+{% block script %}
+$('.footnote').popover()
+{% endblock %}

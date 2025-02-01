@@ -65,7 +65,7 @@ class VerseData
         }
     }
 
-    public function getText() {
+    public function getText() : string {
         $text = '';
         foreach ($this->verseParts as $versePart) {
             if ($versePart->type == VersePartType::POEM_LINE) {
@@ -76,6 +76,10 @@ class VerseData
                 $text = $versePart->content;
             }
         }
+        return $text;
     }
 
+    public function getCount() : int {
+        return count($this->verseParts);
+    }
 }

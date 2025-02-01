@@ -5,7 +5,8 @@ namespace SzentirasHu\Service\Text\VerseParsers;
 use Log;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\Xref;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\VerseData;
-
+use SzentirasHu\Http\Controllers\Display\VerseParsers\VersePart;
+use SzentirasHu\Http\Controllers\Display\VerseParsers\VersePartType;
 use SzentirasHu\Service\Reference\CanonicalReference;
 
 use SzentirasHu\Service\Reference\ParsingException;
@@ -18,18 +19,21 @@ class KGVerseParser extends DefaultVerseParser
      * @param $rawVerse
      * @param $verse
      */
-    protected function parseTextVerse($rawVerse, VerseData $verse)
+    protected function parseTextVerse($rawVerse, VerseData $verseData)
     {
-        $verse->simpleText = $rawVerse->verse;
+        $rawText = $rawVerse->verse;
+        
         foreach (self::$xrefSigns as $xrefSign) {
             $xrefSignPos = mb_strpos($rawVerse->verse, $xrefSign);
             if ($xrefSignPos) {
-                $this->createXrefHolder($verse, $xrefSign);
-                $verse->xrefs[$xrefSign]->position = $xrefSignPos;
-                $verse->simpleText = preg_replace("/" . $xrefSign . " ?/u", '', $verse->getText());
+                $this->createXrefHolder($verseData, $xrefSign);
+                $verseData->xrefs[$xrefSign]->position = $xrefSignPos;
+                $rawText = preg_replace("/" . $xrefSign . " ?/u", '', $rawText);
             }
         }
-        $verse->elements[] = $verse->simpleText;
+        
+        $verseData->verseParts[] = new VersePart($verseData, $this->replaceTags($rawText), VersePartType::SIMPLE_TEXT, count($verseData->verseParts));
+        
     }
 
     /**
