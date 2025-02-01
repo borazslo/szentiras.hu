@@ -8,11 +8,10 @@
     </p>
     {% endset %}
 <a tabindex="0" class="footnote" data-placement="auto top" data-toggle="popover" data-trigger="focus" data-html="true" data-content="{{ currentFootnote }}">
-{% endif %}
+{% endif -%}
 <span class="numv">{{ verse.numv }}</span>
-{% if verse.footnotes is not empty %}</a>{% endif %}
+{%- if verse.footnotes is not empty %}</a>{% endif %}
 {%- endmacro %}
-
 {% for verse in verseContainer.parsedVerses %}
     {% for headingLevel in 0..4 %}
     {% if verse.headings[headingLevel] is defined %}
