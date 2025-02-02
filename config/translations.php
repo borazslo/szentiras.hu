@@ -43,10 +43,11 @@ return [
         'verseTypes' =>
         [
             'text' => [901],
-            'heading' => [0=>5, 1=>10, 2=>20, 3=>30],
+            'heading' => [0=>301, 1=>320, 2=>330, 3=>640, 4=>650, 5=>680, 6 => 701, 7 => 702],
             'footnote' => [120, 2001, 2002],
             'poemLine' => [902],
-            'xref' => [920]
+            'xref' => [920],
+            'footnoteInterval' => [1990]
         ],
         'textSource' => env('TEXT_SOURCE_KNB'),
         'id' => 3

@@ -32,6 +32,10 @@ class VersePart
         return $this->type == VersePartType::POEM_LINE;
     }
 
+    public function isHeading() {
+        return $this->type == VersePartType::HEADING;
+    }
+
     public function isFirst() {
         return $this->order == 0;
     }

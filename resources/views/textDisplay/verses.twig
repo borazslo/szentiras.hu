@@ -47,10 +47,10 @@
             <div class="translationButtons">
                 {% include 'textDisplay.translationButtons' with { 'translations' : translations, 'translation': translation, 'translationLinks' : translationLinks } %}
             </div>
-            <div>
                 {% for verse in verseContainer.parsedVerses %}
                     {% if verse.footnotes is not empty %}
                         {% if not hasFootnote %}
+                        <div class = "footnotes">                            
                             <h5>Jegyzetek</h5>
                             {% set hasFootnote = true %}
                         {% endif %}
@@ -60,7 +60,7 @@
                         {%endfor %}
                     {% endif %}
                     {% endfor %}
-            </div>
+                    {% if hasFootnote %}</div>{% endif %}
             <p>
                 {% if chapterLinks.prevLink %}
                     <a href="/{{ chapterLinks.prevLink }}" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> Előző {{ verseContainer.book.number != 121 ? "fejezet" : "zsoltár"}}</a>
@@ -83,20 +83,6 @@
         </div>
         <hr>
     {% endfor %}
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div class="btn-group">
-                <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleNumv">
-                    <span class="toggle glyphicon glyphicon-check active"></span>
-                    <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
-                    Versszámozás</a>
-                <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleXrefs">
-                    <span class="toggle glyphicon glyphicon-check active"></span>
-                    <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
-                    Hivatkozások</a>
-            </div>
-        </div>
-    </div>
     {% include 'textDisplay.share' with { 'canonicalUrl' : canonicalUrl, 'teaser' : teaser } %}
 
 {% endblock %}

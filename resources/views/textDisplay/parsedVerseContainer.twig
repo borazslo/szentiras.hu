@@ -12,26 +12,40 @@
 <span class="numv">{{ verse.numv }}</span>
 {%- if verse.footnotes is not empty %}</a>{% endif %}
 {%- endmacro %}
+
+
 {% for verse in verseContainer.parsedVerses %}
     {% for headingLevel in 0..4 %}
     {% if verse.headings[headingLevel] is defined %}
         {% set tag = 'h' ~ (headingLevel+1) %}
-        <{{ tag }} id="heading_{{ verse.gepi }}_{{ headingLevel }}">        
+        <{{ tag }} id="heading_{{ verse.gepi }}_{{ headingLevel }}">
         <small>{{ verse.headings[headingLevel]|striptags('<br><a>')|raw }}</small>
         </{{ tag }}>
     {% endif %}
     {% endfor %}
-    {% if verse.numv == 1 %}
-        <span class="text-muted numchapter">{{ verse.chapter }}</span>
-    {% endif %}
     {% set inPoem = false %}
-    {%- for versePart in verse.verseParts %}
-        {%- if versePart.poem %}{% if not inPoem %}<p class="poem">{% set inPoem = true %}{%endif%}
+    {% set chapterNumberWritten = false %}
+    {% set verseNumberWritten = false %}
+    {% for versePart in verse.verseParts %}
+        {% if versePart.poem %}
+            {% if (not chapterNumberWritten) and verse.numv == 1 %}<span class="numchapter">{{ verse.chapter }}</span>{% endif %}
+        {% if not inPoem %}<p class="poem">{% set inPoem = true %}{%endif%}
             {%- if versePart.order == 0 %}{{ _self.numv(verse) }}{% endif %}
             {{- versePart.content|raw }}{% if versePart.last %}</p>{%else%}<br>{%endif%}
-        {% else %}
+        {% elseif  versePart.heading %}
             {%- if inPoem %}</p>{% set inPoem =false %}{% endif %}
-            {%- if versePart.order == 0 %}{{ _self.numv(verse) }}{% endif %}
+            {% if versePart.headingLevel < 5 %}
+                {% set tag = 'h' ~ (versePart.headingLevel+1) %}
+                {% set endtag  = tag %}
+            {% else %}
+                {% set tag = 'span class="heading' ~ (versePart.headingLevel + 1) ~ '"' %}
+                {% set endtag = 'span' %}
+            {% endif %}
+            <{{ tag|raw }} id="heading_{{ verse.gepi }}_{{ versePart.headingLevel }}">{{ versePart.content|striptags('<br><a>')|raw }}</{{ endtag }}>
+        {% else %}
+            {% if (not chapterNumberWritten) and verse.numv == 1 %}<span class="numchapter">{{ verse.chapter }}</span>{% endif %}
+            {%- if inPoem %}</p>{% set inPoem =false %}{% endif %}
+            {%- if not verseNumberWritten %}{{ _self.numv(verse) }}{% set verseNumberWritten=true %}{% endif %}
             {{- versePart.content|raw }}
         {% endif %}                
     {% endfor %}

@@ -176,27 +176,9 @@ class TextDisplayController extends Controller
         $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
         $translatedRef = $this->referenceService->translateReference($canonicalRef, $translation->id);
         $book = $this->bookRepository->getByAbbrevForTranslation($translatedRef->bookRefs[0]->bookId, $translation->id);
-        if ($book) {
-            
-            $chapters = [];
-            
-            
+        if ($book) {           
+            $chapters = [];                    
             $verses = $this->verseRepository->getVerses($book->id);
-            foreach ($verses as $verse) {
-                $type = $verse->getType();
-                if ( preg_match('/^heading[0-9]{1}/',$type)) {
-                    $verseContainer = new VerseContainer($book);
-                    $verseContainer->addVerse($verse);
-                    $heading = $this->textService->getHeadings([$verseContainer])[0];
-                    
-                    $chapters[$verse['chapter']]['headings'][$verse['numv']] = array (
-                        'gepi' => $verse->gepi,
-                        'level' => $heading->headingLevel,
-                        'text' => $heading->content
-                    );
-                } 
-            }
-            
             
             $firstVerses = $this->verseRepository->getLeadVerses($book->id);
             $groupedVerses = [];
