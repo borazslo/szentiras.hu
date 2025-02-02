@@ -14,7 +14,7 @@ services:
     depends_on:
       database:
         condition: service_healthy
-      gulp:
+      migrator:
         condition: service_completed_successfully
   database:
     image: mariadb
@@ -56,9 +56,6 @@ services:
     volumes:
       - .:/app
     command: npm --no-bin-link install
-    depends_on:
-      composer:
-        condition: service_completed_successfully
   gulp:
     image: node
     build:
@@ -68,8 +65,24 @@ services:
       - .:/app
     command: 'node_modules/gulp/bin/gulp.js'
     depends_on:
+      composer:
+        condition: service_completed_successfully
       node:
         condition: service_completed_successfully
-
+  migrator:
+    image: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env.example
+    volumes:
+      - .:/var/www/html
+    command: php artisan migrate -n
+    depends_on:
+      database:
+        condition: service_healthy
+      composer:
+        condition: service_completed_successfully
 volumes:
   db-data:
