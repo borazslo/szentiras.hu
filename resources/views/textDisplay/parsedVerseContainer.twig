@@ -39,7 +39,7 @@
     {% set verseNumberWritten = false %}
     {% for versePart in verse.verseParts %}
         {% if versePart.poem %}
-            {% if (not chapterNumberWritten) and verse.numv == 1 %}<span class="numchapter">{{ verse.chapter }}</span>{% endif %}
+            {% if (not chapterNumberWritten) and verse.numv == 1 %}    {% set chapterNumberWritten = true %}<span class="numchapter">{{ verse.chapter }}</span>{% endif %}
         {% if not inPoem %}<p class="poem">{% set inPoem = true %}{%endif%}
             {%- if versePart.order == 0 %}{{ _self.numv(verse) }}{% endif %}
             {{- versePart.content|raw }}{% if versePart.last %} {{ _self.xrefs(verse, translation) }}</p>{%else%}<br>{%endif%}
