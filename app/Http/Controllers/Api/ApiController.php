@@ -19,6 +19,7 @@ use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use View;
 use Request;
+use SzentirasHu\Data\Repository\VerseRepository;
 
 class ApiController extends Controller
 {
@@ -41,6 +42,10 @@ class ApiController extends Controller
      */
     private $bookRepository;
     /**
+     * @var \SzentirasHu\Data\Repository\VerseRepository
+     */
+    private $verseRepository;
+    /**
      * @var \SzentirasHu\Service\Reference\ReferenceService
      */
     private $referenceService;
@@ -58,6 +63,7 @@ class ApiController extends Controller
         LectureSelector $lectureSelector,
         TranslationRepository $translationRepository,
         BookRepository $bookRepository,
+        VerseRepository $verseRepository,
         ReferenceService $referenceService,
         SearchService $searchService)
     {
@@ -65,6 +71,7 @@ class ApiController extends Controller
         $this->lectureSelector = $lectureSelector;
         $this->translationRepository = $translationRepository;
         $this->bookRepository = $bookRepository;
+        $this->verseRepository = $verseRepository;
         $this->referenceService = $referenceService;
         $this->searchService = $searchService;
     }
@@ -148,7 +155,9 @@ class ApiController extends Controller
             $bookData[] = [
                 'abbrev' => $book->abbrev,
                 'name' => $book->name,
-                'number' => $book->number
+                'number' => $book->number,
+                'corpus' => $book->old_testament,
+                'chapterCount' => $this->verseRepository->getMaxChapterByBookNumber($book->number, $translation->id)
             ];
         }
         $data = [

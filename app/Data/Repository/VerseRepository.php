@@ -22,4 +22,5 @@ interface VerseRepository {
 
     public function getVerses($bookId);
 
+    public function getMaxChapterByBookNumber($bookNumber, $translationId);
 } 
