@@ -21,3 +21,4 @@ PROVISIONED
 .phpunit.result.cache
 *.bak
 .phpunit.cache
+.vscode
