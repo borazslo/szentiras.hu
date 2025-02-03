@@ -3,6 +3,7 @@
 @muted-text-color: #6c757d;
 @text-font: 'Noto Sans', sans-serif;
 @book-font: 'Noto Serif', serif;
+@book-font-size: 16px;
 
 @footnote-link-color: #0056b3;
 @footnote-hover-color: #007BFF;
@@ -39,7 +40,7 @@ p.popover-footnote {
 }
 .parsedVerses {
     font-family: @book-font;
-    font-size: 16px;
+    font-size: @book-font-size;
 }
 
 div.translationButtons {
@@ -65,11 +66,13 @@ span.numv {
 
 span.heading7 {
     display: inline-block;
+    font-size: @book-font-size * 0.875;
     margin-top: 3px;
     font-weight: bold;
     &::after {
         content: "."
     }
+    color: @muted-text-color;
 }
 
 div.footnotes {

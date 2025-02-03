@@ -40,7 +40,7 @@ class KNBVerseParser extends DefaultVerseParser
             $xref->text = $xrefText;
             $verseData->xrefs[] = $xref;
         }
-
+        return $rawText;
     }
 
     protected function parseXrefverse($book, $rawVerse, VerseData $verse)
@@ -68,5 +68,12 @@ class KNBVerseParser extends DefaultVerseParser
         $verseData->verseParts[] = $versePart;
 
     }
+
+    protected function parsePoemLine($rawVerse, VerseData $verseData)
+    {
+        $rawVerse->verse = $this->parseXrefs($rawVerse->verse, $verseData);
+        parent::parsePoemLine($rawVerse, $verseData);
+    }
+
 
 }
