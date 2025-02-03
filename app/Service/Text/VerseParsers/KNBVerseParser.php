@@ -20,6 +20,8 @@ class KNBVerseParser extends DefaultVerseParser
         $rawText = preg_replace('/<i>/', '<em>', $rawText);
         $rawText = preg_replace('/<\/i>/', '</em>', $rawText);
         $rawText = preg_replace('/<fs>/', '', $rawText);
+        $rawText = preg_replace('/<khiv>/', '', $rawText);
+        $rawText = preg_replace('/<\/khiv>/', '', $rawText);
         $purified = preg_replace('/\s*'.self::XREF_REGEXP.'/u', '', $rawText);
         $purified = preg_replace('/<\/?i>/', '', $purified);
         return $purified;
@@ -55,8 +57,15 @@ class KNBVerseParser extends DefaultVerseParser
     protected function parseTextVerse($rawVerse, VerseData $verseData)
     {
         $rawText = $rawVerse->verse;
+        $containsBr = false;
+        if (substr($rawText, -4) === '<br>') {
+            $containsBr = true;
+            $rawText = substr($rawText, 0, -4);
+        }
         $this->parseXrefs($rawText, $verseData);
-        $verseData->verseParts[] = new VersePart($verseData, $this->replaceTags($rawText), VersePartType::SIMPLE_TEXT, count($verseData->verseParts));
+        $versePart= new VersePart($verseData, $this->replaceTags($rawText), VersePartType::SIMPLE_TEXT, count($verseData->verseParts));
+        $versePart->newline = $containsBr;
+        $verseData->verseParts[] = $versePart;
 
     }
 

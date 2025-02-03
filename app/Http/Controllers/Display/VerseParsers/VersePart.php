@@ -15,6 +15,7 @@ class VersePart
     public int $headingLevel;
     public int $order; // order of the parts, useful to find out if something is at the beginning (or end) of the verse
     public VerseData $verse;
+    public bool $newline;
 
     public function __construct(VerseData $verse, string $content, VersePartType $type, int $order, int $headingLevel = 0) {
         $this->content = $content;
