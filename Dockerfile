@@ -11,6 +11,10 @@ RUN apt-get update && \
     zip \
     unzip
 
+RUN apt install -y \
+    hunspell \
+    hunspell-hu
+
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

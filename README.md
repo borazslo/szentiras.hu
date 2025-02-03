@@ -14,10 +14,12 @@ Szentírás .hu
 > - **további fordítások** - Ez szintén az első ponton múlik.
 > - **Frissített szerver** - Az új site frissített szerveren fut.
 > Más funkciója az új site-nak jelenleg nincs.
-> 
+>
 > A régi oldalt életben tartjuk a [regi.szentiras.hu](http://regi.szentiras.hu) címen, de ha sikerül új szervert találnunk és a megfelelő szövegfelhasználási engedélyeket megszereznünk, akkor ismét önállóan létezni fog az oldal, az eredeti koncepció szerint.
 
 A [szentiras.hu](http://szentiras.hu) 2025 előtti változatának teljes kódja.
+
+Fejlesztői környezet *docker compose* használatával: [docs/docker-compose-env.md](docs/docker-compose-env.md)
 
 ------
 Az alábbi információk elavultak.
@@ -68,7 +70,7 @@ A Laravel keretrendszert használjuk.
 - A találatokat súlyozza és a legsúlyosabbal kezdi (tehát nem előfordulási könyvbeli sorrendben jelennek meg)
 - Amit figyel
     - Sphinx extended search nyelvtan szerint
-    - szótőben keres (megkeresi a hunspell a keresőszó szótöveit, a szentírás minden versét szótöves változatban is tároljuk) PARTLY DONE (a keresőszót nem tövezzük) 
+    - szótőben keres (megkeresi a hunspell a keresőszó szótöveit, a szentírás minden versét szótöves változatban is tároljuk) PARTLY DONE (a keresőszót nem tövezzük)
 - Extrák
     - megnézni, hogy az alternatív fordításokban ugyan erre mennyi a találat - csak a Sphinx indexben nézi, ezért villámgyors
     - tippeket ad hasonló kifejezésekre ill. azonos szótövű szavakra
