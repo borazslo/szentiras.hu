@@ -189,6 +189,12 @@ class ApiController extends Controller
         return Redirect::to('api');
     }
 
+    public function getTranslationList() {
+        $translations = $this->translationRepository->getAllOrderedByDenom();
+        return $this->formatJsonResponse(["translations" => $translations, "defaultTranslationId" => \Config::get('settings.defaultTranslationId')]);
+
+    }
+
     private function formatJsonResponse($data)
     {
         $flags = \Config::get('app.debug') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE : 0;
