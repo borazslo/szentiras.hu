@@ -179,9 +179,33 @@ class TextDisplayController extends Controller
         if ($book) {           
             $chapters = [];                    
             $verses = $this->verseRepository->getVerses($book->id);
-            
-            $firstVerses = $this->verseRepository->getLeadVerses($book->id);
             $groupedVerses = [];
+            foreach ($verses as $verse) {
+                $type = $verse->getType();
+                if (preg_match('/^heading[6-9]{1}/', $type)) {
+                    $gepi = $verse->gepi;
+                    if (!isset($groupedVerses[$gepi])) {
+                        $groupedVerses[$gepi] = [];
+                    }
+                    $groupedVerses[$gepi][] = $verse;
+                }
+            }
+            $chapterHeadings = [];
+            foreach ($groupedVerses as $gepi => $verses) {
+                $verseContainer = new VerseContainer($book);
+                foreach ($verses as $verse) {
+                    $verseContainer->addVerse($verse);
+                }
+                $headings = $this->textService->getHeadings([$verseContainer]);
+                if (!empty($headings)) {
+                    if (!isset($chapterHeadings[$verse->chapter])) {
+                        $chapterHeadings[$verse->chapter] = [];
+                    }
+                    $chapterHeadings[$verse->chapter] = array_merge($chapterHeadings[$verse->chapter], $headings);
+                }
+            }
+            $firstVerses = $this->verseRepository->getLeadVerses($book->id);
+
             foreach ($firstVerses as $verse) {
                 $type = $verse->getType();
                 if ($type == 'text' || $type == 'poemLine') {
@@ -195,7 +219,7 @@ class TextDisplayController extends Controller
                     }
                     $chapters[$verse['chapter']]['leadVerses'][$verse['numv']] = $oldText . $this->textService->getTeaser([$verseContainer]);
                 }
-            }
+            }            
             $allTranslations = $this->translationRepository->getAllOrderedByDenom();
             $bookTranslations = $this->getAllBookTranslations($book->number);
             return View::make('textDisplay.book', [
@@ -203,6 +227,7 @@ class TextDisplayController extends Controller
                 'reference' => $translatedRef,
                 'book' => $book,
                 'chapters' => $chapters,
+                'headings' => $chapterHeadings,
                 'translations' => $allTranslations,
                 'translationLinks' => $allTranslations->map(
                         function ($translation) use ($canonicalRef, $bookTranslations) {

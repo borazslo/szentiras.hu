@@ -34,7 +34,10 @@
         <dd>A fordítás rövidítése. Ha nincs megadva, az alapértelmezett fordítás alapján ad vissza találatot.</dd>
     </dl>
     <h4>forditasok</h4>
-    Egyetlen szentírási vers megjelenítése az összes elérhető fordításban<br>
+    <h5>Fordítások listája</h5>
+    {% set exampleUrl = 'api/forditasok' %}
+    <a href="{{ exampleUrl }}">{{ url(exampleUrl) }}</a>
+    <h5>Egyetlen szentírási vers megjelenítése az összes elérhető fordításban</h5>
     Példa:
     {% set exampleUrl = 'api/forditasok/10100100100' %}
     <a href="{{ exampleUrl }}">{{ url(exampleUrl) }}</a></p>

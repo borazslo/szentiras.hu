@@ -52,7 +52,7 @@
             {% endif %}
             <{{ tag|raw }} class="heading {{ extraclass }}" id="heading_{{ verse.gepi }}_{{ versePart.headingLevel }}">{{ versePart.content|striptags('<br><a>')|raw }}</{{ tag }}>
         {% else %}
-            {% if (not chapterNumberWritten) and verse.numv == 1 %}<span class="numchapter">{{ verse.chapter }}</span>{% endif %}
+            {% if (not chapterNumberWritten) and verse.numv == 1 %}{% set chapterNumberWritten=true %}<span class="numchapter">{{ verse.chapter }}</span>{% endif %}
             {%- if inPoem %}</p>{% set inPoem =false %}{% endif %}
             {%- if not verseNumberWritten %}{{ _self.numv(verse) }}{% set verseNumberWritten=true %}{% endif %}
             {{- versePart.content|raw }}

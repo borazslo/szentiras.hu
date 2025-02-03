@@ -124,7 +124,8 @@ class TextService
         $headings = [];
         foreach ($verseContainers as $verseContainer) {
             $parsedVerses = $verseContainer->getParsedVerses();
-            $headings[] = $parsedVerses[0]->getHeadingVerseParts();            
+            foreach ($parsedVerses as $verseData)
+            $headings = array_merge($headings, $verseData->getHeadingVerseParts());            
         }      
         return $headings;
     }

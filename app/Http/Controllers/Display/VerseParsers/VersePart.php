@@ -25,6 +25,10 @@ class VersePart
         $this->verse = $verse;
     }
 
+    public function getGepi() {
+        return $this->verse->gepi;
+    }
+
     public function getContent() {
         return $this->content;
     }
