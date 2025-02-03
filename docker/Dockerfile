@@ -49,7 +49,7 @@ RUN apt install -y texlive-xetex
 RUN apt install -y texlive-lang-european
 RUN apt install -y fonts-linuxlibertine
 
-COPY /app/deploy/local/sphinx/sphinx.conf /etc/sphinxsearch
+COPY ../deploy/local/sphinx/sphinx.conf /etc/sphinxsearch
 RUN sed -i 's/^START=no/START=yes/' /etc/default/sphinxsearch
 
 CMD ["bash"]
