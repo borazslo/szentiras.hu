@@ -67,7 +67,7 @@ return [
         'verseTypes' =>
         [
             'text' => [901],
-            'heading' => [0=>401, 1=>501, 2=>601, 3=>701, 4=>704],
+            'heading' => [2=>401, 3=>501, 4=>601, 5=>701, 6=>704],
             'footnote' => [2001]
         ],
         'textSource' => env('TEXT_SOURCE_SZIT'),
