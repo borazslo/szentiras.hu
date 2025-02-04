@@ -106,13 +106,13 @@ class UpdateTextsCommand extends Command
         }
 
         $columns = [
-            'SZIT' => ['gepi' => 0, 'rov' => 5],
-            'KNB' => ['gepi' => 0, 'rov' => 3],
-            'UF' => ['gepi' => 0, 'rov' => 4],
-            'KG' => ['gepi' => 0, 'rov' => 4],
-            'BD' => ['gepi' => 0, 'rov' => 1],
-            'RUF' => ['gepi' => 0, 'rov' => 5],
-			'STL' => ['gepi' => 0, 'rov' => 2],
+            'SZIT' => ['gepi' => 0, 'rov' => 5, 'bookSheetHeaderRows' => 1],
+            'KNB' => ['gepi' => 0, 'rov' => 3, 'bookSheetHeaderRows' => 2],
+            'UF' => ['gepi' => 0, 'rov' => 4, 'bookSheetHeaderRows' => 1],
+            'KG' => ['gepi' => 0, 'rov' => 4, 'bookSheetHeaderRows' => 1],
+            'BD' => ['gepi' => 0, 'rov' => 1, 'bookSheetHeaderRows' => 1],
+            'RUF' => ['gepi' => 0, 'rov' => 5, 'bookSheetHeaderRows' => 1],
+			'STL' => ['gepi' => 0, 'rov' => 2, 'bookSheetHeaderRows' => 1],
         ];
         $this->verifyBookColumns($columns, $abbrev);
 
@@ -127,7 +127,7 @@ class UpdateTextsCommand extends Command
         $linesRead = 0;
         foreach ($bookRowIterator as $row) {
             // skip first line
-            if ($linesRead == 0 or $linesRead == 1) {
+            if ($linesRead == 0 or ($linesRead == 1 && $columns[$abbrev]['bookSheetHeaderRows'] == 2)) {
                 $this->info("Első két sor átugrása...");
                 $linesRead++;
                 continue;
@@ -364,15 +364,11 @@ class UpdateTextsCommand extends Command
                     $verseRoot = null;
                 }
                 $values['verseroot'] = $verseRoot;
-                if (isset($cols['ido']) && !empty($row[$cols['ido']])) {
-                    $values['ido'] = $row[$cols['ido']];
-                }
                 if (isset($books_gepi2id[$values['book_number']])) {
                     $values['book_id'] = $books_gepi2id[$values['book_number']];
                 } else {
-                    print_r($values);
                     print_r($books_gepi2id);
-                    App::abort(500, 'Nincs meg a book number a gepi2id listában');
+                    App::abort(500, 'Nincs meg a book number ' . $values['book_number'] . ' a gepi2id listában');
                 }
                 $inserts[$rowNumber] = $values;
             }
@@ -456,9 +452,6 @@ class UpdateTextsCommand extends Command
                 if (preg_match('/[A-Z]{3}_hiv/', $col)) $fields['gepi'] = $col;
                 if (preg_match('/[A-Z]{3}_old/', $col)) $fields['old'] = $col;
                 if (preg_match('/ssz$/i', $col)) $fields['did'] = $col;
-            }
-            if (!isset($headers['ido'])) {
-                unset($fields['ido']);
             }
         }
         $errors = [];
