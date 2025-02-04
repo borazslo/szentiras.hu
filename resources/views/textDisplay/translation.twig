@@ -10,7 +10,10 @@
 
 {% block content %}
     {% include 'textDisplay.breadcrumb' %}
+
     {% include 'bookAbbrevList' with { 'translation' : translation } %}
+      
+    {% include 'quickChapterSelector' %}
     
                 <h4>Újszövetség</h4>
                 <ul class="list-unstyled">
@@ -24,10 +27,16 @@
             <h4>Ószövetség</h4>
         {% endif %}
     {% endfor %}
-    
+
     <ul class="list-unstyled">
         {% for book in books|filter(book => book.old_testament) %}
             {{ _self.bookLink(translation, book) }}
         {% endfor %}
     </ul>
+{% endblock %}
+
+{% block script %}
+    document.addEventListener('DOMContentLoaded', () => {
+        quickChapterSelector("{{ translation.abbrev }}");
+    });
 {% endblock %}

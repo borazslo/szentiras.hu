@@ -64,6 +64,11 @@ span.numv {
   color: @muted-text-color;
 }
 
+h6 {
+    font-size: @book-font-size * 0.875;
+    font-weight: bold;
+}
+
 span.heading7, span.heading8 {
     display: inline-block;
     font-size: @book-font-size * 0.875;
@@ -87,4 +92,26 @@ h4.bookchapter {
     display: inline;
     margin: 0px;
     padding-right: 10px;
+}
+
+.hideSpinner {
+    opacity: 0;
+}
+
+div.quickSelector {
+    display: inline-block;
+
+    .dropdown-menu {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+}
+
+div.bookChapterSelector {
+    display: inline-block;
+    .dropdown-menu {
+        max-height: 400px;
+        overflow-y: auto;
+    }
 }
