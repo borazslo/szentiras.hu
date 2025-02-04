@@ -182,7 +182,7 @@ class TextDisplayController extends Controller
             $groupedVerses = [];
             foreach ($verses as $verse) {
                 $type = $verse->getType();
-                if (preg_match('/^heading[6-9]{1}/', $type)) {
+                if (preg_match('/^heading[5-9]{1}/', $type)) {
                     $gepi = $verse->gepi;
                     if (!isset($groupedVerses[$gepi])) {
                         $groupedVerses[$gepi] = [];
