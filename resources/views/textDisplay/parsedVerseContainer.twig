@@ -9,7 +9,7 @@
     {% endset %}
 <a tabindex="0" class="footnote" data-placement="auto top" data-toggle="popover" data-trigger="focus" data-html="true" data-content="{{ currentFootnote }}">
 {% endif -%}
-<span class="numv">{{ verse.numv }}</span>
+<span class="numv"><sup>{{ verse.numv }}</sup></span>
 {%- if verse.footnotes is not empty %}</a>{% endif %}
 {%- endmacro %}
 
