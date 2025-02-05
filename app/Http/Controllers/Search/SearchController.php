@@ -18,6 +18,7 @@ use SzentirasHu\Service\VerseContainer;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
+use SzentirasHu\Service\Text\TranslationService;
 use View;
 
 /**
@@ -50,7 +51,7 @@ class SearchController extends Controller
      */
     private $searchService;
 
-    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, TextService $textService, SearchService $searchService)
+    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, TextService $textService, SearchService $searchService, protected TranslationService $translationService)
     {
         $this->bookRepository = $bookRepository;
         $this->translationRepository = $translationRepository;
@@ -118,7 +119,7 @@ class SearchController extends Controller
     private function getView($form)
     {
         $translations = $this->translationRepository->getAll();
-        $books = $this->bookRepository->getBooksByTranslation($this->translationRepository->getDefault()->id);
+        $books = $this->bookRepository->getBooksByTranslation($this->translationService->getDefaultTranslation()->id);
         return View::make("search.search", [
             'form' => $form,
             'translations' => $translations,
@@ -136,7 +137,7 @@ class SearchController extends Controller
         $augmentedView = $view;
         $translatedRefs = $this->searchService->findTranslatedRefs($form->textToSearch, $form->translation);
         if (!empty($translatedRef)) {
-            $translation = $form->translation ? $form->translation : $this->translationRepository->getDefault();
+            $translation = $form->translation ? $form->translation : $this->translationService->getDefaultTranslation();
             $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($form->textToSearch), $translation->id);
             $labels = [];
             foreach ($translatedRefs as $ref) {

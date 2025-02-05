@@ -40,10 +40,4 @@ interface TranslationRepository {
      */
     public function getById($id);
 
-    /**
-     * @return Translation
-     */
-    public function getDefault();
-
-
 } 

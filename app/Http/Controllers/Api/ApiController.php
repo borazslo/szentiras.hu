@@ -2,6 +2,7 @@
 
 namespace SzentirasHu\Http\Controllers\Api;
 
+use Redirect;
 use SzentirasHu\Http\Controllers\Controller;
 use SzentirasHu\Service\Reference\ParsingException;
 use SzentirasHu\Service\Search\FullTextSearchParams;
@@ -20,6 +21,8 @@ use SzentirasHu\Data\Repository\TranslationRepository;
 use View;
 use Request;
 use SzentirasHu\Data\Repository\VerseRepository;
+use SzentirasHu\Service\Text\BookService;
+use SzentirasHu\Service\Text\TranslationService;
 
 class ApiController extends Controller
 {
@@ -65,7 +68,9 @@ class ApiController extends Controller
         BookRepository $bookRepository,
         VerseRepository $verseRepository,
         ReferenceService $referenceService,
-        SearchService $searchService)
+        SearchService $searchService,
+        protected TranslationService $translationService,
+        protected BookService $bookService)
     {
         $this->textService = $textService;
         $this->lectureSelector = $lectureSelector;
@@ -86,7 +91,7 @@ class ApiController extends Controller
         if ($translationAbbrev) {
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
         } else {
-            $translation = $this->translationRepository->getDefault();
+            $translation = $this->translationService->getDefaultTranslation();
         }
         $canonicalRef = CanonicalReference::fromString($refString);
         $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($refString), $translation->id);
@@ -157,7 +162,7 @@ class ApiController extends Controller
                 'name' => $book->name,
                 'number' => $book->number,
                 'corpus' => $book->old_testament,
-                'chapterCount' => $this->verseRepository->getMaxChapterByBookNumber($book->number, $translation->id)
+                'chapterCount' => $this->bookService->getChapterCount($book, $translation)
             ];
         }
         $data = [
@@ -222,7 +227,7 @@ class ApiController extends Controller
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
             return $translation;
         } else {
-            $translation = $this->translationRepository->getDefault();
+            $translation = $this->translationService->getDefaultTranslation();
             return $translation;
         }
     }

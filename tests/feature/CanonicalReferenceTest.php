@@ -300,15 +300,19 @@ class CanonicalReferenceTest extends TestCase
 
     public function testCollectChapterIds()
     {
-        $range = new ChapterRange();
-        $range->chapterRef = new ChapterRef(2);
-        $range->untilChapterRef = new ChapterRef(4);
+        $range = new ChapterRange(new ChapterRef(2), new ChapterRef(4));
         $ids = CanonicalReference::collectChapterIds($range);
         $this->assertContains(2, $ids);
         $this->assertContains(3, $ids);
         $this->assertContains(4, $ids);
         $this->assertNotContains(1, $ids);
         $this->assertNotContains(5, $ids);
+    }
+    
+    public function testGetReferenceFromBookChapterVerse()
+    {
+        $ref = CanonicalReference::fromBookChapterVerse("2Kor", "3", "4");
+        $this->assertEquals("2Kor 3,4", $ref->toString());
     }
 
 

@@ -194,7 +194,7 @@ class UpdateTextsCommand extends Command
         $reader->close();
 
         if (count($inserts) > 0) {
-            $this->saveToDb($abbrev, $translation, $inserts);
+            $this->saveToDb($translation, $inserts);
         } else {
             $this->info("Nincs mit feltölteni.");
         }
@@ -296,23 +296,18 @@ class UpdateTextsCommand extends Command
      * @param $translation
      * @param $inserts
      */
-    private function saveToDb($abbrev, $translation, $inserts)
+    private function saveToDb($translation, $inserts)
     {
         $this->info("\nMysql adatbázis lementése...");
         $progressBar = $this->output->createProgressBar(count($inserts));
-        //TODO: larevelesíteni (http://bundles.laravel.com/bundle/mysqldump-php ?)
-        $connections = Config::get('database.connections');
-        $conn = $connections[Config::get('database.default')];
-        exec('mysqldump -u ' . $conn['username'] . ' --password=' . $conn['password'] . ' ' . $conn['database'] . ' ' . $conn['prefix'] . 'tdverse > ' . $this->sourceDirectory . '/' . $conn['database'] . '_' . $conn['prefix'] . 'tdverse_' . $abbrev . '_' . date('YmdHis') . '.sql');
-
         Artisan::call('down');
-        $this->info("Mysql tábla ürítése...");
+        $this->info("Adatbázistábla ürítése...");
         if (!$this->option('filter')) {
             DB::table('tdverse')->where('trans', '=', $translation->id)->delete();
         } else {
             DB::table('tdverse')->where('trans', '=', $translation->id)->where('gepi', 'REGEXP', $this->option('filter'))->delete();
         }
-        $this->info("Mysql tábla feltöltése " . count($inserts) . " sorral...");
+        $this->info("Adatbázistábla feltöltése " . count($inserts) . " sorral...");
         echo "\n";
         for ($rowNumber = 0; $rowNumber < count($inserts); $rowNumber += 100) {
             $slice = array_slice($inserts, $rowNumber, 100);
@@ -350,6 +345,10 @@ class UpdateTextsCommand extends Command
                 break;
             }
             $gepi = $row->getCellAtIndex($cols[$fields['gepi']])->getValue();
+            $search = ['1010020040a', '1010020040b'];
+            $replace = ['10100200401', '10100200402'];      
+            $gepi = str_replace($search, $replace, $gepi);
+
             if (!$this->option('filter') OR preg_match('/' . $this->option('filter') . '/i', $gepi)) {
                 $values['trans'] = $translation->id;
                 $values['gepi'] = $gepi;

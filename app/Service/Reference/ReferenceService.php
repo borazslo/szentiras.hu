@@ -10,6 +10,7 @@ use Log;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
+use SzentirasHu\Service\Text\TranslationService;
 
 class ReferenceService
 {
@@ -27,7 +28,7 @@ class ReferenceService
      */
     private $verseRepository;
 
-    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository, VerseRepository $verseRepository)
+    function __construct(TranslationRepository $translationRepository, BookRepository $bookRepository, VerseRepository $verseRepository, protected TranslationService $translationService)
     {
         $this->translationRepository = $translationRepository;
         $this->bookRepository = $bookRepository;
@@ -92,7 +93,7 @@ class ReferenceService
         $bookRefs = array_map(function ($bookRef) use ($translationId, $ref) {
             return $this->translateBookRef($bookRef, $translationId, $ref->translationId);
         }, $ref->bookRefs);
-        return new CanonicalReference($bookRefs);
+        return new CanonicalReference($bookRefs, $translationId);
     }
 
 
@@ -142,6 +143,15 @@ class ReferenceService
             false;
 
         return [$prevRef, $nextRef];
+    }
+
+    public function createReferenceFromNumbers($bookNumber, $chapterNumber, int $verseNumber, $translation = null) {
+        if ($translation == null) {
+            $translation = $this->translationService->getDefaultTranslation();
+        }
+        $book = $this->bookRepository->getByNumberForTranslation($bookNumber, $translation->id);
+        $ref = CanonicalReference::fromBookChapterVerse($book->abbrev, $chapterNumber, $verseNumber);
+        return $ref;
     }
 
 }

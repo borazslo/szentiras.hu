@@ -4,11 +4,12 @@
 
 namespace SzentirasHu\Service\Text;
 
-
+use SzentirasHu\Data\Entity\Translation;
 use SzentirasHu\Service\Reference\CanonicalReference;
 use SzentirasHu\Service\Reference\ReferenceService;
 use SzentirasHu\Service\VerseContainer;
 use SzentirasHu\Data\Repository\BookRepository;
+use SzentirasHu\Data\Repository\TranslationRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\VersePart;
 
@@ -26,12 +27,17 @@ class TextService
      * @var \SzentirasHu\Data\Repository\VerseRepository
      */
     private $verseRepository;
+    /**
+     * @var \SzentirasHu\Data\Repository\TranslationRepository
+     */
+    private $translationRepository;
 
-    function __construct(ReferenceService $referenceService, BookRepository $bookRepository, VerseRepository $verseRepository)
+    function __construct(ReferenceService $referenceService, BookRepository $bookRepository, VerseRepository $verseRepository, TranslationRepository $translationRepository)
     {
         $this->referenceService = $referenceService;
         $this->bookRepository = $bookRepository;
         $this->verseRepository = $verseRepository;
+        $this->translationRepository = $translationRepository;
     }
 
 
@@ -78,12 +84,12 @@ class TextService
      * @param $translationId int
      * @return string
      */
-    public function getPureText($canonicalRef, $translationId)
+    public function getPureText($canonicalRef, $translation)
     {
         if (is_string($canonicalRef)) {
             $canonicalRef = CanonicalReference::fromString($canonicalRef);
         }
-        $verseContainers = $this->getTranslatedVerses($canonicalRef, $translationId);
+        $verseContainers = $this->getTranslatedVerses($canonicalRef, $translation->id);
         $text = '';
         foreach ($verseContainers as $verseContainer) {
             $verses = $verseContainer->getParsedVerses();
@@ -94,6 +100,11 @@ class TextService
             }
         }
         return $text;
+    }
+
+    public function getPureTextFromNumbers($bookNumber, $chapterNumber, int $verseNumber, $translation) {
+        $reference = $this->referenceService->createReferenceFromNumbers($bookNumber, $chapterNumber, $verseNumber, $translation);
+        return $this->getPureText($reference, $translation);
     }
 
     /**

@@ -12,6 +12,7 @@ use SzentirasHu\Service\VerseContainer;
 use SzentirasHu\Data\Entity\Verse;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
+use SzentirasHu\Service\Text\TranslationService;
 
 class SearchService {
 
@@ -33,7 +34,7 @@ class SearchService {
      */
     private $referenceService;
 
-    function __construct(SearcherFactory $searcherFactory, VerseRepository $verseRepository, TranslationRepository $translationRepository, ReferenceService $referenceService)
+    function __construct(SearcherFactory $searcherFactory, VerseRepository $verseRepository, TranslationRepository $translationRepository, ReferenceService $referenceService, protected TranslationService $translationService)
     {
         $this->searcherFactory = $searcherFactory;
         $this->verseRepository = $verseRepository;
@@ -107,7 +108,7 @@ class SearchService {
         //echo "<pre>".print_r($sphinxResults ,1)."</pre>";
         
         
-        $defaultTranslation = $this->translationRepository->getDefault();
+        $defaultTranslation = $this->translationService->getDefaultTranslation();
                 
         /* beginning of new part */                
         $results = [];
@@ -234,11 +235,12 @@ class SearchService {
                 $verseData['chapter'] = $verse->chapter;
                 $verseData['numv'] = $verse->numv;
                 $verseData['text'] = '';
-                if ($verse->headings) {
-                    foreach ($verse->headings as $heading) {
-                        $verseData['text'] .= "<small>".$heading . '</small> ';
-                    }
-                }
+                // TODO: add headings
+                // if ($verse->headings) {
+                //     foreach ($verse->headings as $heading) {
+                //         $verseData['text'] .= "<small>".$heading . '</small> ';
+                //     }
+                // }
                 if ($verse->getText()) {
                     $verseData['text'] .= preg_replace('/<[^>]*>/', ' ', $verse->getText());
                 }
