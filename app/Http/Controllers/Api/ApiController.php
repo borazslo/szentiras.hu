@@ -248,12 +248,12 @@ class ApiController extends Controller
         foreach ($translations as $translation) {
             try {
                 $canonicalRef = $this->referenceService->translateReference(CanonicalReference::fromString($ref), $translation->id);
-                $text = $this->textService->getPureText($canonicalRef, $translation->id);
+                $text = $this->textService->getPureText($canonicalRef, $translation);
                 $result = [];
                 if (!empty($text)) {
                     $result['canonicalRef'] = $canonicalRef->toString();
                     $result['canonicalUrl'] = URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id));
-                    $result['text'] = $this->textService->getPureText($canonicalRef, $translation->id);
+                    $result['text'] = $this->textService->getPureText($canonicalRef, $translation);
                     $result['translationAbbrev'] = $translation->abbrev;
                     $result['translationName'] = $translation->name;
                     $results[] = $result;
