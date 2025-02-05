@@ -19,5 +19,9 @@ return [
     ],
     'googleAppName' => 'szentiras-hu',
     'googleApiKey' => env('GOOGLE_API_KEY'),
-    'googleCalendarId' => 'katolikus.hu@gmail.com'
+    'googleCalendarId' => 'katolikus.hu@gmail.com',
+    'ai' => [
+        'embeddingModel' => env("APP_EMBEDDING_MODEL", 'text-embedding-3-large'),
+        'embeddingDimensions' => env("APP_EMBEDDING_DIMENSIONS", 2000)
+    ]
 ];

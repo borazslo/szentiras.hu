@@ -14,7 +14,6 @@ class CleanTdverse extends Migration {
     { 
         Schema::table('tdverse', function(Blueprint $table)
         {
-            $table->dropUnique('index_did_trans');
             $table->dropColumn('did');
             $table->dropColumn('hiv');
             $table->dropColumn('old');

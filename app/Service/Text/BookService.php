@@ -2,6 +2,7 @@
 
 namespace SzentirasHu\Service\Text;
 
+use Illuminate\Support\Collection;
 use SzentirasHu\Data\Entity\Book;
 use SzentirasHu\Data\Entity\Translation;
 use SzentirasHu\Data\Repository\BookRepository;
@@ -12,10 +13,7 @@ class BookService {
     public function __construct(protected BookRepository $bookRepository, protected VerseRepository $verseRepository) {
     }
 
-    /**
-     * @return Book[]
-     */
-    public function getBooksForTranslation(Translation $translation) {
+    public function getBooksForTranslation(Translation $translation) : Collection {
         return $this->bookRepository->getBooksByTranslation($translation->id);
     }
 

@@ -17,6 +17,8 @@
         "laravel/framework": "^11.0",
         "laravel/helpers": "^1.7",
         "laravel/tinker": "^2.5",
+        "openai-php/laravel": "^0.10.2",
+        "pgvector/pgvector": "^0.2.1",
         "predis/predis": "^1.0",
         "rcrowe/twigbridge": "0.14.3",
         "twig/twig": "~3.9"
@@ -79,7 +81,8 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "allow-plugins": {
-            "kylekatarnls/update-helper": true
+            "kylekatarnls/update-helper": true,
+            "php-http/discovery": true
         }
     },
     "prefer-stable": true

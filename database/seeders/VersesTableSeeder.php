@@ -30,6 +30,7 @@ class VersesTableSeeder extends \Illuminate\Database\Seeder
         $v->tip = 6;
         $v->verse = "verse " . $v->hiv;
         $v->verseroot = "verseroot" . $v->hiv;
+        $v->ido = "2025-02-05";
         $v->save();
     }
 }

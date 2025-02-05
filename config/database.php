@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'bible'),
+    'default' => env('DB_CONNECTION', 'postgres'),
 
     /*
     |--------------------------------------------------------------------------
@@ -44,6 +44,16 @@ return [
             'prefix'    => env('DB_PREFIX', 'kar_'),
             'strict'    => false,
         ],
+
+        'postgres' => [
+            'driver' => 'pgsql',
+            'host'      => env('DB_HOST', 'localhost'),
+            'database'  => env('DB_DATABASE', 'bible'),
+            'username'  => env('DB_USERNAME', 'homestead'),
+            'password'  => env('DB_PASSWORD', 'secret'),
+            'collation' => 'hu-x-icu',
+            'prefix'    => env('DB_PREFIX', 'kar_')
+        ]
 
     ],
 

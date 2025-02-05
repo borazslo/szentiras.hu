@@ -36,7 +36,7 @@ RUN apt install -y curl && \
     command -v nvm && \
     bash -c "source $NVM_DIR/nvm.sh && nvm install v6.2.2"
 
-RUN apt install -y php8.2-xml php8.2-zip php8.2-gd php8.2-mbstring php8.2-mysql php8.2-curl php8.2-xdebug
+RUN apt install -y php8.2-xml php8.2-zip php8.2-gd php8.2-mbstring php8.2-mysql php8.2-curl php8.2-xdebug php8.2-pgsql
 
 RUN apt install -y hunspell hunspell-hu
 
@@ -48,6 +48,11 @@ RUN apt install -y texlive
 RUN apt install -y texlive-xetex
 RUN apt install -y texlive-lang-european
 RUN apt install -y fonts-linuxlibertine
+
+RUN apt install -y postgresql-common
+RUN /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+RUN apt install postgresql-14-pgvector
+
 
 COPY ../deploy/local/sphinx/sphinx.conf /etc/sphinxsearch
 RUN sed -i 's/^START=no/START=yes/' /etc/default/sphinxsearch

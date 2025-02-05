@@ -1,0 +1,31 @@
+{% extends 'layout' %}
+
+{% set pageTitle %}
+Keresés jelentés szerint mesterséges intelligencia segítségével | Szentírás
+{% endset %}
+
+{% block content %}
+    <h2>Keresés jelentés szerint, mesterséges intelligencia segítségével</h2>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form role="form" class="form-horizontal" method="get"
+                  action="{{ action('Search\\SemanticSearchController@anySearch') }}">
+                <div class="form-group">
+                    <label for="textToSearch" class="col-sm-3 control-label">Keresendő</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="textToSearch" id="textToSearch" value="{{ form.textToSearch }}" class="form-control"/>
+                    </div>
+                </div>
+                <input type="submit" value="Keresés" class="btn btn-default"/>
+            </form>
+        </div>
+    </div>                     
+
+    <table class="table">
+        <tr><th>Referencia</th><th>Szöveg</th></tr>
+    {% for result in response.results %}
+        <tr><td>{{ result.embeddedVerse.reference }}</td><td>{{ result.embeddedVerse.content }}</td></tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}

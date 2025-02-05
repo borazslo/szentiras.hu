@@ -65,20 +65,21 @@ class VerseData
         }
     }
 
-    public function getText() : string {
-        $text = '';
-        foreach ($this->verseParts as $versePart) {
-            if ($versePart->type == VersePartType::POEM_LINE) {
-                $text .= "{$versePart->content}";
-            } else if ($versePart->type == VersePartType::HEADING) {
-                $text .= "<h{$versePart->headingLevel}>{$versePart->content}</h{$versePart->headingLevel}>";
-            } else {
-                $text = $versePart->content;
-            }
-        }
+    public function getText() : string {        
+        $text = implode(" ",
+            array_map(function($versePart) {
+                if ($versePart->type == VersePartType::POEM_LINE) {
+                    return $versePart->content;
+                } else if ($versePart->type == VersePartType::HEADING) {
+                    return "<h{$versePart->headingLevel}>{$versePart->content}</h{$versePart->headingLevel}>";
+                } else {
+                    return $versePart->content;
+                }
+            }, $this->verseParts));
         return $text;
     }
 
+    
     public function getCount() : int {
         return count($this->verseParts);
     }

@@ -39,10 +39,6 @@ class SearchController extends Controller
      */
     private $translationRepository;
     /**
-     * @var \SzentirasHu\Data\Repository\VerseRepository
-     */
-    private $verseRepository;
-    /**
      * @var \SzentirasHu\Service\Text\TextService
      */
     private $textService;
@@ -51,11 +47,10 @@ class SearchController extends Controller
      */
     private $searchService;
 
-    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, TextService $textService, SearchService $searchService, protected TranslationService $translationService)
+    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, TextService $textService, SearchService $searchService, protected TranslationService $translationService)
     {
         $this->bookRepository = $bookRepository;
         $this->translationRepository = $translationRepository;
-        $this->verseRepository = $verseRepository;
         $this->textService = $textService;
         $this->searchService = $searchService;
     }

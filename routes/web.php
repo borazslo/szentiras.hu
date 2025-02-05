@@ -22,6 +22,9 @@ Route::get("/kereses/suggest", 'Search\SearchController@anySuggest');
 Route::post("/kereses/suggest", 'Search\SearchController@anySuggest');
 Route::post("/kereses/legacy", 'Search\SearchController@postLegacy');
 
+Route::get("/ai-search", 'Search\SemanticSearchController@getIndex');
+Route::get("/ai-search/search", 'Search\SemanticSearchController@anySearch');
+
 Route::post('/searchbible.php', 'SzentirasHu\Http\Controllers\Search\SearchController@postLegacy');
 
 /** API */
