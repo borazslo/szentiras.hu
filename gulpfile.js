@@ -22,8 +22,8 @@ elixir(function(mix) {
             'compiled/less.css'
             ]);
     mix.
-        coffee(['ad.coffee', 'pdfDialog.coffee', 'quickSearch.coffee', 'textDisplay.coffee'], 'resources/assets/js/compiled/coffee.js');
-    mix.scripts(['compiled/coffee.js']);
+        coffee(['*.coffee'], 'resources/assets/js/compiled/coffee.js');
+    mix.scripts(['compiled/coffee.js', '*.js']);
 
     mix.version(['css/all.css', 'js/all.js']);
 

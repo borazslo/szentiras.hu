@@ -42,7 +42,7 @@ class VerseData
      */
     public function getHeadingVerseParts(): array {
         return array_filter($this->verseParts, function(VersePart $versePart) {
-            return $versePart->type === VersePartType::HEADING && $versePart->headingLevel >=0 && $versePart->headingLevel <= 4;
+            return $versePart->type === VersePartType::HEADING;
         });        
     }
 

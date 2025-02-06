@@ -46,4 +46,10 @@ class VerseRepositoryEloquent implements VerseRepository {
         }
         return array_replace(array_flip($verseIds), $idVerseMap);
     }
+
+    public function getMaxChapterByBookNumber($bookNumber, $translationId)
+    {
+        return Verse::where('book_number', $bookNumber)->where('trans', $translationId)->max('chapter');
+    }
+
 }

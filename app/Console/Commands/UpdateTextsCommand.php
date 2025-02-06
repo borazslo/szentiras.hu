@@ -105,13 +105,13 @@ class UpdateTextsCommand extends Command
         }
 
         $columns = [
-            'SZIT' => ['gepi' => 0, 'rov' => 5],
-            'KNB' => ['gepi' => 0, 'rov' => 3],
-            'UF' => ['gepi' => 0, 'rov' => 4],
-            'KG' => ['gepi' => 0, 'rov' => 4],
-            'BD' => ['gepi' => 0, 'rov' => 1],
-            'RUF' => ['gepi' => 0, 'rov' => 5],
-			'STL' => ['gepi' => 0, 'rov' => 2],
+            'SZIT' => ['gepi' => 0, 'rov' => 5, 'bookSheetHeaderRows' => 1],
+            'KNB' => ['gepi' => 0, 'rov' => 3, 'bookSheetHeaderRows' => 2],
+            'UF' => ['gepi' => 0, 'rov' => 4, 'bookSheetHeaderRows' => 1],
+            'KG' => ['gepi' => 0, 'rov' => 4, 'bookSheetHeaderRows' => 1],
+            'BD' => ['gepi' => 0, 'rov' => 1, 'bookSheetHeaderRows' => 1],
+            'RUF' => ['gepi' => 0, 'rov' => 5, 'bookSheetHeaderRows' => 1],
+			'STL' => ['gepi' => 0, 'rov' => 2, 'bookSheetHeaderRows' => 1],
         ];
         $this->verifyBookColumns($columns, $abbrev);
 
@@ -126,7 +126,7 @@ class UpdateTextsCommand extends Command
         $linesRead = 0;
         foreach ($bookRowIterator as $row) {
             // skip first line
-            if ($linesRead == 0 or $linesRead == 1) {
+            if ($linesRead == 0 or ($linesRead == 1 && $columns[$abbrev]['bookSheetHeaderRows'] == 2)) {
                 $this->info("Első két sor átugrása...");
                 $linesRead++;
                 continue;
@@ -193,7 +193,7 @@ class UpdateTextsCommand extends Command
         $reader->close();
 
         if (count($inserts) > 0) {
-            $this->saveToDb($abbrev, $translation, $inserts);
+            $this->saveToDb($translation, $inserts);
         } else {
             $this->info("Nincs mit feltölteni.");
         }
@@ -295,23 +295,18 @@ class UpdateTextsCommand extends Command
      * @param $translation
      * @param $inserts
      */
-    private function saveToDb($abbrev, $translation, $inserts)
+    private function saveToDb($translation, $inserts)
     {
         $this->info("\nMysql adatbázis lementése...");
         $progressBar = $this->output->createProgressBar(count($inserts));
-        //TODO: larevelesíteni (http://bundles.laravel.com/bundle/mysqldump-php ?)
-        $connections = Config::get('database.connections');
-        $conn = $connections[Config::get('database.default')];
-        exec('mysqldump -u ' . $conn['username'] . ' --password=' . $conn['password'] . ' ' . $conn['database'] . ' ' . $conn['prefix'] . 'tdverse > ' . $this->sourceDirectory . '/' . $conn['database'] . '_' . $conn['prefix'] . 'tdverse_' . $abbrev . '_' . date('YmdHis') . '.sql');
-
         Artisan::call('down');
-        $this->info("Mysql tábla ürítése...");
+        $this->info("Adatbázistábla ürítése...");
         if (!$this->option('filter')) {
             DB::table('tdverse')->where('trans', '=', $translation->id)->delete();
         } else {
             DB::table('tdverse')->where('trans', '=', $translation->id)->where('gepi', 'REGEXP', $this->option('filter'))->delete();
         }
-        $this->info("Mysql tábla feltöltése " . count($inserts) . " sorral...");
+        $this->info("Adatbázistábla feltöltése " . count($inserts) . " sorral...");
         echo "\n";
         for ($rowNumber = 0; $rowNumber < count($inserts); $rowNumber += 100) {
             $slice = array_slice($inserts, $rowNumber, 100);
@@ -349,6 +344,10 @@ class UpdateTextsCommand extends Command
                 break;
             }
             $gepi = $row->getCellAtIndex($cols[$fields['gepi']])->getValue();
+            $search = ['1010020040a', '1010020040b'];
+            $replace = ['10100200401', '10100200402'];      
+            $gepi = str_replace($search, $replace, $gepi);
+
             if (!$this->option('filter') OR preg_match('/' . $this->option('filter') . '/i', $gepi)) {
                 $values['trans'] = $translation->id;
                 $values['gepi'] = $gepi;
@@ -363,15 +362,11 @@ class UpdateTextsCommand extends Command
                     $verseRoot = null;
                 }
                 $values['verseroot'] = $verseRoot;
-                if (isset($cols['ido']) && !empty($row[$cols['ido']])) {
-                    $values['ido'] = $row[$cols['ido']];
-                }
                 if (isset($books_gepi2id[$values['book_number']])) {
                     $values['book_id'] = $books_gepi2id[$values['book_number']];
                 } else {
-                    print_r($values);
                     print_r($books_gepi2id);
-                    App::abort(500, 'Nincs meg a book number a gepi2id listában');
+                    App::abort(500, 'Nincs meg a book number ' . $values['book_number'] . ' a gepi2id listában');
                 }
                 $inserts[$rowNumber] = $values;
             }
@@ -455,9 +450,6 @@ class UpdateTextsCommand extends Command
                 if (preg_match('/[A-Z]{3}_hiv/', $col)) $fields['gepi'] = $col;
                 if (preg_match('/[A-Z]{3}_old/', $col)) $fields['old'] = $col;
                 if (preg_match('/ssz$/i', $col)) $fields['did'] = $col;
-            }
-            if (!isset($headers['ido'])) {
-                unset($fields['ido']);
             }
         }
         $errors = [];

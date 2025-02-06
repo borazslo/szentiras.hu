@@ -44,7 +44,7 @@ class TranslationRepositoryEloquent implements TranslationRepository
 
     public function getByAbbrev($abbrev)
     {
-        return Translation::where('abbrev', $abbrev)->first();
+        return Translation::byAbbrev($abbrev);
     }
 
     public function getById($id)
@@ -53,11 +53,6 @@ class TranslationRepositoryEloquent implements TranslationRepository
             "translations_getById_{$id}", 120, function() use ($id) {
             return Translation::find($id);
         });
-    }
-
-    public function getDefault()
-    {
-        return Translation::find(\Config::get('settings.defaultTranslationId'));
     }
 
 }

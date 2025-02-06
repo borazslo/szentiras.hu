@@ -9,21 +9,34 @@
     {% include 'textDisplay.breadcrumb' %}
 
     <div class="translationButtons">
+        <div class="dropdown bookChapterSelector">
+            <button class="btn btn-default  dropdown-toggle" type="button" data-toggle="dropdown" id="corpusSelectorButton" aria-haspopup="true" aria-expanded="false">
+Fejezetválasztás <span class="caret"></span></button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                {% for chapterId, chapter in chapters %}    
+                {% set chheadings = headings[chapterId] %}
+                {% set headingText = chheadings ? chheadings|map (h => "#{h.content}" )|join(", ") : ""%}
+                <li><a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapterId}}"  class="dropdown-item"><b>{{ chapterId }}</b> <small>{{ headingText|str_limit(50, '…') }}</small></a>        
+                {% endfor %}
+            </ul>
+        </div>
+    
         {% include 'textDisplay.translationButtons' with { 'translations': translations, 'translation': translation, 'link': book.abbrev } %}
     </div>
-   
+
+
     {% for chapterId, chapter in chapters %}
         {%set chapterLink %}/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapterId }}{% endset %}
         {%set chapterText %}{{ chapterId }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}{% endset %}
         <h4  class="bookchapter"><a href="{{ chapterLink }}">{{ chapterText }}</a></h4>
 
-        {% set headings = chapter.headings %}
-        {% if headings|length > 0 %}
-            <h4><small>
-        {% for heading in headings %}
-             {{ heading.text|striptags('<br><a>')|raw  }} <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapterId}}#heading_{{ heading.gepi }}_{{ heading.level }}' class='link'>&raquo;</a><br/>
+        {% set chheadings = headings[chapterId] %}
+        {% if chheadings|length > 0 %}            
+            <small>
+        {% for heading in chheadings %}
+            <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapterId}}#heading_{{ heading.gepi }}_{{ heading.headingLevel }}' class='link'>{{ heading.content|striptags('<br><a>')|raw  }}.&nbsp;</a>
         {% endfor %}        
-        </small></h4>
+        </small>
         {% endif %}        
         
         {% set leadVerses = chapter.leadVerses %} 

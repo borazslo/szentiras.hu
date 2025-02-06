@@ -42,6 +42,19 @@ class CanonicalReference
         return $ref;
     }
 
+    public static function fromBookChapterVerse($bookAbbrev, $chapterNumber, int $verseNumber) {
+        $ref = new CanonicalReference();
+        $bookRef = new BookRef($bookAbbrev);
+        $verseRef = new VerseRef($verseNumber);
+        $verseRange = new VerseRange($verseRef);
+        $chapterRef = new ChapterRef($chapterNumber);
+        $chapterRef->addVerseRange($verseRange);
+        $chapterRange = new ChapterRange($chapterRef);        
+        $bookRef->addChapterRange($chapterRange);
+        $ref->addBookRef($bookRef);
+        return $ref;
+    }
+
     public function toString()
     {
         $s = '';
@@ -87,6 +100,10 @@ class CanonicalReference
             $currentChapter++;
         } while ($chapterRange->untilChapterRef && $currentChapter <= $chapterRange->untilChapterRef->chapterId);
         return $searchedChapters;
+    }
+
+    public function addBookRef(BookRef $bookRef) {
+        $this->bookRefs[] = $bookRef;
     }
 
 }

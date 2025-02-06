@@ -58,10 +58,18 @@ div.translationButtons {
 
 
 span.numv {
-  position: relative; 
-  font-size: 0.8em; /* Adjust the size as needed */
-  top: -0.5em; /* Move the number up */
   color: @muted-text-color;
+}
+
+h5 {
+    font-weight: bold;
+    color: @muted-text-color;
+}
+
+h6 {
+    font-size: @book-font-size * 0.875;
+    font-weight: bold;
+    color: @muted-text-color;
 }
 
 span.heading7, span.heading8 {
@@ -87,4 +95,26 @@ h4.bookchapter {
     display: inline;
     margin: 0px;
     padding-right: 10px;
+}
+
+.hideSpinner {
+    opacity: 0;
+}
+
+div.quickSelector {
+    display: inline-block;
+
+    .dropdown-menu {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+}
+
+div.bookChapterSelector {
+    display: inline-block;
+    .dropdown-menu {
+        max-height: 400px;
+        overflow-y: auto;
+    }
 }

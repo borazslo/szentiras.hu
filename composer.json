@@ -20,7 +20,6 @@
         "phpoffice/phpspreadsheet": "^3.9",
         "predis/predis": "^1.0",
         "rcrowe/twigbridge": "0.14.3",
-        "twig/extra-bundle": "^3.19",
         "twig/twig": "~3.9"
     },
     "require-dev": {

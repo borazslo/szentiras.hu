@@ -2,6 +2,7 @@
 
 namespace SzentirasHu\Http\Controllers\Api;
 
+use Redirect;
 use SzentirasHu\Http\Controllers\Controller;
 use SzentirasHu\Service\Reference\ParsingException;
 use SzentirasHu\Service\Search\FullTextSearchParams;
@@ -19,6 +20,9 @@ use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use View;
 use Request;
+use SzentirasHu\Data\Repository\VerseRepository;
+use SzentirasHu\Service\Text\BookService;
+use SzentirasHu\Service\Text\TranslationService;
 
 class ApiController extends Controller
 {
@@ -41,6 +45,10 @@ class ApiController extends Controller
      */
     private $bookRepository;
     /**
+     * @var \SzentirasHu\Data\Repository\VerseRepository
+     */
+    private $verseRepository;
+    /**
      * @var \SzentirasHu\Service\Reference\ReferenceService
      */
     private $referenceService;
@@ -58,13 +66,17 @@ class ApiController extends Controller
         LectureSelector $lectureSelector,
         TranslationRepository $translationRepository,
         BookRepository $bookRepository,
+        VerseRepository $verseRepository,
         ReferenceService $referenceService,
-        SearchService $searchService)
+        SearchService $searchService,
+        protected TranslationService $translationService,
+        protected BookService $bookService)
     {
         $this->textService = $textService;
         $this->lectureSelector = $lectureSelector;
         $this->translationRepository = $translationRepository;
         $this->bookRepository = $bookRepository;
+        $this->verseRepository = $verseRepository;
         $this->referenceService = $referenceService;
         $this->searchService = $searchService;
     }
@@ -79,7 +91,7 @@ class ApiController extends Controller
         if ($translationAbbrev) {
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
         } else {
-            $translation = $this->translationRepository->getDefault();
+            $translation = $this->translationService->getDefaultTranslation();
         }
         $canonicalRef = CanonicalReference::fromString($refString);
         $verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($refString), $translation->id);
@@ -148,7 +160,9 @@ class ApiController extends Controller
             $bookData[] = [
                 'abbrev' => $book->abbrev,
                 'name' => $book->name,
-                'number' => $book->number
+                'number' => $book->number,
+                'corpus' => $book->old_testament,
+                'chapterCount' => $this->bookService->getChapterCount($book, $translation)
             ];
         }
         $data = [
@@ -213,7 +227,7 @@ class ApiController extends Controller
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
             return $translation;
         } else {
-            $translation = $this->translationRepository->getDefault();
+            $translation = $this->translationService->getDefaultTranslation();
             return $translation;
         }
     }
@@ -234,12 +248,12 @@ class ApiController extends Controller
         foreach ($translations as $translation) {
             try {
                 $canonicalRef = $this->referenceService->translateReference(CanonicalReference::fromString($ref), $translation->id);
-                $text = $this->textService->getPureText($canonicalRef, $translation->id);
+                $text = $this->textService->getPureText($canonicalRef, $translation);
                 $result = [];
                 if (!empty($text)) {
                     $result['canonicalRef'] = $canonicalRef->toString();
                     $result['canonicalUrl'] = URL::to($this->referenceService->getCanonicalUrl($canonicalRef, $translation->id));
-                    $result['text'] = $this->textService->getPureText($canonicalRef, $translation->id);
+                    $result['text'] = $this->textService->getPureText($canonicalRef, $translation);
                     $result['translationAbbrev'] = $translation->abbrev;
                     $result['translationName'] = $translation->name;
                     $results[] = $result;

@@ -22,6 +22,9 @@
 {%  endblock %}
 
 {% block content %}
+
+    {% include 'quickChapterSelector' %}
+
     {% for row in cathBibles %}
         <h4><a href='/{{ row.abbrev }}'>{{ row.name }} ({{ row.denom }})</a></h4>
         <p class="hidden-xs">{{ row.copyright|raw }}</p>
@@ -39,4 +42,10 @@
 
 {% block abbrevlist %}
     {% include 'bookAbbrevList' %}
+{% endblock %}
+
+{% block script %}
+    document.addEventListener('DOMContentLoaded', () => {
+        quickChapterSelector();
+    });
 {% endblock %}
