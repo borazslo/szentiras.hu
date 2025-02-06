@@ -28,6 +28,12 @@ Then, in the Docker interactive shell session, you may have to start the MySQL s
 service mysql start
 ```
 
+Then, you need to start the indexer service:
+
+```
+service sphinxsearch start
+```
+
 To serve the website:
 ```
 php artisan serve --port 1024
@@ -47,6 +53,10 @@ SET character_set_connection = 'utf8mb4';
 SET character_set_results = 'utf8mb4';
 ```
 
+To reindex:
+```
+indexer --config /etc/sphinxsearch/sphinx.conf --all --rotate
+```
 
 # Why this version of Ubuntu?
 
