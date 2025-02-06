@@ -15,13 +15,17 @@ return new class extends Migration
             $table->id();
             $table->vector("embedding", \Config::get("settings.ai.embeddingDimensions"));
             $table->string("model");
-            $table->text("content");
             $table->string("reference");
+            $table->integer("chapter")->nullable();
+            $table->integer("verse")->nullable();
             $table->integer("translation_id");
+            $table->foreign("translation_id")->references("id")->on("translations");
             $table->bigInteger("gepi")->nullable();
             $table->integer("book_id");
+            $table->foreign("book_id")->references("id")->on("books");
             $table->string("scope")->default("verse");
-            $table->timestamps();
+            $table->index(["reference", "translation_id"]);
+            $table->index("reference");
         });
     }
 
@@ -30,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists("embedded_verses");
+        Schema::dropIfExists("embedded_excerpts");
     }
 };

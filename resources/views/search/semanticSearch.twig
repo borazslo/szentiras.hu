@@ -21,11 +21,46 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
         </div>
     </div>                     
 
-    <table class="table">
-        <tr><th>Referencia</th><th>Szöveg</th></tr>
-    {% for result in response.results %}
-        <tr><td>{{ result.embeddedExcerpt.reference }}</td><td>{{ result.embeddedExcerpt.content }}</td></tr>
-    {% endfor %}
-    </table>
+    <div>
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a role="tab" data-toggle="tab" href="#versek">Versek</a></li>
+        <li role="presentation"><a role="tab" data-toggle="tab" href="#fejezetek">Fejezetek</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="versek">
+            {% for result in response.results %}        
+                {% for verseContainer in result.verseContainers %}
+                <blockquote>
+                    <footer>
+                        <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                    </footer>
+                    {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis} %}
+                </blockquote>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="fejezetek">
+            {% for result in chapterResponse.results %}        
+                {% for verseContainer in result.verseContainers %}
+                <blockquote>
+                    <footer>
+                        <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                    </footer>
+                    {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}
+                </blockquote>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+    </div>
+    </div>
 
 {% endblock %}
+
+{% block script %}
+    $('#myTabs a').click(function (e) {
+        //e.preventDefault()
+        //$(this).tab('show')
+      })      
+{%  endblock %}

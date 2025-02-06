@@ -8,5 +8,7 @@ class SemanticSearchResult {
 
     public $distance;
     public EmbeddedExcerpt $embeddedExcerpt;
-
+    public $verseContainers;
+    public $topVerseContainers;
+    public $highlightedGepis;
 }

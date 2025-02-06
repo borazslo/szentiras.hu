@@ -3,6 +3,7 @@
 namespace SzentirasHu\Http\Controllers\Search;
 
 use Illuminate\Http\Request;
+use SzentirasHu\Data\Entity\EmbeddedExcerptScope;
 use SzentirasHu\Http\Controllers\Controller;
 use SzentirasHu\Http\Controllers\Search\SearchForm;
 use SzentirasHu\Http\Controllers\Search\SemanticSearchForm;
@@ -50,10 +51,12 @@ class SemanticSearchController extends Controller
 
     private function semanticSearch(SemanticSearchForm $form, $view)
     {
-        $results = $this->semanticSearchService->findNeighbors($form->textToSearch);
-        if (!empty($results)) {
-            $view = $view->with('response', $results);
-        }
+        // TODO: Call OpenAI only once!
+        $response = $this->semanticSearchService->findNeighbors($form->textToSearch);
+        $chapterResponse = $this->semanticSearchService->findNeighbors($form->textToSearch, EmbeddedExcerptScope::Chapter);
+        $view = $view->with('response', $response);
+        $view = $view->with('chapterResponse', $chapterResponse);
+
         return $view;
     }
 

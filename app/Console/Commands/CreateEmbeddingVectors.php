@@ -3,6 +3,7 @@
 namespace SzentirasHu\Console\Commands;
 
 use Illuminate\Console\Command;
+use OpenAI\Exceptions\ErrorException;
 use OpenAI\Laravel\Facades\OpenAI as OpenAI;
 use Pgvector\Laravel\Distance;
 use Pgvector\Laravel\Vector;
@@ -42,21 +43,22 @@ class CreateEmbeddingVectors extends Command
     private int $tokenCount = 0;
 
     public function __construct(
-        protected TextService $textService, 
-        protected BookService $bookService, 
-        protected TranslationService $translationService, 
-        protected ReferenceService $referenceService) {
+        protected TextService $textService,
+        protected BookService $bookService,
+        protected TranslationService $translationService,
+        protected ReferenceService $referenceService
+    ) {
         parent::__construct();
-        
+
         $this->model = \Config::get("settings.ai.embeddingModel");
-        $this->dimensions = \Config::get("settings.ai.embeddingDimensions");      
+        $this->dimensions = \Config::get("settings.ai.embeddingDimensions");
     }
 
     /**
      * Execute the console command.
      */
     public function handle()
-    {        
+    {
         $translationAbbrev = $this->argument('translation');
         $translation = $this->translationService->getByAbbreviation($translationAbbrev);
         if ($this->option("deleteAll")) {
@@ -72,13 +74,13 @@ class CreateEmbeddingVectors extends Command
         $tokenCount = 0;
         foreach ($books as $book) {
             $chapterCount = $this->bookService->getChapterCount($book, $translation);
-            for ($chapter=1; $chapter <= $chapterCount; $chapter++) {                
+            for ($chapter = 1; $chapter <= $chapterCount; $chapter++) {
                 $chapterReference = "{$book->abbrev} $chapter";
-                $this->embedExcerpt($chapterReference, EmbeddedExcerptScope::Chapter, $translation, $book);
+                $this->embedExcerpt($chapterReference, EmbeddedExcerptScope::Chapter, $translation, $book, $chapter);
                 $verse = 1;
                 do {
-                    $reference = "{$book->abbrev} $chapter, $verse";
-                    $text = $this->embedExcerpt($reference, EmbeddedExcerptScope::Verse, $translation, $book);
+                    $reference = "{$book->abbrev} $chapter,$verse";
+                    $text = $this->embedExcerpt($reference, EmbeddedExcerptScope::Verse, $translation, $book, $chapter, $verse);
                     $verse++;
                 } while (!empty($text));
             }
@@ -96,12 +98,14 @@ class CreateEmbeddingVectors extends Command
         }
         $tokenCount += $response->usage->totalTokens;
         $this->info("Tokens used: $tokenCount");
-
     }
-    
 
-    private function embedExcerpt(string $reference, EmbeddedExcerptScope $scope, Translation $translation, Book $book) {
+
+    private function embedExcerpt(string $reference, EmbeddedExcerptScope $scope, Translation $translation, Book $book, int $chapter, int $verse = null)
+    {
+        $this->info("$reference");
         $text = null;
+        $existingEmbedding = EmbeddedExcerpt::whereBelongsTo($translation)->where("reference", $reference)->first();
         if ($scope == EmbeddedExcerptScope::Chapter) {
             $canonicalChapterReference = CanonicalReference::fromString($reference, $translation->id);
             $text = $this->textService->getPureText($canonicalChapterReference, $translation);
@@ -110,33 +114,45 @@ class CreateEmbeddingVectors extends Command
             $canonicalReference = CanonicalReference::fromString($reference, $translation->id);
             $verseContainers = $this->textService->getTranslatedVerses($canonicalReference, $translation->id);
             $gepi = array_pop($verseContainers[0]->rawVerses)[0]->gepi ?? null;
-            $text = $this->textService->getPureText($canonicalReference, $translation);            
+            $text = $this->textService->getPureText($canonicalReference, $translation);
         }
-        $existingEmbedding = EmbeddedExcerpt::whereBelongsTo($translation)->where("reference", $reference)->first();
-        if (!empty($text) && (empty($existingEmbedding) || $this->option("update")) ) {
-            $response = OpenAI::embeddings()->create([
-                    'model' => $this->model,
-                    'input' => $text,
-                    'dimensions' => $this->dimensions
-            ]);
-            if (!empty($response)) {
-                $this->tokenCount += $response->usage->totalTokens;
-                if (count($response->embeddings) > 0) {
-                    $embedding = $response->embeddings[0]->embedding;
-                    $this->info("$reference: $text");
-                    if (!empty($existingEmbedding)) {
-                        $existingEmbedding->delete();
+        if (empty($existingEmbedding) || $this->option("update")) {
+            if (!empty($text)) {
+                try {
+                    $response = OpenAI::embeddings()->create([
+                        'model' => $this->model,
+                        'input' => $text,
+                        'dimensions' => $this->dimensions
+                    ]);
+                } catch (ErrorException $e) {
+                    sleep(30);
+                    $this->info("OpenAI error occurred, might have reached the rate limit. Sleep for 30 seconds.");
+                    $response = OpenAI::embeddings()->create([
+                        'model' => $this->model,
+                        'input' => $text,
+                        'dimensions' => $this->dimensions
+                    ]);
+                }
+                if (!empty($response)) {
+                    $this->tokenCount += $response->usage->totalTokens;
+                    if (count($response->embeddings) > 0) {
+                        $embedding = $response->embeddings[0]->embedding;
+                        $this->info("$text");
+                        if (!empty($existingEmbedding)) {
+                            $existingEmbedding->delete();
+                        }
+                        $embeddedExcerpt = new EmbeddedExcerpt();
+                        $embeddedExcerpt->embedding = $embedding;
+                        $embeddedExcerpt->model = $this->model;
+                        $embeddedExcerpt->reference = $reference;
+                        $embeddedExcerpt->chapter = $chapter;
+                        $embeddedExcerpt->verse = $verse;
+                        $embeddedExcerpt->book()->associate($book);
+                        $embeddedExcerpt->translation()->associate($translation);
+                        $embeddedExcerpt->scope = $scope;
+                        $embeddedExcerpt->gepi = $gepi;
+                        $embeddedExcerpt->save();
                     }
-                    $embeddedExcerpt = new EmbeddedExcerpt();                        
-                    $embeddedExcerpt->embedding = $embedding;
-                    $embeddedExcerpt->model = $this->model;
-                    $embeddedExcerpt->content = $text;
-                    $embeddedExcerpt->reference = $reference;
-                    $embeddedExcerpt->book()->associate($book);
-                    $embeddedExcerpt->translation()->associate($translation);
-                    $embeddedExcerpt->scope = $scope;
-                    $embeddedExcerpt->gepi = $gepi;
-                    $embeddedExcerpt->save();
                 }
             }
         }

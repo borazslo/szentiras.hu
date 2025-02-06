@@ -11,7 +11,6 @@ use SzentirasHu\Data\Entity\Translation;
 
 /**
  * @property string model
- * @property string content
  * @property string reference
  * @property array embedding
  * @property integer chapter
@@ -36,5 +35,7 @@ class EmbeddedExcerpt extends Model
     public function book(): BelongsTo {
         return $this->belongsTo(Book::class);
     }
+
+    public $timestamps = false;
 
 }
