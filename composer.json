@@ -17,6 +17,7 @@
         "laravel/helpers": "^1.7",
         "laravel/tinker": "^2.5",
         "openspout/openspout": "^4.28",
+        "phpoffice/phpspreadsheet": "^3.9",
         "predis/predis": "^1.0",
         "rcrowe/twigbridge": "0.14.3",
         "twig/extra-bundle": "^3.19",

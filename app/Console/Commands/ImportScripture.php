@@ -19,6 +19,7 @@ use OpenSpout\Common\Entity\Row;
 use SzentirasHu\Data\Entity\Translation;
 use OpenSpout\Reader\XLSX\RowIterator;
 use OpenSpout\Reader\XLSX\Reader;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ImportScripture extends Command
 {
@@ -95,6 +96,7 @@ class ImportScripture extends Command
         if ($this->option('file')) {
             $filePath = $this->option('file');
             $this->info("A fájl betöltése innen: " . $this->option('file'));
+            $filePath = $this->ensureProperFile($filePath);
         } else {
             $url = Config::get("translations.{$transAbbrevToImport}.textSource");
             if (empty($url)) {
@@ -281,7 +283,7 @@ class ImportScripture extends Command
         $result['verseroot'] = null;
 
         if ($this->hunspellEnabled && in_array($result['tip'], [60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704])) {
-            $result['verseroot'] = $this->stem($result['verse'], $pipes);
+            $result['verseroot'] = $this->executeStemming($result['verse'], $pipes);
         }
 
         if (isset($verseSheetHeaders['ido']) && !empty($row[$verseSheetHeaders['ido']])) {
@@ -403,7 +405,7 @@ class ImportScripture extends Command
         return $dbToHeaderMap;
     }
 
-    private function stem(string $verse, array $pipes): string
+    private function executeStemming(string $verse, array $pipes): string
     {
         $processedVerse = strip_tags($verse);
         $processedVerse = preg_replace("/(,|:|\?|!|;|\.|„|”|»|«|\")/i", ' ', $processedVerse);
@@ -503,7 +505,30 @@ class ImportScripture extends Command
         $firstCellValue = $row->getCellAtIndex(0)?->getValue();
         $secondCellValue = $row->getCellAtIndex(1)?->getValue();
 
-        return (!is_numeric($firstCellValue) || empty($firstCellValue)) 
+        return (!is_numeric($firstCellValue) || empty($firstCellValue))
             && !is_numeric($secondCellValue);
+    }
+
+    private function ensureProperFile(string $originalFilePath): string
+    {
+        if (!file_exists($originalFilePath)) {
+            App::abort(500, "A fájl nem található: $originalFilePath");
+        }
+
+        $fileExtension = pathinfo($originalFilePath, PATHINFO_EXTENSION);
+        if (strtolower($fileExtension) == 'xls') {
+            $spreadsheet = IOFactory::load($originalFilePath);
+            $newXlsxFile = preg_replace('/\.xls$/i', '.xlsx', $originalFilePath);
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $this->info("Régi Excel formátum konvertálása, cél fájl: $newXlsxFile");
+            $writer->save($newXlsxFile);
+            return $newXlsxFile;
+        }
+
+        if (strtolower($fileExtension) == 'xlsx' || strtolower($fileExtension) == 'xlsm') {
+            return $originalFilePath;
+        }
+
+        App::abort(500, "A fájl nem Excel Sheet: $originalFilePath ($fileExtension)");
     }
 }
