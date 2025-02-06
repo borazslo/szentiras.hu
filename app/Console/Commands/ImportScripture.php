@@ -14,11 +14,11 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
-use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use OpenSpout\Reader\Common\Creator\ReaderFactory;
+use OpenSpout\Common\Entity\Row;
 use SzentirasHu\Data\Entity\Translation;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Reader\XLSX\RowIterator;
-use Box\Spout\Reader\XLSX\Reader;
+use OpenSpout\Reader\XLSX\RowIterator;
+use OpenSpout\Reader\XLSX\Reader;
 
 class ImportScripture extends Command
 {
@@ -127,7 +127,7 @@ class ImportScripture extends Command
     private function readInserts(string $filePath, Translation $translation, string $transAbbrevToImport): array
     {
         $this->info("A $filePath fájl betöltése...");
-        $reader = ReaderEntityFactory::createXLSXReader();
+        $reader = ReaderFactory::createFromFileByMimeType($filePath);
         $reader->open($filePath);
         $this->info("A $filePath fájl megnyitva...");
         $sheets = $this->getSheets($reader);
@@ -276,7 +276,7 @@ class ImportScripture extends Command
         $result['book_number'] = (int) substr($gepi, 0, 3);
         $result['chapter'] = (int) substr($gepi, 3, 3);
         $result['numv'] = (int) substr($gepi, 6, 3);
-        $result['tip'] = $row->getCellAtIndex($verseSheetHeaders['jelstatusz']);
+        $result['tip'] = $row->getCellAtIndex($verseSheetHeaders['jelstatusz'])->getValue();
         $result['verse'] = $row->getCellAtIndex($verseSheetHeaders['jel'])->getValue();
         $result['verseroot'] = null;
 
@@ -484,7 +484,7 @@ class ImportScripture extends Command
         foreach ($verseRowIterator as $row) { // only go through the first row
             foreach ($row->getCells() as $cell) {
                 $cols[$cell->getValue()] = $i;
-                $this->info("$i.oszlop: {$cell}");
+                $this->info("$i.oszlop: {$cell->getValue()}");
                 $i++;
             }
             break;
