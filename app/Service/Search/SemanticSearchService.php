@@ -6,7 +6,7 @@ use Config;
 use Log;
 use OpenAI\Laravel\Facades\OpenAI;
 use Pgvector\Laravel\Distance;
-use SzentirasHu\EmbeddedVerse;
+use SzentirasHu\Data\Entity\EmbeddedExcerpt;
 
 class SemanticSearchService {
 
@@ -19,13 +19,13 @@ class SemanticSearchService {
             'dimensions' => $dimensions
         ]);
         $vector = $response->embeddings[0]->embedding;
-        $neighbors = EmbeddedVerse::query()
+        $neighbors = EmbeddedExcerpt::query()
             ->nearestNeighbors("embedding", $vector, $metric)->take($maxResults)->get();
         $results = [];
         Log::info("OpenAI request finished, total tokens: {$response->usage->totalTokens}");
         foreach ($neighbors as $neighbor) {
             $result = new SemanticSearchResult;
-            $result->embeddedVerse = $neighbor;
+            $result->embeddedExcerpt = $neighbor;
             $result->distance = $neighbor->neighbor_distance;
             $results[] = $result;
         }

@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create("embedded_verses", function (Blueprint $table) {
+        Schema::create("embedded_excerpts", function (Blueprint $table) {
             $table->id();
             $table->vector("embedding", \Config::get("settings.ai.embeddingDimensions"));
             $table->string("model");
             $table->text("content");
             $table->string("reference");
             $table->integer("translation_id");
+            $table->bigInteger("gepi")->nullable();
+            $table->integer("book_id");
+            $table->string("scope")->default("verse");
             $table->timestamps();
         });
     }

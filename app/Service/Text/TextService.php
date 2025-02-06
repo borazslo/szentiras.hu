@@ -4,6 +4,7 @@
 
 namespace SzentirasHu\Service\Text;
 
+use SzentirasHu\Data\Entity\Book;
 use SzentirasHu\Data\Entity\Translation;
 use SzentirasHu\Service\Reference\CanonicalReference;
 use SzentirasHu\Service\Reference\ReferenceService;
@@ -12,6 +13,7 @@ use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\VersePart;
+use SzentirasHu\Service\Reference\ChapterRange;
 
 class TextService
 {
@@ -67,7 +69,7 @@ class TextService
         return $verseContainers;
     }
 
-    public function getChapterRangeVerses($chapterRange, $book, $searchedChapters)
+    public function getChapterRangeVerses(ChapterRange $chapterRange, Book $book, $searchedChapters)
     {
         $allChapterVerses = $this->verseRepository->getTranslatedChapterVerses($book->id, $searchedChapters);
         $chapterRangeVerses = [];

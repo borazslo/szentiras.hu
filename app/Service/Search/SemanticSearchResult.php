@@ -2,11 +2,11 @@
 
 namespace SzentirasHu\Service\Search;
 
-use SzentirasHu\EmbeddedVerse;
+use SzentirasHu\Data\Entity\EmbeddedExcerpt;
 
 class SemanticSearchResult {
 
     public $distance;
-    public EmbeddedVerse $embeddedVerse;
+    public EmbeddedExcerpt $embeddedExcerpt;
 
 }

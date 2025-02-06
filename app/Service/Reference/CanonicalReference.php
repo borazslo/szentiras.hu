@@ -32,7 +32,7 @@ class CanonicalReference
         return count($ref->bookRefs) > 0;
     }
 
-    public static function fromString($s, $translationId = null)
+    public static function fromString(string $s, int $translationId = null)
     {
         $ref = new CanonicalReference();
         $parser = new ReferenceParser($s);
@@ -89,7 +89,7 @@ class CanonicalReference
 
     /**
      * @param ChapterRange $chapterRange
-     * @return array
+     * @return int[]
      */
     public static function collectChapterIds($chapterRange)
     {

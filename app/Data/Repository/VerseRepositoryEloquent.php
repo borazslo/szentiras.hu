@@ -5,6 +5,7 @@
 
 namespace SzentirasHu\Data\Repository;
 
+use Illuminate\Database\Eloquent\Collection;
 use SzentirasHu\Data\Entity\Book;
 use SzentirasHu\Data\Entity\Verse;
 
@@ -16,7 +17,7 @@ class VerseRepositoryEloquent implements VerseRepository {
         return $verses;
     }
 
-    public function getTranslatedChapterVerses($bookId, $chapters)
+    public function getTranslatedChapterVerses($bookId, $chapters) : Collection
     {
         $verses = Verse::where('book_id', $bookId)->
         whereIn('chapter', $chapters)->

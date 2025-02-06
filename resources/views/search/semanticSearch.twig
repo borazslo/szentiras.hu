@@ -24,7 +24,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
     <table class="table">
         <tr><th>Referencia</th><th>Szöveg</th></tr>
     {% for result in response.results %}
-        <tr><td>{{ result.embeddedVerse.reference }}</td><td>{{ result.embeddedVerse.content }}</td></tr>
+        <tr><td>{{ result.embeddedExcerpt.reference }}</td><td>{{ result.embeddedExcerpt.content }}</td></tr>
     {% endfor %}
     </table>
 
