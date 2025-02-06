@@ -286,8 +286,9 @@ class ImportScripture extends Command
             $result['verseroot'] = $this->executeStemming($result['verse'], $pipes);
         }
 
-        if (isset($verseSheetHeaders['ido']) && !empty($row[$verseSheetHeaders['ido']])) {
-            $result['ido'] = $row[$verseSheetHeaders['ido']];
+        if (isset($verseSheetHeaders['ido'])) {
+            $idoValue = $row->getCellAtIndex($verseSheetHeaders['ido'])->getValue();
+            $result['ido'] = $idoValue;
         }
 
         if (!isset($booksGepiToId[$result['book_number']])) {
