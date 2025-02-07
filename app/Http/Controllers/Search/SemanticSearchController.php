@@ -51,9 +51,9 @@ class SemanticSearchController extends Controller
 
     private function semanticSearch(SemanticSearchForm $form, $view)
     {
-        // TODO: Call OpenAI only once!
-        $response = $this->semanticSearchService->findNeighbors($form->textToSearch);
-        $chapterResponse = $this->semanticSearchService->findNeighbors($form->textToSearch, EmbeddedExcerptScope::Chapter);
+        $aiResult = $this->semanticSearchService->generateVector($form->textToSearch);
+        $response = $this->semanticSearchService->findNeighbors($aiResult->vector);
+        $chapterResponse = $this->semanticSearchService->findNeighbors($aiResult->vector, EmbeddedExcerptScope::Chapter);
         $view = $view->with('response', $response);
         $view = $view->with('chapterResponse', $chapterResponse);
 

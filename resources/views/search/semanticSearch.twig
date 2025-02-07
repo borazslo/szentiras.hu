@@ -5,7 +5,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
 {% endset %}
 
 {% block content %}
-    <h2>Keresés jelentés szerint, mesterséges intelligencia segítségével</h2>
+    <h3>Keresés jelentés szerint, AI segítségével</h2>
     <div class="panel panel-default">
         <div class="panel-body">
             <form role="form" class="form-horizontal" method="get"
@@ -35,7 +35,9 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                     <footer>
                         <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                     </footer>
-                    {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis} %}
+                    <div class="parsedVerses">
+                        {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis} %}
+                    </div>
                 </blockquote>
                 {% endfor %}
             {% endfor %}
@@ -47,7 +49,9 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                     <footer>
                         <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                     </footer>
-                    {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}
+                    <div class="parsedVerses">                    
+                        {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}
+                    <div class="parsedVerses">
                 </blockquote>
                 {% endfor %}
             {% endfor %}

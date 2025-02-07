@@ -23,7 +23,7 @@ a.footnote {
     outline: none;
     .numv {
         color: @footnote-link-color;
-        font-weight: bold;
+        font-style: italic;
     }    
     cursor: pointer;
     text-decoration: none;    
@@ -41,6 +41,34 @@ p.popover-footnote {
 .parsedVerses {
     font-family: @book-font;
     font-size: @book-font-size;
+    hyphens: auto;
+
+    h5 {
+        font-weight: bold;
+        color: @muted-text-color;
+    }
+    
+    h6 {
+        font-size: @book-font-size * 0.875;
+        font-weight: bold;
+        color: @muted-text-color;
+    }
+    
+    span.heading7, span.heading8 {
+        display: inline-block;
+        font-size: @book-font-size * 0.875;
+        margin-top: 3px;
+        font-weight: bold;
+        &::after {
+            content: "."
+        }
+        color: @muted-text-color;
+    }  
+
+    .mark {
+        background-color: rgba(255, 255, 0, 0.5);
+        color: black;
+    }
 }
 
 div.translationButtons {
@@ -59,28 +87,6 @@ div.translationButtons {
 
 span.numv {
   color: @muted-text-color;
-}
-
-h5 {
-    font-weight: bold;
-    color: @muted-text-color;
-}
-
-h6 {
-    font-size: @book-font-size * 0.875;
-    font-weight: bold;
-    color: @muted-text-color;
-}
-
-span.heading7, span.heading8 {
-    display: inline-block;
-    font-size: @book-font-size * 0.875;
-    margin-top: 3px;
-    font-weight: bold;
-    &::after {
-        content: "."
-    }
-    color: @muted-text-color;
 }
 
 div.footnotes {

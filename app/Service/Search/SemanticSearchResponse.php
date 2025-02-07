@@ -9,7 +9,7 @@ class SemanticSearchResponse {
     /**
      * @param SemanticSearchResult[] $results
      */
-    public function __construct(public array $results, public string $searchTerm, public Distance $metric, public int $tokenCount) {
+    public function __construct(public array $results, public Distance $metric) {
 
     }
 

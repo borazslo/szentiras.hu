@@ -11,21 +11,40 @@ use SzentirasHu\Data\Entity\EmbeddedExcerptScope;
 use SzentirasHu\Service\Reference\CanonicalReference;
 use SzentirasHu\Service\Text\TextService;
 
+class EmbeddingResult {
+    /**
+     * @param array<float> $vector
+     */
+    public function __construct(public array $vector, int $totalTokens, ) {
+    }
+}
+
 class SemanticSearchService {
 
     public function __construct(protected TextService $textService) {
     }
 
-    public function findNeighbors($text, $scope = EmbeddedExcerptScope::Verse, $maxResults = 10, $metric = Distance::Cosine) {
-        $model = Config::get("settings.ai.embeddingModel");
-        $dimensions = Config::get("settings.ai.embeddingDimensions");
+    public function generateVector(string $text, string $model = null, int $dimensions = null) {
+        if (is_null($model)) {
+            $model = Config::get("settings.ai.embeddingModel");
+        }
+        if (is_null($dimensions)) {
+            $dimensions = Config::get("settings.ai.embeddingDimensions");
+        }
         $response = OpenAI::embeddings()->create([
             'model' => $model,
             'input' => $text,
-            'dimensions' => $dimensions
+            'dimensions' => $dimensions,
+            'user' => "szentiras.eu"
         ]);
-        Log::info("OpenAI request finished, total tokens: {$response->usage->totalTokens}");
         $vector = $response->embeddings[0]->embedding;
+        $totalTokens = $response->usage->totalTokens;
+        Log::info("OpenAI request finished, total tokens: {$totalTokens}");
+        return new EmbeddingResult($vector, $totalTokens);
+    }
+
+    public function findNeighbors(array $vector, $scope = EmbeddedExcerptScope::Verse, $maxResults = 10, $metric = Distance::Cosine) {
+        
         $neighbors = EmbeddedExcerpt::query()
             ->nearestNeighbors("embedding", $vector, $metric);
         if ($scope == EmbeddedExcerptScope::Verse) {
@@ -59,7 +78,7 @@ class SemanticSearchService {
             $result->highlightedGepis = $highlightedGepis;
             $results[] = $result;
         }        
-        $response = new SemanticSearchResponse($results, $text, $metric, $response->usage->totalTokens);
+        $response = new SemanticSearchResponse($results, $metric);
         return $response;
     }
 }
