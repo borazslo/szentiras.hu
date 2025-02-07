@@ -21,4 +21,8 @@ class BookService {
         return $this->verseRepository->getMaxChapterByBookNumber($book->number, $translation->id);
     }
 
+    public function getVerseCount(Book $book, int $chapter, Translation $translation) {
+        return $this->verseRepository->getMaxNumv($book, $chapter, $translation);
+    }
+
 }

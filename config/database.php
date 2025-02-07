@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'postgres'),
+    'default' => env('DB_CONNECTION', 'bible'),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,7 +33,7 @@ return [
 
     'connections' => [
 
-        'bible' => [
+        'mysql' => [
             'driver'    => 'mysql',
             'host'      => env('DB_HOST', 'localhost'),
             'database'  => env('DB_DATABASE', 'bible'),
@@ -45,7 +45,7 @@ return [
             'strict'    => false,
         ],
 
-        'postgres' => [
+        'bible' => [
             'driver' => 'pgsql',
             'host'      => env('DB_HOST', 'localhost'),
             'database'  => env('DB_DATABASE', 'bible'),

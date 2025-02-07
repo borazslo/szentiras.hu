@@ -15,7 +15,7 @@ class EmbeddingResult {
     /**
      * @param array<float> $vector
      */
-    public function __construct(public array $vector, int $totalTokens, ) {
+    public function __construct(public array $vector, public int $totalTokens ) {
     }
 }
 
@@ -24,7 +24,7 @@ class SemanticSearchService {
     public function __construct(protected TextService $textService) {
     }
 
-    public function generateVector(string $text, string $model = null, int $dimensions = null) {
+    public function generateVector(string $text, string $model = null, int $dimensions = null) : EmbeddingResult{
         if (is_null($model)) {
             $model = Config::get("settings.ai.embeddingModel");
         }
@@ -43,29 +43,41 @@ class SemanticSearchService {
         return new EmbeddingResult($vector, $totalTokens);
     }
 
-    public function findNeighbors(array $vector, $scope = EmbeddedExcerptScope::Verse, $maxResults = 10, $metric = Distance::Cosine) {
-        
-        $neighbors = EmbeddedExcerpt::query()
-            ->nearestNeighbors("embedding", $vector, $metric);
-        if ($scope == EmbeddedExcerptScope::Verse) {
-            $neighbors = $neighbors->where("scope", EmbeddedExcerptScope::Verse);
-        } else if ($scope == EmbeddedExcerptScope::Chapter) {
-            $neighbors = $neighbors->where("scope", EmbeddedExcerptScope::Chapter);
+    public function findNeighbors(array $vector, $scope = EmbeddedExcerptScope::Verse, $maxResults = 10, $metric = Distance::Cosine, string $model = null) : SemanticSearchResponse {        
+        if (is_null($model)) {
+            $model = Config::get("settings.ai.embeddingModel");
         }
-        $neighbors = $neighbors->take($maxResults)->get();
+        $neighbors = EmbeddedExcerpt::query()
+            ->where("scope", $scope)
+            ->where("model", $model)
+            ->nearestNeighbors("embedding", $vector, $metric)
+            ->take($maxResults)            
+            ->get();
         // if we are looking for chapters, look for the most relevant verse in the chapter
         $topVerseContainers = [];
         $results = [];
         foreach ($neighbors as $neighbor) {
-            if ($neighbor->scope == EmbeddedExcerptScope::Chapter) {
+            if ($scope == EmbeddedExcerptScope::Chapter || $scope == EmbeddedExcerptScope::Range) {
                 $book = $neighbor->book;
                 $topVerseInChapter = EmbeddedExcerpt::query()
                     ->nearestNeighbors("embedding", $vector, $metric)
+                    ->where("model", $model)
                     ->whereBelongsTo($book)                    
-                    ->where("scope", EmbeddedExcerptScope::Verse)
-                    ->where("chapter", $neighbor->chapter)
-                    ->first();
-                $topVerseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($topVerseInChapter->reference, $topVerseInChapter->translation->id), $topVerseInChapter->translation->id);                
+                    ->where("scope", EmbeddedExcerptScope::Verse);
+                if ($scope == EmbeddedExcerptScope::Chapter) {
+                    $topVerseInChapter = $topVerseInChapter
+                        ->where("chapter",  $neighbor->chapter);
+                } else if ($scope == EmbeddedExcerptScope::Range) {
+                    $pointerFrom = $neighbor->chapter * 10000 + $neighbor->verse;
+                    $pointerTo = $neighbor->to_chapter * 10000 + $neighbor->to_verse;
+                    $topVerseInChapter = $topVerseInChapter->whereRaw(
+                        "chapter * 10000 + verse >= ? AND chapter * 10000 + verse <= ?",
+                        [$pointerFrom, $pointerTo]);
+                }
+                $topVerseInChapter = $topVerseInChapter->first();
+                if (!empty($topVerseInChapter)) {
+                    $topVerseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($topVerseInChapter->reference, $topVerseInChapter->translation->id), $topVerseInChapter->translation->id);                
+                }
             }
             $result = new SemanticSearchResult;
             $result->embeddedExcerpt = $neighbor;

@@ -24,6 +24,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
     <div>
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active"><a role="tab" data-toggle="tab" href="#versek">Versek</a></li>
+        <li role="presentation"><a role="tab" data-toggle="tab" href="#szakaszok">Szakaszok</a></li>
         <li role="presentation"><a role="tab" data-toggle="tab" href="#fejezetek">Fejezetek</a></li>
     </ul>
 
@@ -42,6 +43,21 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                 {% endfor %}
             {% endfor %}
         </div>
+        <div role="tabpanel" class="tab-pane" id="szakaszok">
+            {% for result in rangeResponse.results %}        
+                {% for verseContainer in result.verseContainers %}
+                <blockquote>
+                    <footer>
+                        <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                    </footer>
+                    <div class="parsedVerses">                    
+                        {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}
+                    <div class="parsedVerses">
+                </blockquote>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
         <div role="tabpanel" class="tab-pane" id="fejezetek">
             {% for result in chapterResponse.results %}        
                 {% for verseContainer in result.verseContainers %}

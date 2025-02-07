@@ -13,9 +13,12 @@ use SzentirasHu\Data\Entity\EmbeddedExcerptScope;
 use SzentirasHu\Data\Entity\Translation;
 use SzentirasHu\Service\Reference\CanonicalReference;
 use SzentirasHu\Service\Reference\ReferenceService;
+use SzentirasHu\Service\Search\SemanticSearchService;
 use SzentirasHu\Service\Text\BookService;
 use SzentirasHu\Service\Text\TextService;
 use SzentirasHu\Service\Text\TranslationService;
+
+use function PHPUnit\Framework\isEmpty;
 
 class CreateEmbeddingVectors extends Command
 {
@@ -29,7 +32,8 @@ class CreateEmbeddingVectors extends Command
             {translation=KNB : A fordítás rövidítése, amihez a vektorokat generáljuk.} 
             {--b|book= : A könyv(ek) rövidítése, ha nem az összeshez szeretnénk vektorokat, pl. Ter,2Kor.}
             {--u|update : Kérje el újra a vektorokat, akkor is, ha már létezik.}
-            {--deleteAll : Töröljük az adott fordítás összes vektorját, és kérjük le újra.}';
+            {--deleteAll : Töröljük az adott fordítás összes vektorját, és kérjük le újra.}
+            {--scope= : A generált vektorok hatóköre: verse, chapter, range. Ha nincs megadva, mindegyiket generálja.}';
 
     /**
      * The console command description.
@@ -41,12 +45,16 @@ class CreateEmbeddingVectors extends Command
     private string $model;
     private int $dimensions;
     private int $tokenCount = 0;
+    private int $maxRetry = 3;
+    private int $windowSize = 10;
+    private int $stepSize = 5;
 
     public function __construct(
         protected TextService $textService,
         protected BookService $bookService,
         protected TranslationService $translationService,
-        protected ReferenceService $referenceService
+        protected ReferenceService $referenceService,
+        protected SemanticSearchService $semanticSearchService
     ) {
         parent::__construct();
 
@@ -74,88 +82,137 @@ class CreateEmbeddingVectors extends Command
         $tokenCount = 0;
         foreach ($books as $book) {
             $chapterCount = $this->bookService->getChapterCount($book, $translation);
+
+            if (!$this->option("scope") || $this->option("scope")=="range") {
+                $chapterLengths = [];
+                for ($chapter = 1; $chapter <= $chapterCount; $chapter++) {
+                    $chapterLengths[] = $this->bookService->getVerseCount($book, $chapter, $translation);
+                }
+
+                $slidingWindows = $this->generateSlidingWindows($chapterLengths, $this->windowSize, $this->stepSize);
+                foreach ($slidingWindows as $window) {
+                    $fromChapter = $window[0];
+                    $fromVerse = $window[1];
+                    $toChapter = $window[2];
+                    $toVerse = $window[3];
+                    $reference = "{$book->abbrev} {$fromChapter},{$fromVerse}-{$toChapter},{$toVerse}";
+                    $canonicalReference = CanonicalReference::fromString($reference, $translation->id);
+                    $text = $this->textService->getPureText($canonicalReference, $translation);
+                    $this->embedExcerpt($canonicalReference, $text, EmbeddedExcerptScope::Range, $translation, $book, $fromChapter, $fromVerse, $toChapter, $toVerse);
+                }
+            }
+
             for ($chapter = 1; $chapter <= $chapterCount; $chapter++) {
                 $chapterReference = "{$book->abbrev} $chapter";
-                $this->embedExcerpt($chapterReference, EmbeddedExcerptScope::Chapter, $translation, $book, $chapter);
-                $verse = 1;
-                do {
-                    $reference = "{$book->abbrev} $chapter,$verse";
-                    $text = $this->embedExcerpt($reference, EmbeddedExcerptScope::Verse, $translation, $book, $chapter, $verse);
-                    $verse++;
-                } while (!empty($text));
+                $canonicalReference = CanonicalReference::fromString($chapterReference, $translation->id);
+                $text = $this->textService->getPureText($canonicalReference, $translation);
+                if (!$this->option("scope") || $this->option("scope")=="chapter") {                    
+                    $this->embedExcerpt($canonicalReference, $text, EmbeddedExcerptScope::Chapter, $translation, $book, $chapter);
+                }
+                if (!$this->option("scope") || $this->option("scope")=="verse") {                    
+                    $verse = 1;
+                    do {
+                        $reference = "{$book->abbrev} $chapter,$verse";
+                        $canonicalReference = CanonicalReference::fromString($reference, $translation->id);
+                        $verseContainers = $this->textService->getTranslatedVerses($canonicalReference, $translation->id);
+                        $gepi = array_pop($verseContainers[0]->rawVerses)[0]->gepi ?? null;
+                        $text = $this->textService->getPureText($canonicalReference, $translation);
+                        $this->embedExcerpt($canonicalReference, $text, EmbeddedExcerptScope::Verse, $translation, $book, $chapter, $verse, null, null, $gepi);
+                        $verse++;
+                    } while (!empty($text));
+                }
             }
         }
-        $response = OpenAI::embeddings()->create([
-            'model' => $this->model,
-            'input' => "A fáraó gyűlöli a zsidókat",
-            'dimensions' => $this->dimensions
-        ]);
-        $vector = $response->embeddings[0]->embedding;
-        $neighbors = EmbeddedExcerpt::query()
-            ->nearestNeighbors("embedding", $vector, Distance::L2)->take(5)->get();
-        foreach ($neighbors as $neighbor) {
-            $this->info("{$neighbor->content} Distance: {$neighbor->neighbor_distance}");
-        }
-        $tokenCount += $response->usage->totalTokens;
-        $this->info("Tokens used: $tokenCount");
     }
 
 
-    private function embedExcerpt(string $reference, EmbeddedExcerptScope $scope, Translation $translation, Book $book, int $chapter, int $verse = null)
-    {
-        $this->info("$reference");
-        $text = null;
-        $existingEmbedding = EmbeddedExcerpt::whereBelongsTo($translation)->where("reference", $reference)->first();
-        if ($scope == EmbeddedExcerptScope::Chapter) {
-            $canonicalChapterReference = CanonicalReference::fromString($reference, $translation->id);
-            $text = $this->textService->getPureText($canonicalChapterReference, $translation);
-            $gepi = null;
-        } else if ($scope == EmbeddedExcerptScope::Verse) {
-            $canonicalReference = CanonicalReference::fromString($reference, $translation->id);
-            $verseContainers = $this->textService->getTranslatedVerses($canonicalReference, $translation->id);
-            $gepi = array_pop($verseContainers[0]->rawVerses)[0]->gepi ?? null;
-            $text = $this->textService->getPureText($canonicalReference, $translation);
+    function generateSlidingWindows($chapterLengths, $windowSize = 10, $stepSize = 5) {
+        $windows = [];
+        $chapters = [];
+    
+        // Build the book structure
+        foreach ($chapterLengths as $chapterIndex => $sections) {
+            for ($section = 1; $section <= $sections; $section++) {
+                $chapters[] = ['chapter' => $chapterIndex + 1, 'section' => $section];
+            }
         }
-        if (empty($existingEmbedding) || $this->option("update")) {
+    
+        $totalSections = count($chapters);
+    
+        // Slide the window over the sections
+        for ($start = 0; $start < $totalSections; $start += $stepSize) {
+            $end = $start + $windowSize - 1;
+            if ($end >= $totalSections) {
+                $end = $totalSections - 1;
+            }
+    
+            $from = $chapters[$start];
+            $to = $chapters[$end];
+    
+            $windows[] = [
+                $from['chapter'],
+                $from['section'],
+                $to['chapter'],
+                $to['section']
+            ];
+    
+            // Break if we've reached the end
+            if ($end == $totalSections - 1) {
+                break;
+            }
+        }
+    
+        return $windows;
+    }
+
+    private function existingEmbedding(CanonicalReference $reference, Translation $translation) {
+        return EmbeddedExcerpt::whereBelongsTo($translation)->where("reference", $reference->toString())->first();
+    }
+
+    private function embedExcerpt(CanonicalReference $reference, string $text, EmbeddedExcerptScope $scope, Translation $translation, Book $book, int $chapter, int $verse = null, int $toChapter = null, int $toVerse = null, $gepi = null)
+    {
+        $this->info($reference->toString());
+        if (empty($this->existingEmbedding($reference, $translation)) || $this->option("update")) {
             if (!empty($text)) {
-                try {
-                    $response = OpenAI::embeddings()->create([
-                        'model' => $this->model,
-                        'input' => $text,
-                        'dimensions' => $this->dimensions
-                    ]);
-                } catch (ErrorException $e) {
-                    sleep(30);
-                    $this->info("OpenAI error occurred, might have reached the rate limit. Sleep for 30 seconds.");
-                    $response = OpenAI::embeddings()->create([
-                        'model' => $this->model,
-                        'input' => $text,
-                        'dimensions' => $this->dimensions
-                    ]);
+                $retries = 0;
+                $success = false;
+                while ($retries < $this->maxRetry && !$success) {
+                    try {
+                        $response = $this->semanticSearchService->generateVector($text, $this->model, $this->dimensions);
+                        $success = true;
+                    } catch (ErrorException $e) {
+                        $retries ++;
+                        $this->info($e->getMessage());
+                        $this->info("OpenAI error occurred, might have reached the rate limit. Retrying {$retries}/{$this->maxRetry}. Waiting 15 seconds.");
+                        sleep(15);
+                    }
                 }
                 if (!empty($response)) {
-                    $this->tokenCount += $response->usage->totalTokens;
-                    if (count($response->embeddings) > 0) {
-                        $embedding = $response->embeddings[0]->embedding;
+                    $this->tokenCount += $response->totalTokens;
                         $this->info("$text");
-                        if (!empty($existingEmbedding)) {
-                            $existingEmbedding->delete();
-                        }
-                        $embeddedExcerpt = new EmbeddedExcerpt();
-                        $embeddedExcerpt->embedding = $embedding;
-                        $embeddedExcerpt->model = $this->model;
-                        $embeddedExcerpt->reference = $reference;
-                        $embeddedExcerpt->chapter = $chapter;
-                        $embeddedExcerpt->verse = $verse;
-                        $embeddedExcerpt->book()->associate($book);
-                        $embeddedExcerpt->translation()->associate($translation);
-                        $embeddedExcerpt->scope = $scope;
-                        $embeddedExcerpt->gepi = $gepi;
-                        $embeddedExcerpt->save();
+                        $this->saveEmbeddingExcerpt($reference, $response->vector, $scope, $translation, $book, $chapter, $verse, $toChapter, $toVerse, $gepi);
                     }
                 }
             }
+    }
+
+    private function saveEmbeddingExcerpt(CanonicalReference $reference, array $embedding, EmbeddedExcerptScope $scope, Translation $translation, Book $book, int $chapter, int $verse = null, int $toChapter = null, int $toVerse = null, int $gepi = null) {
+        $existingEmbedding = $this->existingEmbedding($reference, $translation);
+        if (!empty($existingEmbedding)) {
+            $existingEmbedding->delete();
         }
-        return $text;
+        $embeddedExcerpt = new EmbeddedExcerpt();
+        $embeddedExcerpt->embedding = $embedding;
+        $embeddedExcerpt->model = $this->model;
+        $embeddedExcerpt->reference = $reference->toString();
+        $embeddedExcerpt->chapter = $chapter;
+        $embeddedExcerpt->verse = $verse;
+        $embeddedExcerpt->to_chapter = $toChapter;
+        $embeddedExcerpt->to_verse = $toVerse;
+        $embeddedExcerpt->book()->associate($book);
+        $embeddedExcerpt->translation()->associate($translation);
+        $embeddedExcerpt->scope = $scope;
+        $embeddedExcerpt->gepi = $gepi;
+        $embeddedExcerpt->save();
     }
 }

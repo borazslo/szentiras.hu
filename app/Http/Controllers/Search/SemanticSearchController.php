@@ -54,8 +54,10 @@ class SemanticSearchController extends Controller
         $aiResult = $this->semanticSearchService->generateVector($form->textToSearch);
         $response = $this->semanticSearchService->findNeighbors($aiResult->vector);
         $chapterResponse = $this->semanticSearchService->findNeighbors($aiResult->vector, EmbeddedExcerptScope::Chapter);
+        $rangeResponse = $this->semanticSearchService->findNeighbors($aiResult->vector, EmbeddedExcerptScope::Range);
         $view = $view->with('response', $response);
         $view = $view->with('chapterResponse', $chapterResponse);
+        $view = $view->with('rangeResponse', $rangeResponse);
 
         return $view;
     }

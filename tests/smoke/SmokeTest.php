@@ -48,7 +48,7 @@ class SmokeTest extends TestCase
             ['TESTTRANS' => [
                 'verseTypes' =>
                 [
-                    'text' => [901],
+                    'text' => [6, 901],
                     'heading' => [0=>5, 1=>10, 2=>20, 3=>30],
                     'footnote' => [120, 2001, 2002],
                     'poemLine' => [902],

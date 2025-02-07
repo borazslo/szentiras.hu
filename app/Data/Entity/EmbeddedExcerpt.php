@@ -15,6 +15,8 @@ use SzentirasHu\Data\Entity\Translation;
  * @property array embedding
  * @property integer chapter
  * @property integer verse
+ * @property integer to_chapter
+ * @property integer to_verse
  * @property integer gepi
  * @property EmbeddedExcerptScope scope
  */

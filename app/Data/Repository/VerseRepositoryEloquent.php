@@ -7,6 +7,7 @@ namespace SzentirasHu\Data\Repository;
 
 use Illuminate\Database\Eloquent\Collection;
 use SzentirasHu\Data\Entity\Book;
+use SzentirasHu\Data\Entity\Translation;
 use SzentirasHu\Data\Entity\Verse;
 
 class VerseRepositoryEloquent implements VerseRepository {
@@ -52,5 +53,11 @@ class VerseRepositoryEloquent implements VerseRepository {
     {
         return Verse::where('book_number', $bookNumber)->where('trans', $translationId)->max('chapter');
     }
+
+    public function getMaxNumv(Book $book, int $chapter, Translation $translation)
+    {
+        return Verse::whereBelongsTo($translation)->where("book_number", $book->number)->where('chapter', $chapter)->max('numv');
+    }
+
 
 }
