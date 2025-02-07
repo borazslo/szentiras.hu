@@ -301,21 +301,17 @@ class ImportScripture extends Command
 
     private function saveToDb(string $abbrev, Translation $translation, array $inserts): void
     {
-        $this->info("\nMysql adatbázis lementése...");
+        $this->info("\nFeldolgozott adatok mentése az adatbázisba...");
         $progressBar = $this->output->createProgressBar(count($inserts));
-        //TODO: larevelesíteni (http://bundles.laravel.com/bundle/mysqldump-php ?)
-        $connections = Config::get('database.connections');
-        $conn = $connections[Config::get('database.default')];
-        exec('mysqldump -u ' . $conn['username'] . ' --password=' . $conn['password'] . ' ' . $conn['database'] . ' ' . $conn['prefix'] . 'tdverse > ' . $this->sourceDirectory . '/' . $conn['database'] . '_' . $conn['prefix'] . 'tdverse_' . $abbrev . '_' . date('YmdHis') . '.sql');
 
         Artisan::call('down');
-        $this->info("Mysql tábla ürítése...");
+        $this->info("A tdveres tábla (részleges) ürítése...");
         if (!$this->option('filter')) {
             DB::table('tdverse')->where('trans', '=', $translation->id)->delete();
         } else {
             DB::table('tdverse')->where('trans', '=', $translation->id)->where('gepi', 'REGEXP', $this->option('filter'))->delete();
         }
-        $this->info("Mysql tábla feltöltése " . count($inserts) . " sorral...");
+        $this->info("A tdverse tábla feltöltése " . count($inserts) . " sorral...");
         echo "\n";
         for ($rowNumber = 0; $rowNumber < count($inserts); $rowNumber += 100) {
             $slice = array_slice($inserts, $rowNumber, 100);
