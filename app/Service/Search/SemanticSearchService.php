@@ -8,6 +8,7 @@ use OpenAI\Laravel\Facades\OpenAI;
 use Pgvector\Laravel\Distance;
 use SzentirasHu\Data\Entity\EmbeddedExcerpt;
 use SzentirasHu\Data\Entity\EmbeddedExcerptScope;
+use SzentirasHu\Http\Controllers\Search\SemanticSearchForm;
 use SzentirasHu\Service\Reference\CanonicalReference;
 use SzentirasHu\Service\Text\TextService;
 
@@ -17,6 +18,14 @@ class EmbeddingResult {
      */
     public function __construct(public array $vector, public int $totalTokens ) {
     }
+}
+
+class SemanticSearchParams {
+
+    public $text;
+    public $translationId;
+    public $bookNumbers;
+
 }
 
 class SemanticSearchService {
@@ -43,16 +52,25 @@ class SemanticSearchService {
         return new EmbeddingResult($vector, $totalTokens);
     }
 
-    public function findNeighbors(array $vector, $scope = EmbeddedExcerptScope::Verse, $maxResults = 10, $metric = Distance::Cosine, string $model = null) : SemanticSearchResponse {        
+    public function findNeighbors(SemanticSearchParams $params, array $vector, $scope = EmbeddedExcerptScope::Verse, $maxResults = 10, $metric = Distance::Cosine, string $model = null) : SemanticSearchResponse {        
         if (is_null($model)) {
             $model = Config::get("settings.ai.embeddingModel");
         }
         $neighbors = EmbeddedExcerpt::query()
             ->where("scope", $scope)
             ->where("model", $model)
-            ->nearestNeighbors("embedding", $vector, $metric)
-            ->take($maxResults)            
-            ->get();
+            ->nearestNeighbors("embedding", $vector, $metric);
+        if (!empty($params->translationId)) {
+            $neighbors = $neighbors->whereHas("book.translation", function($query) use ($params) {
+                $query->where("id", $params->translationId);
+            });
+        }
+        if (!empty($params->bookNumbers)) {
+            $neighbors = $neighbors->whereHas("book", function($query) use ($params) {
+                $query->whereIn("number", $params->bookNumbers);
+            });
+        }
+        $neighbors = $neighbors->limit($maxResults)->get();
         // if we are looking for chapters, look for the most relevant verse in the chapter
         $topVerseContainers = [];
         $results = [];
@@ -83,6 +101,7 @@ class SemanticSearchService {
             $result->embeddedExcerpt = $neighbor;
             $result->distance = $neighbor->neighbor_distance;
             $result->verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($neighbor->reference, $neighbor->translation->id), $neighbor->translation->id);
+            $result->quality=$this->getQualityScore($neighbor->neighbor_distance, $metric, $scope);
             $highlightedGepis = [];
             foreach ($topVerseContainers as $verseContainer) {
                 $highlightedGepis = array_map(fn($k) => "{$k}",array_keys($verseContainer->rawVerses));
@@ -92,5 +111,36 @@ class SemanticSearchService {
         }        
         $response = new SemanticSearchResponse($results, $metric);
         return $response;
+    }
+
+    private function getQualityScore(float $distance, Distance $metric, EmbeddedExcerptScope $scope) {        
+        $value = $distance;
+        if ($metric == Distance::Cosine) {
+            if ($value < .4) {
+                return 5;
+            } else if ($value <.5) {
+                return 4;
+            } else if ($value <.6) {
+                return 3;
+            } else if ($value <.7) {
+                return 2;
+            } else {
+                return 1;
+            }
+        } else {
+            if ($value < .8) {
+                return 5;
+            } else if ($value <.9) {
+                return 4;
+            } else if ($value <1) {
+                return 3;
+            } else if ($value <1.1) {
+                return 2;
+            } else {
+                return 1;
+            }
+        }
+        
+        return $value;
     }
 }

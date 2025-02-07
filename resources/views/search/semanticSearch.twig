@@ -16,6 +16,30 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                         <input type="text" name="textToSearch" id="textToSearch" value="{{ form.textToSearch }}" class="form-control"/>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="bookNumber" class="col-sm-3 control-label">Könyv</label>
+                    <div class="col-sm-9">
+                        <select name="bookNumber" class="form-control" id="bookNumber">
+                            <option value="all" {{ 'all' == form.bookNumber ? 'selected' }}>mind</option>
+                            <option value="old_testament" {{ 'old_testament' == form.bookNumber ? 'selected' }}>Ószövetség</option>
+                            <option value="new_testament" {{ 'new_testament' == form.bookNumber ? 'selected' }}>Újszövetség</option>
+                            {% for book in books %}
+                                <option value="{{ book.number }}" {{ book.number == form.bookNumber ? 'selected' }}>{{ book.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="translationId" class="col-sm-3 control-label">Fordítás</label>
+                    <div class="col-sm-9">
+                        <select name="translationId" class="form-control" id="translationId">
+                            <option value="0" {{ form.translationId is not defined ? 'selected' }}>mind</option>
+                            {% for translation in translations %}
+                                <option value="{{ translation.id }}" {{ translation.id == form.translationId ? 'selected' }}>{{ translation.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
                 <input type="submit" value="Keresés" class="btn btn-default"/>
             </form>
         </div>
@@ -28,6 +52,17 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
         <li role="presentation"><a role="tab" data-toggle="tab" href="#fejezetek">Fejezetek</a></li>
     </ul>
 
+    {% macro quality(result) %}
+        <div class="quality" title="Becsült hasonlóság">
+            {% for i in 1..5 %}
+                {% if i <= result.quality %}
+                    <span class="star active">&#9733;</span>
+                {% else %}
+                    <span class="star inactive">&#9734;</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endmacro %}
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="versek">
             {% for result in response.results %}        
@@ -35,6 +70,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                 <blockquote>
                     <footer>
                         <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                        {{ _self.quality(result) }}
                     </footer>
                     <div class="parsedVerses">
                         {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis} %}
@@ -49,6 +85,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                 <blockquote>
                     <footer>
                         <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                        {{ _self.quality(result) }}
                     </footer>
                     <div class="parsedVerses">                    
                         {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}
@@ -64,6 +101,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                 <blockquote>
                     <footer>
                         <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                        {{ _self.quality(result) }}                        
                     </footer>
                     <div class="parsedVerses">                    
                         {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}

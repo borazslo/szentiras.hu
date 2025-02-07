@@ -166,18 +166,18 @@ class SearchController extends Controller
         return $view;
     }
 
-    private function extractBookNumbers($form)
+    public static function extractBookNumbers($bookNumber)
     {
         $bookIds = [];
-        if ($form->book) {
-            if ($form->book == 'old_testament') {
+        if ($bookNumber) {
+            if ($bookNumber == 'old_testament') {
                 $bookIds = range(101, 146);
-            } else if ($form->book == 'new_testament') {
+            } else if ($bookNumber == 'new_testament') {
                 $bookIds = range(201, 227);
-            } else if ($form->book == 'all') {
+            } else if ($bookNumber == 'all') {
                 $bookIds = [];
             } else {
-                $bookIds = [$form->book];
+                $bookIds = [$bookNumber];
             }
         }
         return $bookIds;

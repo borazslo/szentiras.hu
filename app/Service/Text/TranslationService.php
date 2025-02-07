@@ -19,4 +19,8 @@ class TranslationService {
         return $this->translationRepository->getByAbbrev($translationAbbrev);
     }
 
+    public function getAllTranslations() {
+        return $this->translationRepository->getAll();
+    }
+
 }

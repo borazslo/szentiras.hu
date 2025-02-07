@@ -11,4 +11,5 @@ class SemanticSearchResult {
     public $verseContainers;
     public $topVerseContainers;
     public $highlightedGepis;
+    public $quality;
 }
