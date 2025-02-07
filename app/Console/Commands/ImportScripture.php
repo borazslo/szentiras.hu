@@ -142,37 +142,15 @@ class ImportScripture extends Command
         $verseSheetHeaders = $this->getHeaders($verseRowIterator);
 
         $dbToHeaderMap = $this->mapVerseSheetHeadersToDbColumns($verseSheetHeaders);
-
-        $pipes = [];
-        if ($this->hunspellEnabled) {
-            $hunspellProcess = proc_open(
-                'stdbuf -oL hunspell -m -d hu_HU -i UTF-8',
-                $this->descriptorspec,
-                $pipes,
-                null,
-                null
-            );
-            $this->info("Hunspell-hu indul...");
-        }
-
+    
         $inserts = $this->readLines(
             $verseRowIterator,
             $verseSheetHeaders,
             $dbToHeaderMap,
             $translation,
-            $bookNumberToId,
-            $pipes
+            $bookNumberToId
         );
-
-        if ($this->hunspellEnabled) {
-            fclose($pipes[0]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            if (isset($hunspellProcess)) {
-                proc_close($hunspellProcess);
-            }
-        }
-
+      
         $reader->close();
         return $inserts;
     }
@@ -234,7 +212,7 @@ class ImportScripture extends Command
         return $sheets;
     }
 
-    private function readLines(RowIterator $verseRowIterator, array $verseSheetHeaders, array $dbToHeaderMap, Translation $translation, array $booksGepiToId, array $pipes): array
+    private function readLines(RowIterator $verseRowIterator, array $verseSheetHeaders, array $dbToHeaderMap, Translation $translation, array $booksGepiToId): array
     {
         $this->info("Beolvasás sorról sorra...\n");
         $progressBar = $this->output->createProgressBar();
@@ -258,21 +236,33 @@ class ImportScripture extends Command
                     $verseSheetHeaders,
                     $translation,
                     $gepi,
-                    $booksGepiToId,
-                    $pipes
+                    $booksGepiToId
                 );
                 $inserts[$rowNumber] = $newInsert;
-            }
-            $rowNumber++;
-            $progressBar->setMessage("$rowNumber - {$newInsert['gepi']} - új szavak: {$this->newStems}");
-            $progressBar->advance();
+            
+            
+                $rowNumber++;
+                $progressBar->setMessage("$rowNumber - {$newInsert['gepi']} - új szavak: {$this->newStems}");
+                $progressBar->advance();
+            }            
         }
         $progressBar->finish();
         return $inserts;
     }
 
-    private function toDbRow(Row $row, array $verseSheetHeaders, Translation $translation, string $gepi, array $booksGepiToId, array $pipes): array
+    private function toDbRow(Row $row, array $verseSheetHeaders, Translation $translation, string $gepi, array $booksGepiToId): array
     {
+        $pipes = [];
+        if ($this->hunspellEnabled) {
+            $hunspellProcess = proc_open(
+                'stdbuf -oL hunspell -m -d hu_HU -i UTF-8',
+                $this->descriptorspec,
+                $pipes,
+                null,
+                null
+            );                    
+        }
+
         $result['trans'] = $translation->id;
         $result['gepi'] = $gepi;
         $result['book_number'] = (int) substr($gepi, 0, 3);
@@ -295,6 +285,15 @@ class ImportScripture extends Command
             App::abort(500, 'Nincs meg a book number a gepi->id listában');
         }
         $result['book_id'] = $booksGepiToId[$result['book_number']];
+
+        if ($this->hunspellEnabled) {
+            fclose($pipes[0]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            if (isset($hunspellProcess)) {
+                proc_close($hunspellProcess);
+            }
+        }
 
         return $result;
     }
