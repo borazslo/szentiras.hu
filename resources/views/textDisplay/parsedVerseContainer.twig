@@ -53,7 +53,7 @@
             {% if versePart.headingLevel < 6 %}
                 {% set tag = 'h' ~ (versePart.headingLevel+1) %}
             {% else %}
-                {% set tag = 'span' %}{% set extraclass = 'heading' ~ (versePart.headingLevel + 1) ~ (mark ? 'mark' : '') %}
+                {% set tag = 'span' %}{% set extraclass = 'heading' ~ (versePart.headingLevel + 1) ~ (mark ? ' mark' : '') %}
             {% endif %}
             <{{ tag|raw }} class="heading {{ extraclass }}" id="heading_{{ verse.gepi }}_{{ versePart.headingLevel }}">{{ versePart.content|striptags('<br><a>')|raw }}</{{ tag }}>
         {% else %}
