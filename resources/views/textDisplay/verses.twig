@@ -1,7 +1,10 @@
 {% extends 'layout' %}
 
 {% block meta %}
-    <link rel="canonical" href="{{ url('/' ~ canonicalUrl ) }}" />
+    <link rel="canonical" href="{{ url('/' ~ seoUrl ) }}" />
+    {% if seoUrl != canonicalUrl %}
+        <meta name="robots" content="noindex,nofollow">
+    {% endif %}
 
     <meta property="og:url" content="{{ url('/' ~ canonicalUrl ) }}">
     <meta property="og:title" content="{{ metaTitle }}">

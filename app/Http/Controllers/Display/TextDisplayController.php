@@ -108,6 +108,7 @@ class TextDisplayController extends Controller
                 'translation' => $translation,
                 'translations' => $translations,
                 'canonicalUrl' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
+                'seoUrl' => $this->referenceService->getSeoUrl($canonicalRef, $translation->id),
                 'metaTitle' => $this->getTitle($verseContainers, $translation),
                 'teaser' => $this->textService->getTeaser($verseContainers),
                 'chapterLinks' => $chapterLinks,

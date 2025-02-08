@@ -105,6 +105,17 @@ class ReferenceService
         return $url;
     }
 
+    public function getSeoUrl(CanonicalReference $ref, $translationId)
+    {
+        $translation = $this->translationRepository->getById($translationId);
+        $translatedRef = $this->translateReference($ref, $translationId);
+        $firstBook=$ref->bookRefs[0]->bookId;
+        $firstChapter=$ref->bookRefs[0]->chapterRanges[0]->chapterRef->chapterId;
+        $url = "{$translation->abbrev}/{$firstBook}{$firstChapter}";
+        return $url;
+    }
+
+
     public function getBook($canonicalReference, $translationId)
     {
         $bookRef = $canonicalReference->bookRefs[0];
