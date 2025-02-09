@@ -26,9 +26,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ## TODO review the following configuration
-    ports:
-      - "127.0.0.1:8080:80"
     volumes:
       - storage:/var/www/html/storage
     env_file:
@@ -50,9 +47,6 @@ services:
     image: mariadb
     env_file:
       - ./.env
-    ## TODO review the following configuration
-    ports:
-      - "127.0.0.1:3306:3306"
     volumes:
       - ./tmp:/docker-entrypoint-initdb.d
       - db-data:/var/lib/mysql
@@ -66,7 +60,7 @@ services:
     volumes:
       - ./deploy/production/sphinx/sphinx.conf.in:/etc/sphinxsearch/sphinx.conf.in:ro
       - ./docker/sphinx/start.sh:/start.sh:ro
-      - storage:/storage
+      - sphinx_data:/var/data
     env_file:
       - ./.env
     depends_on:
@@ -76,5 +70,6 @@ volumes:
   db-data:
   storage:
   letsencrypt:
+  sphinx_data:
 networks:
   traefik:
