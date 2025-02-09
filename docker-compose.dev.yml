@@ -48,6 +48,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
   mailpit:
     image: axllent/mailpit
     ports:
