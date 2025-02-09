@@ -22,3 +22,4 @@ PROVISIONED
 *.bak
 .phpunit.cache
 .vscode
+generated

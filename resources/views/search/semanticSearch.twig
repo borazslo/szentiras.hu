@@ -30,12 +30,12 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="translationId" class="col-sm-3 control-label">Fordítás</label>
+                    <label for="translationAbbrev" class="col-sm-3 control-label">Fordítás</label>
                     <div class="col-sm-9">
-                        <select name="translationId" class="form-control" id="translationId">
-                            <option value="0" {{ form.translationId is not defined ? 'selected' }}>mind</option>
+                        <select name="translationAbbrev" class="form-control" id="translationAbbrev">
+                            <option value="0" {{ form.translationAbbrev is not defined ? 'selected' }}>mind</option>
                             {% for translation in translations %}
-                                <option value="{{ translation.id }}" {{ translation.id == form.translationId ? 'selected' }}>{{ translation.name }}</option>
+                                <option value="{{ translation.abbrev }}" {{ translation.abbrev == form.translationAbbrev ? 'selected' }}>{{ translation.name }}</option>
                             {% endfor %}
                         </select>
                     </div>

@@ -10,7 +10,9 @@ use SzentirasHu\Data\Entity\EmbeddedExcerpt;
 use SzentirasHu\Data\Entity\EmbeddedExcerptScope;
 use SzentirasHu\Http\Controllers\Search\SemanticSearchForm;
 use SzentirasHu\Service\Reference\CanonicalReference;
+use SzentirasHu\Service\Text\BookService;
 use SzentirasHu\Service\Text\TextService;
+use SzentirasHu\Service\Text\TranslationService;
 
 class EmbeddingResult {
     /**
@@ -23,14 +25,14 @@ class EmbeddingResult {
 class SemanticSearchParams {
 
     public $text;
-    public $translationId;
-    public $bookNumbers;
+    public $translationAbbrev;
+    public $usxCodes;
 
 }
 
 class SemanticSearchService {
 
-    public function __construct(protected TextService $textService) {
+    public function __construct(protected TextService $textService, protected TranslationService $translationService, protected BookService $bookService) {
     }
 
     public function generateVector(string $text, string $model = null, int $dimensions = null) : EmbeddingResult{
@@ -40,16 +42,19 @@ class SemanticSearchService {
         if (is_null($dimensions)) {
             $dimensions = Config::get("settings.ai.embeddingDimensions");
         }
-        $response = OpenAI::embeddings()->create([
-            'model' => $model,
-            'input' => $text,
-            'dimensions' => $dimensions,
-            'user' => "szentiras.eu"
-        ]);
-        $vector = $response->embeddings[0]->embedding;
-        $totalTokens = $response->usage->totalTokens;
-        Log::info("OpenAI request finished, total tokens: {$totalTokens}");
-        return new EmbeddingResult($vector, $totalTokens);
+        return \Cache::remember("generateVector_{$text}_{$model}_{$dimensions}", 3600, function () use ($text, $model, $dimensions) {
+            $response = OpenAI::embeddings()->create([
+                'model' => $model,
+                'input' => $text,
+                'dimensions' => $dimensions,
+                'user' => "szentiras.eu"
+            ]);
+            $vector = $response->embeddings[0]->embedding;
+            $totalTokens = $response->usage->totalTokens;
+            Log::info("OpenAI request finished, total tokens: {$totalTokens}");
+            return new EmbeddingResult($vector, $totalTokens); 
+        });
+
     }
 
     public function findNeighbors(SemanticSearchParams $params, array $vector, $scope = EmbeddedExcerptScope::Verse, $maxResults = 10, $metric = Distance::Cosine, string $model = null) : SemanticSearchResponse {        
@@ -60,15 +65,11 @@ class SemanticSearchService {
             ->where("scope", $scope)
             ->where("model", $model)
             ->nearestNeighbors("embedding", $vector, $metric);
-        if (!empty($params->translationId)) {
-            $neighbors = $neighbors->whereHas("book.translation", function($query) use ($params) {
-                $query->where("id", $params->translationId);
-            });
+        if (!empty($params->translationAbbrev)) {
+            $neighbors->where("translation_abbrev", $params->translationAbbrev);
         }
         if (!empty($params->bookNumbers)) {
-            $neighbors = $neighbors->whereHas("book", function($query) use ($params) {
-                $query->whereIn("number", $params->bookNumbers);
-            });
+            $neighbors->whereIn("usx_code", $params->usxCodes);
         }
         $neighbors = $neighbors->limit($maxResults)->get();
         // if we are looking for chapters, look for the most relevant verse in the chapter
@@ -76,11 +77,11 @@ class SemanticSearchService {
         $results = [];
         foreach ($neighbors as $neighbor) {
             if ($scope == EmbeddedExcerptScope::Chapter || $scope == EmbeddedExcerptScope::Range) {
-                $book = $neighbor->book;
                 $topVerseInChapter = EmbeddedExcerpt::query()
                     ->nearestNeighbors("embedding", $vector, $metric)
                     ->where("model", $model)
-                    ->whereBelongsTo($book)                    
+                    ->where("usx_code", $neighbor->usx_code)
+                    ->where("translation_abbrev", $neighbor->translation_abbrev)
                     ->where("scope", EmbeddedExcerptScope::Verse);
                 if ($scope == EmbeddedExcerptScope::Chapter) {
                     $topVerseInChapter = $topVerseInChapter
@@ -94,13 +95,15 @@ class SemanticSearchService {
                 }
                 $topVerseInChapter = $topVerseInChapter->first();
                 if (!empty($topVerseInChapter)) {
-                    $topVerseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($topVerseInChapter->reference, $topVerseInChapter->translation->id), $topVerseInChapter->translation->id);                
+                    $topVerseTranslation = $this->translationService->getByAbbreviation($topVerseInChapter->translation_abbrev);                    
+                    $topVerseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($topVerseInChapter->reference, $topVerseTranslation->id), $topVerseTranslation->id);                
                 }
             }
             $result = new SemanticSearchResult;
             $result->embeddedExcerpt = $neighbor;
             $result->distance = $neighbor->neighbor_distance;
-            $result->verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($neighbor->reference, $neighbor->translation->id), $neighbor->translation->id);
+            $neighborTranslation = $this->translationService->getByAbbreviation($neighbor->translation_abbrev);
+            $result->verseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($neighbor->reference, $neighborTranslation->id), $neighborTranslation->id);
             $result->quality=$this->getQualityScore($neighbor->neighbor_distance, $metric, $scope);
             $highlightedGepis = [];
             foreach ($topVerseContainers as $verseContainer) {

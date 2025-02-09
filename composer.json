@@ -17,6 +17,7 @@
         "laravel/framework": "^11.0",
         "laravel/helpers": "^1.7",
         "laravel/tinker": "^2.5",
+        "league/flysystem-aws-s3-v3": "^3.0",
         "openai-php/laravel": "^0.10.2",
         "pgvector/pgvector": "^0.2.1",
         "predis/predis": "^1.0",

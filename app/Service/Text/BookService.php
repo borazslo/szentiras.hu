@@ -10,7 +10,7 @@ use SzentirasHu\Data\Repository\VerseRepository;
 
 class BookService {
 
-    public function __construct(protected BookRepository $bookRepository, protected VerseRepository $verseRepository) {
+    public function __construct(protected BookRepository $bookRepository, protected VerseRepository $verseRepository, protected TranslationService $translationService) {   
     }
 
     public function getBooksForTranslation(Translation $translation) : Collection {
@@ -23,6 +23,11 @@ class BookService {
 
     public function getVerseCount(Book $book, int $chapter, Translation $translation) {
         return $this->verseRepository->getMaxNumv($book, $chapter, $translation);
+    }
+
+    public function getBookByUsxCodeTranslation(string $usxCode, string $translationAbbrev) : Book {
+        $translation = $this->translationService->getByAbbrev($translationAbbrev);
+        return $this->bookRepository->getByNumberForTranslation($usxCode, $translation->id);
     }
 
 }

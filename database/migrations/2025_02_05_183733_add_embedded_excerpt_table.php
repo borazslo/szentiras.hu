@@ -14,19 +14,18 @@ return new class extends Migration
         Schema::create("embedded_excerpts", function (Blueprint $table) {
             $table->id();
             $table->vector("embedding", \Config::get("settings.ai.embeddingDimensions"));
+            $table->string("hash", 32);
             $table->string("model");
             $table->string("reference");
             $table->integer("chapter")->nullable();
             $table->integer("verse")->nullable();
             $table->integer("to_chapter")->nullable();
             $table->integer("to_verse")->nullable();            
-            $table->integer("translation_id");
-            $table->foreign("translation_id")->references("id")->on("translations");
-            $table->bigInteger("gepi")->nullable();
-            $table->integer("book_id");
-            $table->foreign("book_id")->references("id")->on("books");
+            $table->bigInteger("gepi")->nullable();            
+            $table->string("translation_abbrev", 10);
+            $table->string("usx_code", 3);
             $table->string("scope")->default("verse");
-            $table->index(["reference", "translation_id"]);
+            $table->index(["reference", "translation_abbrev"]);
             $table->index("reference");
         });
 
