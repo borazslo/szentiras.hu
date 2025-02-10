@@ -42,13 +42,6 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
     </div>                     
 
     {% if response is defined %}
-    <div>
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="nav-item"><a class="nav-link active" role="tab" data-bs-toggle="tab" href="#versek">Versek</a></li>
-            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#szakaszok">Szakaszok</a></li>
-            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#fejezetek">Fejezetek</a></li>
-        </ul>
-
         {% macro quality(result) %}
             <div class="quality" title="Becsült hasonlóság">
                 {% for i in 1..5 %}
@@ -60,16 +53,21 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                 {% endfor %}
             </div>
         {% endmacro %}
-
-        <div class="tab-content mt-2">
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="nav-item"><a class="nav-link active" role="tab" type="button" data-bs-target="#versek" data-bs-toggle="tab">Versek</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" type="button" data-bs-target="#szakaszok" data-bs-toggle="tab" >Szakaszok</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" type="button" data-bs-target="#fejezetek" data-bs-toggle="tab">Fejezetek</a></li>
+        </ul>
+        <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="versek">
                 {% for result in response.results %}        
                     {% for verseContainer in result.verseContainers %}
-                    <blockquote class="blockquote">
-                        <footer class="blockquote-footer">
+                    <blockquote class="blockquote searchResult">
+                        <div class="searchResultSource">
                             <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                             {{ _self.quality(result) }}
-                        </footer>
+                        </div>
                         <div class="parsedVerses">
                             {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis} %}
                         </div>
@@ -80,11 +78,11 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
             <div role="tabpanel" class="tab-pane" id="szakaszok">
                 {% for result in rangeResponse.results %}        
                     {% for verseContainer in result.verseContainers %}
-                        <blockquote class="blockquote">
-                            <footer class="blockquote-footer">
+                        <blockquote class="blockquote searchResult">
+                            <div class="searchResultSource">
                                 <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                             {{ _self.quality(result) }}
-                        </footer>
+                            </div>
                         <div class="parsedVerses">                    
                             {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}
                         <div class="parsedVerses">
@@ -96,11 +94,11 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
             <div role="tabpanel" class="tab-pane" id="fejezetek">
                 {% for result in chapterResponse.results %}        
                     {% for verseContainer in result.verseContainers %}
-                        <blockquote class="blockquote">
-                            <footer class="blockquote-footer">
-                            <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                        <blockquote class="blockquote searchResult">
+                            <div class="searchResultSource">
+                                <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                             {{ _self.quality(result) }}                        
-                        </footer>
+                            </div>
                         <div class="parsedVerses">                    
                             {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}
                         <div class="parsedVerses">

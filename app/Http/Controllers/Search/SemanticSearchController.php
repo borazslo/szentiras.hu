@@ -28,7 +28,7 @@ class SemanticSearchController extends Controller
     {
         $textToSearch = $request->get('textToSearch');
         if (empty($textToSearch)) {
-            return $this->getIndex();
+            return $this->getIndex($request);
         }
         $form = $this->prepareForm($request, $textToSearch);
         $view = $this->getView($form);
@@ -69,8 +69,8 @@ class SemanticSearchController extends Controller
     {
         $semanticSearchParams = new SemanticSearchParams();
         $semanticSearchParams->text = $form->textToSearch;
-        $semanticSearchParams->translationId = $form->translationId;
-        $semanticSearchParams->bookNumbers = SearchController::extractBookNumbers($form->bookNumber);
+        $semanticSearchParams->translationAbbrev = $form->translationId;
+        $semanticSearchParams->usxCodes = SearchController::extractBookNumbers($form->bookNumber);
         $aiResult = $this->semanticSearchService->generateVector($form->textToSearch);
         $response = $this->semanticSearchService->findNeighbors($semanticSearchParams, $aiResult->vector);
         $chapterResponse = $this->semanticSearchService->findNeighbors($semanticSearchParams, $aiResult->vector, EmbeddedExcerptScope::Chapter);
