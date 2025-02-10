@@ -4,7 +4,7 @@ namespace SzentirasHu\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use SzentirasHu\Console\Commands\UpdateTextsCommand;
+use SzentirasHu\Console\Commands\ImportScripture;
 
 class Kernel extends ConsoleKernel
 {
@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        UpdateTextsCommand::class,
+        ImportScripture::class,
     ];
 
     /**

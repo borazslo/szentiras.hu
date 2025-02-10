@@ -1,9 +1,7 @@
 ## How-to
 
 1. get a translation (xlsm)
-2. in UpdateTextsCommand.php, near lin 110, set the proper "gepi" and "rov" columns
-      - e.g. KNB 'rov' may be 6 - depends on the actual version of the source document
-3. run `php artisan szentiras:updateTexts --file=KNB_szovegforras.xlsm --nohunspell`
+2. run `php artisan szentiras:importScripture --file=KNB_szovegforras.xlsm --nohunspell`
 
 ## Proper translation Xlsm
 
