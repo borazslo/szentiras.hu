@@ -6,8 +6,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
 
 {% block content %}
     <h2>Keresés a Bibliában</h2>
-    <div class="panel panel-default">
-        <div class="panel-body">
+    <div class="card mb-2">
+        <div class="card-body">
             <form role="form" class="form-horizontal" method="get"
                   action="{{ action('Search\\SearchController@anySearch') }}">
                 <div class="form-group">
@@ -128,8 +128,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                     <!--{{ chapters.weight }}-->
                 {% for abbrev,group in chapters.translations %}
                     <li role="presentation" class="nav-item {% if loop.first %}active{% endif %}">                
-                        <h5><a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}"><span
-                                    class="glyphicon glyphicon-book"></span></a><a href="#g{{ key }}_{{ group.trans.abbrev }}" 
+                        <h5><a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}">
+                            <i class="fas fa-book"></a><a href="#g{{ key }}_{{ group.trans.abbrev }}" 
                                       class="nav-link" data-toggle="tab"  ><!--
                             
                         -->{% if form.translation is not defined or form.translation.id < 1 %}<span title="{{ group.trans.name }}">{{ group.trans.abbrev }}</span><!--
@@ -174,8 +174,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
     {% if fullTextResults is defined %}
         <h4>Találatok a szövegben <span class="badge">{{ fullTextResults.hitCount }} találat</span></h4>
         {% for result in fullTextResults.results %}
-            <h5><a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }}"><span
-                            class="glyphicon glyphicon-book"></span> {{ result.book.name }}
+            <h5><a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }}"><i
+                            class="fas fa-book"></i> {{ result.book.name }}
                     ({{ result.translation.name }})</a></h5>
             <ul class="list-unstyled">
                 {% if form.grouping == 'verse' %}

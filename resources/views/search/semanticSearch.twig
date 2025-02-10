@@ -6,8 +6,8 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
 
 {% block content %}
     <h3>Keresés jelentés szerint, AI segítségével</h2>
-    <div class="panel panel-default">
-        <div class="panel-body">
+    <div class="card mb-2">
+        <div class="card-body">
             <form role="form" class="form-horizontal" method="get"
                   action="{{ action('Search\\SemanticSearchController@anySearch') }}">
                 <div class="form-group">
@@ -48,9 +48,9 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
     {% if response is defined %}
     <div>
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a role="tab" data-toggle="tab" href="#versek">Versek</a></li>
-            <li role="presentation"><a role="tab" data-toggle="tab" href="#szakaszok">Szakaszok</a></li>
-            <li role="presentation"><a role="tab" data-toggle="tab" href="#fejezetek">Fejezetek</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link active" role="tab" data-toggle="tab" href="#versek">Versek</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#szakaszok">Szakaszok</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#fejezetek">Fejezetek</a></li>
         </ul>
 
         {% macro quality(result) %}
@@ -65,12 +65,12 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
             </div>
         {% endmacro %}
 
-        <div class="tab-content">
+        <div class="tab-content mt-2">
             <div role="tabpanel" class="tab-pane active" id="versek">
                 {% for result in response.results %}        
                     {% for verseContainer in result.verseContainers %}
-                    <blockquote>
-                        <footer>
+                    <blockquote class="blockquote">
+                        <footer class="blockquote-footer">
                             <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                             {{ _self.quality(result) }}
                         </footer>
@@ -84,9 +84,9 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
             <div role="tabpanel" class="tab-pane" id="szakaszok">
                 {% for result in rangeResponse.results %}        
                     {% for verseContainer in result.verseContainers %}
-                    <blockquote>
-                        <footer>
-                            <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                        <blockquote class="blockquote">
+                            <footer class="blockquote-footer">
+                                <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                             {{ _self.quality(result) }}
                         </footer>
                         <div class="parsedVerses">                    
@@ -100,8 +100,8 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
             <div role="tabpanel" class="tab-pane" id="fejezetek">
                 {% for result in chapterResponse.results %}        
                     {% for verseContainer in result.verseContainers %}
-                    <blockquote>
-                        <footer>
+                        <blockquote class="blockquote">
+                            <footer class="blockquote-footer">
                             <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                             {{ _self.quality(result) }}                        
                         </footer>
@@ -120,8 +120,4 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
 {% endblock %}
 
 {% block script %}
-    $('#myTabs a').click(function (e) {
-        //e.preventDefault()
-        //$(this).tab('show')
-      })      
 {%  endblock %}
