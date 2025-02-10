@@ -1,18 +1,24 @@
 <nav aria-label="breadcrumb">
-<ol class="breadcrumb">
+<ol class="breadcrumb breadcrumb-chevron">
     {% if translation is defined %}
-        <li class="breadcrumb-item"><a href="/{{ translation.abbrev }}">{{ translation.name }}</a></li>
-        {% if book is defined %}
+        
+        {% if book is not defined %}
+            <li class="breadcrumb-item active">{{ translation.name }}</li>            
+        {%  else %}
+            <li class="breadcrumb-item"><a href="/{{ translation.abbrev }}">{{ translation.name }}</a></li>
+            {% if bookRef is defined %}    
             <li class="breadcrumb-item"><a href="/{{ translation.abbrev }}/{{ book.abbrev }}">{{ book.name }}</a></li>
-        {% endif %}
-        {% if bookRef is defined %}
-            {% if bookRef.chapterRanges|length == 1 and bookRef.chapterRanges[0].untilChapterRef is empty %}
+            {% if bookRef.chapterRanges|length == 1 and bookRef.chapterRanges[0].untilChapterRef is empty %}                
+                <li class="breadcrumb-item active">{{ bookRef.toString() }}</a></li>
+            {% else %}
                 {% set chapter = bookRef.chapterRanges[0].chapterRef.chapterId %}
                 <li class="breadcrumb-item"><a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}</a></li>
+            {% endif %}
+
             {% else %}
-                <li class="breadcrumb-item active">{{ bookRef.toString() }}</a></li>
+                <li class="breadcrumb-item active">{{ book.name }}</li>
             {% endif %}
         {% endif %}
-    {% endif %}
+            {% endif %}
 </ol>
 </nav>

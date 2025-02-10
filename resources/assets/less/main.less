@@ -5,8 +5,12 @@
 @book-font: 'Noto Serif', serif;
 @book-font-size: 16px;
 
+@link-color: #0056b3;
+@link-hover-color: #007BFF;
+
 @footnote-link-color: #0056b3;
 @footnote-hover-color: #007BFF;
+
 
 html {
     font-size: 14px;
@@ -16,6 +20,14 @@ body {
     background-color: @background-color;
     color: @text-color;
     font-family: @text-font;
+}
+
+a {
+    text-decoration: none;
+    color: @link-color;
+    &:hover {
+        color: @link-hover-color;
+    }
 }
 
 a.leadChapterLink {

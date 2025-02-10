@@ -9,7 +9,7 @@ use SzentirasHu\Http\Controllers\Display\VerseParsers\Xref;
 
 class KNBVerseParser extends DefaultVerseParser
 {
-    const XREF_REGEXP = '\s*\{([0-9A-Z][^\}^\{]+)\}';
+    const XREF_REGEXP = '\s*\{([0-9\p{L}][^\}^\{]+)\}';
 
     protected function replaceTags($rawText) {
         $rawText = preg_replace('/<tv>/', ' ', $rawText);

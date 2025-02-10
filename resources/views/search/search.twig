@@ -10,15 +10,15 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         <div class="card-body">
             <form role="form" class="form-horizontal" method="get"
                   action="{{ action('Search\\SearchController@anySearch') }}">
-                <div class="form-group">
+                <div class="mb-2">
                     <label for="textToSearch" class="col-sm-3 control-label">Keresendő</label>
                     <div class="col-sm-9">
                         <input type="text" name="textToSearch" id="textToSearch" value="{{ form.textToSearch }}" class="form-control"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="book" class="col-sm-3 control-label">Könyv</label>
-                    <div class="col-sm-9">
+                <div class="mb-2 row">
+                    <div class="col">
+                        <label for="book" class="form-label">Könyv</label>                        
                         <select name="book" class="form-control" id="book">
                             <option value="all" {{ 'all' == form.book ? 'selected' }}>mind</option>
                             <option value="old_testament" {{ 'old_testament' == form.book ? 'selected' }}>Ószövetség</option>
@@ -28,10 +28,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                             {% endfor %}
                         </select>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="translation" class="col-sm-3 control-label">Fordítás</label>
-                    <div class="col-sm-9">
+                    <div class="col">
+                        <label for="translation" class="form-label">Fordítás</label>
                         <select name="translation" class="form-control" id="translation">
                             <option value="0" {{ form.translation is not defined ? 'selected' }}>mind</option>
                             {% for translation in translations %}
@@ -39,10 +37,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                             {% endfor %}
                         </select>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="grouping" class="col-sm-3 control-label">Csoportosítás</label>
-                    <div class="col-sm-9">
+                    <div class="col">
+                        <label for="grouping" class="form-label">Csoportosítás</label>
                         <select name="grouping" class="form-control" id="grouping">
                             <option value="verse" {{ form.grouping == 'verse' ? 'selected' }}>versenként</option>
                             <option value="chapter" {{ form.grouping == 'chapter' ? 'selected' }}>fejezetenként</option>                            
@@ -50,7 +46,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                         </select>
                     </div>
                 </div>
-                <input type="submit" value="Keresés" class="btn btn-default"/>
+                <input type="submit" value="Keresés" class="btn btn-primary"/>
             </form>
         </div>
     </div>
@@ -82,8 +78,8 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
    
     {% if fullTextResults.resultsByBookNumber is defined or  fullTextResults is defined %}
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="nav-item"><a class="nav-link active" role="tab" data-toggle="tab" href="#newstyle">Új kinézet</a></li>
-            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#oldstyle">Régi kinézet</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link active" role="tab" data-bs-toggle="tab" href="#newstyle">Új kinézet</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#oldstyle">Régi kinézet</a></li>
         </ul>
     <div class="tab-content ">                   
     <div role="tabpanel" class="tab-pane active" id="newstyle">
@@ -128,7 +124,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                     <li role="presentation" class="nav-item {% if loop.first %}active{% endif %}">                
                         <h5><a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}">
                             <i class="fas fa-book"></i></a><a href="#g{{ key }}_{{ group.trans.abbrev }}" 
-                                      class="nav-link" data-toggle="tab"  ><!--
+                                      class="nav-link" data-bs-toggle="tab"  ><!--
                             
                         -->{% if form.translation is not defined or form.translation.id < 1 %}<span title="{{ group.trans.name }}">{{ group.trans.abbrev }}</span><!--
                         --><span class="header-colon {{ loop.first ? 'active' : 'hidden-xs hidden-sm' }}">:</span>

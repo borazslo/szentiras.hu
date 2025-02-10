@@ -8,6 +8,6 @@
 <div>
     {{ macros.social('http://www.facebook.com/share.php?title=' ~ teaser ~ '&u=' ~ fullCanonicalUrl, 'fab fa-facebook', '#3b5999', 'Facebook') }}
     {{ macros.social('https://twitter.com/share?lang=hu&text=' ~ teaser ~ '&url=' ~ fullCanonicalUrl, 'fab fa-x-twitter', '#55acee', 'Twitter') }}
-    <a href="/qr/dialog/{{ fullCanonicalUrl }}" rel="nofollow" data-target="#qrModal" data-toggle="modal" id="qrLink" class="btn btn-default"><i class="fa fa-qrcode fa-lg"></i> QR-kód</a></li>
-    <a href="/pdf/dialog/{{ canonicalUrl }}" rel="nofollow" data-target="#pdfModal" data-toggle="modal" id="pdfLink" class="btn btn-default"><i class="fa fa-print fa-lg"></i> PDF</a>
+    <a href="/qr/dialog/{{ fullCanonicalUrl }}" rel="nofollow" data-target="#qrModal" data-bs-toggle="modal" id="qrLink" class="btn btn-default"><i class="fa fa-qrcode fa-lg"></i> QR-kód</a></li>
+    <a href="/pdf/dialog/{{ canonicalUrl }}" rel="nofollow" data-target="#pdfModal" data-bs-toggle="modal" id="pdfLink" class="btn btn-default"><i class="fa fa-print fa-lg"></i> PDF</a>
 </div>

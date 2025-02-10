@@ -10,15 +10,13 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
         <div class="card-body">
             <form role="form" class="form-horizontal" method="get"
                   action="{{ action('Search\\SemanticSearchController@anySearch') }}">
-                <div class="form-group">
-                    <label for="textToSearch" class="col-sm-3 control-label">Keresendő</label>
-                    <div class="col-sm-9">
-                        <input type="text" name="textToSearch" id="textToSearch" value="{{ form.textToSearch }}" class="form-control"/>
-                    </div>
+                <div class="mb-2">
+                    <label for="textToSearchAi" class="form-label">Keresendő</label>
+                    <input type="text" name="textToSearch" id="textToSearchAi" value="{{ form.textToSearch }}" class="form-control"/>                    
                 </div>
-                <div class="form-group">
-                    <label for="bookNumber" class="col-sm-3 control-label">Könyv</label>
-                    <div class="col-sm-9">
+                <div class="row g-3 mb-2">
+                    <div class="col">
+                        <label for="bookNumber" class="form-label">Könyv</label>
                         <select name="bookNumber" class="form-control" id="bookNumber">
                             <option value="all" {{ 'all' == form.bookNumber ? 'selected' }}>mind</option>
                             <option value="old_testament" {{ 'old_testament' == form.bookNumber ? 'selected' }}>Ószövetség</option>
@@ -28,10 +26,8 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                             {% endfor %}
                         </select>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="translationAbbrev" class="col-sm-3 control-label">Fordítás</label>
-                    <div class="col-sm-9">
+                    <div class="col">
+                        <label for="translationAbbrev" class="form-label">Fordítás</label>
                         <select name="translationAbbrev" class="form-control" id="translationAbbrev">
                             <option value="0" {{ form.translationAbbrev is not defined ? 'selected' }}>mind</option>
                             {% for translation in translations %}
@@ -40,7 +36,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                         </select>
                     </div>
                 </div>
-                <input type="submit" value="Keresés" class="btn btn-default"/>
+                <input type="submit" value="Keresés" class="btn btn-primary"/>
             </form>
         </div>
     </div>                     
@@ -48,9 +44,9 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
     {% if response is defined %}
     <div>
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="nav-item"><a class="nav-link active" role="tab" data-toggle="tab" href="#versek">Versek</a></li>
-            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#szakaszok">Szakaszok</a></li>
-            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#fejezetek">Fejezetek</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link active" role="tab" data-bs-toggle="tab" href="#versek">Versek</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#szakaszok">Szakaszok</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#fejezetek">Fejezetek</a></li>
         </ul>
 
         {% macro quality(result) %}
