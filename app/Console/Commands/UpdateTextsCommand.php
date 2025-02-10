@@ -14,8 +14,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
-use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
-
+use OpenSpout\Reader\Common\Creator\ReaderFactory;
 
 class UpdateTextsCommand extends Command
 {
@@ -68,7 +67,7 @@ class UpdateTextsCommand extends Command
      */
     public function handle()
     {
-        \Artisan::call("cache:clear");
+        Artisan::call("cache:clear");
         if (!$this->option('nohunspell')) {
             $this->testHunspell();
         }
@@ -117,7 +116,7 @@ class UpdateTextsCommand extends Command
         $this->verifyBookColumns($columns, $abbrev);
 
         $this->info("A $filePath fájl betöltése...");
-        $reader = ReaderEntityFactory::createXLSXReader();
+        $reader = ReaderFactory::createFromFileByMimeType($filePath);
         $reader->open($filePath);
         $this->info("A $filePath fájl megnyitva...");
 
@@ -239,7 +238,7 @@ class UpdateTextsCommand extends Command
 
     /**
      * @param $path
-     * @return \Box\Spout\Reader\XLSX\Sheet[]
+     * @return \OpenSpout\Reader\XLSX\Sheet[]
      */
     private function getSheets($reader)
     {
@@ -319,7 +318,7 @@ class UpdateTextsCommand extends Command
     }
 
     /**
-     * @param \Box\Spout\Reader\XLSX\RowIterator $verseRowIterator
+     * @param \OpenSpout\Reader\XLSX\RowIterator $verseRowIterator
      * @param $cols
      * @param $fields
      * @param $translation
@@ -355,7 +354,7 @@ class UpdateTextsCommand extends Command
                 $values['book_number'] = (int)substr($gepi, 0, 3);
                 $values['chapter'] = (int)substr($gepi, 3, 3);
                 $values['numv'] = (int)substr($gepi, 6, 3);
-                $values['tip'] = $row->getCellAtIndex($cols['jelstatusz']);
+                $values['tip'] = $row->getCellAtIndex($cols['jelstatusz'])->getValue();
                 $values['verse'] = $row->getCellAtIndex($cols['jel'])->getValue();
                 if ($this->hunspellEnabled && in_array($values['tip'], [60, 6, 901, 5, 10, 20, 30, 1, 2, 3, 401, 501, 601, 701, 703, 704])) {
                     $verseRoot = $this->stem($values['verse'], $pipes);
@@ -413,7 +412,7 @@ class UpdateTextsCommand extends Command
     }
 
     /**
-     * @param \Box\Spout\Reader\XLSX\RowIterator $verseRowIterator
+     * @param \OpenSpout\Reader\XLSX\RowIterator $verseRowIterator
      * @return array
      */
     private function getHeaders($verseRowIterator)
@@ -424,7 +423,7 @@ class UpdateTextsCommand extends Command
         foreach ($verseRowIterator as $row) { // only go through the first row
             foreach ($row->getCells() as $cell) {
                 $cols[$cell->getValue()] = $i;
-                $this->info("$i.oszlop: {$cell}");
+                $this->info("$i.oszlop: {$cell->getValue()}");
                 $i++;
             }
             break;
