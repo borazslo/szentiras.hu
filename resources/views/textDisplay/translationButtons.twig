@@ -3,9 +3,9 @@
         {% if otherTranslation.enabled %}
             <a class="btn btn-sm btn-outline-primary" role="button" href="/{{ otherTranslation.link }}">{{ otherTranslation.abbrev }}</a>
         {% else %}
-            <a class="btn btn-sm btn-outline-primary disabled" role="button" title="A hivatkozás {{ otherTranslation.abbrev }} fordításban nem elérhető.">{{ otherTranslation.abbrev }}</a>
+            <a class="btn btn-sm btn-outline-primary disabled"  role="button" title="A hivatkozás {{ otherTranslation.abbrev }} fordításban nem elérhető.">{{ otherTranslation.abbrev }}</a>
         {% endif %}
     {% else %}
-        <a href="#" class="btn btn-sm btn-secondary" disabled role="button">{{ otherTranslation.abbrev }}</a>
+        <a href="#" class="btn btn-sm btn-secondary disabled"  >{{ otherTranslation.abbrev }}</a>
     {% endif %}
 {% endfor %}

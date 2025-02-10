@@ -6,22 +6,28 @@
     <div class="card-body">
         <form id="quickSearchForm" role="form" method="get" class="form-inline"
                 action="/kereses/search">
-            <div class="form-group d-flex justify-content-center " style="width:100%">
-                <div class="input-group" style="width:100%">
+            <div class="form-group">
+                <div class="input-group">
                     <input id="quickSearch" type="text" class="form-control" name="textToSearch" value="{{ form.textToSearch }}" placeholder="Gyorskeresés">
                     <input id="grouping" type="hidden" class="form-control" name="grouping" value="verse">
-                    <a id="quickSearchButton" href="#" class="btn btn-default btn-secondary input-group-addon"><i class="fa-solid fa-magnifying-glass"></i></a>
-                    <a href="/kereses/search" title="Részletes keresés" class="hidden-sm btn-primary d-md-none d-lg-none btn btn-default input-group-addon"><i class="fa-solid fa-gear"></i></a></span>
-                    <a href="/ai-search" title="AI keresés" class="d-sm-none d-md-none d-lg-none btn btn-default input-group-addon"><i class="fa-solid fa-robot fa-large"></i></a></span>                            
+                    <div class="input-group-append">
+                        <a id="quickSearchButton" href="#" class="btn btn-default btn-secondary"><i class="fas fa-magnifying-glass"></i></a>
+                    </div>
+                    <div class="input-group-append">
+                        <a href="/kereses/search" title="Részletes keresés" class="btn-primary d-md-none d-lg-none btn btn-default"><i class="fa-solid fa-gear"></i></a></span>
+                    </div>
+                    <div class="input-group-append">
+                        <a href="/ai-search" title="AI keresés" class="btn-primary d-md-none d-lg-none btn btn-default"><i class="fa-solid fa-robot fa-large"></i></a></span>                            
+                    </div>
 
                 </div>
             </div>
         </form>
-        <div class="d-xs-none row justify-content-center" style="margin-top:5px">
-            <a href="/kereses/search" role="button" class="btn btn-primary btn-default"><i class="fa-solid fa-gear"></i> Részletes keresés</a>
+        <div class="d-none d-md-block row text-center" style="margin-top:5px">
+            <a href="/kereses/search" role="button" class=" btn btn-primary btn-default"><i class="fas fa-gear"></i> Részletes keresés</a>
         </div>
-        <div class="d-xs-none row justify-content-center" style="margin-top:5px">
-            <a href="/ai-search" role="button" class="btn btn-primary btn-default"><i class="fa-solid fa-robot fa-large"></i> AI keresés</a>
+        <div class="d-none d-md-block row text-center" style="margin-top:5px">
+            <a href="/ai-search" role="button" class="btn btn-primary btn-default"><i class="fas fa-robot fa-large"></i> AI keresés</a>
         </div>
     </div>
 </div>

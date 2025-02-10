@@ -71,21 +71,22 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         {% endfor %}
     {% endif %}
 
+    <div class="mb-2">
     {% for translationHit in translationHits %}
         <a href="/kereses/search?textToSearch={{ form.textToSearch }}&translation={{ translationHit.translation.id }}&book={{ form.book }}&grouping={{ form.grouping }}"
-           class="btn btn-default btn-xs">{{ translationHit.translation.abbrev }} <sup>{% if translationHit.hitCount > 999 %}&gt;{% endif %}{{ translationHit.hitCount }}</sup>
+           role="button" class="btn btn-info btn-sm">{{ translationHit.translation.abbrev }} <sup>{% if translationHit.hitCount > 999 %}&gt;{% endif %}{{ translationHit.hitCount }}</sup>
         </a>
     {% endfor %}
+    </div>
         
    
     {% if fullTextResults.resultsByBookNumber is defined or  fullTextResults is defined %}
-    <div class="btn-group" style="float:right" role="group" aria-label="...">
-       <a type="button" class="style-btn btn btn-primary nav-link" href="#newstyle" data-toggle="tab" >Új kinézet</a>  
-        <a type="button" class="style-btn btn btn-default nav-link" href="#oldstyle" data-toggle="tab">Régi kinézet</a>
-    </div>
-
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="nav-item"><a class="nav-link active" role="tab" data-toggle="tab" href="#newstyle">Új kinézet</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#oldstyle">Régi kinézet</a></li>
+        </ul>
     <div class="tab-content ">                   
-    <div class="tab-pane active" id="newstyle">
+    <div role="tabpanel" class="tab-pane active" id="newstyle">
     
     {% if fullTextResults.resultsByBookNumber is defined %}
         {% set results =  fullTextResults.resultsByBookNumber %}
@@ -94,9 +95,6 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         
         
         <style>
-            .bs-example{
-                margin-bottom: 0px;
-            }
             .tab-content {
                 /* border-left: 1px solid #ddd;
                 border-right: 1px solid #ddd;            
@@ -129,7 +127,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                 {% for abbrev,group in chapters.translations %}
                     <li role="presentation" class="nav-item {% if loop.first %}active{% endif %}">                
                         <h5><a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}">
-                            <i class="fas fa-book"></a><a href="#g{{ key }}_{{ group.trans.abbrev }}" 
+                            <i class="fas fa-book"></i></a><a href="#g{{ key }}_{{ group.trans.abbrev }}" 
                                       class="nav-link" data-toggle="tab"  ><!--
                             
                         -->{% if form.translation is not defined or form.translation.id < 1 %}<span title="{{ group.trans.name }}">{{ group.trans.abbrev }}</span><!--
@@ -169,7 +167,7 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
     {% endif %}
     
         </div>                   
-        <div class="tab-pane" id="oldstyle">
+        <div role="tabpanel" class="tab-pane" id="oldstyle">
         
     {% if fullTextResults is defined %}
         <h4>Találatok a szövegben <span class="badge">{{ fullTextResults.hitCount }} találat</span></h4>
