@@ -18,6 +18,7 @@ initToggler = ->
       selector: '.xref'
       toggleButton: '#toggleXrefs'
     }
+
   ]
 
   for toggle in toggles
@@ -39,5 +40,23 @@ initToggler = ->
             $(toggle.selector).fadeIn(delay)
             $(toggle.toggleButton).addClass('active')
             localStorage.setItem(toggle.storageKey, 'false')
+
+  state = localStorage.getItem('aiToolsState')
+  if state == 'true'
+    $('.parsedVerses span.numv').addClass('ai')
+    $('#toggleAiTools').addClass('active')
+  else
+    $('.parsedVerses span.numv').removeClass('ai')
+    $('#toggleAiTools').removeClass('active')
+
+  $('#toggleAiTools').click ->
+    if $('#toggleAiTools').hasClass('active')
+      $('.parsedVerses span.numv').removeClass('ai')
+      $('#toggleAiTools').removeClass('active')
+      localStorage.setItem('aiToolsState', 'false')
+    else
+      $('.parsedVerses span.numv').addClass('ai')
+      $('#toggleAiTools').addClass('active')
+      localStorage.setItem('aiToolsState', 'true')
 
 initToggler()

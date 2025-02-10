@@ -28,15 +28,13 @@ Fejezetválasztás <span class="caret"></span></button>
     {% for chapterId, chapter in chapters %}
         {%set chapterLink %}/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapterId }}{% endset %}
         {%set chapterText %}{{ chapterId }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}{% endset %}
-        <h4  class="bookchapter"><a href="{{ chapterLink }}">{{ chapterText }}</a></h4>
+        <h5 class="bookchapter"><a href="{{ chapterLink }}">{{ chapterText }}</a></h5>
 
         {% set chheadings = headings[chapterId] %}
         {% if chheadings|length > 0 %}            
-            <small>
         {% for heading in chheadings %}
             <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapterId}}#heading_{{ heading.gepi }}_{{ heading.headingLevel }}' class='link'>{{ heading.content|striptags('<br><a>')|raw  }}.&nbsp;</a>
         {% endfor %}        
-        </small>
         {% endif %}        
         
         {% set leadVerses = chapter.leadVerses %} 

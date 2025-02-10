@@ -8,6 +8,10 @@
 @footnote-link-color: #0056b3;
 @footnote-hover-color: #007BFF;
 
+html {
+    font-size: 14px;
+}
+
 body {
     background-color: @background-color;
     color: @text-color;
@@ -69,6 +73,15 @@ p.popover-footnote {
         background-color: rgba(255, 255, 0, 0.5);
         color: black;
     }
+
+    span.numv.ai {
+        color: #007bff;
+        cursor: pointer;
+        font-weight: bold;
+        font-family: @text-font;
+    }
+
+
 }
 
 div.translationButtons {
@@ -97,7 +110,7 @@ div.footnotes {
     border-top: 1px solid grey;
 }
 
-h4.bookchapter {
+h5.bookchapter {
     display: inline;
     margin: 0px;
     padding-right: 10px;
@@ -105,6 +118,10 @@ h4.bookchapter {
 
 .hideSpinner {
     opacity: 0;
+}
+
+.hidden {
+    display: none !important;
 }
 
 div.quickSelector {
@@ -128,3 +145,18 @@ div.bookChapterSelector {
 div.quality {
     display: inline-block;
 }
+
+.active .toggle {
+    &.inactive {
+        display: none;
+    }
+
+    &.active {
+        display: inline;
+    }
+}
+
+i.toggle.active {
+    display: none;
+}
+

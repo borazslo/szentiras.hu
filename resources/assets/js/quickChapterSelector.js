@@ -33,13 +33,12 @@ window.quickChapterSelector = (translation = null) => {
                     bookSelectorList.removeChild(bookSelectorList.firstChild);
                 }
                 filteredBooks.forEach(book => {
-                    const li = document.createElement('li');
                     const a = document.createElement('a');
                     a.href = '#';
                     a.setAttribute('data-booknumber', book.number);
                     a.setAttribute('data-abbrev', book.abbrev);
+                    a.classList.add('dropdown-item');
                     a.innerHTML = `<strong>${book.abbrev}</strong> <small>${book.name}</small>`;
-                    li.appendChild(a);
                     a.addEventListener('click', async (event) => {
                         chapterSelector.classList.add('hidden');
                         showSpinner();                        
@@ -50,22 +49,21 @@ window.quickChapterSelector = (translation = null) => {
                         const selectedBook = books.find(book => book.number == bookNumber);    
                         bookSelectorButton.innerHTML = `<strong>${selectedBook.abbrev}</strong>`;
                         for (let i = 1; i <= selectedBook.chapterCount; i++) {
-                            const li = document.createElement('li');
                             const a = document.createElement('a');
+                            a.classList.add('dropdown-item');
                             let aLink = `/${selectedBook.abbrev}${i}`;                            
                             if (translation !== null) {
                                 aLink = `/${translation}`+aLink;
                             }
                             a.href = aLink;
                             a.textContent = i;
-                            li.appendChild(a);
-                            chapterSelectorList.appendChild(li);
+                            chapterSelectorList.appendChild(a);
                           }
                         chapterSelector.classList.remove('hidden');
 
                         showSpinner(false);
                     });
-                    bookSelectorList.appendChild(li);
+                    bookSelectorList.appendChild(a);
                 });
                 showSpinner(false);
                 bookSelector.classList.remove('hidden');

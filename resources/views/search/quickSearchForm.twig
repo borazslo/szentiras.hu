@@ -1,53 +1,49 @@
 
-<div class="panel-group" id="accordion">
-    <div class="panel panel-default">
-        <div class="panel-heading visible-lg-block visible-md-block">
-            <h4 class="panel-title">
-                    Keresés a Bibliában
-            </h4>
-        </div>
-        <div id="collapseOne" class="panel-collapse">
-            <div class="panel-body">
-                <form id="quickSearchForm" role="form" method="get" class="form-inline"
-                      action="/kereses/search">
-                    <div class="form-group" style="width:100%">
-                        <div class="input-group" style="width:100%">
-                            <input id="quickSearch" type="text" class="form-control" name="textToSearch" value="{{ form.textToSearch }}" placeholder="Gyorskeresés">
-                            <input id="grouping" type="hidden" class="form-control" name="grouping" value="verse">
-                            <a id="quickSearchButton" class="btn btn-default input-group-addon"><span class="glyphicon glyphicon-search"></span></a>
-                            <a href="/kereses/search" title="Részletes keresés" class="hidden-sm hidden-md hidden-lg btn btn-default input-group-addon"><span class="glyphicon glyphicon-cog"></span></a></span>
-                            <a href="/ai-search" title="AI keresés" class="hidden-sm hidden-md hidden-lg btn btn-default input-group-addon"><i class="fa-solid fa-robot fa-large"></i></a></span>                            
+<div class="card" id="accordion">
+    <div class="card-header visible-lg visile-md">
+        Keresés a Bibliában
+    </div>
+    <div class="card-body">
+        <form id="quickSearchForm" role="form" method="get" class="form-inline"
+                action="/kereses/search">
+            <div class="form-group d-flex justify-content-center " style="width:100%">
+                <div class="input-group" style="width:100%">
+                    <input id="quickSearch" type="text" class="form-control" name="textToSearch" value="{{ form.textToSearch }}" placeholder="Gyorskeresés">
+                    <input id="grouping" type="hidden" class="form-control" name="grouping" value="verse">
+                    <a id="quickSearchButton" href="#" class="btn btn-default btn-secondary input-group-addon"><i class="fa-solid fa-magnifying-glass"></i></a>
+                    <a href="/kereses/search" title="Részletes keresés" class="hidden-sm btn-primary d-md-none d-lg-none btn btn-default input-group-addon"><i class="fa-solid fa-gear"></i></a></span>
+                    <a href="/ai-search" title="AI keresés" class="d-sm-none d-md-none d-lg-none btn btn-default input-group-addon"><i class="fa-solid fa-robot fa-large"></i></a></span>                            
 
-                        </div>
-                    </div>
-                </form>
-                <div class="hidden-xs row center-block" style="margin-top:5px">
-                    <a href="/kereses/search" class="btn btn-default center-block"><span class="glyphicon glyphicon-cog"></span> Részletes keresés</a>
-                </div>
-                <div class="hidden-xs row center-block" style="margin-top:5px">
-                    <a href="/ai-search" class="btn btn-default center-block"><i class="fa-solid fa-robot fa-large"></i> AI keresés</a>
                 </div>
             </div>
+        </form>
+        <div class="d-xs-none row justify-content-center" style="margin-top:5px">
+            <a href="/kereses/search" role="button" class="btn btn-primary btn-default"><i class="fa-solid fa-gear"></i> Részletes keresés</a>
+        </div>
+        <div class="d-xs-none row justify-content-center" style="margin-top:5px">
+            <a href="/ai-search" role="button" class="btn btn-primary btn-default"><i class="fa-solid fa-robot fa-large"></i> AI keresés</a>
         </div>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div class="btn-group">
-                <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleNumv">
-                    <span class="toggle glyphicon glyphicon-check active"></span>
-                    <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
-                    Versszámozás</a>
-                <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleXrefs">
-                    <span class="toggle glyphicon glyphicon-check active"></span>
-                    <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
-                    Hivatkozások</a>
-                <a href="javascript:void(0)" class="btn btn-default btn-sm active" id="toggleHeadings">
-                    <span class="toggle glyphicon glyphicon-check active"></span>
-                    <span class="toggle glyphicon glyphicon-unchecked inactive"></span>
-                    Címsorok</a>
-    
-            </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex flex-wrap">
+                    <a href="javascript:void(0)" role="button" class="btn btn-default btn-outline-primary btn-sm active m-1 flex-fill" id="toggleNumv">
+                        <i class="toggle fa-regular fa-square-check active"></i>
+                        <i class="toggle fa-regular fa-square inactive"></i>
+                        Versszámozás</a>
+                    <a href="javascript:void(0)" role="button" class="btn btn-default btn-outline-primary btn-sm active m-1 flex-fill" id="toggleXrefs">
+                        <i class="toggle fa-regular fa-square-check active"></i>
+                        <i class="toggle fa-regular fa-square inactive"></i>
+                        Hivatkozások</a>
+                    <a href="javascript:void(0)" role="button"  class="btn btn-default btn-outline-primary btn-sm active m-1 flex-fill" id="toggleHeadings">
+                        <i class="toggle fa-regular fa-square-check active"></i>
+                        <i class="toggle fa-regular fa-square inactive"></i>
+                        Címsorok</a>
+                    <a href="javascript:void(0)" role="button" class="btn btn-default btn-outline-primary btn-sm inactive m-1 flex-fill" id="toggleAiTools">
+                        <i class="toggle fa-regular fa-square-check active"></i>
+                        <i class="toggle fa-regular fa-square inactive"></i>
+                        AI eszközök</a>                    
         </div>
     </div>
-
 </div>

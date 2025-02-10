@@ -25,10 +25,13 @@
 
     {% include 'quickChapterSelector' %}
 
+    <div class="container mt-1">
     {% for row in cathBibles %}
-        <h4><a href='/{{ row.abbrev }}'>{{ row.name }} ({{ row.denom }})</a></h4>
+        <h4 a href='/{{ row.abbrev }}'>{{ row.name }} ({{ row.denom }})</a></h4>
+
         <p class="hidden-xs">{{ row.copyright|raw }}</p>
     {% endfor %}
+    </div>
 
 <br />
 

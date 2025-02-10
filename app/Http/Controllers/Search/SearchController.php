@@ -214,7 +214,7 @@ class SearchController extends Controller
         if ($form->translation) {
             $searchParams->translationId = $form->translation->id;
         }
-        $searchParams->bookNumbers = $this->extractBookNumbers($form);
+        $searchParams->bookNumbers = $this->extractBookNumbers($form->book);
         $searchParams->synonyms = true;
         $searchParams->grouping = $form->grouping;        
         return $searchParams;
