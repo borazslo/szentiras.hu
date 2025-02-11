@@ -65,7 +65,11 @@ function initToggler() {
                 popover.setContent({ '.popover-body': data});
                 element.dataset.loaded = true;
             })
-            .catch( (e) => console.log("Error loading content", e));
+            .catch( (e) => {
+                console.log("Error loading content", e);
+                popover.setContent({ '.popover-body': ":( Hiba a betöltés során"});
+                element.dataset.loaded = true;
+            });
         }
     }
 
