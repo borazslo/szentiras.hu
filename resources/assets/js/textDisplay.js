@@ -115,8 +115,25 @@ if (qrModal) {
             .then(response => response.text())
             .then(data => {
                 const qrModalContent = qrModal.querySelector('.modal-content');
-                console.log(data);
                 qrModalContent.innerHTML = `${data}`;
+            })
+            .catch( (e) => {
+                console.log("Error loading content", e);
+            });
+    });
+        
+}
+
+const pdfModal = document.getElementById('pdfModal');
+if (pdfModal) {
+    pdfModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const recipient = button.getAttribute('data-bs-view');
+        fetch(`${recipient}`)
+            .then(response => response.text())
+            .then(data => {
+                const modalContent = pdfModal.querySelector('.modal-content');
+                modalContent.innerHTML = `${data}`;
             })
             .catch( (e) => {
                 console.log("Error loading content", e);
