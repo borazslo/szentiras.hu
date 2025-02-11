@@ -83,10 +83,10 @@ class TextService
 
     /**
      * @param $canonicalRef CanonicalReference | string
-     * @param $translationId int
+     * @param Translation $translation
      * @return string
      */
-    public function getPureText($canonicalRef, $translation)
+    public function getPureText($canonicalRef, $translation, $includeHeadings = true)
     {
         if (is_string($canonicalRef)) {
             $canonicalRef = CanonicalReference::fromString($canonicalRef);
@@ -96,7 +96,7 @@ class TextService
         foreach ($verseContainers as $verseContainer) {
             $verses = $verseContainer->getParsedVerses();
             foreach ($verses as $verse) {
-                $verseText = $verse->getText();
+                $verseText = $verse->getText($includeHeadings);
                 $verseText = preg_replace('/<[^>]*>/', ' ', $verseText);
                 $text .= $verseText . ' ';
             }

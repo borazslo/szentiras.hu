@@ -1,0 +1,43 @@
+{% macro similarity(value) %}
+  {% if value %}
+  <div class="quality" title="Becsült hasonlóság">
+      {% for i in 1..5 %}
+          {% if i+4 <= value * 10 %}
+              <span class="star active">&#9733;</span>
+          {% else %}
+              <span class="star inactive">&#9734;</span>
+          {% endif %}
+      {% endfor %}
+  </div>
+  {% endif %}
+{% endmacro %}
+
+
+<ul class="nav nav-tabs ai-tools" id="myTab{{ hash }}" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel{{ hash }}" type="button" role="tab" aria-controls="home" aria-selected="true">Fordítások</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="similar-tab" data-bs-toggle="tab" data-bs-target="#similar{{ hash }}" type="button" role="tab" aria-controls="profile" aria-selected="false">AI párhuzamok</button>
+    </li>
+  </ul>
+  
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div class="tab-pane active" id="parallel{{ hash }}" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+      {% for pureText in pureTexts %}
+        <div>
+        <a href="/{{ pureText.translationAbbrev }}/{{ pureText.reference }}">{{ pureText.translationAbbrev }}: {{ pureText.reference }}</a> {{ _self.similarity(pureText.similarity) }} {{ pureText.text }}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="tab-pane" id="similar{{ hash }}" role="tabpanel" aria-labelledby="similar-tab" tabindex="0">
+      {% for similar in similars %}
+        <div>
+          <a href="/{{ similar.translationAbbrev }}/{{ similar.reference }}">{{ similar.reference }}</a> {{ _self.similarity(similar.similarity) }} {{ similar.text }}
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+  

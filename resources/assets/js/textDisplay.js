@@ -43,22 +43,61 @@ function initToggler() {
 
     var aiState = localStorage.getItem('aiToolsState');
     if (aiState === 'true') {
-        $('.parsedVerses span.numv').addClass('ai');
-        $('#toggleAiTools').addClass('active');
+        ai(true);
     } else {
-        $('.parsedVerses span.numv').removeClass('ai');
-        $('#toggleAiTools').removeClass('active');
+        ai(false);
     }
 
     $('#toggleAiTools').click(function() {
         if ($('#toggleAiTools').hasClass('active')) {
-            $('.parsedVerses span.numv').removeClass('ai');
-            $('#toggleAiTools').removeClass('active');
-            localStorage.setItem('aiToolsState', 'false');
+            ai(false);
         } else {
-            $('.parsedVerses span.numv').addClass('ai');
-            $('#toggleAiTools').addClass('active');
-            localStorage.setItem('aiToolsState', 'true');
+            ai(true);
         }
     });
+
+    async function getPopoverContent(element) {
+        const popover = bootstrap.Popover.getOrCreateInstance(element);
+        if (!element.dataset.loaded) {
+            fetch(`/ai-tool/${element.getAttribute("data-link")}`)
+            .then(response => response.json())
+            .then(data => {
+                popover.setContent({ '.popover-body': data});
+                element.dataset.loaded = true;
+            })
+            .catch( (e) => console.log("Error loading content", e));
+        }
+    }
+
+    function ai(turnOn) {
+        if (turnOn) {
+            $('.parsedVerses span.numv').hide();
+            $('.parsedVerses span.numvai').show();
+            $('#toggleAiTools').addClass('active');
+            localStorage.setItem('aiToolsState', 'true');
+            aiTriggers = document.querySelectorAll("a.numvai");
+            [...aiTriggers].map(aiTrigger => {
+                new bootstrap.Popover(aiTrigger,
+                    {
+                        trigger: 'click manual',
+                        html: true,
+                        placement: "auto",
+                        content: "Betöltés....",
+                        sanitize: false
+                    }
+                );
+                aiTrigger.addEventListener("shown.bs.popover", () => {
+                    getPopoverContent(aiTrigger);
+                 })
+            });
+        } else {
+            if (localStorage.getItem("hideNumbers") != 'true') {
+                $('.parsedVerses span.numv').show();
+            }
+            $('.parsedVerses span.numvai').hide();
+            $('#toggleAiTools').removeClass('active');
+            localStorage.setItem('aiToolsState', 'false');
+        }
+    }
+
 }

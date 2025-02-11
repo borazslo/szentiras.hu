@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use SzentirasHu\Http\Controllers\Ai\AiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,8 @@ Route::post("/kereses/legacy", 'Search\SearchController@postLegacy');
 
 Route::get("/ai-search", 'Search\SemanticSearchController@getIndex');
 Route::get("/ai-search/search", 'Search\SemanticSearchController@anySearch');
+
+Route::get("/ai-tool/{translationAbbrev}/{refString}", [AiController::class, 'getAiToolPopover']);
 
 Route::post('/searchbible.php', 'SzentirasHu\Http\Controllers\Search\SearchController@postLegacy');
 

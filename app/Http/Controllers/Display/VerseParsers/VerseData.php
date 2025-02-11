@@ -65,13 +65,13 @@ class VerseData
         }
     }
 
-    public function getText() : string {        
+    public function getText(bool $includeHeadings = true) : string {        
         $text = implode(" ",
-            array_map(function($versePart) {
+            array_map(function($versePart) use ($includeHeadings) {
                 if ($versePart->type == VersePartType::POEM_LINE) {
                     return $versePart->content;
                 } else if ($versePart->type == VersePartType::HEADING) {
-                    return "<h{$versePart->headingLevel}>{$versePart->content}</h{$versePart->headingLevel}>";
+                    return $includeHeadings ? "<h{$versePart->headingLevel}>{$versePart->content}</h{$versePart->headingLevel}>" : "";
                 } else {
                     return $versePart->content;
                 }

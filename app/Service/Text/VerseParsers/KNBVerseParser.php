@@ -50,51 +50,7 @@ class KNBVerseParser extends DefaultVerseParser
         $verse->xrefs[]= $xref;
     }
 
-    function fixEmTags($rawText) {
-    $openTag = '<em>';
-    $closeTag = '</em>';
 
-    $openTagCount = substr_count($rawText, $openTag);
-    $closeTagCount = substr_count($rawText, $closeTag);
-
-    // If there are more opening tags than closing tags, add a closing tag at the end
-    if ($openTagCount > $closeTagCount) {
-        $rawText .= $closeTag;
-    }
-
-    // If there are more closing tags than opening tags, add an opening tag at the beginning
-    if ($closeTagCount > $openTagCount) {
-        $rawText = $openTag . $rawText;
-    }
-
-    // Ensure tags are properly nested
-    $fixedText = '';
-    $openTags = 0;
-    $length = strlen($rawText);
-    for ($i = 0; $i < $length; $i++) {
-        if (substr($rawText, $i, 4) === $openTag) {
-            $openTags++;
-            $fixedText .= $openTag;
-            $i += 3; // Skip the next 3 characters
-        } elseif (substr($rawText, $i, 5) === $closeTag) {
-            if ($openTags > 0) {
-                $openTags--;
-                $fixedText .= $closeTag;
-            }
-            $i += 4; // Skip the next 4 characters
-        } else {
-            $fixedText .= $rawText[$i];
-        }
-    }
-
-    // If there are any unclosed tags, close them
-    while ($openTags > 0) {
-        $fixedText .= $closeTag;
-        $openTags--;
-    }
-
-    return $fixedText;
-}
 
     /**
      * @param $rawVerse
@@ -109,7 +65,9 @@ class KNBVerseParser extends DefaultVerseParser
             $rawText = substr($rawText, 0, -4);
         }
         $this->parseXrefs($rawText, $verseData);
-        $versePart= new VersePart($verseData, $this->fixEmTags($this->replaceTags($rawText)), VersePartType::SIMPLE_TEXT, count($verseData->verseParts));
+        $rawText = $this->replaceTags($rawText);
+        $rawText = $this->fixEmTags($rawText);
+        $versePart= new VersePart($verseData, $rawText, VersePartType::SIMPLE_TEXT, count($verseData->verseParts));
 
         $versePart->newline = $containsBr;
         $verseData->verseParts[] = $versePart;

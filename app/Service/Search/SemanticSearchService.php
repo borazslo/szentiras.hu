@@ -3,9 +3,11 @@
 namespace SzentirasHu\Service\Search;
 
 use Config;
+use Exception;
 use Log;
 use OpenAI\Laravel\Facades\OpenAI;
 use Pgvector\Laravel\Distance;
+use Pgvector\Vector;
 use SzentirasHu\Data\Entity\EmbeddedExcerpt;
 use SzentirasHu\Data\Entity\EmbeddedExcerptScope;
 use SzentirasHu\Http\Controllers\Search\SemanticSearchForm;
@@ -146,4 +148,102 @@ class SemanticSearchService {
         
         return $value;
     }
+
+    /**
+     * Returns the most similar verses in the same translation.
+     */
+    public function findSimilarVersesInTranslation($reference, $translationAbbrev, $limit = 10) {
+        $model = Config::get("settings.ai.embeddingModel");
+        $scope = EmbeddedExcerptScope::Verse;
+        $vector = EmbeddedExcerpt::query()
+        ->where("reference", $reference)
+        ->where("translation_abbrev", $translationAbbrev)            
+        ->where("scope", $scope)
+        ->where("model", $model)
+        ->first();
+        if (empty($vector)) {
+            return null;
+        }
+        return EmbeddedExcerpt::query()
+        ->where("reference", "!=", $reference)
+        ->where("translation_abbrev", $translationAbbrev)            
+        ->where("scope", $scope)
+        ->where("model", $model)
+        ->nearestNeighbors("embedding", $vector->embedding, Distance::Cosine)
+        ->limit($limit)
+        ->get();
+
+    }
+
+    public function retrieveVector($reference, $translationAbbrev, $scope = EmbeddedExcerptScope::Verse) {
+        $model = Config::get("settings.ai.embeddingModel");
+        $vector = EmbeddedExcerpt::query()
+            ->where("reference", $reference)
+            ->where("translation_abbrev", $translationAbbrev)            
+            ->where("scope", $scope)
+            ->where("model", $model)
+            ->first();
+        if (empty($vector)) {
+            return null;
+        }
+        return $vector->embedding;
+    }
+
+    public function calculateSimilarity(Vector $v1, Vector $v2) {
+        return $this->cosineSimilarity($v1, $v2);
+    }
+
+    function cosineSimilarity(Vector $v1, Vector $v2)
+    {
+        $components1 = $v1->toArray();
+        $components2 = $v2->toArray();
+
+        // Ensure both vectors have the same dimensionality
+        if (count($components1) !== count($components2)) {
+            throw new Exception('Vectors must have the same number of dimensions.');
+        }
+
+        $dotProduct = 0;
+        $magnitude1 = 0;
+        $magnitude2 = 0;
+        $length = count($components1);
+
+        for ($i = 0; $i < $length; $i++) {
+            $x = $components1[$i];
+            $y = $components2[$i];
+
+            $dotProduct += $x * $y;
+            $magnitude1 += $x * $x;
+            $magnitude2 += $y * $y;
+        }
+
+        $magnitude1 = sqrt($magnitude1);
+        $magnitude2 = sqrt($magnitude2);
+
+        if ($magnitude1 == 0 || $magnitude2 == 0) {
+            // If either vector has zero magnitude, cosine similarity is undefined
+            return 0;
+        }
+
+        return $dotProduct / ($magnitude1 * $magnitude2);
+    }
+
+    function normalizeVector(Vector $vector)
+    {
+        $components = $vector->toArray();
+        $magnitude = sqrt(array_reduce($components, function ($carry, $item) {
+            return $carry + $item * $item;
+        }, 0));
+
+        if ($magnitude == 0) {
+            return new Vector($components);
+        }
+
+        $normalizedComponents = array_map(function ($item) use ($magnitude) {
+            return $item / $magnitude;
+        }, $components);
+
+        return new Vector($normalizedComponents);
+    }
+
 }

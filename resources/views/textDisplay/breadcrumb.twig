@@ -8,13 +8,9 @@
             <li class="breadcrumb-item"><a href="/{{ translation.abbrev }}">{{ translation.name }}</a></li>
             {% if bookRef is defined %}    
             <li class="breadcrumb-item"><a href="/{{ translation.abbrev }}/{{ book.abbrev }}">{{ book.name }}</a></li>
-            {% if bookRef.chapterRanges|length == 1 and bookRef.chapterRanges[0].untilChapterRef is empty %}                
-                <li class="breadcrumb-item active">{{ bookRef.toString() }}</a></li>
-            {% else %}
-                {% set chapter = bookRef.chapterRanges[0].chapterRef.chapterId %}
-                <li class="breadcrumb-item"><a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}</a></li>
-            {% endif %}
-
+            {% set chapter = bookRef.chapterRanges[0].chapterRef.chapterId %}
+            <li class="breadcrumb-item"><a href="/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapter }}">{{ chapter }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}</a></li>                                    
+            <li class="breadcrumb-item active">{{ bookRef.toString() }}</a></li>            
             {% else %}
                 <li class="breadcrumb-item active">{{ book.name }}</li>
             {% endif %}
