@@ -105,3 +105,22 @@ function initToggler() {
     }
 
 }
+
+const qrModal = document.getElementById('qrModal');
+if (qrModal) {
+    qrModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const recipient = button.getAttribute('data-bs-view');
+        fetch(`${recipient}`)
+            .then(response => response.text())
+            .then(data => {
+                const qrModalContent = qrModal.querySelector('.modal-content');
+                console.log(data);
+                qrModalContent.innerHTML = `${data}`;
+            })
+            .catch( (e) => {
+                console.log("Error loading content", e);
+            });
+    });
+        
+}

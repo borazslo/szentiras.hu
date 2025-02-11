@@ -23,5 +23,8 @@ return [
     'ai' => [
         'embeddingModel' => env("APP_EMBEDDING_MODEL", 'text-embedding-3-large'),
         'embeddingDimensions' => env("APP_EMBEDDING_DIMENSIONS", 2000)
+    ],
+    'brand' => [
+        'domain' => env("APP_BRAND_DOMAIN", 'szentiras.eu')
     ]
 ];
