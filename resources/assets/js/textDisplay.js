@@ -139,5 +139,6 @@ if (pdfModal) {
                 console.log("Error loading content", e);
             });
     });
+    initPdfModal();
         
 }

@@ -24,7 +24,7 @@
             <div class="row">
                 <div class="btn-group-vertical" id="pdfToggles">
                     {{ macros.toggleButton('pdfHeadings', 'Címsorok', true) }}
-                    {# {{ macros.toggleButton('pdfRefs', 'Hivatkozások', false) }} #}
+                    {{ macros.toggleButton('pdfRefs', 'Hivatkozások', false) }}
                     {{ macros.toggleButton('pdfNums', 'Versszámozás', false) }}
                          <div class="form-control">Példányszám
                         <select id="pdfQuantity">
@@ -43,5 +43,5 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Bezárás</button>
+    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Bezárás</button>
 </div>
