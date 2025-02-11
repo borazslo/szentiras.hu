@@ -1,18 +1,26 @@
-window.quickChapterSelector = (translation = null) => {
-    let books;
-    const corpusSelectorButton = document.getElementById("corpusSelectorButton");
-    const bookSelectorButton = document.getElementById('bookSelectorButton');    
-    const bookSelector = document.getElementById('bookSelector');
-    const bookSelectorList = document.getElementById("bookSelectorList");
-    const chapterSelector = document.getElementById('chapterSelector');
-    const chapterSelectorButton = document.getElementById('chapterSelectorButton');    
-    const chapterSelectorList = document.getElementById("chapterSelectorList");
+class QuickChapterSelector {
 
-    const spinner = document.getElementById("selectorSpinner");            
+    translation = null;
 
-    function showSpinner(show = true) { show ? spinner.classList.remove('hideSpinner') : spinner.classList.add('hideSpinner'); }
+    constructor(translation = null) {
+        this.translation = translation;
+    }
 
-    const dropdownItems = document.querySelectorAll('#corpusSelector .dropdown-item');
+    init() {
+        let books;
+        const corpusSelectorButton = document.getElementById("corpusSelectorButton");
+        const bookSelectorButton = document.getElementById('bookSelectorButton');
+        const bookSelector = document.getElementById('bookSelector');
+        const bookSelectorList = document.getElementById("bookSelectorList");
+        const chapterSelector = document.getElementById('chapterSelector');
+        const chapterSelectorButton = document.getElementById('chapterSelectorButton');
+        const chapterSelectorList = document.getElementById("chapterSelectorList");
+
+        const spinner = document.getElementById("selectorSpinner");
+
+        function showSpinner(show = true) { show ? spinner.classList.remove('hideSpinner') : spinner.classList.add('hideSpinner'); }
+
+        const dropdownItems = document.querySelectorAll('#corpusSelector .dropdown-item');
         dropdownItems.forEach(item => {
             item.addEventListener('click', async (event) => {
                 bookSelector.classList.add('hidden');
@@ -23,12 +31,11 @@ window.quickChapterSelector = (translation = null) => {
                 const value = item.getAttribute("data-value");
                 const itemHtmlValue = item.innerHTML;
                 corpusSelectorButton.innerHTML = `<strong>${itemHtmlValue}</strong>`;
-
-                const apiLink = translation ? `/api/books/${translation}` : '/api/books';
+                const apiLink = this.translation ? `/api/books/${this.translation}` : '/api/books';
                 const response = await fetch(apiLink);
                 const bookResponse = await response.json();
                 books = bookResponse.books;
-                const filteredBooks = books.filter(book => book.corpus == value);    
+                const filteredBooks = books.filter(book => book.corpus == value);
                 while (bookSelectorList.firstChild) {
                     bookSelectorList.removeChild(bookSelectorList.firstChild);
                 }
@@ -41,24 +48,24 @@ window.quickChapterSelector = (translation = null) => {
                     a.innerHTML = `<strong>${book.abbrev}</strong> <small>${book.name}</small>`;
                     a.addEventListener('click', async (event) => {
                         chapterSelector.classList.add('hidden');
-                        showSpinner();                        
+                        showSpinner();
                         while (chapterSelectorList.firstChild) {
                             chapterSelectorList.removeChild(chapterSelectorList.firstChild);
                         }
                         const bookNumber = a.getAttribute("data-booknumber");
-                        const selectedBook = books.find(book => book.number == bookNumber);    
+                        const selectedBook = books.find(book => book.number == bookNumber);
                         bookSelectorButton.innerHTML = `<strong>${selectedBook.abbrev}</strong>`;
                         for (let i = 1; i <= selectedBook.chapterCount; i++) {
                             const a = document.createElement('a');
                             a.classList.add('dropdown-item');
-                            let aLink = `/${selectedBook.abbrev}${i}`;                            
-                            if (translation !== null) {
-                                aLink = `/${translation}`+aLink;
+                            let aLink = `/${selectedBook.abbrev}${i}`;
+                            if (this.translation !== null) {
+                                aLink = `/${this.translation}` + aLink;
                             }
                             a.href = aLink;
                             a.textContent = i;
                             chapterSelectorList.appendChild(a);
-                          }
+                        }
                         chapterSelector.classList.remove('hidden');
 
                         showSpinner(false);
@@ -70,5 +77,12 @@ window.quickChapterSelector = (translation = null) => {
 
             });
         }
-    );
-};
+        );
+
+    }
+}
+
+export default function initQuickChapterSelector(translation = null) {
+    const quickChapterSelector = new QuickChapterSelector(translation);
+    quickChapterSelector.init();
+}

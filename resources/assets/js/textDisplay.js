@@ -1,4 +1,4 @@
-function initToggler() {
+const initToggler = function () {
     var delay = 400;
     var toggles = [
         {
@@ -18,7 +18,7 @@ function initToggler() {
         }
     ];
 
-    toggles.forEach(function(toggle) {
+    toggles.forEach(function (toggle) {
         var state = localStorage.getItem(toggle.storageKey);
         if (state === 'true') {
             $(toggle.selector).hide();
@@ -28,7 +28,7 @@ function initToggler() {
             $(toggle.toggleButton).addClass('active');
         }
 
-        $(toggle.toggleButton).click(function() {
+        $(toggle.toggleButton).click(function () {
             if ($(toggle.toggleButton).hasClass('active')) {
                 $(toggle.selector).fadeOut(delay);
                 $(toggle.toggleButton).removeClass('active');
@@ -48,7 +48,7 @@ function initToggler() {
         ai(false);
     }
 
-    $('#toggleAiTools').click(function() {
+    $('#toggleAiTools').click(function () {
         if ($('#toggleAiTools').hasClass('active')) {
             ai(false);
         } else {
@@ -56,20 +56,32 @@ function initToggler() {
         }
     });
 
-    async function getPopoverContent(element) {
-        const popover = bootstrap.Popover.getOrCreateInstance(element);
+    async function getPopoverContent(element, loadingPopover, popover) {
         if (!element.dataset.loaded) {
+            loadingPopover.show();
             fetch(`/ai-tool/${element.getAttribute("data-link")}`)
-            .then(response => response.json())
-            .then(data => {
-                popover.setContent({ '.popover-body': data});
-                element.dataset.loaded = true;
-            })
-            .catch( (e) => {
-                console.log("Error loading content", e);
-                popover.setContent({ '.popover-body': ":( Hiba a betöltés során"});
-                element.dataset.loaded = true;
-            });
+                .then(response => response.json())
+                .then(data => {
+                    popover.setContent({ '.popover-body': data });
+                    loadingPopover.dispose();
+                    popover.show();
+                    element.dataset.loaded = true;                    
+                    popover.tip.querySelector('.btn-close').addEventListener("click", () => {
+                         popover.hide();
+                    });
+                })
+                .catch((e) => {
+                    console.log("Error loading content", e);
+                    popover.setContent({ '.popover-body': ":( Hiba a betöltés során" });
+                    setTimeout(() => { popover.hide() }, 1000);
+                    element.dataset.loaded = true;
+                });
+        } else {
+            popover.show();            
+            popover.tip.querySelector('.btn-close').addEventListener("click", () => {
+                popover.hide();
+           });
+
         }
     }
 
@@ -79,20 +91,29 @@ function initToggler() {
             $('.parsedVerses span.numvai').show();
             $('#toggleAiTools').addClass('active');
             localStorage.setItem('aiToolsState', 'true');
-            aiTriggers = document.querySelectorAll("a.numvai");
+            const aiTriggers = document.querySelectorAll("a.numvai");
             [...aiTriggers].map(aiTrigger => {
-                new bootstrap.Popover(aiTrigger,
+                const loadingPopover = new bootstrap.Popover(aiTrigger,
                     {
-                        trigger: 'click manual',
+                        trigger: 'click',
                         html: true,
                         placement: "auto",
                         content: "Betöltés....",
                         sanitize: false
                     }
                 );
-                aiTrigger.addEventListener("shown.bs.popover", () => {
-                    getPopoverContent(aiTrigger);
-                 })
+                const popover = new bootstrap.Popover(aiTrigger,
+                    {
+                        trigger: 'manual',
+                        html: true,
+                        placement: "auto",
+                        content: "Betöltés....",
+                        sanitize: false
+                    }
+                );
+                aiTrigger.addEventListener("click", () => {
+                    getPopoverContent(aiTrigger, loadingPopover, popover);                    
+                });
             });
         } else {
             if (localStorage.getItem("hideNumbers") != 'true') {
@@ -117,11 +138,11 @@ if (qrModal) {
                 const qrModalContent = qrModal.querySelector('.modal-content');
                 qrModalContent.innerHTML = `${data}`;
             })
-            .catch( (e) => {
+            .catch((e) => {
                 console.log("Error loading content", e);
             });
     });
-        
+
 }
 
 const pdfModal = document.getElementById('pdfModal');
@@ -135,9 +156,11 @@ if (pdfModal) {
                 const modalContent = pdfModal.querySelector('.modal-content');
                 modalContent.innerHTML = `${data}`;
             })
-            .catch( (e) => {
+            .catch((e) => {
                 console.log("Error loading content", e);
             });
     });
     initPdfModal();
 }
+
+initToggler();

@@ -47,8 +47,4 @@
     {% include 'bookAbbrevList' %}
 {% endblock %}
 
-{% block script %}
-    document.addEventListener('DOMContentLoaded', () => {
-        quickChapterSelector();
-    });
-{% endblock %}
+{% set js = ['pages/home'] %}

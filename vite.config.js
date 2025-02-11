@@ -7,7 +7,9 @@ export default defineConfig({
     },
     plugins: [
         laravel({
-            input: ['resources/assets/less/app.less', 'resources/assets/js/app.js'],
+            input: ['resources/assets/less/app.less', 
+                'resources/assets/js/app.js', 
+                'resources/assets/js/pages/home.js'],
             refresh: true,
         }),
     ],

@@ -12,6 +12,7 @@
   {% endif %}
 {% endmacro %}
 
+<button data-close-button-id="closePopover" type="button" class="btn-close"></button>
 
 <ul class="nav nav-tabs ai-tools" id="myTab{{ hash }}" role="tablist">
     <li class="nav-item" role="presentation">
@@ -31,7 +32,7 @@
         </div>
       {% endfor %}
     </div>
-    <div class="tab-pane" id="similar{{ hash }}" role="tabpanel" aria-labelledby="similar-tab" tabindex="0">
+    <div class="tab-pane scrollable-content" id="similar{{ hash }}" role="tabpanel" aria-labelledby="similar-tab" tabindex="0">
       {% for similar in similars %}
         <div>
           <a href="/{{ similar.translationAbbrev }}/{{ similar.reference }}">{{ similar.reference }}</a> {{ _self.similarity(similar.similarity) }} {{ similar.text }}
@@ -40,4 +41,3 @@
     </div>
 
   </div>
-  
