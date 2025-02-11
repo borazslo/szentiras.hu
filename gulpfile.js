@@ -17,13 +17,9 @@ elixir(function(mix) {
     mix
         .less(['*.less'], 'resources/assets/css/compiled/less.css')
         .styles([
-			'font-awesome.min.css',
-            'style.css',
             'compiled/less.css'
             ]);
-    mix.
-        coffee(['*.coffee'], 'resources/assets/js/compiled/coffee.js');
-    mix.scripts(['compiled/coffee.js', '*.js']);
+    mix.scripts(['*.js']);
 
     mix.version(['css/all.css', 'js/all.js']);
 

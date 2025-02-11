@@ -140,5 +140,4 @@ if (pdfModal) {
             });
     });
     initPdfModal();
-        
 }
