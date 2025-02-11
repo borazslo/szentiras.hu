@@ -21,20 +21,28 @@ const initToggler = function () {
     toggles.forEach(function (toggle) {
         var state = localStorage.getItem(toggle.storageKey);
         if (state === 'true') {
-            $(toggle.selector).hide();
+            $(toggle.selector).addClass('hidden');
             $(toggle.toggleButton).removeClass('active');
         } else {
-            $(toggle.selector).show();
+            $(toggle.selector).removeClass('hidden');
             $(toggle.toggleButton).addClass('active');
         }
 
         $(toggle.toggleButton).click(function () {
             if ($(toggle.toggleButton).hasClass('active')) {
                 $(toggle.selector).fadeOut(delay);
+                $(toggle.selector).addClass('hidden');
                 $(toggle.toggleButton).removeClass('active');
                 localStorage.setItem(toggle.storageKey, 'true');
             } else {
-                $(toggle.selector).fadeIn(delay);
+                // special treatment for numv beacuse of the ai
+                if (localStorage.getItem("aiToolsState") == 'true' && toggle.toggleButton == '#toggleNumv') {
+                    $(".numchapter").removeClass('hidden');
+                    $(".numchapter").fadeIn(delay);
+                } else {
+                    $(toggle.selector).removeClass('hidden');
+                    $(toggle.selector).fadeIn(delay);
+                }
                 $(toggle.toggleButton).addClass('active');
                 localStorage.setItem(toggle.storageKey, 'false');
             }
@@ -87,8 +95,8 @@ const initToggler = function () {
 
     function ai(turnOn) {
         if (turnOn) {
-            $('.parsedVerses span.numv').hide();
-            $('.parsedVerses span.numvai').show();
+            $('.parsedVerses span.numv').addClass('hidden');
+            $('.parsedVerses span.numvai').removeClass('hidden');
             $('#toggleAiTools').addClass('active');
             localStorage.setItem('aiToolsState', 'true');
             const aiTriggers = document.querySelectorAll("a.numvai");
@@ -117,9 +125,9 @@ const initToggler = function () {
             });
         } else {
             if (localStorage.getItem("hideNumbers") != 'true') {
-                $('.parsedVerses span.numv').show();
+                $('.parsedVerses span.numv').removeClass('hidden');
             }
-            $('.parsedVerses span.numvai').hide();
+            $('.parsedVerses span.numvai').addClass('hidden');
             $('#toggleAiTools').removeClass('active');
             localStorage.setItem('aiToolsState', 'false');
         }
