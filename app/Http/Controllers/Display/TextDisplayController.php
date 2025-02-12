@@ -257,15 +257,6 @@ class TextDisplayController extends Controller
 
     }
 
-    private function fallbackSearch($translation, $reference)
-    {
-        $location = "/kereses/search?textToSearch={$reference}";
-        if ($translation) {
-            $location .= "&translation={$translation->id}";
-        }
-        return Redirect::to($location);
-    }
-
     private function getTitle($verseContainers, $translation)
     {
         $title = "";

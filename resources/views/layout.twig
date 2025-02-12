@@ -35,6 +35,8 @@
             <div class="row">
                 <div class="col-md-3 col-sm-4">
                      {% include 'menu' %}
+                     {% block extramenu %}{% endblock %}
+                     
                 </div>
                 <div class="col-md-9 col-sm-8">
                     {% block pageHeader %}{% endblock %}
