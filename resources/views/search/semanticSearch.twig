@@ -12,7 +12,8 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                   action="{{ action('Search\\SemanticSearchController@anySearch') }}">
                 <div class="mb-2">
                     <label for="textToSearchAi" class="form-label">Keresendő</label>
-                    <input type="text" name="textToSearch" id="textToSearchAi" value="{{ form.textToSearch }}" class="form-control"/>                    
+                    <input required type="text" name="textToSearch" id="textToSearchAi" value="{{ form.textToSearch }}" class="form-control"/>                    
+                    {{ errors.first('textToSearch') }}
                 </div>
                 <div class="row g-3 mb-2">
                     <div class="col">

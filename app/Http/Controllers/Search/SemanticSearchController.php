@@ -2,11 +2,13 @@
 
 namespace SzentirasHu\Http\Controllers\Search;
 
+use Config;
 use Illuminate\Http\Request;
 use SzentirasHu\Data\Entity\EmbeddedExcerptScope;
 use SzentirasHu\Http\Controllers\Controller;
 use SzentirasHu\Http\Controllers\Search\SearchForm;
 use SzentirasHu\Http\Controllers\Search\SemanticSearchForm;
+use SzentirasHu\Http\Requests\SemanticSearchFormRequest;
 use SzentirasHu\Service\Search\SemanticSearchParams;
 use SzentirasHu\Service\Search\SemanticSearchService;
 use SzentirasHu\Service\Text\BookService;
@@ -24,12 +26,22 @@ class SemanticSearchController extends Controller
 
     }
 
-    public function anySearch(Request $request)
+    public function anySearch(SemanticSearchFormRequest $request)
     {
         $textToSearch = $request->get('textToSearch');
         if (empty($textToSearch)) {
             return $this->getIndex($request);
         }
+
+        if (Config::get('settings.ai.unregisteredSearchLimit') != -1) {
+            $key = 'semanticSearchCalls';
+            $count = $request->session()->get($key, 0) + 1;
+            $request->session()->put($key, $count);
+            if ($count > Config::get('settings.ai.unregisteredSearchLimit')) {
+                return view('search.semanticSearchThrottle');
+            }
+        }        
+        
         $form = $this->prepareForm($request, $textToSearch);
         $view = $this->getView($form);
         $view = $this->semanticSearch($form, $view);
