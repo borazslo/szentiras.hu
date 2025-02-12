@@ -200,6 +200,7 @@ function initPdfModal() {
                 .then(data => {
                     const modalContent = pdfModal.querySelector('.modal-content');
                     modalContent.innerHTML = `${data}`;
+                    initPdfModalScripts();
                 })
                 .catch((e) => {
                     console.log("Error loading content", e);

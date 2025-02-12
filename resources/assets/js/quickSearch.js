@@ -18,6 +18,20 @@ $('#quickSearch').autocomplete({
   };
   
   $('.quickSearchButton').on('click', () => {
+    $('.interstitial').show();
     $('#quickSearchForm').trigger("submit");
   });
-  
+
+  $(".translationHit").on('click', function() {    
+    $('.interstitial').show();
+    $(this).closest('form').trigger("submit");
+  });
+
+  $('.searchResultTranslationSelector').on('click', function() {
+    $(this).siblings().removeClass('active');
+    $(this).addClass('active');
+    const idToShow = $(this).data('target');   
+    const divToShow = $(idToShow);
+    $(divToShow).siblings().hide();
+    divToShow.show();
+  });

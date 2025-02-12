@@ -70,34 +70,33 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
 
     <div class="mb-2">
     {% for translationHit in translationHits %}
-        <a href="/kereses/search?textToSearch={{ form.textToSearch }}&translation={{ translationHit.translation.id }}&book={{ form.book }}&grouping={{ form.grouping }}"
-           role="button" class="btn btn-info btn-sm">{{ translationHit.translation.abbrev }} <sup>{% if translationHit.hitCount > 999 %}&gt;{% endif %}{{ translationHit.hitCount }}</sup>
+        <form class="translationHitForm" action="/kereses/search?textToSearch={{ form.textToSearch }}&translation={{ translationHit.translation.id }}&book={{ form.book }}&grouping={{ form.grouping }}" method="post">
+            {{ csrf_field() }}
+        <a 
+           role="button" class="btn btn-info btn-sm translationHit">{{ translationHit.translation.abbrev }} <sup>{% if translationHit.hitCount > 999 %}&gt;{% endif %}{{ translationHit.hitCount }}</sup>
         </a>
+        </form>
     {% endfor %}
     </div>
         
    
     {% if fullTextResults.resultsByBookNumber is defined or  fullTextResults is defined %}
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="nav-item"><a role="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#newstyle">Új kinézet</a></li>
-            <li role="presentation" class="nav-item"><a role="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#oldstyle">Régi kinézet</a></li>
+            <li role="presentation" class="nav-item"><a role="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#newstyle">Fordítások egymás mellett</a></li>
+            <li role="presentation" class="nav-item"><a role="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#oldstyle">Fordítások egymás alatt</a></li>
         </ul>
     <div class="tab-content ">                   
     <div role="tabpanel" class="tab-pane active" id="newstyle">
     
     {% if fullTextResults.resultsByBookNumber is defined %}
         {% set results =  fullTextResults.resultsByBookNumber %}
-        <h4>Találatok a szövegekben</h4>
-        
+       
         {% for key, chapters in results %}                        
-            <div class="bs-example">            
-                <ul class="nav nav-tabs">
+            <div class="searchResult">
                 {% for abbrev,group in chapters.translations %}
-                    <li role="presentation" class="nav-item">
-                        <a data-bs-target="#g{{ key }}_{{ group.trans.abbrev }}" class="nav-link btn-outline-primary {% if loop.first %}active{% endif %}" data-bs-toggle="tab">
+                        <a data-target="#g{{ key }}_{{ group.trans.abbrev }}" class="searchResultTranslationSelector btn btn-outline-secondary btn-sm {% if loop.first %}active{% endif %}">
                             <i class="fas fa-book"></i>{% if form.translation is not defined or form.translation.id < 1 %}
                             <span title="{{ group.trans.name }}">{{ group.trans.abbrev }}</span>
-                            <span class="header-colon {{ loop.first ? 'active' : 'd-sm-none' }}">:</span>
                         {% endif %}                        
                             <span class="header-bookabbrev {{ loop.first ? 'active d-sm-inline' : 'inactive d-md-inline'}}" title="{{ group.book.name }}">{{ group.book.abbrev }}</span>
                             <span class="header-ref {{ loop.first ? 'active' : 'd-sm-none'}}">
@@ -105,17 +104,17 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
                                 {% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}
                             </span>                                                                                                      
                         </a>
-                    </li>                               
                 {% endfor %}
-                </ul>                
-                <div class="tab-content ">                   
+                <div>                   
                 {% for abbrev,group in chapters.translations %}
-                        <div class="tab-pane {% if loop.first %}active{% endif %}" id="g{{ key }}_{{ group.trans.abbrev }}">                        
+                        <div class="searchResultTranslationText searchResultVerse {% if loop.first %}active{% endif %}" id="g{{ key }}_{{ group.trans.abbrev }}">
+                            <a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}"><i class="fas fa-circle-chevron-right"></i></a>
                         {% for verse in group.verses %}
-                            {% if verse.chapterStart %}{% if form.grouping == 'book' %}{{ loop.first ? "" : "<br>" }}<strong><a href="/{{ group.trans.abbrev }}/{{ group.book.abbrev }}{{ verse.chapter }}">{{ verse.chapter }}</a></strong> {% endif %}{% endif %}
-                            {% if verse.ellipseBefore %} [...] {% endif %}{% if form.grouping == 'book' or  form.grouping == 'chapter' %}<sup><a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">{{ verse.numv }}</a></sup>{% endif %}{{ verse.text|raw }}
+                            {% if verse.chapterStart %}{% if form.grouping == 'book' %}{{ loop.first ? "" : "<br>" }}<strong>
+                                <a href="/{{ group.trans.abbrev }}/{{ group.book.abbrev }}{{ verse.chapter }}">{{ verse.chapter }}</a></strong> {% endif %}{% endif %}
+                            {% if verse.ellipseBefore %} [...] {% endif %}{% if form.grouping == 'book' or  form.grouping == 'chapter' %}<sup>
+                                <a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">{{ verse.numv }}</a></sup>{% endif %}{{ verse.text|raw }}
                         {% endfor %}
-                        <a href="/{{ group.trans.abbrev}}/{{ group.book.abbrev }}{% if form.grouping == 'verse' or  form.grouping == 'chapter' %}{{ group.verses[0].chapter }}{% endif %}{% if form.grouping == 'verse' %},{{ group.verses[0].numv }}{% endif %}">&raquo;</a>
                         </div>
                     {% endfor %}
                 </div>
@@ -131,26 +130,26 @@ Keresés{% if form.textToSearch is defined %}: {{ form.textToSearch }}{% endif %
         {% for result in fullTextResults.results %}
             <h5><a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }}"><i class="fas fa-book"></i> {{ result.book.name }}
                     ({{ result.translation.name }})</a></h5>
-            <ul class="list-unstyled">
+            <div>
                 {% if form.grouping == 'verse' %}
                     {% for verse in result.verses %}
-                        <li>
+                        <div class="searchResultVerse">
                             <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ verse.chapter }},{{ verse.numv }}">
                                 {{ verse.chapter }},{{ verse.numv }}</a>
                             {{ verse.text|raw }}
-                        </li>
+                        </div>
                     {% endfor %}
                 {% else %}
                     {% for chapter, verses in result.chapters %}
-                        <li>
+                        <div class="searchResultVerse">
                             <a href="/{{ result.translation.abbrev }}/{{ result.book.abbrev }} {{ chapter }}">{{ chapter }}</a>
                             {% for verse in verses %}
                                 {% if verse.ellipseBefore %} [...] {% endif %}<sup>{{ verse.numv }}</sup>{{ verse.text|raw }}
                             {% endfor %}
-                        </li>
+                            </div>
                     {% endfor %}
                 {% endif %}
-            </ul>
+                        </div>
         {% endfor %}
     {% endif %}
         

@@ -8,7 +8,7 @@ return [
     'audioDirectory' => env("AUDIO_DIRECTORY", 'hang'),
     'sourceDirectory' => '/tmp',
     'facebookAppId' => '679257202109581',
-    'searchLimit' => 1000,
+    'sphinxSearchLimit' => env("APP_SPHINX_SEARCH_LIMIT", 1000),
     'logLevel' => env("LOG_LEVEL", 'debug'),
     'imageMagickCommand' => [ 'gm', 'convert' ],
     'sphinxConfig' => env('SPHINX_CONFIG', '/etc/sphinxsearch/sphinx.conf'),

@@ -1,4 +1,4 @@
-window.initPdfModal = function () {
+window.initPdfModalScripts = function () {
 
     const options = () => {
         return $.param({
