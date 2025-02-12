@@ -4,14 +4,15 @@
         Keresés a Bibliában
     </div>
     <div class="card-body">
-        <form id="quickSearchForm" role="form" method="get" class="form-inline"
+        <form id="quickSearchForm" role="form" method="post" class="form-inline"
                 action="/kereses/search">
             <div class="form-group">
                 <div class="input-group">
                     <input id="quickSearch" type="text" class="form-control" name="textToSearch" value="{{ form.textToSearch }}" placeholder="Gyorskeresés">
                     <input id="grouping" type="hidden" class="form-control" name="grouping" value="verse">
+                    {{ csrf_field() }}
                     <div class="input-group-append">
-                        <a id="quickSearchButton" href="#" class="btn btn-default btn-secondary"><i class="fas fa-magnifying-glass"></i></a>
+                        <a href="#" class="quickSearchButton btn btn-default btn-secondary"><i class="fas fa-magnifying-glass"></i></a>
                     </div>
                     <div class="input-group-append">
                         <a href="/kereses/search" title="Részletes keresés" class="btn-primary d-md-none d-lg-none btn btn-default"><i class="fa-solid fa-gear"></i></a></span>
@@ -24,32 +25,10 @@
             </div>
         </form>
         <div class="d-none d-md-block text-center mt-2">
-            <a href="/kereses/search" role="button" class=" btn btn-primary btn-default"><i class="fas fa-gear"></i> Részletes keresés</a>
+            <a href="#" role="button" class="quickSearchButton btn btn-primary btn-default"><i class="fas fa-gear"></i> Részletes keresés</a>
         </div>
         <div class="d-none d-md-block text-center mt-2">
             <a href="/ai-search" role="button" class="btn btn-primary btn-default"><i class="fas fa-robot fa-large"></i> AI keresés</a>
-        </div>
-    </div>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="d-flex flex-wrap">
-                    <a href="javascript:void(0)" role="button" class="btn btn-default btn-outline-primary btn-sm active m-1 flex-fill" id="toggleNumv">
-                        <i class="toggle fa-regular fa-square-check active"></i>
-                        <i class="toggle fa-regular fa-square inactive"></i>
-                        Versszámozás</a>
-                    <a href="javascript:void(0)" role="button" class="btn btn-default btn-outline-primary btn-sm active m-1 flex-fill" id="toggleXrefs">
-                        <i class="toggle fa-regular fa-square-check active"></i>
-                        <i class="toggle fa-regular fa-square inactive"></i>
-                        Hivatkozások</a>
-                    <a href="javascript:void(0)" role="button"  class="btn btn-default btn-outline-primary btn-sm active m-1 flex-fill" id="toggleHeadings">
-                        <i class="toggle fa-regular fa-square-check active"></i>
-                        <i class="toggle fa-regular fa-square inactive"></i>
-                        Címsorok</a>
-                    <a href="javascript:void(0)" role="button" class="btn btn-default btn-outline-primary btn-sm inactive m-1 flex-fill" id="toggleAiTools">
-                        <i class="toggle fa-regular fa-square-check active"></i>
-                        <i class="toggle fa-regular fa-square inactive"></i>
-                        AI eszközök</a>                    
         </div>
     </div>
 </div>

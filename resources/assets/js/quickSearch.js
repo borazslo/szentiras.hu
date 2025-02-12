@@ -17,7 +17,7 @@ $('#quickSearch').autocomplete({
     }
   };
   
-  $('#quickSearchButton').on('click', () => {
-    $('#quickSearchForm').submit();
+  $('.quickSearchButton').on('click', () => {
+    $('#quickSearchForm').trigger("submit");
   });
   

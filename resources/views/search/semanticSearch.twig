@@ -8,7 +8,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
     <h3>Keresés jelentés szerint, AI segítségével</h2>
     <div class="card mb-2">
         <div class="card-body">
-            <form role="form" class="form-horizontal" method="get"
+            <form role="form" class="form-horizontal" method="post"
                   action="{{ action('Search\\SemanticSearchController@anySearch') }}">
                 <div class="mb-2">
                     <label for="textToSearchAi" class="form-label">Keresendő</label>
@@ -37,6 +37,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                         </select>
                     </div>
                 </div>
+                {{ csrf_field() }}
                 <input type="submit" value="Keresés" class="btn btn-primary"/>
             </form>
         </div>

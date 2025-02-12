@@ -17,14 +17,13 @@ use SzentirasHu\Http\Controllers\Ai\AiController;
 Route::get('/', 'Home\HomeController@index');
 
 Route::get("/kereses", 'Search\SearchController@getIndex');
-Route::get("/kereses/search", 'Search\SearchController@anySearch');
 Route::post("/kereses/search", 'Search\SearchController@anySearch');
 Route::get("/kereses/suggest", 'Search\SearchController@anySuggest');
 Route::post("/kereses/suggest", 'Search\SearchController@anySuggest');
 Route::post("/kereses/legacy", 'Search\SearchController@postLegacy');
 
 Route::get("/ai-search", 'Search\SemanticSearchController@getIndex');
-Route::get("/ai-search/search", 'Search\SemanticSearchController@anySearch');
+Route::post("/ai-search/search", 'Search\SemanticSearchController@anySearch');
 
 Route::get("/ai-tool/{translationAbbrev}/{refString}", [AiController::class, 'getAiToolPopover']);
 
