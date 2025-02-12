@@ -67,7 +67,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                     {% for verseContainer in result.verseContainers %}
                     <blockquote class="blockquote searchResult">
                         <div class="searchResultSource">
-                            <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                            <a href="/{{ result.embeddedExcerpt.translation_abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                             {{ _self.quality(result) }}
                         </div>
                         <div class="parsedVerses">
@@ -82,7 +82,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                     {% for verseContainer in result.verseContainers %}
                         <blockquote class="blockquote searchResult">
                             <div class="searchResultSource">
-                                <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                                <a href="/{{ result.embeddedExcerpt.translation_abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                             {{ _self.quality(result) }}
                             </div>
                         <div class="parsedVerses">                    
@@ -98,7 +98,7 @@ Keresés jelentés szerint mesterséges intelligencia segítségével | Szentír
                     {% for verseContainer in result.verseContainers %}
                         <blockquote class="blockquote searchResult">
                             <div class="searchResultSource">
-                                <a href="/{{ result.embeddedExcerpt.translation.abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                                <a href="/{{ result.embeddedExcerpt.translation_abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
                             {{ _self.quality(result) }}                        
                             </div>
                         <div class="parsedVerses">                    
