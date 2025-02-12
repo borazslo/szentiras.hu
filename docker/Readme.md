@@ -29,6 +29,12 @@ Then, in the Docker interactive shell session, you may have to start the MySQL s
 service mysql start
 ```
 
+Then, you need to start the indexer service:
+
+```
+service sphinxsearch start
+```
+
 To serve the website:
 
 ```sh
@@ -49,6 +55,12 @@ mysql -u homestead -p
 SET character_set_client = 'utf8mb4';
 SET character_set_connection = 'utf8mb4';
 SET character_set_results = 'utf8mb4';
+```
+
+To reindex:
+
+```sh
+indexer --config /etc/sphinxsearch/sphinx.conf --all --rotate
 ```
 
 # Why this version of Ubuntu?
