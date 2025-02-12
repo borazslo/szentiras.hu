@@ -137,10 +137,9 @@ class TextDisplayController extends Controller
                 // Create a new canonical reference with the collected chapter numbers
                 $chapterReferenceString = '';
                 foreach ($chapterNumbers as $bookId => $chapters) {
-                    // ["Mt" => [1,2], "Mk" => [2,3]] should be "Mt1;Mt2;Mk2;Mk3"
-                    foreach ($chapters as $chapter) {
-                        $chapterReferenceString .= $bookId.$chapter . ';';
-                    }
+                    // ["Mt" => [1,2], "Mk" => [2,3]] should be "Mt1;2;3;Mk3"
+                    $chapterReferenceString .= $bookId;
+                    $chapterReferenceString .= implode(';', $chapters);
                 }
                 $fullContextVerseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($chapterReferenceString, $translation->id), $translation->id);
                 $highlightedGepis = [];
