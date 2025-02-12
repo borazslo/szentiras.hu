@@ -22,8 +22,8 @@ su - postgres -c "psql -d bible -c \"CREATE EXTENSION IF NOT EXISTS vector\""
 su - postgres -c "psql -d bible_testing -c \"CREATE EXTENSION IF NOT EXISTS vector\""
 
 
-nvm install v9.0.0
-nvm use v9.0.0
+nvm install 22
+nvm use 22
 npm --no-bin-link install
 
 php composer.phar install
