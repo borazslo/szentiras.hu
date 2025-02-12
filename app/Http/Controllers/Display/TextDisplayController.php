@@ -92,6 +92,7 @@ class TextDisplayController extends Controller
 
     public function showTranslatedReferenceText($translationAbbrev, $reference, $previousDay = null, $readingPlanDay = null, $nextDay = null)
     {
+        $fullContext = request()->has("fullContext");
         try {
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
             $canonicalRef = CanonicalReference::fromString($reference, $translation->id);
@@ -105,14 +106,59 @@ class TextDisplayController extends Controller
             if (sizeof($verseContainers) == 1 && empty($verseContainers[0]->rawVerses)) {
                 abort(404);
             }
+            $fullChaptersIncluded = true;
+            foreach ($verseContainers as $verseContainer) {
+                $bookRef = $verseContainer->bookRef;
+                if (count($bookRef->chapterRanges) > 1) {
+                    $fullChaptersIncluded = false;
+                    break;
+                } else {
+                    $chapterRange = $bookRef->chapterRanges[0];
+                    if ($chapterRange->untilChapterRef !== null && 
+                        $chapterRange->chapterRef->chapterId != $chapterRange->untilChapterRef->chapterId 
+                        && (!empty($chapterRange->chapterRef->verseRanges) || !empty($chapterRange->untilChapterRef->verseRanges))) {
+                        $fullChaptersIncluded = false;
+                        break;
+                    } else if (!empty($chapterRange->chapterRef->verseRanges)) {
+                        $fullChaptersIncluded = false;
+                        break;
+                    }
+                }
+            }
+            if ($fullContext) {
+                // Collect chapter numbers from verse containers
+                $chapterNumbers = [];
+                foreach ($verseContainers as $verseContainer) {
+                    $chapterNumbers[$verseContainer->bookRef->bookId] = array_merge($verseContainer->bookRef->getIncludedChapters(), $chapterNumbers[$verseContainer->bookRef->bookId] ?? []);
+                    $chapterNumbers[$verseContainer->bookRef->bookId] = array_unique($chapterNumbers[$verseContainer->bookRef->bookId]);
+                    // sort the array
+                    sort($chapterNumbers[$verseContainer->bookRef->bookId]);
+                }
+                // Create a new canonical reference with the collected chapter numbers
+                $chapterReferenceString = '';
+                foreach ($chapterNumbers as $bookId => $chapters) {
+                    // ["Mt" => [1,2], "Mk" => [2,3]] should be "Mt1;Mt2;Mk2;Mk3"
+                    foreach ($chapters as $chapter) {
+                        $chapterReferenceString .= $bookId.$chapter . ';';
+                    }
+                }
+                $fullContextVerseContainers = $this->textService->getTranslatedVerses(CanonicalReference::fromString($chapterReferenceString, $translation->id), $translation->id);
+                $highlightedGepis = [];
+                foreach ($verseContainers as $verseContainer) {
+                    $highlightedGepis = array_merge($highlightedGepis, array_map(fn($k) => "{$k}",array_keys($verseContainer->rawVerses)));
+                }
+            }
             $translations = $this->translationRepository->getAllOrderedByDenom();
             return View::make('textDisplay.verses')->with([
+                'fullChaptersIncluded' => $fullChaptersIncluded,
+                'highlightedGepis' => $highlightedGepis ?? [],
+                'fullContext' => $fullContext,
                 'previousDay' => $previousDay,
                 'readingPlan' => $readingPlanDay ? $readingPlanDay->plan : null,
                 'readingPlanDay' => $readingPlanDay,
                 'nextDay' => $nextDay,
 				'canonicalRef' => str_replace(" ", "%20", $canonicalRef->toString()),
-                'verseContainers' => $verseContainers,
+                'verseContainers' => $fullContextVerseContainers ?? $verseContainers,
                 'translation' => $translation,
                 'translations' => $translations,
                 'canonicalUrl' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),

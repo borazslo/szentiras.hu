@@ -6,9 +6,6 @@
         <p>
          {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' : translation} %}
         </p>
-        <div class="translationButtons">
-            {% include 'textDisplay.translationButtons' with { 'translations' : translations, 'translation': translation, 'translationLinks' : translationLinks } %}
-        </div>
             {% for verse in verseContainer.parsedVerses %}
                 {% if verse.footnotes is not empty %}
                     {% if not hasFootnote %}

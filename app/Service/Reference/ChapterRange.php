@@ -80,4 +80,14 @@ class ChapterRange
         }
         return false;
     }
+
+    public function getIncludedChapters() {
+        $chapters = [];
+        $chapter = $this->chapterRef->chapterId;
+        $untilChapter = $this->untilChapterRef ? $this->untilChapterRef->chapterId : $chapter;
+        for ($i = $chapter; $i <= $untilChapter; $i++) {
+            $chapters[] = $i;
+        }
+        return $chapters;
+    }
 }

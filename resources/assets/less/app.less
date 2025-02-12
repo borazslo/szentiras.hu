@@ -60,6 +60,7 @@ p.popover-footnote {
     font-family: @book-font;
     margin: 0;
 }
+
 .parsedVerses {
     font-family: @book-font;
     font-size: @book-font-size;
@@ -69,6 +70,7 @@ p.popover-footnote {
     h5 {
         font-weight: bold;
         color: @muted-text-color;
+        margin-top:1rem;
     }
     
     h6 {
@@ -80,18 +82,17 @@ p.popover-footnote {
     }
     
     span.heading7, span.heading8 {
-        display: inline-block;
+        display: inline;
         font-size: @book-font-size * 0.875;
         margin-top: 3px;
+        margin-right: 3px;
         font-weight: bold;
-        &::after {
-            content: "."
-        }
         color: @muted-text-color;
+
     }  
 
     .mark {
-        background-color: rgba(255, 255, 0, 0.5);
+        background-color: rgba(255, 255, 0, 0.25);
         color: black;
     }
 
@@ -258,6 +259,8 @@ div.xrefQuotation {
     h1, h2, h3, h4, h5, h6 {
         display: inline-block;
         margin: 0;
+        font-weight: bold;
+        font-size: 0.8rem;
     }
     a.ref {
         font-family: @text-font;

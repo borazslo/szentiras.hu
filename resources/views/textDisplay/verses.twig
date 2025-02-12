@@ -39,7 +39,18 @@
         {% include 'textDisplay.translationButtons' with { 'translations': translations, 'translation': translation, 'link': book.abbrev } %}
     </div>
 
+    {% if not fullChaptersIncluded and not fullContext %}
+    <a class="btn btn-info" id="shareButton" href="{{ url('/' ~ canonicalUrl ~ '?fullContext') }}" title="Teljes szövegkörnyezet megjelenítése">
+        <i class="fa-solid fa-up-right-and-down-left-from-center"></i> Teljes szövegkörnyezet megjelenítése</a>
+    {% endif %}
+    {% if fullContext %}
+        <a class="btn btn-info" id="shareButton" href="{{ url('/' ~ canonicalUrl) }}" title="Teljes szövegkörnyezet megjelenítése">
+            <i class="fa-solid fa-down-left-and-up-right-to-center"></i> Csak a hivatkozás szövegének megjelenítése</a>
+    {% endif %}
     {% include 'textDisplay.verseContainers' with  { 'verseContainers' : verseContainers } %}
+    <div class="translationButtons">
+        {% include 'textDisplay.translationButtons' with { 'translations': translations, 'translation': translation, 'link': book.abbrev } %}
+    </div>
     {% include 'textDisplay.share' with { 'canonicalUrl' : canonicalUrl, 'teaser' : teaser } %}
 {% endblock %}
 
