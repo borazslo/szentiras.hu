@@ -11,7 +11,7 @@
 {%- else -%}
     <span class="numv hidden"><sup>{{ verse.numv }}</sup></span>
 {%- endif -%}
-<a class="numvai" data-bs-placement="auto" tabindex="0" data-bs-custom-class="ai-tool-popover" data-bs-toggle="popover" data-link="{{ verse.book.translation.abbrev }}/{{ verse.book.abbrev}}{{ verse.chapter }},{{ verse.numv }}"><span class="numvai hidden">{{ verse.numv }}</span></a>&nbsp;
+<a class="numvai" data-bs-placement="auto" tabindex="0" data-bs-custom-class="ai-tool-popover" data-bs-toggle="popover" data-link="{{ verse.book.translation.abbrev }}/{{ verse.book.abbrev}}{{ verse.chapter }},{{ verse.numv }}"><span class="numvai hidden">{{ verse.numv }}&nbsp;</span></a>
 {%- endmacro %}
 
 {% macro xrefs(verse, translation) %}
@@ -19,7 +19,8 @@
         <span class="xref">
             <sup>
                 ({%- for xref in verse.xrefs -%}
-                <a href="/{{ translation.abbrev }}/{{ xref.text }}">{{ xref.text }}{% if not loop.last %};{% endif %}</a>
+                <a tabindex="0" class="xref" data-bs-custom-class="xref-popover" data-bs-placement="auto" data-bs-toggle="popover" data-bs-trigger="manual"
+                data-link="{{ translation.abbrev }}/{{ xref.text }}">{{ xref.text }}{% if not loop.last %};{% endif %}</a>
                 {%- endfor -%})
             </sup>
         </span>

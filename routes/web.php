@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use SzentirasHu\Http\Controllers\Ai\AiController;
+use SzentirasHu\Http\Controllers\Display\TextDisplayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,4 +71,6 @@ Route::get('/{TRANSLATION_ABBREV}/{REFERENCE}', 'Display\\TextDisplayController@
 
 Route::get('/{REFERENCE}', 'Display\\TextDisplayController@showReferenceText')
      ->where('REFERENCE', '[^/]+');
-
+Route::get('/xref/{TRANSLATION_ABBREV}/{REFERENCE}', [TextDisplayController::class, 'showXrefText'])
+    ->where(['TRANSLATION_ABBREV' => Config::get('settings.translationAbbrevRegex'),
+        'REFERENCE' => '[^/]+']);

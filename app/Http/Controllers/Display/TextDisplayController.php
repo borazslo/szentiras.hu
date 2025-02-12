@@ -82,6 +82,14 @@ class TextDisplayController extends Controller
         return $this->showTranslatedReferenceText(null, $reference);
     }
 
+    public function showXrefText($translationAbbrev, $reference) {
+        $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
+        $canonicalRef = CanonicalReference::fromString($reference, $translation->id);
+        $verseContainers = $this->textService->getTranslatedVerses($canonicalRef, $translation->id);        
+        $view = view('textDisplay.xrefText', ['verseContainers' => $verseContainers, 'translation' => $translation])->render();
+        return response()->json($view);
+    }
+
     public function showTranslatedReferenceText($translationAbbrev, $reference, $previousDay = null, $readingPlanDay = null, $nextDay = null)
     {
         try {

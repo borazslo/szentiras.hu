@@ -9,7 +9,8 @@ export default defineConfig({
         laravel({
             input: ['resources/assets/less/app.less', 
                 'resources/assets/js/app.js', 
-                'resources/assets/js/pages/home.js'],
+                'resources/assets/js/pages/home.js',
+                'resources/assets/js/pages/translation.js'],
             refresh: true,
         }),
     ],
