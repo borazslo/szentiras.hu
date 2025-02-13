@@ -1,6 +1,7 @@
 name: Szentiras Smoke Test
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
