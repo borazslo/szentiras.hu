@@ -60,5 +60,19 @@ jobs:
       - name: Seed Database
         run: php artisan db:seed --env=testing
 
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22.x'
+        
+      - name: Install NPM Dependencies
+        run: npm install
+
+      - name: Install Vite
+        run: npm install vite
+
+      - name: Build Application
+        run: npm run build
+        
       - name: Run Tests
         run: php artisan test
