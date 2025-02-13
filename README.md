@@ -19,7 +19,7 @@ Szentírás .hu
 
 A [szentiras.hu](http://szentiras.hu) 2025 előtti változatának teljes kódja.
 
-Fejlesztői környezet *docker compose* használatával: [docs/docker-compose-env.md](docs/docker-compose-env.md)
+Fejlesztői környezet használata: [docker/Readme.md](docker/Readme.md)
 
 ------
 Az alábbi információk elavultak.

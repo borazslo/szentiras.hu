@@ -1,88 +1,75 @@
 ---
 services:
+  # traefik:
+  #   image: traefik:v3.3
+  #   restart: unless-stopped
+  #   command:
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entryPoints.web.address=:80"
+  #     - "--entryPoints.websecure.address=:443"
+  #     ## TODO review the following configuration
+  #     - "--certificatesresolvers.myresolver.acme.email=info@szentiras.hu"
+  #     - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+  #     ## TODO http -> https redirect
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - letsencrypt:/letsencrypt
+  #   networks:
+  #     - default
+  #     - traefik
   app:
     image: app
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8080:80"
-    env_file:
-      - ./.env.example
     volumes:
-      - .:/var/www/html
+      - storage:/var/www/html/storage
+    env_file:
+      - ./.env
     depends_on:
       database:
         condition: service_healthy
-      migrator:
-        condition: service_completed_successfully
+    labels:
+      - "traefik.enable=true"
+      ## TODO get host from .env
+      - "traefik.http.routers.app.rule=Host(`szentiras.hu`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=myresolver"
+      - "traefik.http.services.app.loadbalancer.server.port=80"
+    networks:
+      - traefik
+      - default
   database:
     image: mariadb
-    environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: bible
-      MYSQL_USER: homestead
-      MYSQL_PASSWORD: secret
-    ports:
-      - "3306:3306"
+    env_file:
+      - ./.env
     volumes:
       - ./tmp:/docker-entrypoint-initdb.d
       - db-data:/var/lib/mysql
     healthcheck:
-      test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
-      start_period: 1m
-      start_interval: 10s
-      interval: 1m
+      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
+      interval: 10s
       timeout: 5s
       retries: 3
-  mailpit:
-    image: axllent/mailpit
-    ports:
-      - "1025:1025"
-      - "8025:8025"
-  composer:
-    image: app
-    build:
-      context: .
-      dockerfile: Dockerfile
+  sphinx:
+    image: nsign/sphinx-docker:2.2.11
     volumes:
-      - .:/var/www/html
-    command: php composer.phar install
-  node:
-    image: node
-    build:
-      context: .
-      dockerfile: Dockerfile.node
-    volumes:
-      - .:/app
-    command: npm --no-bin-link install
-  gulp:
-    image: node
-    build:
-      context: .
-      dockerfile: Dockerfile.node
-    volumes:
-      - .:/app
-    command: 'node_modules/gulp/bin/gulp.js'
-    depends_on:
-      composer:
-        condition: service_completed_successfully
-      node:
-        condition: service_completed_successfully
-  migrator:
-    image: app
-    build:
-      context: .
-      dockerfile: Dockerfile
+      - ./deploy/production/sphinx/sphinx.conf.in:/etc/sphinxsearch/sphinx.conf.in:ro
+      - ./docker/sphinx/start.sh:/start.sh:ro
+      - sphinx_data:/var/data
     env_file:
-      - ./.env.example
-    volumes:
-      - .:/var/www/html
-    command: php artisan migrate -n
+      - ./.env
     depends_on:
       database:
         condition: service_healthy
-      composer:
-        condition: service_completed_successfully
 volumes:
   db-data:
+  storage:
+  letsencrypt:
+  sphinx_data:
+networks:
+  traefik:
