@@ -67,7 +67,7 @@ const initToggler = function () {
     function ai(turnOn) {
         async function getPopoverContent(element, loadingPopover, popover) {
             if (!element.dataset.loaded) {
-                loadingPopover.show();
+                loadingPopover.show();                
                 fetch(`/ai-tool/${element.getAttribute("data-link")}`)
                     .then(response => response.json())
                     .then(data => {
@@ -75,9 +75,11 @@ const initToggler = function () {
                         popover.setContent({ '.popover-body': data });
                         popover.show();
                         element.dataset.loaded = true;
-                        popover.tip.querySelector('.btn-close').addEventListener("click", () => {
-                            popover.hide();
-                        });
+                        element.addEventListener("shown.bs.popover", () => {
+                            popover.tip.querySelector('.btn-close').addEventListener("click", () => {
+                                popover.hide();
+                            });
+                        });    
                     })
                     .catch((e) => {
                         loadingPopover.hide();
@@ -88,10 +90,11 @@ const initToggler = function () {
                     });
             } else {
                 popover.show();
-                popover.tip.querySelector('.btn-close').addEventListener("click", () => {
-                    popover.hide();
-                });
-    
+                element.addEventListener("shown.bs.popover", () => {
+                    popover.tip.querySelector('.btn-close').addEventListener("click", () => {
+                        popover.hide();
+                    });
+                });    
             }
         }
     
@@ -104,7 +107,7 @@ const initToggler = function () {
             [...aiTriggers].map(aiTrigger => {
                 const loadingPopover = new bootstrap.Popover(aiTrigger,
                     {
-                        trigger: 'click',
+                        trigger: 'manual',
                         placement: "auto",
                         content: "Betöltés....",
                     }
@@ -113,6 +116,7 @@ const initToggler = function () {
                     {
                         trigger: 'manual',
                         html: true,
+                        content: '...', // not created without content!!!
                         placement: "auto",
                         sanitize: false
                     }
@@ -145,8 +149,10 @@ function xrefPopovers() {
                     popover.setContent({ '.popover-body': data });
                     popover.show();
                     element.dataset.loaded = true;
-                    popover.tip.querySelector('.btn-close').addEventListener("click", () => {
-                        popover.hide();
+                    element.addEventListener("shown.bs.popover", () => {
+                        popover.tip.querySelector('.btn-close').addEventListener("click", () => {
+                            popover.hide();
+                        });
                     });
                 })
                 .catch((e) => {
@@ -158,8 +164,10 @@ function xrefPopovers() {
                 });
         } else {
             popover.show();
-            popover.tip.querySelector('.btn-close').addEventListener("click", () => {
-                popover.hide();
+            element.addEventListener("shown.bs.popover", () => {
+                popover.tip.querySelector('.btn-close').addEventListener("click", () => {
+                    popover.hide();
+                });
             });
 
         }
