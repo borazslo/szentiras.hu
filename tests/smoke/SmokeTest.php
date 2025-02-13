@@ -90,7 +90,7 @@ class SmokeTest extends TestCase
 
     public function testBasicSearch()
     {
-        $this->get('/kereses/search?textToSearch=Ter&book=all&translation=0&grouping=chapter')->assertStatus(200);
+        $this->post('/kereses/search?textToSearch=Ter&book=all&translation=0&grouping=chapter')->assertStatus(200);
     }
 
     public function testBookWithExplicitTranslation() {
