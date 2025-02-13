@@ -72,9 +72,18 @@ class TextDisplayController extends Controller
     {
         $translation = $this->translationRepository->getByAbbrev($translationAbbrev);
         $books = $this->translationRepository->getBooks($translation);
+        $bookHeaders = [];
+        $toc = request()->has("toc");
+        if ($toc) {
+            foreach ($books as $book) {
+                $bookHeaders[$book->abbrev] = $this->getBookViewArray($book, $translation, CanonicalReference::fromString("{$book->abbrev}", $translation->id), CanonicalReference::fromString("{$book->abbrev}", $translation->id));
+            }    
+        }
         return View::make('textDisplay.translation',
             ['translation' => $translation,
-                'books' => $books]);
+                'books' => $books,
+                'bookHeaders' => $bookHeaders,
+                'toc' => $toc]);
     }
 
     public function showReferenceText($reference)
@@ -230,76 +239,78 @@ class TextDisplayController extends Controller
         $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
         $translatedRef = $this->referenceService->translateReference($canonicalRef, $translation->id);
         $book = $this->bookRepository->getByAbbrevForTranslation($translatedRef->bookRefs[0]->bookId, $translation->id);
-        if ($book) {           
-            $chapters = [];                    
-            $verses = $this->verseRepository->getVerses($book->id);
-            $groupedVerses = [];
-            foreach ($verses as $verse) {
-                $type = $verse->getType();
-                if (preg_match('/^heading[5-9]{1}/', $type)) {
-                    $gepi = $verse->gepi;
-                    if (!isset($groupedVerses[$gepi])) {
-                        $groupedVerses[$gepi] = [];
-                    }
-                    $groupedVerses[$gepi][] = $verse;
-                }
-            }
-            $chapterHeadings = [];
-            foreach ($groupedVerses as $gepi => $verses) {
-                $verseContainer = new VerseContainer($book);
-                foreach ($verses as $verse) {
-                    $verseContainer->addVerse($verse);
-                }
-                $headings = $this->textService->getHeadings([$verseContainer]);
-                if (!empty($headings)) {
-                    if (!isset($chapterHeadings[$verse->chapter])) {
-                        $chapterHeadings[$verse->chapter] = [];
-                    }
-                    $chapterHeadings[$verse->chapter] = array_merge($chapterHeadings[$verse->chapter], $headings);
-                }
-            }
-            $firstVerses = $this->verseRepository->getLeadVerses($book->id);
-
-            foreach ($firstVerses as $verse) {
-                $type = $verse->getType();
-                if ($type == 'text' || $type == 'poemLine') {
-                    $verseContainer = new VerseContainer($book);
-                    $verseContainer->addVerse($verse);
-                    $oldText = "";                    
-                    if(isset($chapters[$verse['chapter']]['leadVerses'])) {                   
-                        if (array_has($chapters[$verse['chapter']]['leadVerses'], $verse['numv'])) {
-                            $oldText = $chapters[$verse['chapter']]['leadVerses'][$verse['numv']];
-                        }
-                    }
-                    $chapters[$verse['chapter']]['leadVerses'][$verse['numv']] = $oldText . $this->textService->getTeaser([$verseContainer]);
-                }
-            }            
-            $allTranslations = $this->translationRepository->getAllOrderedByDenom();
-            $bookTranslations = $this->getAllBookTranslations($book->number);
-            return View::make('textDisplay.book', [
-                'translation' => $translation,
-                'reference' => $translatedRef,
-                'book' => $book,
-                'chapters' => $chapters,
-                'headings' => $chapterHeadings,
-                'translations' => $allTranslations,
-                'translationLinks' => $allTranslations->map(
-                        function ($translation) use ($canonicalRef, $bookTranslations) {
-                            $bookExistsInTranslation = $bookTranslations->contains($translation->id);
-                            return [
-                                'id' => $translation->id,
-                                'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
-                                'abbrev' => $translation->abbrev,
-                                'enabled' => $bookExistsInTranslation];
-                        }
-                    )
-
-            ]);
-
+        if ($book) {
+            return View::make('textDisplay.book', $this->getBookViewArray($book, $translation, $canonicalRef, $translatedRef));
         } else {
             abort(404);
         }
+    }
 
+    private function getBookViewArray($book, $translation, $canonicalRef, $translatedRef) {
+        $chapters = [];
+        $verses = $this->verseRepository->getVerses($book->id);
+        $groupedVerses = [];
+        foreach ($verses as $verse) {
+            $type = $verse->getType();
+            if (preg_match('/^heading[5-9]{1}/', $type)) {
+                $gepi = $verse->gepi;
+                if (!isset($groupedVerses[$gepi])) {
+                    $groupedVerses[$gepi] = [];
+                }
+                $groupedVerses[$gepi][] = $verse;
+            }
+        }
+        $chapterHeadings = [];
+        foreach ($groupedVerses as $gepi => $verses) {
+            $verseContainer = new VerseContainer($book);
+            foreach ($verses as $verse) {
+                $verseContainer->addVerse($verse);
+            }
+            $headings = $this->textService->getHeadings([$verseContainer]);
+            if (!empty($headings)) {
+                if (!isset($chapterHeadings[$verse->chapter])) {
+                    $chapterHeadings[$verse->chapter] = [];
+                }
+                $chapterHeadings[$verse->chapter] = array_merge($chapterHeadings[$verse->chapter], $headings);
+            }
+        }
+        $firstVerses = $this->verseRepository->getLeadVerses($book->id);
+
+        foreach ($firstVerses as $verse) {
+            $type = $verse->getType();
+            if ($type == 'text' || $type == 'poemLine') {
+                $verseContainer = new VerseContainer($book);
+                $verseContainer->addVerse($verse);
+                $oldText = "";                    
+                if(isset($chapters[$verse['chapter']]['leadVerses'])) {                   
+                    if (array_has($chapters[$verse['chapter']]['leadVerses'], $verse['numv'])) {
+                        $oldText = $chapters[$verse['chapter']]['leadVerses'][$verse['numv']];
+                    }
+                }
+                $chapters[$verse['chapter']]['leadVerses'][$verse['numv']] = $oldText . $this->textService->getTeaser([$verseContainer]);
+            }
+        }            
+        $allTranslations = $this->translationRepository->getAllOrderedByDenom();
+        $bookTranslations = $this->getAllBookTranslations($book->number);
+        $bookViewArray = [
+            'translation' => $translation,
+            'reference' => $translatedRef,
+            'book' => $book,
+            'chapters' => $chapters,
+            'headings' => $chapterHeadings,
+            'translations' => $allTranslations,
+            'translationLinks' => $allTranslations->map(
+                    function ($translation) use ($canonicalRef, $bookTranslations) {
+                        $bookExistsInTranslation = $bookTranslations->contains($translation->id);
+                        return [
+                            'id' => $translation->id,
+                            'link' => $this->referenceService->getCanonicalUrl($canonicalRef, $translation->id),
+                            'abbrev' => $translation->abbrev,
+                            'enabled' => $bookExistsInTranslation];
+                    }
+                )
+            ];
+            return $bookViewArray;
     }
 
     private function getTitle($verseContainers, $translation)
