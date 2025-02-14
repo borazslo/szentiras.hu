@@ -31,7 +31,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: xml,zip,gd,mbstring,curl,pgsql
+          extensions: xml,zip,gd,mbstring,curl,pgsql,gmp
  
           ini-values: |
             memory_limit = 512M

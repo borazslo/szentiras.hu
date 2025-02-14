@@ -36,7 +36,7 @@ RUN apt install -y curl && \
     command -v nvm && \
     bash -c "source $NVM_DIR/nvm.sh && nvm install 22"
 
-RUN apt install -y php8.2-xml php8.2-zip php8.2-gd php8.2-mbstring php8.2-mysql php8.2-curl php8.2-xdebug php8.2-pgsql
+RUN apt install -y php8.2-xml php8.2-zip php8.2-gd php8.2-mbstring php8.2-mysql php8.2-curl php8.2-xdebug php8.2-pgsql php8.2-gmp
 
 RUN apt install -y hunspell hunspell-hu
 

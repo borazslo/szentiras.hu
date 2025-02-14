@@ -1,8 +1,9 @@
 {% set externalIcon %}<i class="fa-solid fa-arrow-up-right-from-square"></i>{% endset %}
 
-<nav class="navbar navbar-light bg-light navbar-expand-md" role="navigation">
+<nav class="navbar navbar-light navbar-expand-md" role="navigation">
+    <div class="container-fluid">
     <a class="navbar-brand" href="/">Szentírás.eu</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-target="#navbar" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Menü kapcsolása">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Menü">
         <span class="navbar-toggler-icon"></span>
     </button>
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -34,5 +35,20 @@
                 </li>
                 <li class="nav-item"><a class="nav-link" href="/api">Fejlesztőknek</a></li>
                 <li class="nav-item"><a class="nav-link" href="/info">Újdonságaink</a></li>
+              </ul>  
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    {% if  not session('anonymous_token') %}
+                    <a class="nav-link" href="/register">
+                        <i class="fa-solid fa-user fa-lg"></i> Belépés/Regisztráció
+                    </a>
+                    {% else %}
+                        <a class="nav-link" href="/profile/{{ session('anonymous_token') }}">
+                            <i class="fa-solid fa-user-check fa-lg"></i>
+                        </a>                        
+                    {% endif %}
+                </li>
+            </ul>
         </div>
+    </div>
 </nav>

@@ -44,6 +44,7 @@ class Kernel extends HttpKernel
         'guest' => \SzentirasHu\Http\Middleware\RedirectIfAuthenticated::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'cors' => \Illuminate\Http\Middleware\HandleCors::class
+        'cors' => \Illuminate\Http\Middleware\HandleCors::class,
+        'anonymousId' => \SzentirasHu\Http\Middleware\ValidateAnonymousId::class,
     ];
 }

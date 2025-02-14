@@ -1,0 +1,27 @@
+{% extends 'layout' %}
+
+{% block meta %}
+    <meta name="robots" content="noindex,nofollow">
+{% endblock %}
+{% block content %}
+    <label for="tokenField" class="form-label">Névtelen azonosító:</label> 
+    <div class="input-group">        
+<input type="text" class="form-control" value="{{ anonymousId.token }}" id="tokenField" readonly>
+<button class="btn btn-primary" onclick="copyToken()"><i class="fas fa-copy"></i> Belépési link másolása</button>
+    </div>
+
+    <form method="get" action="/logout">
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Kilépés</button>           
+        </div>
+    </form>
+
+<script>
+function copyToken() {
+    var copyText = document.getElementById("tokenField");
+    navigator.clipboard.writeText(window.location.protocol + "://" + window.location.host+"/profile/"+copyText.value);
+    document.execCommand("copy");
+    alert("A belépési link a vágólapra került!");
+}
+</script>
+{% endblock %}
