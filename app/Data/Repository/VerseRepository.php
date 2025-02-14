@@ -8,7 +8,7 @@ use SzentirasHu\Data\Entity\Verse;
 
 interface VerseRepository {
 
-    public function getTranslatedChapterVerses($bookId, $chapters);
+    public function getTranslatedChapterVerses($bookId, $chapters, $types);
 
     /**
      * @return Verse

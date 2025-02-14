@@ -18,13 +18,19 @@ class VerseRepositoryEloquent implements VerseRepository {
         return $verses;
     }
 
-    public function getTranslatedChapterVerses($bookId, $chapters) : Collection
+    public function getTranslatedChapterVerses($bookId, $chapters, $types = []) : Collection
     {
-        $verses = Verse::where('book_id', $bookId)->
-        whereIn('chapter', $chapters)->
-        orderBy('id')
+        $verses = Verse::where('book_id', $bookId);
+        if (!empty($chapters)) {
+            $verses->whereIn('chapter', $chapters);
+        }
+        if (!empty($types)) {
+            $verses->whereIn('tip', $types);
+        }
+        return $verses
+            ->orderBy('id')
             ->get();
-        return $verses;
+        
 
     }
 

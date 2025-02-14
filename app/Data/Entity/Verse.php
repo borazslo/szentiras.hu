@@ -53,6 +53,19 @@ class Verse extends Eloquent {
         return self::$typeMap;
     }
 
+    public static function getHeadingTypes($translationId) {
+        $typeMap = self::getTypeMap();
+        $headingTypes = [];
+        foreach ($typeMap as $types) {
+            foreach ($types as $typeId => $typeName) {
+                if (strpos($typeName, 'heading') !== false) {
+                    $headingTypes[$translationId][] = $typeId;
+                }
+            }
+        }
+        return $headingTypes[$translationId];
+    }
+
     public function getType() {
         $typeMap = self::getTypeMap();
         if (array_key_exists($this->tip, $typeMap[$this->trans] ?? [] )) {

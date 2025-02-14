@@ -333,5 +333,17 @@ div.searchResult {
 }
 
 div.tocItem {
-    margin-left: 1rem;
+    margin-left: 1rem;    
+    display: flex;
+    align-items: flex-start;
+
+    .chapterNumber {
+        font-weight: bold;
+        margin-right: 10px;
+        min-width: 15px;
+        text-align: right;
+    }
+    .chapterHeadings {
+        flex: 1;
+    }
 }

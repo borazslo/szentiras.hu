@@ -25,7 +25,7 @@ class VerseContainer
      */
     private $verseParser;
     /**
-     * @var string[Verse][]
+     * @var Verse[]
      */
     public $rawVerses;
 

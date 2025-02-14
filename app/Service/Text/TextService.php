@@ -48,7 +48,7 @@ class TextService
      * @param $translation
      * @return VerseContainer[]
      */
-    public function getTranslatedVerses($canonicalRef, $translationId)
+    public function getTranslatedVerses($canonicalRef, $translationId, $verseTypes = [])
     {
         $translatedRef = $this->referenceService->translateReference($canonicalRef, $translationId);
         $verseContainers = [];
@@ -56,9 +56,16 @@ class TextService
             $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translationId);
             if ($book) {
                 $verseContainer = new VerseContainer($book, $bookRef);
-                foreach ($bookRef->chapterRanges as $chapterRange) {
-                    $searchedChapters = CanonicalReference::collectChapterIds($chapterRange);
-                    $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters);
+                if (!empty($bookRef->chapterRanges)) {
+                    foreach ($bookRef->chapterRanges as $chapterRange) {
+                        $searchedChapters = CanonicalReference::collectChapterIds($chapterRange);
+                        $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters, $verseTypes);
+                        foreach ($verses as $verse) {
+                            $verseContainer->addVerse($verse);
+                        }
+                    }    
+                } else {
+                    $verses = $this->getChapterRangeVerses(null, $book, [], $verseTypes);
                     foreach ($verses as $verse) {
                         $verseContainer->addVerse($verse);
                     }
@@ -69,12 +76,12 @@ class TextService
         return $verseContainers;
     }
 
-    public function getChapterRangeVerses(ChapterRange $chapterRange, Book $book, $searchedChapters)
+    public function getChapterRangeVerses(?ChapterRange $chapterRange, Book $book, $searchedChapters, $verseTypes = [])
     {
-        $allChapterVerses = $this->verseRepository->getTranslatedChapterVerses($book->id, $searchedChapters);
+        $allChapterVerses = $this->verseRepository->getTranslatedChapterVerses($book->id, $searchedChapters, $verseTypes);
         $chapterRangeVerses = [];
         foreach ($allChapterVerses as $verse) {
-            if ($chapterRange->hasVerse($verse->chapter, $verse->numv)) {
+            if (is_null($chapterRange) || $chapterRange->hasVerse($verse->chapter, $verse->numv)) {
                 $chapterRangeVerses[] = $verse;
             }
         }
