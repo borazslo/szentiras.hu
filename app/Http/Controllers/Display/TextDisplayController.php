@@ -240,15 +240,14 @@ class TextDisplayController extends Controller
         $translatedRef = $this->referenceService->translateReference($canonicalRef, $translation->id);
         $book = $this->bookRepository->getByAbbrevForTranslation($translatedRef->bookRefs[0]->bookId, $translation->id);
         if ($book) {
-            return View::make('textDisplay.book', $this->getBookViewArray($book, $translation, $canonicalRef, $translatedRef));
+            return View::make('textDisplay.book', $this->getBookViewArray($book, $this->verseRepository->getVerses($book->id), $translation, $canonicalRef, $translatedRef));
         } else {
             abort(404);
         }
     }
 
-    private function getBookViewArray($book, $translation, $canonicalRef, $translatedRef) {
+    private function getBookViewArray($book, $verses, $translation, $canonicalRef, $translatedRef) {
         $chapters = [];
-        $verses = $this->verseRepository->getVerses($book->id);
         $groupedVerses = [];
         foreach ($verses as $verse) {
             $type = $verse->getType();

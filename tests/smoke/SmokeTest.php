@@ -49,7 +49,7 @@ class SmokeTest extends TestCase
                 'verseTypes' =>
                 [
                     'text' => [6, 901],
-                    'heading' => [0=>5, 1=>10, 2=>20, 3=>30],
+                    'heading' => [5=>0, 10=>1, 20=>2, 30=>3],
                     'footnote' => [120, 2001, 2002],
                     'poemLine' => [902],
                     'xref' => [920]

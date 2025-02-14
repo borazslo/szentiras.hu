@@ -43,7 +43,7 @@ return [
         'verseTypes' =>
         [
             'text' => [901],
-            'heading' => [0=>301, 1=>320, 2=>330, 3=>640, 4=>650, 5=>680, 6 => 701, 7 => 702],
+            'heading' => [301=>0, 320=>1, 330=>2, 640=>3, 650=>4, 680=>5, 701=>6, 702=>7],
             'footnote' => [120, 2001, 2002],
             'poemLine' => [902],
             'xref' => [920],
@@ -67,7 +67,7 @@ return [
         'verseTypes' =>
         [
             'text' => [901],
-            'heading' => [2=>401, 3=>501, 4=>601, 5=>701, 6=>704],
+            'heading' => [401=>2, 501=>3, 601=>4, 701=>5, 704=>6],
             'footnote' => [2001]
         ],
         'textSource' => env('TEXT_SOURCE_SZIT'),
@@ -77,7 +77,7 @@ return [
         'verseTypes' =>
         [
             'text' => [901],
-            'heading' => [3=>703]
+            'heading' => [703 => 3]
         ],
         'textSource' => env('TEXT_SOURCE_UF'),
         'id' => 2
@@ -86,7 +86,7 @@ return [
         'verseTypes' =>
         [
             'text' => [901],
-            'heading' => [2=>701, 3=>704]
+            'heading' => [701=>2, 704=>3]
         ],
         'textSource' => env('TEXT_SOURCE_BD'),
         'id' => 5,
@@ -95,7 +95,7 @@ return [
         'verseTypes' =>
         [
             'text' => [901],
-            'heading' => [3=>701],
+            'heading' => [701=>3],
             'footnote' => [2001],
             'xref' => [2021]
         ],
