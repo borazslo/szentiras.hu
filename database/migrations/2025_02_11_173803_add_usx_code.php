@@ -4,50 +4,92 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use SzentirasHu\Data\Entity\Book;
+use SzentirasHu\Data\UsxCodes;
+
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('books', function (Blueprint $table) {
+        $abbreviationToUsxMapping = UsxCodes::abbreviationToUsxMapping();
+        $bookNumberAndTranslationToUsxMapping =
+            $this->bookNumberAndTranslationToUsxMapping($abbreviationToUsxMapping);
+
+        $this->dropUnnecessaryBookRelatedColumns();
+
+        $this->addUsxCode($abbreviationToUsxMapping, $bookNumberAndTranslationToUsxMapping);
+
+        Schema::table('translations', function (Blueprint $table): void {
+            $table->unique('abbrev');
+        });
+    }
+
+    public function down(): void // TODO rewrite this
+    {
+        Schema::table('books', function (Blueprint $table): void {
+            $table->renameColumn('order', 'number');
+            $table->dropColumn('usx_code');
+        });
+
+        Schema::table('translations', function (Blueprint $table): void {
+            $table->dropUnique(['abbrev']);
+        });
+
+        Schema::table('book_abbrevs', function (Blueprint $table): void {
+            $table->renameColumn('usx_code', 'book_id');
+        });
+
+        Schema::table('tdverse', function (Blueprint $table): void {
+            $table->renameColumn('usx_code', 'book_number');
+        });
+    }
+
+    private function dropUnnecessaryBookRelatedColumns()
+    {
+        Schema::table('book_abbrevs', function (Blueprint $table): void {
+            $table->dropColumn('book_id');
+        });
+        Schema::table('tdverse', function (Blueprint $table): void {
+            $table->dropColumn('book_number');
+        });
+    }
+
+    private function addUsxCode($abbreviationToUsxMapping, $bookNumberAndTranslationToUsxMapping)
+    {
+        Schema::table('books', function (Blueprint $table): void {
             $table->renameColumn('number', 'order');
             $table->string('usx_code', 3);
         });
 
-        Schema::table('translations', function (Blueprint $table) {
-            $table->unique('abbrev');
-        });
-
-        Schema::table('book_abbrevs', function (Blueprint $table) {
-            $table->renameColumn('book_id', 'usx_code');
-        });
-
-        Schema::table('tdverse', function (Blueprint $table) {
-            $table->renameColumn('book_number', 'usx_code');
+        Schema::table('book_abbrevs', function (Blueprint $table): void {
+            $table->string('usx_code', 3);
         });
 
         $this->updateUsxCodeForAbbrev(
-            $this->getUsxCodeMapping(),
+            $abbreviationToUsxMapping,
             ['books', 'book_abbrevs']
+        );
+
+        Schema::table('tdverse', function (Blueprint $table): void {
+            $table->string('usx_code', 3);
+        });
+
+        $this->updateUsxCodeForBookNumberAndTranslation(
+            $bookNumberAndTranslationToUsxMapping,
+            ['tdverse']
         );
     }
 
-    public function down(): void
+    private function bookNumberAndTranslationToUsxMapping($abbreviationToUsxMapping): array
     {
-        Schema::table('books', function (Blueprint $table) {
-            $table->renameColumn('order', 'number');
-            $table->dropColumn('usx_code');
-        });
-    
-        Schema::table('translations', function (Blueprint $table) {
-            $table->dropUnique(['abbrev']);
-        });
-    
-        Schema::table('book_abbrevs', function (Blueprint $table) {
-            $table->renameColumn('usx_code', 'book_id');
-        });
-    
-        Schema::table('tdverse', function (Blueprint $table) {
-            $table->renameColumn('usx_code', 'book_number');
-        });
+        $result = [];
+        $books = Book::all();
+        foreach ($books as $book) {
+            $abbrev = $book->translation->abbrev;
+            $usx = $abbreviationToUsxMapping[$abbrev];
+            $key = $this->encodeBookAndTranslation($book->number, $abbrev);
+            $result[$key] = $usx;
+        }
+        return $result;
     }
 
     private function updateUsxCodeForAbbrev(array $mapping, array $tables): void
@@ -66,38 +108,34 @@ return new class extends Migration {
         }
     }
 
-    private function getUsxCodeMapping(): array
+    private function updateUsxCodeForBookNumberAndTranslation(array $mapping, array $tables): void
     {
-        $csvFile = database_path('mappings/book_usx_codes.csv');
+        $ids = [];
+        $caseStatement = "CASE CONCAT(book_number, '|', translation) ";
 
-        if (!file_exists($csvFile)) {
-            throw new \Exception("CSV file not found: {$csvFile}");
+        foreach ($mapping as $encodedBookAndTranslation => $usxCode) {
+            $ids[] = "'{$encodedBookAndTranslation}'";
+            $caseStatement .= "WHEN '{$encodedBookAndTranslation}' THEN '{$usxCode}' ";
         }
 
-        $handle = fopen($csvFile, 'r');
-        $mapping = [];
+        $caseStatement .= "END";
 
-        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
-            if ($this->isInvalidRow($row)) {
-                continue;
-            }
+        $idsList = implode(',', $ids);
 
-            $abbrev = trim($row[0]);
-            $usxCode = trim($row[1]);
-            $mapping[$abbrev] = $usxCode;
+        foreach ($tables as $tableName) {
+            DB::statement("UPDATE {$tableName} SET usx_code = {$caseStatement} WHERE CONCAT(book_number, '|', translation) IN ({$idsList})");
         }
-        fclose($handle);
-
-        if (empty($mapping)) {
-            throw new \Exception("CSV file is empty or improperly formatted.");
-        }
-
-        return $mapping;
     }
+
 
     private function isInvalidRow(array $row): bool
     {
         return count($row) !== 2;
+    }
+
+    private function encodeBookAndTranslation(int $bookNumber, string $translation): string
+    {
+        return "{$bookNumber}|{$translation}";
     }
 };
 
