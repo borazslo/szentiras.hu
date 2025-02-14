@@ -11,6 +11,8 @@ use SzentirasHu\Data\UsxCodes;
 return new class extends Migration {
     public function up(): void
     {
+        $prefix = Config::get('database.connections.bible.prefix');
+
         $abbreviationToUsxMapping =
             UsxCodes::abbreviationToUsxMapping();
         $bookNumberAndTranslationToUsxMapping =
@@ -21,6 +23,7 @@ return new class extends Migration {
             $this->translationIdToTranslationAbbreviationMapping();
 
         $this->addUsxCodeRelatedColumns(
+            $prefix,
             $abbreviationToUsxMapping,
             $bookNumberAndTranslationToUsxMapping,
             $translationIdToTranslationAbbreviationMapping
@@ -29,6 +32,10 @@ return new class extends Migration {
         Schema::table('translations', function (Blueprint $table): void {
             $table->unique('abbrev');
         });
+
+        DB::statement(
+            "UPDATE {$prefix}tdverse SET gepi = CONCAT(usx_code, '_', chapter, '_', numv);"
+        );
 
         $this->dropUnnecessaryBookRelatedColumns();
     }
@@ -76,6 +83,7 @@ return new class extends Migration {
     }
 
     private function addUsxCodeRelatedColumns(
+        $prefix,
         $abbreviationToUsxMapping,
         $bookNumberAndTranslationToUsxMapping,
         $translationIdToTranslationAbbreviationMapping
@@ -91,11 +99,13 @@ return new class extends Migration {
         });
 
         $this->updateUsxCodeForAbbrev(
+            $prefix,
             $abbreviationToUsxMapping,
             ['books', 'book_abbrevs']
         );
 
         $this->updateTranslationAbbrev(
+            $prefix,
             $translationIdToTranslationAbbreviationMapping,
             ['book_abbrevs']
         );
@@ -105,6 +115,7 @@ return new class extends Migration {
         });
 
         $this->updateUsxCodeForBookNumberAndTranslation(
+            $prefix,
             $bookNumberAndTranslationToUsxMapping,
             ['tdverse']
         );
@@ -133,7 +144,7 @@ return new class extends Migration {
         return $result;
     }
 
-    private function updateUsxCodeForAbbrev(array $mapping, array $tables): void
+    private function updateUsxCodeForAbbrev(string $prefix, array $mapping, array $tables): void
     {
         $ids = [];
         $caseStatement = "CASE abbrev ";
@@ -145,11 +156,11 @@ return new class extends Migration {
 
         $idsList = implode(',', $ids);
         foreach ($tables as $tableName) {
-            DB::statement("UPDATE {$tableName} SET usx_code = {$caseStatement} WHERE abbrev IN ({$idsList})");
+            DB::statement("UPDATE {$prefix}{$tableName} SET usx_code = {$caseStatement} WHERE abbrev IN ({$idsList})");
         }
     }
 
-    private function updateUsxCodeForBookNumberAndTranslation(array $mapping, array $tables): void
+    private function updateUsxCodeForBookNumberAndTranslation(string $prefix, array $mapping, array $tables): void
     {
         $ids = [];
         $caseStatement = "CASE CONCAT(book_number, '|', translation) ";
@@ -164,11 +175,11 @@ return new class extends Migration {
         $idsList = implode(',', $ids);
 
         foreach ($tables as $tableName) {
-            DB::statement("UPDATE {$tableName} SET usx_code = {$caseStatement} WHERE CONCAT(book_number, '|', translation) IN ({$idsList})");
+            DB::statement("UPDATE {$prefix}{$tableName} SET usx_code = {$caseStatement} WHERE CONCAT(book_number, '|', translation) IN ({$idsList})");
         }
     }
 
-    private function updateTranslationAbbrev(array $mapping, array $tables): void
+    private function updateTranslationAbbrev(string $prefix, array $mapping, array $tables): void
     {
         $ids = [];
         $caseStatement = "CASE translation_id ";
@@ -180,7 +191,7 @@ return new class extends Migration {
 
         $idsList = implode(',', $ids);
         foreach ($tables as $tableName) {
-            DB::statement("UPDATE {$tableName} SET translation_abbrev = {$caseStatement} WHERE translation_id IN ({$idsList})");
+            DB::statement("UPDATE {$prefix}{$tableName} SET translation_abbrev = {$caseStatement} WHERE translation_id IN ({$idsList})");
         }
     }
 
