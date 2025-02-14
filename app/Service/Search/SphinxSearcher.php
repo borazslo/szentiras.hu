@@ -66,7 +66,7 @@ class SphinxSearcher implements Searcher
         if ($params->limit) {
             $limit = $params->limit;
         } else {
-            $limit = (int)Config::get('settings.searchLimit') + 1;
+            $limit = (int)Config::get('settings.sphinxSearchLimit') + 1;
         }
         $this->sphinxClient->limit($limit);
         

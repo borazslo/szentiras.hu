@@ -116,7 +116,7 @@ class PdfController extends Controller {
         $process = new Process($command);
         $process->setWorkingDirectory($workingDir);
         $process->setEnv(['PATH' => '/usr/bin']);
-        $process->mustRun();
+        $process->run();
         fclose($tmpFile);
         return preg_replace('/\.tmp$/', '', $tmpFileName) . '.pdf';
     }

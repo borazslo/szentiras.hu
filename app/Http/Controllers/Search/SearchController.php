@@ -39,10 +39,6 @@ class SearchController extends Controller
      */
     private $translationRepository;
     /**
-     * @var \SzentirasHu\Data\Repository\VerseRepository
-     */
-    private $verseRepository;
-    /**
      * @var \SzentirasHu\Service\Text\TextService
      */
     private $textService;
@@ -51,11 +47,10 @@ class SearchController extends Controller
      */
     private $searchService;
 
-    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, VerseRepository $verseRepository, TextService $textService, SearchService $searchService, protected TranslationService $translationService)
+    function __construct(BookRepository $bookRepository, TranslationRepository $translationRepository, TextService $textService, SearchService $searchService, protected TranslationService $translationService)
     {
         $this->bookRepository = $bookRepository;
         $this->translationRepository = $translationRepository;
-        $this->verseRepository = $verseRepository;
         $this->textService = $textService;
         $this->searchService = $searchService;
     }
@@ -171,18 +166,18 @@ class SearchController extends Controller
         return $view;
     }
 
-    private function extractBookNumbers($form)
+    public static function extractBookNumbers($bookNumber)
     {
         $bookIds = [];
-        if ($form->book) {
-            if ($form->book == 'old_testament') {
+        if ($bookNumber) {
+            if ($bookNumber == 'old_testament') {
                 $bookIds = range(101, 146);
-            } else if ($form->book == 'new_testament') {
+            } else if ($bookNumber == 'new_testament') {
                 $bookIds = range(201, 227);
-            } else if ($form->book == 'all') {
+            } else if ($bookNumber == 'all') {
                 $bookIds = [];
             } else {
-                $bookIds = [$form->book];
+                $bookIds = [$bookNumber];
             }
         }
         return $bookIds;
@@ -219,7 +214,7 @@ class SearchController extends Controller
         if ($form->translation) {
             $searchParams->translationId = $form->translation->id;
         }
-        $searchParams->bookNumbers = $this->extractBookNumbers($form);
+        $searchParams->bookNumbers = $this->extractBookNumbers($form->book);
         $searchParams->synonyms = true;
         $searchParams->grouping = $form->grouping;        
         return $searchParams;

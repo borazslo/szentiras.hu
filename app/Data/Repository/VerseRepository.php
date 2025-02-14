@@ -2,12 +2,13 @@
 
 namespace SzentirasHu\Data\Repository;
 
-
+use SzentirasHu\Data\Entity\Book;
+use SzentirasHu\Data\Entity\Translation;
 use SzentirasHu\Data\Entity\Verse;
 
 interface VerseRepository {
 
-    public function getTranslatedChapterVerses($bookId, $chapters);
+    public function getTranslatedChapterVerses($bookId, $chapters, $types);
 
     /**
      * @return Verse
@@ -23,4 +24,7 @@ interface VerseRepository {
     public function getVerses($bookId);
 
     public function getMaxChapterByBookNumber($bookNumber, $translationId);
+
+    public function getMaxNumv(Book $book, int $chapter, Translation $translation);
+
 } 

@@ -1,0 +1,119 @@
+{% extends 'layout' %}
+
+{% set pageTitle %}
+Keresés jelentés szerint mesterséges intelligencia segítségével | Szentírás
+{% endset %}
+
+{% block content %}
+    <h3>Keresés jelentés szerint, AI segítségével</h2>
+    <div class="card mb-2">
+        <div class="card-body">
+            <form role="form" class="form-horizontal" method="post"
+                  action="{{ action('Search\\SemanticSearchController@anySearch') }}">
+                <div class="mb-2">
+                    <label for="textToSearchAi" class="form-label">Keresendő</label>
+                    <input required type="text" name="textToSearch" id="textToSearchAi" value="{{ form.textToSearch }}" class="form-control"/>                    
+                    {{ errors.first('textToSearch') }}
+                </div>
+                <div class="row g-3 mb-2">
+                    <div class="col">
+                        <label for="bookNumber" class="form-label">Könyv</label>
+                        <select name="bookNumber" class="form-control" id="bookNumber">
+                            <option value="all" {{ 'all' == form.bookNumber ? 'selected' }}>mind</option>
+                            <option value="old_testament" {{ 'old_testament' == form.bookNumber ? 'selected' }}>Ószövetség</option>
+                            <option value="new_testament" {{ 'new_testament' == form.bookNumber ? 'selected' }}>Újszövetség</option>
+                            {% for book in books %}
+                                <option value="{{ book.number }}" {{ book.number == form.bookNumber ? 'selected' }}>{{ book.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="translationAbbrev" class="form-label">Fordítás</label>
+                        <select name="translationAbbrev" class="form-control" id="translationAbbrev">
+                            <option value="0" {{ form.translationAbbrev is not defined ? 'selected' }}>mind</option>
+                            {% for translation in translations %}
+                                <option value="{{ translation.abbrev }}" {{ translation.abbrev == form.translationAbbrev ? 'selected' }}>{{ translation.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {{ csrf_field() }}
+                <input type="submit" value="Keresés" class="btn btn-primary"/>
+            </form>
+        </div>
+    </div>                     
+
+    {% if response is defined %}
+        {% macro quality(result) %}
+            <div class="quality" title="Becsült hasonlóság">
+                {% for i in 1..5 %}
+                    {% if i <= result.quality %}
+                        <span class="star active">&#9733;</span>
+                    {% else %}
+                        <span class="star inactive">&#9734;</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endmacro %}
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="nav-item"><a class="nav-link active" role="tab" type="button" data-bs-target="#versek" data-bs-toggle="tab">Versek</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" type="button" data-bs-target="#szakaszok" data-bs-toggle="tab" >Szakaszok</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link" role="tab" type="button" data-bs-target="#fejezetek" data-bs-toggle="tab">Fejezetek</a></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="versek">
+                {% for result in response.results %}        
+                    {% for verseContainer in result.verseContainers %}
+                    <blockquote class="blockquote searchResult">
+                        <div class="searchResultSource">
+                            <a href="/{{ result.embeddedExcerpt.translation_abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                            {{ _self.quality(result) }}
+                        </div>
+                        <div class="parsedVerses">
+                            {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis} %}
+                        </div>
+                    </blockquote>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            <div role="tabpanel" class="tab-pane" id="szakaszok">
+                {% for result in rangeResponse.results %}        
+                    {% for verseContainer in result.verseContainers %}
+                        <blockquote class="blockquote searchResult">
+                            <div class="searchResultSource">
+                                <a href="/{{ result.embeddedExcerpt.translation_abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                            {{ _self.quality(result) }}
+                            </div>
+                        <div class="parsedVerses">                    
+                            {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}
+                        <div class="parsedVerses">
+                    </blockquote>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+
+            <div role="tabpanel" class="tab-pane" id="fejezetek">
+                {% for result in chapterResponse.results %}        
+                    {% for verseContainer in result.verseContainers %}
+                        <blockquote class="blockquote searchResult">
+                            <div class="searchResultSource">
+                                <a href="/{{ result.embeddedExcerpt.translation_abbrev }}/{{ result.embeddedExcerpt.reference }}">{{ result.embeddedExcerpt.reference }}</a>
+                            {{ _self.quality(result) }}                        
+                            </div>
+                        <div class="parsedVerses">                    
+                            {% include 'textDisplay.parsedVerseContainer' with { 'verseContainer' : verseContainer, 'translation' :  result.embeddedExcerpt.translation, 'highlightedGepis' : result.highlightedGepis } %}
+                        <div class="parsedVerses">
+                    </blockquote>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+{%  endblock %}

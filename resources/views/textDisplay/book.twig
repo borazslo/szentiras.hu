@@ -10,7 +10,7 @@
 
     <div class="translationButtons">
         <div class="dropdown bookChapterSelector">
-            <button class="btn btn-default  dropdown-toggle" type="button" data-toggle="dropdown" id="corpusSelectorButton" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-default  dropdown-toggle" type="button" data-bs-toggle="dropdown" id="corpusSelectorButton" aria-haspopup="true" aria-expanded="false">
 Fejezetválasztás <span class="caret"></span></button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                 {% for chapterId, chapter in chapters %}    
@@ -27,16 +27,14 @@ Fejezetválasztás <span class="caret"></span></button>
 
     {% for chapterId, chapter in chapters %}
         {%set chapterLink %}/{{ translation.abbrev  }}/{{ book.abbrev }}{{ chapterId }}{% endset %}
-        {%set chapterText %}{{ chapterId }}. {{ book.number != 121 ? "fejezet" : "zsoltár"}}{% endset %}
-        <h4  class="bookchapter"><a href="{{ chapterLink }}">{{ chapterText }}</a></h4>
+        {%set chapterText %}{{ chapterId }}{% endset %}
+        <h5 class="bookchapter"><a href="{{ chapterLink }}">{{ chapterText }}</a></h5>
 
         {% set chheadings = headings[chapterId] %}
         {% if chheadings|length > 0 %}            
-            <small>
-        {% for heading in chheadings %}
+        {%- for heading in chheadings -%}
             <a href='/{{ translation.abbrev }}/{{ book.abbrev }}{{ chapterId}}#heading_{{ heading.gepi }}_{{ heading.headingLevel }}' class='link'>{{ heading.content|striptags('<br><a>')|raw  }}.&nbsp;</a>
         {% endfor %}        
-        </small>
         {% endif %}        
         
         {% set leadVerses = chapter.leadVerses %} 

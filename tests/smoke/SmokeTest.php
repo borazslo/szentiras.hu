@@ -48,8 +48,8 @@ class SmokeTest extends TestCase
             ['TESTTRANS' => [
                 'verseTypes' =>
                 [
-                    'text' => [901],
-                    'heading' => [0=>5, 1=>10, 2=>20, 3=>30],
+                    'text' => [6, 901],
+                    'heading' => [5=>0, 10=>1, 20=>2, 30=>3],
                     'footnote' => [120, 2001, 2002],
                     'poemLine' => [902],
                     'xref' => [920]
@@ -90,7 +90,7 @@ class SmokeTest extends TestCase
 
     public function testBasicSearch()
     {
-        $this->get('/kereses/search?textToSearch=Ter&book=all&translation=0&grouping=chapter')->assertStatus(200);
+        $this->post('/kereses/search?textToSearch=Ter&book=all&translation=0&grouping=chapter')->assertStatus(200);
     }
 
     public function testBookWithExplicitTranslation() {

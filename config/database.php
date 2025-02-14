@@ -33,7 +33,7 @@ return [
 
     'connections' => [
 
-        'bible' => [
+        'mysql' => [
             'driver'    => 'mysql',
             'host'      => env('DB_HOST', 'localhost'),
             'database'  => env('DB_DATABASE', 'bible'),
@@ -44,6 +44,16 @@ return [
             'prefix'    => env('DB_PREFIX', 'kar_'),
             'strict'    => false,
         ],
+
+        'bible' => [
+            'driver' => 'pgsql',
+            'host'      => env('DB_HOST', 'localhost'),
+            'database'  => env('DB_DATABASE', 'bible'),
+            'username'  => env('DB_USERNAME', 'homestead'),
+            'password'  => env('DB_PASSWORD', 'secret'),
+            'collation' => 'hu-x-icu',
+            'prefix'    => env('DB_PREFIX', 'kar_')
+        ]
 
     ],
 

@@ -25,7 +25,9 @@
                     {%- endif %}
                 {%- endfor %}
             {% endif %}
-            {{ (options.nums ? '\\textsuperscript{' ~ verse.numv ~ '}' : '' ) ~ verse.text|raw|replace({'<br>':' \\\\ '}) }} {% if verseContainer.book.number == 121 %} \\ {% endif %}
+            {{ (options.nums ? '\\textsuperscript{' ~ verse.numv ~ '}' : '' ) ~ 
+            (options.headings ? verse.text : verse.getText(false))|raw
+            |replace({'<br>':' \\\\ ', '<h4>': '\\subparagraph{', '</h4>': '}', '<h5>': '\\subparagraph{', '</h5>': '}', '<h6>': '\\textbf{', '</h6>': '}', '<em>':'\\emph{', '</em>': '}'})}} {% if verseContainer.book.number == 121 %} \\ {% endif %}
         {%- endfor %}
 
     {%- endfor %}

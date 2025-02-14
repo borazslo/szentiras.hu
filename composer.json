@@ -16,6 +16,9 @@
         "laravel/framework": "^11.0",
         "laravel/helpers": "^1.7",
         "laravel/tinker": "^2.5",
+        "league/flysystem-aws-s3-v3": "^3.0",
+        "openai-php/laravel": "^0.10.2",
+        "pgvector/pgvector": "^0.2.1",
         "openspout/openspout": "^4.28",
         "phpoffice/phpspreadsheet": "^3.9",
         "predis/predis": "^1.0",
@@ -43,8 +46,7 @@
         "psr-4": {
             "SzentirasHu\\Test\\": "tests/feature",
             "SzentirasHu\\Test\\Smoke\\": "tests/smoke",
-            "SzentirasHu\\Test\\Common\\": "tests/common"
-        }
+            "SzentirasHu\\Test\\Common\\": "tests/common"        }
 
     },
     "extra": {
@@ -80,7 +82,8 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "allow-plugins": {
-            "kylekatarnls/update-helper": true
+            "kylekatarnls/update-helper": true,
+            "php-http/discovery": true
         }
     },
     "prefer-stable": true

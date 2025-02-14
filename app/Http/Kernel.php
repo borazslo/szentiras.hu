@@ -3,6 +3,7 @@
 namespace SzentirasHu\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
 class Kernel extends HttpKernel
 {
@@ -28,7 +29,7 @@ class Kernel extends HttpKernel
         \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \SzentirasHu\Http\Middleware\VerifyCsrfToken::class,
+        VerifyCsrfToken::class,
         \Illuminate\Http\Middleware\HandleCors::class
     ];
 
@@ -43,6 +44,7 @@ class Kernel extends HttpKernel
         'guest' => \SzentirasHu\Http\Middleware\RedirectIfAuthenticated::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'cors' => \Illuminate\Http\Middleware\HandleCors::class
+        'cors' => \Illuminate\Http\Middleware\HandleCors::class,
+        'anonymousId' => \SzentirasHu\Http\Middleware\ValidateAnonymousId::class,
     ];
 }

@@ -1,6 +1,8 @@
 <?php
 
 namespace SzentirasHu\Data\Entity;
+
+use Config;
 use Eloquent;
 
 /**
@@ -31,24 +33,43 @@ class Verse extends Eloquent {
         return $this->belongsTo('SzentirasHu\Data\Entity\Translation','trans');
     }
 
-    public function getType() {
+    public static function getTypeMap() {
         if (!self::$typeMap) {
-            foreach (\Config::get('translations') as $translationId => $typeDefs) {
-                $id = $typeDefs['id'];
+            foreach (Config::get('translations') as $translationAbbrev => $typeDefs) {
+                $translationId = $typeDefs['id'];
                 foreach($typeDefs['verseTypes'] as $typeName => $typeIds) {
-                    foreach ($typeIds as $key => $typeId) {
+                    foreach ($typeIds as $typeId => $typeValue) {
                         if ($typeName == 'heading') {
-                            $t = $typeName.$key;
+                            $t = $typeName . $typeIds[$typeId];
+                            self::$typeMap[$translationId][$typeId] = $t;
                         } else {
                             $t = $typeName;
+                            self::$typeMap[$translationId][$typeValue] = $t;
                         }
-                        self::$typeMap[$id][$typeId] = $t;
                     }
                 }
             }
         }
-        if (array_key_exists($this->tip, self::$typeMap[$this->trans])) {
-            return self::$typeMap[$this->trans][$this->tip];
+        return self::$typeMap;
+    }
+
+    public static function getHeadingTypes($translationId) {
+        $typeMap = self::getTypeMap();
+        $headingTypes = [];
+        foreach ($typeMap as $types) {
+            foreach ($types as $typeId => $typeName) {
+                if (strpos($typeName, 'heading') !== false) {
+                    $headingTypes[$translationId][] = $typeId;
+                }
+            }
+        }
+        return $headingTypes[$translationId];
+    }
+
+    public function getType() {
+        $typeMap = self::getTypeMap();
+        if (array_key_exists($this->tip, $typeMap[$this->trans] ?? [] )) {
+            return $typeMap[$this->trans][$this->tip];
         } else {
             return 'unknown';
         }

@@ -4,6 +4,7 @@
 
 namespace SzentirasHu\Service\Text;
 
+use SzentirasHu\Data\Entity\Book;
 use SzentirasHu\Data\Entity\Translation;
 use SzentirasHu\Service\Reference\CanonicalReference;
 use SzentirasHu\Service\Reference\ReferenceService;
@@ -12,6 +13,7 @@ use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
 use SzentirasHu\Http\Controllers\Display\VerseParsers\VersePart;
+use SzentirasHu\Service\Reference\ChapterRange;
 
 class TextService
 {
@@ -46,7 +48,7 @@ class TextService
      * @param $translation
      * @return VerseContainer[]
      */
-    public function getTranslatedVerses($canonicalRef, $translationId)
+    public function getTranslatedVerses($canonicalRef, $translationId, $verseTypes = [])
     {
         $translatedRef = $this->referenceService->translateReference($canonicalRef, $translationId);
         $verseContainers = [];
@@ -54,9 +56,16 @@ class TextService
             $book = $this->bookRepository->getByAbbrevForTranslation($bookRef->bookId, $translationId);
             if ($book) {
                 $verseContainer = new VerseContainer($book, $bookRef);
-                foreach ($bookRef->chapterRanges as $chapterRange) {
-                    $searchedChapters = CanonicalReference::collectChapterIds($chapterRange);
-                    $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters);
+                if (!empty($bookRef->chapterRanges)) {
+                    foreach ($bookRef->chapterRanges as $chapterRange) {
+                        $searchedChapters = CanonicalReference::collectChapterIds($chapterRange);
+                        $verses = $this->getChapterRangeVerses($chapterRange, $book, $searchedChapters, $verseTypes);
+                        foreach ($verses as $verse) {
+                            $verseContainer->addVerse($verse);
+                        }
+                    }    
+                } else {
+                    $verses = $this->getChapterRangeVerses(null, $book, [], $verseTypes);
                     foreach ($verses as $verse) {
                         $verseContainer->addVerse($verse);
                     }
@@ -67,12 +76,12 @@ class TextService
         return $verseContainers;
     }
 
-    public function getChapterRangeVerses($chapterRange, $book, $searchedChapters)
+    public function getChapterRangeVerses(?ChapterRange $chapterRange, Book $book, $searchedChapters, $verseTypes = [])
     {
-        $allChapterVerses = $this->verseRepository->getTranslatedChapterVerses($book->id, $searchedChapters);
+        $allChapterVerses = $this->verseRepository->getTranslatedChapterVerses($book->id, $searchedChapters, $verseTypes);
         $chapterRangeVerses = [];
         foreach ($allChapterVerses as $verse) {
-            if ($chapterRange->hasVerse($verse->chapter, $verse->numv)) {
+            if (is_null($chapterRange) || $chapterRange->hasVerse($verse->chapter, $verse->numv)) {
                 $chapterRangeVerses[] = $verse;
             }
         }
@@ -81,10 +90,10 @@ class TextService
 
     /**
      * @param $canonicalRef CanonicalReference | string
-     * @param $translationId int
+     * @param Translation $translation
      * @return string
      */
-    public function getPureText($canonicalRef, $translation)
+    public function getPureText($canonicalRef, $translation, $includeHeadings = true)
     {
         if (is_string($canonicalRef)) {
             $canonicalRef = CanonicalReference::fromString($canonicalRef);
@@ -94,7 +103,7 @@ class TextService
         foreach ($verseContainers as $verseContainer) {
             $verses = $verseContainer->getParsedVerses();
             foreach ($verses as $verse) {
-                $verseText = $verse->getText();
+                $verseText = $verse->getText($includeHeadings);
                 $verseText = preg_replace('/<[^>]*>/', ' ', $verseText);
                 $text .= $verseText . ' ';
             }

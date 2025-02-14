@@ -57,6 +57,32 @@ services:
       retries: 3
   sphinx:
     image: nsign/sphinx-docker:2.2.11
+  postgres:
+    image: pgvector/pgvector
+    environment:
+      POSTGRES_USER: homestead
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: bible
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U homestead -d bible"]
+      start_period: 1m
+      interval: 10s
+      timeout: 5s
+      retries: 3      
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+  composer:
+    image: app
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - ./deploy/production/sphinx/sphinx.conf.in:/etc/sphinxsearch/sphinx.conf.in:ro
       - ./docker/sphinx/start.sh:/start.sh:ro

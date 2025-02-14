@@ -1,0 +1,353 @@
+@import url(autocomplete.less);
+
+@background-color: #fafafa;
+@text-color: #2e2e2e;
+@muted-text-color: #6c757d;
+@text-font: 'Noto Sans', sans-serif;
+@book-font: 'Noto Serif', serif;
+@book-font-size: 16px;
+
+@link-color: #0056b3;
+@link-hover-color: #007BFF;
+
+@footnote-link-color: #0056b3;
+@footnote-hover-color: #007BFF;
+
+
+html {
+    font-size: 14px;
+}
+
+body {
+    background-color: @background-color;
+    color: @text-color;
+    font-family: @text-font;
+}
+
+a {
+    text-decoration: none;
+    color: @link-color;
+    &:hover {
+        color: @link-hover-color;
+    }
+}
+
+a.leadChapterLink {
+    color: @text-color;
+    font-family: @book-font;
+}
+
+a.xref {
+    cursor: pointer;
+}
+
+a.footnote {
+    outline: none;
+    .numv {
+        color: @footnote-link-color;
+        font-style: italic;
+    }    
+    cursor: pointer;
+    text-decoration: none;    
+    &:hover {
+        .numv {
+            color: @footnote-hover-color;
+        }    
+    }
+}
+
+p.popover-footnote {
+    font-family: @book-font;
+    margin: 0;
+}
+
+.parsedVerses {
+    font-family: @book-font;
+    font-size: @book-font-size;
+    hyphens: auto;
+    text-align: justify;
+
+    h5 {
+        font-weight: bold;
+        color: @muted-text-color;
+        margin-top:1rem;
+    }
+    
+    h6 {
+        font-size: @book-font-size * 0.875;
+        font-weight: bold;
+        color: @muted-text-color;
+        margin-top: 0.6rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    span.heading7, span.heading8 {
+        display: inline;
+        font-size: @book-font-size * 0.875;
+        margin-top: 3px;
+        margin-right: 3px;
+        font-weight: bold;
+        color: @muted-text-color;
+
+    }  
+
+    .mark {
+        background-color: rgba(255, 255, 0, 0.25);
+        color: black;
+    }
+
+    span.numvai {
+        color: #007bff;
+        cursor: pointer;
+        font-weight: bold;
+        font-family: @text-font;
+    }
+
+
+}
+
+div.translationButtons {
+    font-family: @text-font;
+    margin-bottom: 6px;
+}
+
+.numchapter {
+    font-size: 3.5rem;
+    float: left;
+    padding-right: 6px;
+    line-height: 40px;
+    color: @muted-text-color;
+    position: relative;
+    top:0.4rem;
+}
+
+
+span.numv {
+  color: @muted-text-color;
+}
+
+div.footnotes {
+    margin-top: 12px;
+    h5 {
+        margin-top: 6px;
+    }
+    border-top: 1px solid grey;
+}
+
+h5.bookchapter {
+    display: inline;
+    margin: 0px;
+    padding-right: 6px;
+    line-height: 40px;
+    font-size: 42px;
+    float: left;
+    line-height: 40px;
+}
+
+.hideSpinner {
+    opacity: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+div.quickSelector {
+    display: inline-block;
+
+    .dropdown-menu {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+}
+
+div.bookChapterSelector {
+    display: inline-block;
+    .dropdown-menu {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+}
+
+div.quality {
+    display: inline-block;
+}
+
+.active .toggle {
+    &.inactive {
+        display: none;
+    }
+
+    &.active {
+        display: inline;
+    }
+}
+
+i.toggle.active {
+    display: none;
+}
+
+blockquote.searchResult {
+    padding-left: 6px;
+    height: 100%;
+    border-left: 2px solid gray;
+    
+
+}
+.searchResultSource {
+    font-size: @book-font-size * 0.875;
+    background-color: white;
+    padding: 2px;
+}
+
+.ai-tool-popover {
+    --bs-popover-max-width: 500px;
+    .btn-close {
+        width: 0.5em;
+        height: 0.5em;
+        float: right;
+    }
+    .scrollable-content {
+        overflow-y: auto;
+        max-height: 300px;
+    }
+}
+
+p.footnote {
+    font-size: small;
+}
+
+.footer {
+    padding: 40px 0;
+    color: #999;
+    text-align: center;
+    background-color: #f9f9f9;
+    border-top: 1px solid #e5e5e5;
+}
+
+.share {
+    width: 120px;
+    height: 100px;
+    margin: 5px;
+}
+
+.fb-share-button {
+    padding-bottom: 5px;
+}
+
+.poem {
+    text-align: left;
+    margin: 10px 0 10px 10px;
+}
+
+.xref-popover {
+    --bs-popover-max-width: 500px;
+    .btn-close {
+        width: 0.5em;
+        height: 0.5em;
+        float: right;
+    }
+    .scrollable-content {
+        overflow-y: auto;
+        max-height: 300px;
+    }
+}
+
+
+div.xrefQuotation {
+    h1, h2, h3, h4, h5, h6 {
+        display: inline-block;
+        margin: 0;
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+    a.ref {
+        font-family: @text-font;
+        font-weight: bold;
+    }
+    font-family: @book-font;
+}
+
+h1 .sitesubtitle {
+    font-size: 1.5rem;
+    color: @muted-text-color;
+}
+
+h4 {
+    margin-top: 1rem;
+}
+
+h5 {
+    margin-top: 0.5rem;
+}
+
+
+.btn-primary {
+    background-color: @link-color;
+    border-color: @link-color;
+    &:hover {
+        background-color: @link-hover-color;
+        border-color: @link-hover-color;
+    }
+}
+
+.searchResultVerse {
+    font-family: @book-font;
+}
+
+.searchResultTranslationSelector {
+    margin-right: 6px;
+    padding-top: 6px;
+}
+
+div.searchResult {
+    margin-top: 6px;
+}
+
+.translationHitForm {
+    display: inline-block
+}
+
+.searchResultTranslationText {
+    display: none;
+    
+    &.active {
+        display: block;
+    }
+}
+
+.interstitial {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    color: white;
+    text-align: center;
+    padding-top: 20%;
+    font-size: 2rem;
+}
+
+.form-control::placeholder {
+    color: lightgrey;
+}
+
+div.tocItem {
+    margin-left: 1rem;    
+    display: flex;
+    align-items: flex-start;
+
+    .chapterNumber {
+        font-weight: bold;
+        margin-right: 10px;
+        min-width: 15px;
+        text-align: right;
+    }
+    .chapterHeadings {
+        flex: 1;
+    }
+}

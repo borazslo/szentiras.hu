@@ -230,6 +230,10 @@ class ImportScripture extends Command
                 break;
             }
             $gepi = $verseRow->getCellAtIndex($verseSheetHeaders[$dbToHeaderMap['gepi']])->getValue();
+            $search = ['1010020040a', '1010020040b'];
+            $replace = ['10100200401', '10100200402'];
+            $gepi = str_replace($search, $replace, $gepi);
+
             if (!$this->option('filter') or preg_match('/' . $this->option('filter') . '/i', $gepi)) {
                 $newInsert = $this->toDbRow(
                     $verseRow,

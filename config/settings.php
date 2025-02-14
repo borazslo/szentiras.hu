@@ -8,7 +8,7 @@ return [
     'audioDirectory' => env("AUDIO_DIRECTORY", 'hang'),
     'sourceDirectory' => '/tmp',
     'facebookAppId' => '679257202109581',
-    'searchLimit' => 1000,
+    'sphinxSearchLimit' => env("APP_SPHINX_SEARCH_LIMIT", 1000),
     'logLevel' => env("LOG_LEVEL", 'debug'),
     'imageMagickCommand' => [ 'gm', 'convert' ],
     'sphinxConfig' => env('SPHINX_CONFIG', '/etc/sphinxsearch/sphinx.conf'),
@@ -20,5 +20,13 @@ return [
     ],
     'googleAppName' => 'szentiras-hu',
     'googleApiKey' => env('GOOGLE_API_KEY'),
-    'googleCalendarId' => 'katolikus.hu@gmail.com'
+    'googleCalendarId' => 'katolikus.hu@gmail.com',
+    'ai' => [
+        'embeddingModel' => env("APP_EMBEDDING_MODEL", 'text-embedding-3-large'),
+        'embeddingDimensions' => env("APP_EMBEDDING_DIMENSIONS", 2000),
+        'unregisteredSearchLimit' => env("APP_UNREGISTERED_SEARCH_LIMIT", 5),
+    ],
+    'brand' => [
+        'domain' => env("APP_BRAND_DOMAIN", 'szentiras.eu')
+    ]
 ];
