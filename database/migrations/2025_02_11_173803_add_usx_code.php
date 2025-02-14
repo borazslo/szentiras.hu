@@ -23,25 +23,34 @@ return new class extends Migration {
         });
     }
 
-    public function down(): void // TODO rewrite this
+    public function down(): void
     {
-        Schema::table('books', function (Blueprint $table): void {
-            $table->renameColumn('order', 'number');
+        Schema::table('book_abbrevs', function (Blueprint $table): void {
+            $table->dropColumn('usx_code');
+        });
+
+        Schema::table('tdverse', function (Blueprint $table): void {
             $table->dropColumn('usx_code');
         });
 
         Schema::table('translations', function (Blueprint $table): void {
-            $table->dropUnique(['abbrev']);
+            $table->dropUnique('abbrev');
+        });
+
+        Schema::table('books', function (Blueprint $table): void {
+            $table->dropColumn('usx_code');
+            $table->renameColumn('order', 'number');
         });
 
         Schema::table('book_abbrevs', function (Blueprint $table): void {
-            $table->renameColumn('usx_code', 'book_id');
+            $table->integer('book_id');
         });
 
         Schema::table('tdverse', function (Blueprint $table): void {
-            $table->renameColumn('usx_code', 'book_number');
+            $table->integer('book_number');
         });
     }
+
 
     private function dropUnnecessaryBookRelatedColumns()
     {
