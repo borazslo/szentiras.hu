@@ -2,6 +2,7 @@
 
 namespace SzentirasHu\Http\Controllers\Display;
 
+use Cache;
 use Config;
 use Illuminate\Support\Facades\Log;
 use Redirect;
@@ -79,7 +80,14 @@ class TextDisplayController extends Controller
             foreach ($books as $book) {
                 $canonicalRef = CanonicalReference::fromString("{$book->abbrev}", $translation->id);
                 $verses = $this->textService->getTranslatedVerses($canonicalRef, $translation->id, Verse::getHeadingTypes($translation->id));
-                $bookHeaders[$book->abbrev] = $this->getBookViewArray($book, $verses, $translation, $canonicalRef, $canonicalRef, false);
+                $bookHeaders[$book->abbrev] = 
+                    Cache::remember(
+                        "bookHeader-{$book->abbrev}-{$translation->id}",
+                        60 * 24,
+                        function () use ($book, $verses, $translation, $canonicalRef) {
+                            return $this->getBookViewArray($book, $verses, $translation, $canonicalRef, $canonicalRef, false);
+                        }
+                    );
             }
         }
         return View::make(
