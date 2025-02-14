@@ -5,28 +5,39 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 use SzentirasHu\Data\Entity\Book;
+use SzentirasHu\Data\Entity\Translation;
 use SzentirasHu\Data\UsxCodes;
 
 return new class extends Migration {
     public function up(): void
     {
-        $abbreviationToUsxMapping = UsxCodes::abbreviationToUsxMapping();
+        $abbreviationToUsxMapping =
+            UsxCodes::abbreviationToUsxMapping();
         $bookNumberAndTranslationToUsxMapping =
-            $this->bookNumberAndTranslationToUsxMapping($abbreviationToUsxMapping);
+            $this->bookNumberAndTranslationToUsxMapping(
+                $abbreviationToUsxMapping
+            );
+        $translationIdToTranslationAbbreviationMapping =
+            $this->translationIdToTranslationAbbreviationMapping();
 
-        $this->dropUnnecessaryBookRelatedColumns();
-
-        $this->addUsxCode($abbreviationToUsxMapping, $bookNumberAndTranslationToUsxMapping);
+        $this->addUsxCodeRelatedColumns(
+            $abbreviationToUsxMapping,
+            $bookNumberAndTranslationToUsxMapping,
+            $translationIdToTranslationAbbreviationMapping
+        );
 
         Schema::table('translations', function (Blueprint $table): void {
             $table->unique('abbrev');
         });
+
+        $this->dropUnnecessaryBookRelatedColumns();
     }
 
     public function down(): void
     {
         Schema::table('book_abbrevs', function (Blueprint $table): void {
             $table->dropColumn('usx_code');
+            $table->dropColumn('translation_abbrev');
         });
 
         Schema::table('tdverse', function (Blueprint $table): void {
@@ -44,6 +55,7 @@ return new class extends Migration {
 
         Schema::table('book_abbrevs', function (Blueprint $table): void {
             $table->integer('book_id');
+            $table->tinyInteger('translation_id', autoIncrement: false, unsigned: true)->nullable();
         });
 
         Schema::table('tdverse', function (Blueprint $table): void {
@@ -52,30 +64,40 @@ return new class extends Migration {
     }
 
 
-    private function dropUnnecessaryBookRelatedColumns()
+    private function dropUnnecessaryBookRelatedColumns(): void
     {
         Schema::table('book_abbrevs', function (Blueprint $table): void {
             $table->dropColumn('book_id');
+            $table->dropColumn('translation_id');
         });
         Schema::table('tdverse', function (Blueprint $table): void {
             $table->dropColumn('book_number');
         });
     }
 
-    private function addUsxCode($abbreviationToUsxMapping, $bookNumberAndTranslationToUsxMapping)
-    {
+    private function addUsxCodeRelatedColumns(
+        $abbreviationToUsxMapping,
+        $bookNumberAndTranslationToUsxMapping,
+        $translationIdToTranslationAbbreviationMapping
+    ): void {
         Schema::table('books', function (Blueprint $table): void {
             $table->renameColumn('number', 'order');
             $table->string('usx_code', 3);
         });
 
         Schema::table('book_abbrevs', function (Blueprint $table): void {
+            $table->string('translation_abbrev')->nullable();
             $table->string('usx_code', 3);
         });
 
         $this->updateUsxCodeForAbbrev(
             $abbreviationToUsxMapping,
             ['books', 'book_abbrevs']
+        );
+
+        $this->updateTranslationAbbrev(
+            $translationIdToTranslationAbbreviationMapping,
+            ['book_abbrevs']
         );
 
         Schema::table('tdverse', function (Blueprint $table): void {
@@ -97,6 +119,16 @@ return new class extends Migration {
             $usx = $abbreviationToUsxMapping[$abbrev];
             $key = $this->encodeBookAndTranslation($book->number, $abbrev);
             $result[$key] = $usx;
+        }
+        return $result;
+    }
+
+    private function translationIdToTranslationAbbreviationMapping(): array
+    {
+        $result = [];
+        $translations = Translation::all();
+        foreach ($translations as $translation) {
+            $result[$translation->id] = $translation->abbrev;
         }
         return $result;
     }
@@ -133,6 +165,22 @@ return new class extends Migration {
 
         foreach ($tables as $tableName) {
             DB::statement("UPDATE {$tableName} SET usx_code = {$caseStatement} WHERE CONCAT(book_number, '|', translation) IN ({$idsList})");
+        }
+    }
+
+    private function updateTranslationAbbrev(array $mapping, array $tables): void
+    {
+        $ids = [];
+        $caseStatement = "CASE translation_id ";
+        foreach ($mapping as $transId => $transAbbrev) {
+            $ids[] = "'{$transId}'";
+            $caseStatement .= "WHEN '{$transId}' THEN '{$transAbbrev}' ";
+        }
+        $caseStatement .= "END";
+
+        $idsList = implode(',', $ids);
+        foreach ($tables as $tableName) {
+            DB::statement("UPDATE {$tableName} SET translation_abbrev = {$caseStatement} WHERE translation_id IN ({$idsList})");
         }
     }
 
