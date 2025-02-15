@@ -24,7 +24,7 @@ class Verse extends Eloquent {
     }
 
     public function books() {
-        return $this->belongsTo('SzentirasHu\Data\Entity\Book', 'book_number');
+        return $this->belongsTo('SzentirasHu\Data\Entity\Book', 'usx_code');
     }
 
     public function translation() {
