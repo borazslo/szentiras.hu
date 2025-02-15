@@ -136,7 +136,7 @@ class ImportScripture extends Command
         $this->info("A $filePath fájl megnyitva...");
         $sheets = $this->getSheets($reader);
 
-        $bookOrderToDbIdWithAbbrev = $this->getBookOrderToDbWithAbbrevIdMapping(
+        $bookOrderToDbIdWithAbbrev = $this->getBookOrderToDbIdWithAbbrevMapping(
             $sheets,
             $translation,
             $transAbbrevToImport
@@ -325,7 +325,7 @@ class ImportScripture extends Command
         Artisan::call('up');
     }
 
-    private function getBookOrderToDbWithAbbrevIdMapping(
+    private function getBookOrderToDbIdWithAbbrevMapping(
         array $sheets,
         Translation $translation,
         string $translationAbbrev
