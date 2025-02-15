@@ -10,6 +10,7 @@ use DB;
 use Exception;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use SzentirasHu\Data\Repository\BookRepository;
@@ -20,6 +21,7 @@ use SzentirasHu\Data\Entity\Translation;
 use OpenSpout\Reader\XLSX\RowIterator;
 use OpenSpout\Reader\XLSX\Reader;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use SzentirasHu\Data\UsxCodes;
 
 class ImportScripture extends Command
 {
@@ -129,12 +131,16 @@ class ImportScripture extends Command
     private function readInserts(string $filePath, Translation $translation, string $transAbbrevToImport): array
     {
         $this->info("A $filePath fájl betöltése...");
-        $reader = ReaderFactory::createFromFileByMimeType($filePath);
+        $reader = new Reader();
         $reader->open($filePath);
         $this->info("A $filePath fájl megnyitva...");
         $sheets = $this->getSheets($reader);
 
-        $bookNumberToId = $this->getBookNumberToIdMapping($sheets, $translation, $transAbbrevToImport);
+        $bookOrderToDbIdWithAbbrev = $this->getBookOrderToDbWithAbbrevIdMapping(
+            $sheets,
+            $translation,
+            $transAbbrevToImport
+        );
 
         $this->info("A '$transAbbrevToImport' lap betöltése..");
         $versesSheet = $sheets[$transAbbrevToImport];
@@ -142,15 +148,15 @@ class ImportScripture extends Command
         $verseSheetHeaders = $this->getHeaders($verseRowIterator);
 
         $dbToHeaderMap = $this->mapVerseSheetHeadersToDbColumns($verseSheetHeaders);
-    
+
         $inserts = $this->readLines(
             $verseRowIterator,
             $verseSheetHeaders,
             $dbToHeaderMap,
             $translation,
-            $bookNumberToId
+            $bookOrderToDbIdWithAbbrev
         );
-      
+
         $reader->close();
         return $inserts;
     }
@@ -212,13 +218,15 @@ class ImportScripture extends Command
         return $sheets;
     }
 
-    private function readLines(RowIterator $verseRowIterator, array $verseSheetHeaders, array $dbToHeaderMap, Translation $translation, array $booksGepiToId): array
-    {
+    private function readLines(
+        RowIterator $verseRowIterator,
+        array $verseSheetHeaders,
+        array $dbToHeaderMap,
+        Translation $translation,
+        array $bookOrderToDbIdWithAbbrev
+    ): array {
         $this->info("Beolvasás sorról sorra...\n");
-        $progressBar = $this->output->createProgressBar();
-        $progressBar->setRedrawFrequency(25);
-        $progressBar->setBarWidth(24);
-        $progressBar->setFormat("[%bar%] %message%");
+        $progressBar = $this->createProgressBar();
         $rowNumber = 0;
         foreach ($verseRowIterator as $verseRow) {
             $rowNumber++;
@@ -236,38 +244,37 @@ class ImportScripture extends Command
                     $verseSheetHeaders,
                     $translation,
                     $gepi,
-                    $booksGepiToId
+                    $bookOrderToDbIdWithAbbrev
                 );
                 $inserts[$rowNumber] = $newInsert;
-            
-            
+
+
                 $rowNumber++;
                 $progressBar->setMessage("$rowNumber - {$newInsert['gepi']} - új szavak: {$this->newStems}");
                 $progressBar->advance();
-            }            
+            }
         }
         $progressBar->finish();
         return $inserts;
     }
 
-    private function toDbRow(Row $row, array $verseSheetHeaders, Translation $translation, string $gepi, array $booksGepiToId): array
-    {
+    private function toDbRow(
+        Row $row,
+        array $verseSheetHeaders,
+        Translation $translation,
+        string $gepi,
+        array $bookOrderToDbIdWithAbbrev
+    ): array {
         $pipes = [];
         if ($this->hunspellEnabled) {
-            $hunspellProcess = proc_open(
-                'stdbuf -oL hunspell -m -d hu_HU -i UTF-8',
-                $this->descriptorspec,
-                $pipes,
-                null,
-                null
-            );                    
+            $hunspellProcess = $this->startHunspell($pipes);
         }
 
         $result['trans'] = $translation->id;
-        $result['gepi'] = $gepi;
-        $result['book_number'] = (int) substr($gepi, 0, 3);
+        $result['order'] = (int) substr($gepi, 0, 3);
         $result['chapter'] = (int) substr($gepi, 3, 3);
         $result['numv'] = (int) substr($gepi, 6, 3);
+        $result['gepi'] = $result['usx_code'] . "_" . $result['chapter'] . '_' . $result['numv'];
         $result['tip'] = $row->getCellAtIndex($verseSheetHeaders['jelstatusz'])->getValue();
         $result['verse'] = $row->getCellAtIndex($verseSheetHeaders['jel'])->getValue();
         $result['verseroot'] = null;
@@ -281,18 +288,15 @@ class ImportScripture extends Command
             $result['ido'] = $idoValue;
         }
 
-        if (!isset($booksGepiToId[$result['book_number']])) {
-            App::abort(500, 'Nincs meg a book number a gepi->id listában');
+        if (!isset($bookOrderToDbId[$result['order']])) {
+            App::abort(500, 'Nincs meg a sorszám (book order) az order->db_id listában!');
         }
-        $result['book_id'] = $booksGepiToId[$result['book_number']];
+        [$bookId, $bookAbbrev] = $bookOrderToDbIdWithAbbrev[$result['order']];
+        $result['usx_code'] = $this->bookAbbrevToUsxCode($bookAbbrev);
+        $result['book_id'] = $bookId;
 
         if ($this->hunspellEnabled) {
-            fclose($pipes[0]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            if (isset($hunspellProcess)) {
-                proc_close($hunspellProcess);
-            }
+            $this->closeHunspell($hunspellProcess, $pipes);
         }
 
         return $result;
@@ -321,12 +325,17 @@ class ImportScripture extends Command
         Artisan::call('up');
     }
 
-    private function getBookNumberToIdMapping(array $sheets, Translation $translation, string $translationAbbrev): array
-    {
+    private function getBookOrderToDbWithAbbrevIdMapping(
+        array $sheets,
+        Translation $translation,
+        string $translationAbbrev
+    ): array {
         $this->info("Könyvek lap ellenőrzése");
         $bookRowIterator = $sheets['Könyvek']->getRowIterator();
         $linesRead = 0;
         $badAbbrevs = [];
+        $bookOrderToIdAndAbbrev = [];
+        $dbBookAbbrevToId = $this->getAbbrevToIdFromDb($translation);
         foreach ($bookRowIterator as $bookRow) {
             $valueInFirstCell = $bookRow->getCellAtIndex(0)?->getValue();
             $linesRead++;
@@ -338,27 +347,22 @@ class ImportScripture extends Command
                 $this->info("Sor átugrása: $linesRead. (nem numerikus tartalom)");
                 continue;
             }
-            $dbBookAbbrevToId = $this->getAbbrevToIdFromDb($translation);
-            $bookNumber = $bookRow->getCellAtIndex($this->dbToHeaderColNum[$translationAbbrev]['gepi'])->getValue();
+            $bookOrder = $bookRow->getCellAtIndex($this->dbToHeaderColNum[$translationAbbrev]['gepi'])->getValue();
             $bookAbbrev = $bookRow->getCellAtIndex($this->dbToHeaderColNum[$translationAbbrev]['rov'])->getValue();
-            $this->info("Könyv: $bookNumber, $bookAbbrev");
+            $this->info("{$bookOrder}. könyv: {$bookAbbrev}");
             if ($this->isImportSourceBookAbbrevMissingFromDb($dbBookAbbrevToId, $bookAbbrev)) {
                 $book = $this->bookRepository->getByAbbrev($bookAbbrev, $translation->id); // look up the correct abbreviation
                 if ($book) {
-                    $this->info("Könyv ID az adatbázisban: {$book->id}");
-                    $this->info(1);
-                    $bookNumberToId[$bookNumber] = $book->id;
+                    $bookOrderToIdAndAbbrev[$bookOrder] = [$book->id, $bookAbbrev];
                 } else {
-                    $this->info(2);
                     $badAbbrevs[] = $bookAbbrev;
                 }
             } else if ($bookAbbrev != '-' && $bookAbbrev != '') {
-                $this->info(3);
-                $bookNumberToId[$bookNumber] = $dbBookAbbrevToId[$bookAbbrev];
+                $bookOrderToIdAndAbbrev[$bookOrder] = [$dbBookAbbrevToId[$bookAbbrev], $bookAbbrev];
             }
         }
         $this->checkBadAbbrevs(badAbbrevs: $badAbbrevs);
-        return $bookNumberToId;
+        return $bookOrderToIdAndAbbrev;
     }
 
     private function mapVerseSheetHeadersToDbColumns(array $headers): array
@@ -456,6 +460,17 @@ class ImportScripture extends Command
         }
     }
 
+    private function bookAbbrevToUsxCode(string $bookAbbrev): string
+    {
+        $mapping = UsxCodes::abbreviationToUsxMapping();
+
+        if (!isset($mapping[$bookAbbrev])) {
+            App::abort(500, "Nincs USX kód ehhez a könyvhöz: {$bookAbbrev}");
+        }
+
+        return $mapping[$bookAbbrev];
+    }
+
     private function verifyTranslationAbbrev(string $abbrev): void
     {
         if (!preg_match("/^(" . Config::get('settings.translationAbbrevRegex') . ")$/", $abbrev)) {
@@ -526,5 +541,35 @@ class ImportScripture extends Command
         }
 
         App::abort(500, "A fájl nem Excel Sheet: $originalFilePath ($fileExtension)");
+    }
+
+    private function createProgressBar(): ProgressBar
+    {
+        $progressBar = $this->output->createProgressBar();
+        $progressBar->setRedrawFrequency(25);
+        $progressBar->setBarWidth(24);
+        $progressBar->setFormat("[%bar%] %message%");
+        return $progressBar;
+    }
+
+    private function startHunspell(array $pipes)
+    {
+        return proc_open(
+            'stdbuf -oL hunspell -m -d hu_HU -i UTF-8',
+            $this->descriptorspec,
+            $pipes,
+            null,
+            null
+        );
+    }
+
+    private function closeHunspell($hunspellProcess, array $pipes): void
+    {
+        fclose($pipes[0]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        if (isset($hunspellProcess)) {
+            proc_close($hunspellProcess);
+        }
     }
 }
