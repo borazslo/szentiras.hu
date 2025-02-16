@@ -47,7 +47,7 @@ class CreateEmbeddingVectors extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Create embedding vectors, either to DB, filesystem or S3.';
 
     private string $model;
     private int $dimensions;

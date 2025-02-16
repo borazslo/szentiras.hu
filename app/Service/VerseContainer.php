@@ -29,7 +29,12 @@ class VerseContainer
      */
     public $rawVerses;
 
-    function __construct($book, $bookRef=null)
+    /**
+     * @var VerseData[]
+     */
+    private $parsedVerses;
+
+    function __construct(Book $book, $bookRef=null)
     {
         $this->book = $book;
         $this->rawVerses = [];
@@ -51,6 +56,10 @@ class VerseContainer
      */
     public function getParsedVerses()
     {
+        if (isset($this->parsedVerses)) {
+            return $this->parsedVerses;
+        }
+
         $verseData = [];
         foreach ($this->rawVerses as $gepi => $rawVerses) {
             $parsedVerseData = $this->verseParser->parse($rawVerses, $this->book);
@@ -58,7 +67,9 @@ class VerseContainer
             $parsedVerseData->book = $this->book;
             $verseData[] = $parsedVerseData;
         }
-        return $verseData;
+
+        $this->parsedVerses = $verseData;
+        return $this->parsedVerses;
     }
 
 }

@@ -18,6 +18,7 @@ use SzentirasHu\Data\Repository\BookRepository;
 use SzentirasHu\Data\Repository\TranslationRepository;
 use SzentirasHu\Data\Repository\VerseRepository;
 use SzentirasHu\Data\Repository\ReadingPlanRepository;
+use SzentirasHu\Models\Media;
 use View;
 
 
@@ -117,7 +118,6 @@ class TextDisplayController extends Controller
 
     public function showTranslatedReferenceText($translationAbbrev, $reference, $previousDay = null, $readingPlanDay = null, $nextDay = null)
     {
-        $fullContext = request()->has("fullContext");
         try {
             $translation = $this->translationRepository->getByAbbrev($translationAbbrev ? $translationAbbrev : Config::get('settings.defaultTranslationAbbrev'));
             $canonicalRef = CanonicalReference::fromString($reference, $translation->id);
@@ -152,6 +152,7 @@ class TextDisplayController extends Controller
                     }
                 }
             }
+            $fullContext = request()->has("fullContext");
             if ($fullContext) {
                 // Collect chapter numbers from verse containers
                 $chapterNumbers = [];
@@ -174,11 +175,28 @@ class TextDisplayController extends Controller
                     $highlightedGepis = array_merge($highlightedGepis, array_map(fn($k) => "{$k}", array_keys($verseContainer->rawVerses)));
                 }
             }
+            $mediaEnabled = request()->has("media");
+            if ($mediaEnabled) {
+                $mediaVerses = [];
+                foreach ($verseContainers as $verseContainer) {
+                    foreach ($verseContainer->getParsedVerses() as $verseData) {
+                        $media = Media::where('usx_code', $verseData->book->number)
+                        ->where('chapter', $verseData->chapter)
+                        ->where('verse', $verseData->numv)
+                        ->get();
+                        if (!$media->isEmpty()) {
+                            $mediaVerses["{$verseData->book->number}_{$verseData->chapter}_{$verseData->numv}"] = $media;
+                        }
+                    }
+                }    
+            }
+
             $translations = $this->translationRepository->getAllOrderedByDenom();
             return View::make('textDisplay.verses')->with([
                 'fullChaptersIncluded' => $fullChaptersIncluded,
                 'highlightedGepis' => $highlightedGepis ?? [],
                 'fullContext' => $fullContext,
+                'mediaEnabled' => $mediaEnabled,
                 'previousDay' => $previousDay,
                 'readingPlan' => $readingPlanDay ? $readingPlanDay->plan : null,
                 'readingPlanDay' => $readingPlanDay,
@@ -192,6 +210,7 @@ class TextDisplayController extends Controller
                 'metaTitle' => $this->getTitle($verseContainers, $translation),
                 'teaser' => $this->textService->getTeaser($verseContainers),
                 'chapterLinks' => $chapterLinks,
+                'media' => $mediaVerses ?? [],
                 'translationLinks' => $translations->map(
                     function ($otherTranslation) use ($canonicalRef, $translation) {
                         $allBooksExistInTranslation = true;

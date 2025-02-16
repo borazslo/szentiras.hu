@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use SzentirasHu\Http\Controllers\Ai\AiController;
 use SzentirasHu\Http\Controllers\Auth\AnonymousIdController;
 use SzentirasHu\Http\Controllers\Display\TextDisplayController;
+use SzentirasHu\Http\Controllers\MediaController;
+use SzentirasHu\Models\Media;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,6 +72,8 @@ Route::get('/profile', [AnonymousIdController::class, 'showProfile'])
 Route::get('/logout', [AnonymousIdController::class, 'logout'])
     ->middleware('anonymousId');
 Route::post('/login', [AnonymousIdController::class, 'login']);
+
+Route::get('/media/{uuid}', [MediaController::class, 'show'])->name('media.show');
 
 /** These should come at the end to not collide with other routes! */
 Route::get('/{TRANSLATION_ABBREV}', 'Display\\TextDisplayController@showTranslation')

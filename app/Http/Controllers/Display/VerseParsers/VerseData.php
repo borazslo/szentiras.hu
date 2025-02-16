@@ -4,6 +4,8 @@
  */
 namespace SzentirasHu\Http\Controllers\Display\VerseParsers;
 
+use SzentirasHu\Data\Entity\Book;
+
 /**
  * This class represents all information we have regarding a given bible verse.
  * A given bible verse typically consists of 1 simple text. However, sometimes it contains multiple elements:
@@ -21,7 +23,7 @@ class VerseData
     public $footnotes = [];
     public $simpleText;
     public $gepi;
-    public $book;
+    public Book $book;
     public $poemLines;
 
     /** @var VersePart[] */

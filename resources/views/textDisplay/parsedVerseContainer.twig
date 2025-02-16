@@ -68,4 +68,17 @@
             {%- if versePart.newline %}<br>{% endif -%}
         {%- endif -%}                
     {%- endfor -%}
+    {% set medias = media[verse.book.number ~ "_" ~ verse.chapter ~ "_" ~ verse.numv] %}
+    {% if  medias %}
+        {% for image in medias %}
+            <div class="card">
+                <div class="card-body">
+            <figure class="figure">
+                <img src="/media/{{ image.uuid }}" class="figure-img img-fluid rounded">
+                <figcaption class="figure-caption text-end"><small>Forrás: {{ image.mediaType.website }} ({{ image.mediaType.license }})</small></figcaption>
+            </figure>
+        </div>
+        </div>
+        {% endfor  %}
+    {% endif %}
 {%- endfor -%}
